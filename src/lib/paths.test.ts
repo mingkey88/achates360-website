@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { withBase, mediaUrl } from './paths';
+import { withBase, mediaUrl, backLinkHref } from './paths';
 
 const B = '/achates360-website';
 
@@ -29,5 +29,22 @@ describe('mediaUrl', () => {
   it('resolves a public media path under the base', () => {
     expect(mediaUrl('media/video/abc.mp4', B)).toBe('/achates360-website/media/video/abc.mp4');
     expect(mediaUrl('/cards/angeline.vcf', B)).toBe('/achates360-website/cards/angeline.vcf');
+  });
+});
+
+describe('withBase with a home fragment', () => {
+  it('keeps the fragment on the bare base', () => {
+    expect(withBase('/#all-projects', B)).toBe('/achates360-website#all-projects');
+    expect(withBase('/#all-projects', '/')).toBe('/#all-projects');
+  });
+});
+
+describe('backLinkHref', () => {
+  it('sends the home back link to the All Projects section', () => {
+    expect(backLinkHref('/')).toBe('/#all-projects');
+  });
+  it('leaves other targets alone', () => {
+    expect(backLinkHref('/projects')).toBe('/projects');
+    expect(backLinkHref('https://example.com')).toBe('https://example.com');
   });
 });

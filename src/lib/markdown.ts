@@ -8,5 +8,7 @@ export function renderMd(md: string, base?: string): string {
       if (token.type === 'link') token.href = withBase(token.href, base);
     },
   });
-  return marked.parse(md, { async: false }) as string;
+  // marked treats U+00A0 as whitespace, so a Wix line holding only a no-break space (Wix's blank
+  // line after a hard break) would vanish; as an entity it stays text and renders the same character.
+  return marked.parse(md.replace(/\u00a0/g, '&nbsp;'), { async: false }) as string;
 }

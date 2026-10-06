@@ -21,3 +21,12 @@ describe('renderMd', () => {
     expect(renderMd('**Job Description**  \nThe Account Executive', B)).toBe('<p><strong>Job Description</strong><br>The Account Executive</p>\n');
   });
 });
+
+describe('renderMd and no-break spaces', () => {
+  it('keeps a line holding only a no-break space after a hard break', () => {
+    expect(renderMd('industries.  \n\u00a0', B)).toBe('<p>industries.<br>&nbsp;</p>\n');
+  });
+  it('keeps no-break spaces inside text', () => {
+    expect(renderMd('a\u00a0b', B)).toBe('<p>a&nbsp;b</p>\n');
+  });
+});

@@ -1,18 +1,27 @@
 ---
 import { Image } from 'astro:assets';
 import { renderMd } from '../lib/markdown';
-import { withBase } from '../lib/paths';
-interface Props { blocks: any[] }
-const { blocks } = Astro.props;
+import { withBase, backLinkHref } from '../lib/paths';
+import { isGif } from '../lib/images';
+import BgVideo from './BgVideo.astro';
+import Embed from './Embed.astro';
+import Gallery from './Gallery.astro';
+interface Props { blocks: any[]; gallery?: 'stack' | 'grid' }
+const { blocks, gallery = 'grid' } = Astro.props;
 ---
 {blocks.map((b) => {
   if (b.type === 'text') return <div class="block-text" set:html={renderMd(b.md)} />;
-  if (b.type === 'link') return <p class="block-link"><a href={withBase(b.href)}>{b.label}</a></p>;
+  // The only content link to the home page is Wix's "← BACK TO PROJECTS", whose data-anchor
+  // scrolls home to the All Projects section.
+  if (b.type === 'link') return <p class="block-link"><a href={withBase(backLinkHref(b.href))}>{b.label}</a></p>;
   if (b.type === 'image') {
-    const img = b.src.format === 'gif'
-      ? <img src={b.src.src} width={b.src.width} height={b.src.height} alt={b.alt} loading="lazy" />
+    const img = isGif(b.src)
+      ? <img src={b.src.src} width={b.src.width} height={b.src.height} alt={b.alt} loading="lazy" decoding="async" />
       : <Image src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 980px) 100vw, 980px" />;
     return b.href ? <a class="block-image" href={withBase(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
   }
+  if (b.type === 'gallery') return <Gallery items={b.items} layout={gallery} />;
+  if (b.type === 'video') return <BgVideo src={b.src} poster={b.poster} class="block-video" />;
+  if (b.type === 'embed') return <Embed provider={b.provider} id={b.id} />;
   return null;
 })}

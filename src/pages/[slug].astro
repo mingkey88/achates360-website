@@ -1,0 +1,23 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { assertUniqueSlugs } from '../lib/routes';
+import Project from '../layouts/Project.astro';
+import Basic from '../layouts/Basic.astro';
+
+type Props =
+  | { kind: 'project'; entry: CollectionEntry<'projects'> }
+  | { kind: 'basic'; entry: CollectionEntry<'basic'> };
+
+export async function getStaticPaths() {
+  const [projects, basic] = await Promise.all([getCollection('projects'), getCollection('basic')]);
+  assertUniqueSlugs({ projects: projects.map((e) => e.id), basic: basic.map((e) => e.id) });
+  return [
+    ...projects.map((entry) => ({ params: { slug: entry.id }, props: { kind: 'project' as const, entry } })),
+    ...basic.map((entry) => ({ params: { slug: entry.id }, props: { kind: 'basic' as const, entry } })),
+  ];
+}
+
+const props = Astro.props as Props;
+---
+{props.kind === 'project' && <Project entry={props.entry} />}
+{props.kind === 'basic' && <Basic entry={props.entry} />}

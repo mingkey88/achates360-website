@@ -1,0 +1,22 @@
+---
+import { getImage } from 'astro:assets';
+import { mediaUrl } from '../lib/paths';
+interface Props { src: string; poster: ImageMetadata; class?: string }
+const { src, poster, class: cls } = Astro.props;
+const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
+---
+<div class:list={['bgvideo', cls]}>
+  <video src={mediaUrl(src)} poster={posterUrl} autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+</div>
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const apply = () => document.querySelectorAll<HTMLVideoElement>('.bgvideo video').forEach((v) => {
+    if (reduce.matches) { v.pause(); v.removeAttribute('autoplay'); } else { v.play().catch(() => {}); }
+  });
+  apply();
+  reduce.addEventListener('change', apply);
+</script>
+<style>
+  .bgvideo { position: relative; overflow: hidden; }
+  .bgvideo video { display: block; width: 100%; height: 100%; object-fit: cover; }
+</style>
