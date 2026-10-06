@@ -4,7 +4,8 @@ import { htmlToMarkdown } from './clean.mjs';
 export const CARD_SLUGS = ['angeline', 'joseph-chan', 'donna', 'belinda', 'chuan', 'abby'];
 export const BASIC_SLUGS = ['about', 'joinus'];
 const BACK = /BACK TO PROJECTS/;
-const COPYRIGHT = /^©\s*\d{4}$/;
+// A year or a year range, kept verbatim: "© 2018", "© 2021 - 2022", "© 2021-2022".
+const COPYRIGHT = /^©\s*\d{4}(\s*[-–]\s*\d{4})?$/;
 
 export class MappingError extends Error {}
 
@@ -127,13 +128,20 @@ export function toCard(raw) {
   // A text made only of its links is carried verbatim by `links`.
   const squash = (t) => t.replace(/[\s\u200b]/g, '');
   const linkOnly = (n) => n.kind === 'text' && n.links.length > 0 && squash(n.text) === squash(n.links.map((l) => l.text).join(''));
-  const used = new Set([texts[0], texts[1], texts.at(-1), phoneNode, emailNode, images[0], images.at(-1)]);
+  // Cards place the role before or after the blurb (chuan vs angeline), so only the name is
+  // positional: the two texts that are not name, phone, email or link-only are the blurb and
+  // the role, the blurb being the longer. Any other count is not this layout.
+  const name = texts[0];
+  const free = texts.filter((n) => n !== name && n !== phoneNode && n !== emailNode && !linkOnly(n) && !isSpacer(n));
+  if (free.length !== 2) throw new MappingError(unmapped(raw.slug, free));
+  const [blurb, role] = free[0].text.length >= free[1].text.length ? free : [free[1], free[0]];
+  const used = new Set([name, blurb, role, phoneNode, emailNode, images[0], images.at(-1)]);
   const unused = raw.nodes.filter((n) => !used.has(n) && n.kind !== 'link' && !linkOnly(n) && !isSpacer(n));
   if (unused.length) throw new MappingError(unmapped(raw.slug, unused));
   return {
-    name: texts[0].text,
-    blurb: texts[1].text,
-    role: texts.at(-1).text,
+    name: name.text,
+    blurb: blurb.text,
+    role: role.text,
     qr: image(images[0]),
     photo: image(images.at(-1)),
     links,

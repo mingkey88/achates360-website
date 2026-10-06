@@ -5,3 +5,4 @@ dist/
 source-media/
 .env
 .cache/
+docs/reference/*/

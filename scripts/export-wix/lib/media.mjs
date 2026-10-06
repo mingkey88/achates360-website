@@ -1,5 +1,6 @@
-import { mkdir, stat, writeFile, copyFile, readdir, readFile } from 'node:fs/promises';
-import { join, dirname, extname } from 'node:path';
+import { mkdir, stat, writeFile, copyFile, readdir, readFile, rename } from 'node:fs/promises';
+import { join, dirname, extname, basename } from 'node:path';
+import sharp from 'sharp';
 import { execFileSync } from 'node:child_process';
 import { originalImageUrl, localName, videoFileUrl, bestQuality } from './urls.mjs';
 
@@ -50,10 +51,38 @@ async function findSource(root, sourceMedia, videoId) {
   return name ? join(dir, name) : null;
 }
 
+// Ruling 15: committed images are capped at 2560 px wide; untouched originals stay in the
+// git-ignored cache. Wider images are resized in their own format at high quality; narrower
+// images, GIFs and formats sharp cannot re-encode here are copied byte for byte.
+export const MAX_WIDTH = 2560;
+export const ORIGINALS = '.cache/originals/wix';
+const ENCODE = {
+  jpeg: (img) => img.jpeg({ quality: 90, mozjpeg: true }),
+  png: (img) => img.png({ compressionLevel: 9, palette: false }),
+  webp: (img) => img.webp({ quality: 90 }),
+};
+
+async function writeAtomic(dest, data) {
+  const tmp = `${dest}.tmp-${process.pid}`;
+  await writeFile(tmp, data);
+  await rename(tmp, dest);
+}
+
+async function deriveImage(original, dest) {
+  const { format, width } = await sharp(original).metadata();
+  if (width > MAX_WIDTH && ENCODE[format]) {
+    const img = sharp(original).keepMetadata().resize({ width: MAX_WIDTH, withoutEnlargement: true });
+    await writeAtomic(dest, await ENCODE[format](img).toBuffer());
+    return 'resized';
+  }
+  await writeAtomic(dest, await readFile(original));
+  return 'copied';
+}
+
 const hasFfmpeg = () => { try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); return true; } catch { return false; } };
 
 export async function runJobs(jobs, { root = process.cwd(), fetchImpl = fetch, sourceMedia, log = console.log, concurrency = 4 } = {}) {
-  const result = { downloaded: 0, skipped: 0, failed: [] };
+  const result = { downloaded: 0, skipped: 0, derived: 0, failed: [] };
   const queue = [...jobs];
 
   async function one(job) {
@@ -76,19 +105,35 @@ export async function runJobs(jobs, { root = process.cwd(), fetchImpl = fetch, s
       }
     }
 
-    const existing = await size(dest);
+    // Images download to the originals cache and are then derived into dest; other kinds
+    // download straight to dest.
+    const target = job.kind === 'image' ? join(root, ORIGINALS, basename(job.dest)) : dest;
+    await mkdir(dirname(target), { recursive: true });
+    let fetched = true;
+    const existing = await size(target);
     if (existing > 0) {
       // Skip only on a positive size match; a HEAD that fails or gives no length means re-download.
       let head = null;
       try { head = await fetchImpl(job.url, { method: 'HEAD' }); } catch { /* fall through to GET */ }
       const len = Number(head?.headers.get('content-length'));
-      if (head?.ok && len > 0 && len === existing) { result.skipped++; return; }
+      if (head?.ok && len > 0 && len === existing) fetched = false;
     }
-    const res = await fetchImpl(job.url);
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${job.url}`);
-    await writeFile(dest, Buffer.from(await res.arrayBuffer()));
-    log(`download  ${job.dest}`);
-    result.downloaded++;
+    if (fetched) {
+      const res = await fetchImpl(job.url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${job.url}`);
+      await writeAtomic(target, Buffer.from(await res.arrayBuffer()));
+      log(`download  ${job.kind === 'image' ? join(ORIGINALS, basename(job.dest)) : job.dest}`);
+      result.downloaded++;
+    } else {
+      result.skipped++;
+    }
+    if (job.kind === 'image') {
+      const [origTime, destTime] = await Promise.all([mtime(target), mtime(dest)]);
+      if (destTime >= origTime) return; // committed copy already made from this original
+      const how = await deriveImage(target, dest);
+      log(`${how.padEnd(8)}  ${job.dest}`);
+      result.derived++;
+    }
   }
 
   async function worker() {
@@ -127,11 +172,14 @@ export async function mediaReport(root) {
     byExt[ext].count++; byExt[ext].bytes += f.size;
   }
   const total = files.reduce((s, f) => s + f.size, 0);
+  const originals = await listFiles(join(root, '.cache/originals'));
+  const origTotal = originals.reduce((s, f) => s + f.size, 0);
   const largest = [...files].sort((a, b) => b.size - a.size).slice(0, 20);
   const over = total > 800 * 1024 * 1024 || files.some((f) => f.size > 95 * 1024 * 1024);
   return [
     '# Media report', '',
-    `Total source media: **${mb(total)}** in ${files.length} files.`, '',
+    `Total committed media: **${mb(total)}** in ${files.length} files.`, '',
+    `Untouched originals in .cache/originals (not committed): ${mb(origTotal)} in ${originals.length} files.`, '',
     over ? '> **THRESHOLD EXCEEDED** — stop and ask the user about media hosting (spec §5.5).' : '> Within GitHub Pages limits (800 MB total, 95 MB per file).', '',
     '| Type | Files | Size |', '|---|---|---|',
     ...Object.entries(byExt).sort((a, b) => b[1].bytes - a[1].bytes).map(([e, v]) => `| ${e} | ${v.count} | ${mb(v.bytes)} |`), '',

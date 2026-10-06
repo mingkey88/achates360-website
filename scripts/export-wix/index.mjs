@@ -64,6 +64,8 @@ async function rendered(slug) {
 // 3. Extract, then follow internal links not in the sitemap (one level)
 const raws = new Map();
 const skipped = new Set(); // linked pages not cloned (404, password, render failure)
+const missing = new Map(); // slug -> reason, for linked pages Wix serves without content
+const linkers = new Map(); // non-sitemap slug -> pages linking to it
 const queue = paths.map(slugOf).filter((s) => !only || only.includes(s));
 while (queue.length) {
   const slug = queue.shift();
@@ -81,29 +83,36 @@ while (queue.length) {
   if (!raw.nodes.length) {
     // A linked page Wix serves without content (deleted → 404, or password-protected) is not
     // cloned: it would become an empty public page. A sitemap page is always kept.
-    const why = /^404\b/.test(raw.seo.title) ? 'Wix serves a 404 page'
-      : page.html.includes('type="password"') ? 'Wix serves it behind a password'
-      : 'Wix serves it with no content';
+    const reason = /^404\b/.test(raw.seo.title) ? '404'
+      : page.html.includes('type="password"') ? 'password-protected'
+      : 'no-content';
     if (!paths.includes(slug === 'home' ? '/' : `/${slug}`)) {
-      const from = log.find((e) => e.page === slug && e.message.startsWith('linked from'));
-      if (from) log.splice(log.indexOf(from), 1);
-      log.push({ level: 'query', page: slug, message: `${from ? from.message.split(' but ')[0] : 'linked'}, but ${why} — not cloned` });
+      missing.set(slug, reason);
       skipped.add(slug);
       continue;
     }
-    log.push({ level: 'warning', page: slug, message: `${why} — exported with no content` });
+    log.push({ level: 'warning', page: slug, message: `Wix serves it with no content (${reason}) — exported with no content` });
   }
   raws.set(slug, raw);
   if (only) continue;
   const linked = [...raw.nodes, ...raw.footer].flatMap((n) => [
     n.href, ...(n.links ?? []).map((l) => l.href), ...(n.items ?? []).map((i) => i.href)]);
   for (const href of linked) {
-    if (!href?.startsWith('/') || href.includes('#') || href.startsWith('/_files')) continue;
+    if (!href?.startsWith('/') || href.includes('#') || href.startsWith('/_files') || paths.includes(href)) continue;
     const s = slugOf(href);
-    if (!raws.has(s) && !skipped.has(s) && !queue.includes(s) && !paths.includes(href)) {
-      log.push({ level: 'info', page: s, message: `linked from ${slug} but missing from sitemap — exported` });
-      queue.push(s);
-    }
+    if (!linkers.has(s)) linkers.set(s, []);
+    if (!linkers.get(s).includes(slug)) linkers.get(s).push(slug);
+    if (!raws.has(s) && !skipped.has(s) && !queue.includes(s)) queue.push(s);
+  }
+}
+const WHY = { '404': 'Wix serves a 404 page', 'password-protected': 'Wix serves it behind a password', 'no-content': 'Wix serves it with no content' };
+const knownMissing = [];
+for (const [slug, from] of linkers) {
+  const by = `linked from ${from.join(', ')}`;
+  if (raws.has(slug)) log.push({ level: 'info', page: slug, message: `${by} but missing from sitemap — exported` });
+  else if (missing.has(slug)) {
+    log.push({ level: 'query', page: slug, message: `${by}, but ${WHY[missing.get(slug)]} — not cloned` });
+    knownMissing.push({ path: `/${slug}`, reason: missing.get(slug), linkedFrom: from });
   }
 }
 await browser.close();
@@ -170,14 +179,22 @@ const cards = records.filter((r) => r.collection === 'cards').map((r) => {
 });
 const jobs = collectMedia([...raws.values()], cards);
 const res = await runJobs(jobs, { root, sourceMedia: 'source-media' });
-console.log(`media: ${res.downloaded} downloaded, ${res.skipped} unchanged, ${res.failed.length} failed`);
+console.log(`media: ${res.downloaded} downloaded, ${res.skipped} unchanged, ${res.derived} derived, ${res.failed.length} failed`);
 for (const f of res.failed) log.push({ level: 'warning', page: 'media', message: `${f.url}: ${f.error}` });
 
-// 9. Reports
-await mkdir('docs', { recursive: true });
-await writeFile('docs/media-report.md', await mediaReport(root));
-await writeFile('docs/export-log.md', exportLog(log));
-console.log('wrote docs/media-report.md and docs/export-log.md');
+// 9. Reports. A --only run sees part of the site, so its reports go to the cache and never
+// replace the committed full-run reports.
+const reportDir = only ? '.cache' : 'docs';
+const suffix = only ? '.only' : '';
+await mkdir(reportDir, { recursive: true });
+await writeFile(`${reportDir}/media-report${suffix}.md`, await mediaReport(root));
+await writeFile(`${reportDir}/export-log${suffix}.md`, exportLog(log));
+console.log(`wrote ${reportDir}/media-report${suffix}.md and ${reportDir}/export-log${suffix}.md`);
+if (!only) {
+  knownMissing.sort((a, b) => a.path.localeCompare(b.path));
+  await writeFile('scripts/export-wix/known-missing.json', JSON.stringify(knownMissing, null, 2) + '\n');
+  console.log(`wrote scripts/export-wix/known-missing.json (${knownMissing.length} pages)`);
+}
 const counts = ['query', 'warning', 'info'].map((l) => `${log.filter((e) => e.level === l).length} ${l}`).join(', ');
 console.log(`log: ${counts}`);
 if (renderFailed.length) {

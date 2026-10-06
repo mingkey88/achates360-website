@@ -234,3 +234,28 @@ describe('R13: mappers never discard content silently', () => {
     expect(mapProjectsIndex({ ...projects, nodes }).data.sections).toHaveLength(9);
   });
 });
+
+describe('Ruling 17: mapper gaps found by the full export', () => {
+  const withCopyright = (r, text) => ({ ...r, nodes: r.nodes.map((n) => (n.kind === 'text' && /^©/.test(n.text)
+    ? { ...n, text, html: `<p>${text}</p>` } : n)) });
+
+  it('accepts a copyright year range verbatim, with or without spaces around the dash', () => {
+    for (const text of ['© 2021 - 2022', '© 2021-2022']) {
+      const changed = withCopyright(dbs, text);
+      expect(toProject(changed).copyright).toBe(text);
+      const r = mapPage(changed);
+      expect(r.collection).toBe('projects');
+      expect(r.warnings).toEqual([]);
+    }
+  });
+
+  it('maps a card whose role comes before the blurb (chuan layout)', () => {
+    const role = angeline.nodes.find((n) => n.kind === 'text' && n.text === 'Managing Director');
+    const rest = angeline.nodes.filter((n) => n !== role);
+    const reordered = { ...angeline, nodes: [rest[0], role, ...rest.slice(1)] };
+    const r = mapPage(reordered);
+    expect(r.collection).toBe('cards');
+    expect(r.warnings).toEqual([]);
+    expect(r.data).toEqual(toCard(angeline));
+  });
+});

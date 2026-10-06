@@ -1,8 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mkdtemp, writeFile, mkdir, readFile } from 'node:fs/promises';
+import sharp from 'sharp';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { collectMedia, runJobs } from './media.mjs';
+import { collectMedia, runJobs, mediaReport } from './media.mjs';
+
+// A small real PNG, so derived images can be decoded.
+const png = (width, height = 10) => sharp({ create: { width, height, channels: 3, background: '#c33' } }).png().toBuffer();
+const ORIG = '.cache/originals/wix';
 
 const fakeRaw = {
   slug: 'x', seo: { ogImage: 'og~mv2.png' },
@@ -42,24 +47,57 @@ describe('collectMedia', () => {
 });
 
 describe('runJobs', () => {
-  it('skips files that already exist with the same size, downloads the rest', async () => {
+  it('skips cached originals that already exist with the same size, downloads the rest', async () => {
     const root = await mkdtemp(join(tmpdir(), 'a360-'));
-    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
-    await writeFile(join(root, 'src/assets/wix/a.jpg'), 'abc');
+    const a = await png(20);
+    const b = await png(30);
+    await mkdir(join(root, ORIG), { recursive: true });
+    await writeFile(join(root, ORIG, 'a.png'), a);
     const calls = [];
     const fetchImpl = async (url, opts = {}) => {
       calls.push([opts.method ?? 'GET', url]);
-      return new Response(opts.method === 'HEAD' ? null : 'hello', { status: 200, headers: { 'content-length': url.endsWith('a~mv2.jpg') ? '3' : '5' } });
+      return new Response(opts.method === 'HEAD' ? null : b, { status: 200, headers: { 'content-length': String(url.endsWith('a~mv2.png') ? a.length : b.length) } });
     };
     const jobs = [
-      { kind: 'image', url: 'https://static.wixstatic.com/media/a~mv2.jpg', dest: 'src/assets/wix/a.jpg' },
-      { kind: 'image', url: 'https://static.wixstatic.com/media/b~mv2.jpg', dest: 'src/assets/wix/b.jpg' },
+      { kind: 'image', url: 'https://static.wixstatic.com/media/a~mv2.png', dest: 'src/assets/wix/a.png' },
+      { kind: 'image', url: 'https://static.wixstatic.com/media/b~mv2.png', dest: 'src/assets/wix/b.png' },
     ];
     const res = await runJobs(jobs, { root, fetchImpl, log: () => {} });
-    expect(res.skipped).toBe(1);
-    expect(res.downloaded).toBe(1);
-    expect(await readFile(join(root, 'src/assets/wix/b.jpg'), 'utf8')).toBe('hello');
-    expect(calls.filter(([m]) => m === 'GET').map(([, u]) => u)).toEqual(['https://static.wixstatic.com/media/b~mv2.jpg']);
+    expect(res).toMatchObject({ skipped: 1, downloaded: 1, derived: 2, failed: [] });
+    expect(await readFile(join(root, ORIG, 'b.png'))).toEqual(b);
+    expect(await readFile(join(root, 'src/assets/wix/a.png'))).toEqual(a);
+    expect(await readFile(join(root, 'src/assets/wix/b.png'))).toEqual(b);
+    expect(calls.filter(([m]) => m === 'GET').map(([, u]) => u)).toEqual(['https://static.wixstatic.com/media/b~mv2.png']);
+  });
+
+  it('caps images wider than 2560 px, keeping aspect and format; copies smaller ones byte for byte; a second run skips', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    const wide = await png(3000, 1500);
+    const small = await png(100, 50);
+    const bodies = { 'wide.png': wide, 'small.png': small };
+    const fetchImpl = async (url, opts = {}) => {
+      const body = bodies[url.split('/').pop()];
+      return new Response(opts.method === 'HEAD' ? null : body, { status: 200, headers: { 'content-length': String(body.length) } });
+    };
+    const jobs = Object.keys(bodies).map((f) => ({ kind: 'image', url: `https://x/${f}`, dest: `src/assets/wix/${f}` }));
+    const opts = { root, fetchImpl, log: () => {} };
+    expect(await runJobs(jobs, opts)).toMatchObject({ downloaded: 2, derived: 2, skipped: 0, failed: [] });
+    const capped = await sharp(join(root, 'src/assets/wix/wide.png')).metadata();
+    expect([capped.format, capped.width, capped.height]).toEqual(['png', 2560, 1280]);
+    expect(await readFile(join(root, ORIG, 'wide.png'))).toEqual(wide);
+    expect(await readFile(join(root, 'src/assets/wix/small.png'))).toEqual(small);
+    expect(await runJobs(jobs, opts)).toMatchObject({ downloaded: 0, derived: 0, skipped: 2, failed: [] });
+  });
+
+  it('re-derives when the committed copy is missing even though the original is cached', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    const body = await png(40);
+    await mkdir(join(root, ORIG), { recursive: true });
+    await writeFile(join(root, ORIG, 'c.png'), body);
+    const fetchImpl = async () => new Response(null, { status: 200, headers: { 'content-length': String(body.length) } });
+    const res = await runJobs([{ kind: 'image', url: 'https://x/c.png', dest: 'src/assets/wix/c.png' }], { root, fetchImpl, log: () => {} });
+    expect(res).toMatchObject({ downloaded: 0, skipped: 1, derived: 1 });
+    expect(await readFile(join(root, 'src/assets/wix/c.png'))).toEqual(body);
   });
 
   it('uses a source-media original for a matching video id instead of downloading', async () => {
@@ -86,23 +124,25 @@ describe('runJobs', () => {
 
   it('falls through to GET when HEAD throws', async () => {
     const root = await mkdtemp(join(tmpdir(), 'a360-'));
-    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
-    await writeFile(join(root, 'src/assets/wix/a.jpg'), 'abc');
+    const body = await png(20);
+    await mkdir(join(root, ORIG), { recursive: true });
+    await writeFile(join(root, ORIG, 'a.png'), 'abc');
     const fetchImpl = async (url, opts = {}) => {
       if (opts.method === 'HEAD') throw new Error('HEAD not allowed');
-      return new Response('hello', { status: 200 });
+      return new Response(body, { status: 200 });
     };
-    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.jpg', dest: 'src/assets/wix/a.jpg' }], { root, fetchImpl, log: () => {} });
+    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.png', dest: 'src/assets/wix/a.png' }], { root, fetchImpl, log: () => {} });
     expect(res).toMatchObject({ downloaded: 1, skipped: 0, failed: [] });
-    expect(await readFile(join(root, 'src/assets/wix/a.jpg'), 'utf8')).toBe('hello');
+    expect(await readFile(join(root, 'src/assets/wix/a.png'))).toEqual(body);
   });
 
   it('re-downloads an existing file when HEAD gives no content-length', async () => {
     const root = await mkdtemp(join(tmpdir(), 'a360-'));
-    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
-    await writeFile(join(root, 'src/assets/wix/a.jpg'), 'abc');
-    const fetchImpl = async (url, opts = {}) => new Response(opts.method === 'HEAD' ? null : 'hello', { status: 200 });
-    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.jpg', dest: 'src/assets/wix/a.jpg' }], { root, fetchImpl, log: () => {} });
+    const body = await png(20);
+    await mkdir(join(root, ORIG), { recursive: true });
+    await writeFile(join(root, ORIG, 'a.png'), 'abc');
+    const fetchImpl = async (url, opts = {}) => new Response(opts.method === 'HEAD' ? null : body, { status: 200 });
+    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.png', dest: 'src/assets/wix/a.png' }], { root, fetchImpl, log: () => {} });
     expect(res).toMatchObject({ downloaded: 1, skipped: 0 });
   });
 
@@ -112,5 +152,19 @@ describe('runJobs', () => {
     const res = await runJobs([{ kind: 'image', url: 'https://x/y.jpg', dest: 'src/assets/wix/y.jpg' }], { root, fetchImpl, log: () => {} });
     expect(res.failed).toHaveLength(1);
     expect(res.failed[0].error).toMatch(/403/);
+  });
+});
+
+describe('mediaReport', () => {
+  it('measures the committed media and notes the size of the cached originals', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
+    await mkdir(join(root, ORIG), { recursive: true });
+    await writeFile(join(root, 'src/assets/wix/a.png'), Buffer.alloc(1024 * 1024));
+    await writeFile(join(root, ORIG, 'a.png'), Buffer.alloc(3 * 1024 * 1024));
+    const md = await mediaReport(root);
+    expect(md).toContain('Total committed media: **1.0 MB** in 1 files.');
+    expect(md).toContain('Untouched originals in .cache/originals (not committed): 3.0 MB in 1 files.');
+    expect(md).toContain('Within GitHub Pages limits');
   });
 });
