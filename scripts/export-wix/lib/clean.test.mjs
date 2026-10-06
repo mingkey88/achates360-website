@@ -18,9 +18,9 @@ describe('isSpacer', () => {
 describe('htmlToMarkdown', () => {
   it('keeps headings, paragraphs and copy verbatim', () => {
     const html = '<h2 class="font_2"><span>DBS Discretionary Portfolio Management</span></h2>'
-      + '<p class="font_8"><span>In today\'s volatile world: even the savviest investor…</span></p>';
+      + '<p class="font_8"><span>In today’s volatile world: even the savviest investor…</span></p>';
     expect(htmlToMarkdown(html)).toBe(
-      '## DBS Discretionary Portfolio Management\n\nIn today\'s volatile world: even the savviest investor…');
+      '## DBS Discretionary Portfolio Management\n\nIn today’s volatile world: even the savviest investor…');
   });
 
   it('drops spacer paragraphs between content', () => {
@@ -47,5 +47,22 @@ describe('htmlToMarkdown', () => {
     const md = htmlToMarkdown(html);
     expect(md).toContain('#05-02');
     expect(md.replace(/\\/g, '')).toBe('1 Irving Place, #05-02\n\nSelection 2* Required');
+  });
+
+  it('preserves media-only paragraphs (linked images, iframes, videos, svgs)', () => {
+    const html = '<p><a href="https://www.achates360.com/a"><img src="x.jpg"></a></p><p>t</p>';
+    const md = htmlToMarkdown(html);
+    expect(md).toContain('/a');
+    expect(md).toContain('t');
+  });
+
+  it('avoids doubled bold from nested strong/b ancestors', () => {
+    const html = '<p><strong><span style="font-weight:bold">Both</span></strong></p>';
+    expect(htmlToMarkdown(html)).toBe('**Both**');
+  });
+
+  it('avoids doubled bold from nested bold-styled span ancestors', () => {
+    const html = '<p><span style="font-weight:bold"><span style="font-weight:bold">X</span></span></p>';
+    expect(htmlToMarkdown(html)).toBe('**X**');
   });
 });

@@ -13,7 +13,23 @@ export function isSpacer(text) {
 const td = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-', emDelimiter: '*', br: '  ' });
 
 td.addRule('boldSpan', {
-  filter: (node) => node.nodeName === 'SPAN' && /font-weight:\s*(bold|[6-9]00)/.test(node.getAttribute('style') || ''),
+  filter: (node) => {
+    if (node.nodeName !== 'SPAN' || !/font-weight:\s*(bold|[6-9]00)/.test(node.getAttribute('style') || '')) {
+      return false;
+    }
+    // Check for bold ancestors: strong, b, or bold-styled span
+    let parent = node.parentNode;
+    while (parent) {
+      if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') {
+        return false;
+      }
+      if (parent.nodeName === 'SPAN' && /font-weight:\s*(bold|[6-9]00)/.test(parent.getAttribute('style') || '')) {
+        return false;
+      }
+      parent = parent.parentNode;
+    }
+    return true;
+  },
   replacement: (content) => (content.trim() ? `**${content}**` : content),
 });
 
@@ -25,7 +41,15 @@ td.addRule('normalisedLinks', {
 export function htmlToMarkdown(html) {
   const $ = cheerio.load(`<div id="root">${html}</div>`, null, false);
   $('#root p, #root h1, #root h2, #root h3, #root h4, #root h5, #root h6').each((_, el) => {
-    if (isSpacer($(el).text())) $(el).remove();
+    if (isSpacer($(el).text())) {
+      // Only remove if no media/link descendants
+      const $el = $(el);
+      const hasMedia = $el.find('img, iframe, video, svg').length > 0;
+      const hasLink = $el.find('a[href]').length > 0;
+      if (!hasMedia && !hasLink) {
+        $el.remove();
+      }
+    }
   });
   return td.turndown($('#root').html() ?? '').trim();
 }
