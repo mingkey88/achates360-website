@@ -33,6 +33,26 @@ td.addRule('boldSpan', {
   replacement: (content) => (content.trim() ? `**${content}**` : content),
 });
 
+// Wix marks italic copy with a styled span (e.g. the closing paragraph of /the-brooks-clown).
+const ITALIC = /font-style:\s*italic/;
+td.addRule('italicSpan', {
+  filter: (node) => {
+    if (node.nodeName !== 'SPAN' || !ITALIC.test(node.getAttribute('style') || '')) return false;
+    // An italic ancestor (em, i or another italic span) already emits the delimiters.
+    for (let p = node.parentNode; p; p = p.parentNode) {
+      if (p.nodeName === 'EM' || p.nodeName === 'I') return false;
+      if (p.nodeName === 'SPAN' && ITALIC.test(p.getAttribute('style') || '')) return false;
+    }
+    return true;
+  },
+  // Delimiters hug the text: Markdown does not open emphasis before a space.
+  replacement: (content) => {
+    if (!content.trim()) return content;
+    const [, lead, body, trail] = content.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return `${lead}*${body}*${trail}`;
+  },
+});
+
 td.addRule('normalisedLinks', {
   filter: (node) => node.nodeName === 'A' && node.getAttribute('href'),
   replacement: (content, node) => `[${content}](${normalizeHref(node.getAttribute('href'))})`,

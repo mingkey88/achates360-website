@@ -56,6 +56,18 @@ describe('htmlToMarkdown', () => {
     expect(md).toContain('t');
   });
 
+  it('maps italic spans to emphasis (the closing paragraph of /the-brooks-clown)', () => {
+    const html = '<p class="font_8" style="font-size:15px;"><span style="font-style:italic;" class="wixui-rich-text__text">Hear from Marc (Hatoff) about Singapore’s landmark, Haw Par Villa.</span></p>';
+    expect(htmlToMarkdown(html)).toBe('*Hear from Marc (Hatoff) about Singapore’s landmark, Haw Par Villa.*');
+  });
+  it('keeps spaces outside the emphasis and leaves upright text alone', () => {
+    expect(htmlToMarkdown('<p>Read <span style="font-style: italic"> this </span>now <span style="font-style:normal">plain</span></p>'))
+      .toBe('Read *this* now plain');
+  });
+  it('avoids doubled emphasis from italic ancestors', () => {
+    expect(htmlToMarkdown('<p><em><span style="font-style:italic">X</span></em></p>')).toBe('*X*');
+    expect(htmlToMarkdown('<p><span style="font-style:italic"><span style="font-style:italic">Y</span></span></p>')).toBe('*Y*');
+  });
   it('avoids doubled bold from nested strong/b ancestors', () => {
     const html = '<p><strong><span style="font-weight:bold">Both</span></strong></p>';
     expect(htmlToMarkdown(html)).toBe('**Both**');

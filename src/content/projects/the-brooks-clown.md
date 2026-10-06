@@ -81,7 +81,7 @@ blocks:
 
       Led by Gramblanc’s impetuousness, Hatoff’s gluttony, and some mythical creatures, the pair begin their whimsical adventure through Singapore’s local landmarks and familiar heartlands – from Raffles Place MRT, Bishan Park, to Teck Ghee Court Market & Food Centre and more. Some locales even served as part of their storyline, for example, Hatoff’s frightening and immersive experience at Haw Par Villa’s Ten Courts of Hell. After a colourful adventure, did Hatoff and Gramblanc make it to the meeting? Or did a twist of fate bring them elsewhere?
 
-      Hear from Marc (Hatoff) about their adventures at Singapore’s landmark, Haw Par Villa, and prepare for entry into the Ten Courts of Hell (featured at The Brook’s Clown exhibition at Level 9 of the Singapore National Library from now until 30 Nov ’19).
+      *Hear from Marc (Hatoff) about their adventures at Singapore’s landmark, Haw Par Villa, and prepare for entry into the Ten Courts of Hell (featured at The Brook’s Clown exhibition at Level 9 of the Singapore National Library from now until 30 Nov ’19).*
     box:
       x: 246
       y: 2144
