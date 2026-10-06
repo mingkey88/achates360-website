@@ -331,13 +331,13 @@
       "sample": "Artisan Super Food"
     },
     "backLink": {
-      "fontFamily": "Arial, Helvetica, sans-serif",
-      "fontSize": "10px",
+      "fontFamily": "avenir-lt-w01_35-light1475496, sans-serif",
+      "fontSize": "14px",
       "fontWeight": "400",
-      "lineHeight": "normal",
+      "lineHeight": "19.6px",
       "letterSpacing": "normal",
-      "color": "rgb(0, 0, 238)",
-      "backgroundColor": "rgba(242, 242, 242, 0)",
+      "color": "rgb(47, 46, 46)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
       "textTransform": "none",
       "borderRadius": "0px",
       "borderColor": "rgb(47, 46, 46)",
@@ -345,7 +345,7 @@
       "padding": "0px",
       "fill": "rgb(0, 0, 0)",
       "stroke": "none",
-      "sampledTag": "a",
+      "sampledTag": "span",
       "sample": "← BACK TO PROJECTS"
     },
     "footerText": {
@@ -517,21 +517,21 @@
       "sample": "We are an integrated creative agency pro"
     },
     "backLink": {
-      "fontFamily": "Arial, Helvetica, sans-serif",
-      "fontSize": "10px",
+      "fontFamily": "avenir-lt-w01_35-light1475496, sans-serif",
+      "fontSize": "14px",
       "fontWeight": "400",
-      "lineHeight": "normal",
+      "lineHeight": "19.6px",
       "letterSpacing": "normal",
-      "color": "rgb(0, 0, 238)",
-      "backgroundColor": "rgba(242, 242, 242, 0)",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
       "textTransform": "none",
       "borderRadius": "0px",
-      "borderColor": "rgb(47, 46, 46)",
+      "borderColor": "rgb(255, 255, 255)",
       "borderWidth": "0px",
       "padding": "0px",
       "fill": "rgb(0, 0, 0)",
       "stroke": "none",
-      "sampledTag": "a",
+      "sampledTag": "span",
       "sample": "← BACK TO PROJECTS"
     },
     "footerText": {
@@ -922,13 +922,13 @@
       "sample": "Artisan Super Food"
     },
     "backLink": {
-      "fontFamily": "Arial, Helvetica, sans-serif",
-      "fontSize": "10px",
+      "fontFamily": "avenir-lt-w01_35-light1475496, sans-serif",
+      "fontSize": "13.6054px",
       "fontWeight": "400",
-      "lineHeight": "normal",
+      "lineHeight": "19.0476px",
       "letterSpacing": "normal",
-      "color": "rgb(0, 0, 238)",
-      "backgroundColor": "rgba(242, 242, 242, 0)",
+      "color": "rgb(47, 46, 46)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
       "textTransform": "none",
       "borderRadius": "0px",
       "borderColor": "rgb(47, 46, 46)",
@@ -936,7 +936,7 @@
       "padding": "0px",
       "fill": "rgb(0, 0, 0)",
       "stroke": "none",
-      "sampledTag": "a",
+      "sampledTag": "span",
       "sample": "← BACK TO PROJECTS"
     },
     "footerText": {
@@ -1108,21 +1108,21 @@
       "sample": "We are an integrated creative agency pro"
     },
     "backLink": {
-      "fontFamily": "Arial, Helvetica, sans-serif",
-      "fontSize": "10px",
+      "fontFamily": "avenir-lt-w01_35-light1475496, sans-serif",
+      "fontSize": "13.6054px",
       "fontWeight": "400",
-      "lineHeight": "normal",
+      "lineHeight": "19.0476px",
       "letterSpacing": "normal",
-      "color": "rgb(0, 0, 238)",
-      "backgroundColor": "rgba(242, 242, 242, 0)",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
       "textTransform": "none",
       "borderRadius": "0px",
-      "borderColor": "rgb(47, 46, 46)",
+      "borderColor": "rgb(255, 255, 255)",
       "borderWidth": "0px",
       "padding": "0px",
       "fill": "rgb(0, 0, 0)",
       "stroke": "none",
-      "sampledTag": "a",
+      "sampledTag": "span",
       "sample": "← BACK TO PROJECTS"
     },
     "footerText": {

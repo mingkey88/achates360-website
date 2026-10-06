@@ -11,7 +11,7 @@ const ROLES = {
   projectClient: { sel: `${RT} h6, ${RT} p` },
   projectBody: { sel: `${RT} p` },
   smallHeading: { sel: `${RT} h5` },
-  backLink: { sel: '#PAGES_CONTAINER a', text: 'BACK TO PROJECTS', leaf: false },
+  backLink: { sel: '#PAGES_CONTAINER a', text: 'BACK TO PROJECTS', deepText: true },
   footerText: { sel: '#SITE_FOOTER [data-testid="richTextElement"] p' },
   footerHeading: { sel: '#SITE_FOOTER [data-testid="richTextElement"] h5, #SITE_FOOTER [data-testid="richTextElement"] h6' },
   formLabel: { sel: 'form label' },
@@ -51,7 +51,6 @@ for (const [label, ctxOpts] of [['desktop', { viewport: { width: 1440, height: 9
             return visible(e) && (spec.noText || t) && (!re || re.test(t));
           });
           if (!el) continue;
-          const text = (el.textContent || '').trim();
           if (spec.leaf !== false) {
             // descend through wrappers (e.g. <p><span style="font-family:avenir">) to the styled text element
             for (;;) {
@@ -60,6 +59,16 @@ for (const [label, ctxOpts] of [['desktop', { viewport: { width: 1440, height: 9
               if (kids.length === 1 && !own && visible(kids[0])) el = kids[0]; else break;
             }
           }
+          if (spec.deepText) {
+            // descend to the deepest element whose OWN text node matches (the node that carries the styled text)
+            for (;;) {
+              const next = [...el.children].find((k) => [...k.childNodes].some((n) => n.nodeType === 3 && re.test(n.textContent)))
+                || [...el.children].find((k) => re.test(k.textContent || ''));
+              if (!next) break;
+              el = next;
+            }
+          }
+          const text = (el.textContent || '').trim();
           const cs = getComputedStyle(el);
           res[role] = Object.fromEntries(props.map((p) => [p, cs[p]]));
           res[role].sampledTag = el.tagName.toLowerCase();
