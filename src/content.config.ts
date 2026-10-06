@@ -108,6 +108,8 @@ const home = defineCollection({
     }).strict()),
     allProjects: z.object({ md: z.string(), items: z.array(galleryItem(image)) }).strict(),
     contact: z.object({ md: z.array(z.string()), form: formSchema }).strict(),
+    // Text Wix's mobile homepage adds over the gallery (the "Projects" heading).
+    mobileHeading: z.string().optional(),
   }).strict(),
 });
 
@@ -120,11 +122,19 @@ const projectsIndex = defineCollection({
   }).strict(),
 });
 
+// Site menus (scripts/export-wix/chrome.mjs): Wix's desktop lightbox menu and its mobile menu,
+// each a list of links with optional sub-menus.
+const navLink = z.object({ label: z.string(), href: z.string() }).strict();
+const navItem = navLink.extend({ items: z.array(navLink).optional() }).strict();
+
 const site = defineCollection({
   loader: glob({ pattern: 'site.md', base: './src/content/site' }),
   schema: ({ image }) => z.object({
     logo: z.object({ src: image(), alt: z.string(), href: z.string() }).strict(),
     footer: z.array(block(image)),
+    menu: z.array(navItem).optional(),
+    mobileMenu: z.array(navItem).optional(),
+    menuSocial: z.array(z.object({ src: image(), alt: z.string(), href: z.string() }).strict()).optional(),
   }).strict(),
 });
 

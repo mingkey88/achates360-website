@@ -30,6 +30,12 @@
 - **redpacket** — live page not linked from /projects
 - **ritz-carlton-mid-autumn** — live page not linked from /projects
 - **singapore-aviation-academy** — live page not linked from /projects
+- **site** — menu: "Alstom Asia Pacific" -> /alstom-r151-last-train-handover is not in the snapshot (added on the live site after the export) — left out
+- **site** — menu: "Singapore General Hospital" -> /sgh-patient-safety-appreciation-night is not in the snapshot (added on the live site after the export) — left out
+- **site** — menu: "Singapore Urban Mobility Week 2026" -> /alstom-singapore-urban-mobility-week-2026 is not in the snapshot (added on the live site after the export) — left out
+- **site** — mobileMenu: "Alstom Asia Pacific" -> /alstom-r151-last-train-handover is not in the snapshot (added on the live site after the export) — left out
+- **site** — mobileMenu: "Singapore General Hospital" -> /sgh-patient-safety-appreciation-night is not in the snapshot (added on the live site after the export) — left out
+- **site** — mobileMenu: "Singapore Urban Mobility Week 2026" -> /alstom-singapore-urban-mobility-week-2026 is not in the snapshot (added on the live site after the export) — left out
 - **uel-annual-report** — live page not linked from /projects
 - **uel-annual-report** — off-canvas "© 2021 - 2022" in the hero — shown on screens ≳2000px wide and read by screen readers; keep or remove?
 

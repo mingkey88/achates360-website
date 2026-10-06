@@ -7,6 +7,8 @@ import { collectMedia, runJobs, mediaReport, dirSize } from './lib/media.mjs';
 import { fetchSitemapPaths, sitemapRenderFailures } from './lib/sitemap.mjs';
 import { writeRecord, exportLog } from './lib/write.mjs';
 import { openBrowser, renderPage } from './render.mjs';
+import { captureChrome, CHROME_CACHE } from './chrome.mjs';
+import { toChrome } from './lib/chrome.mjs';
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -62,6 +64,12 @@ async function rendered(slug) {
         if (attempt >= 2) throw e;
       }
     }
+  }
+  // Site chrome (menus, mobile-only text) is captured from home alongside its render, so a fresh
+  // render never leaves an older capture behind.
+  if (slug === 'home' && !offline && (!cached || !(await exists(CHROME_CACHE)))) {
+    console.log('capture site chrome (menus)');
+    await writeFile(CHROME_CACHE, JSON.stringify(await captureChrome(browser, mobileContext), null, 1) + '\n');
   }
   return { html: await readFile(html, 'utf8'), sidecar: JSON.parse(await readFile(side, 'utf8')) };
 }
@@ -148,6 +156,17 @@ for (const raw of raws.values()) {
   records.push(r);
 }
 if (raws.has('home')) records.push({ collection: 'site', id: 'site', data: toSite(raws.get('home')) });
+// Site chrome (scripts/export-wix/chrome.mjs): the menus join the site record, the mobile-only
+// heading the home record. Links to pages the snapshot does not serve are left out (logged).
+if (raws.has('home') && (await exists(CHROME_CACHE))) {
+  const knownPaths = new Set([...paths, ...records.map((r) => (r.id === 'home' ? '/' : `/${r.id}`)), ...knownMissing.map((k) => k.path)]);
+  const chrome = toChrome(JSON.parse(await readFile(CHROME_CACHE, 'utf8')), { homeRaw: raws.get('home'), knownPaths });
+  Object.assign(records.find((r) => r.collection === 'site').data, chrome.site);
+  Object.assign(records.find((r) => r.collection === 'home').data, chrome.home);
+  for (const w of chrome.warnings) log.push({ level: 'query', page: 'site', message: w });
+} else if (raws.has('home')) {
+  log.push({ level: 'warning', page: 'site', message: `no chrome capture (${CHROME_CACHE}) — site menus not exported; run node scripts/export-wix/chrome.mjs` });
+}
 if (raws.has('projects')) {
   applyListing(records.filter((r) => r.collection === 'projects'), toProjectsIndex(raws.get('projects')));
   for (const r of records.filter((x) => x.collection === 'projects' && !x.data.listed)) {

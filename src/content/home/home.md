@@ -425,4 +425,5 @@ contact:
           - Environmental Graphics
           - Others ( Pls specify in message)
     submitLabel: Submit
+mobileHeading: "## Projects"
 ---

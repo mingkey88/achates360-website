@@ -284,10 +284,19 @@ export function mapHome(raw) {
     allProjects,
     contact,
   };
-  return { data, warnings };
+  // The clone id (slide-n / all-projects / contact) of the keyed section at or after a Wix
+  // section, or null: how anchor links into the homepage resolve (also used for site chrome).
+  const targetOf = (section) => {
+    const start = sectionOrder.indexOf(section);
+    const hit = start < 0 ? undefined : sectionOrder.slice(start).find((s) => keyBySection.has(s));
+    return hit ? keyBySection.get(hit) : null;
+  };
+  return { data, warnings, targetOf };
 }
 
 export const toHome = (raw) => mapHome(raw).data;
+/** The homepage anchor (clone section id) a Wix section of the homepage maps to, or null. */
+export const homeTarget = (raw, section) => mapHome(raw).targetOf(section);
 
 export function mapProjectsIndex(raw) {
   const warnings = [];
