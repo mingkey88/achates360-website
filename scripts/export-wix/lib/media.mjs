@@ -13,6 +13,7 @@ export function collectMedia(raws, cards) {
     for (const n of nodes) {
       if (n.kind === 'image') images.add(n.file);
       if (n.kind === 'bgvideo') images.add(n.poster);
+      if (n.kind === 'player' && n.videoId) images.add(n.poster);
       if (n.kind === 'gallery') for (const i of n.items) if (i.file) images.add(i.file);
     }
   };

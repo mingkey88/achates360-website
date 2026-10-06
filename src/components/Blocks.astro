@@ -1,27 +1,86 @@
 ---
-import { Image } from 'astro:assets';
-import { renderMd } from '../lib/markdown';
-import { withBase, backLinkHref } from '../lib/paths';
-import { isGif } from '../lib/images';
-import BgVideo from './BgVideo.astro';
-import Embed from './Embed.astro';
-import Gallery from './Gallery.astro';
-interface Props { blocks: any[]; gallery?: 'stack' | 'grid'; pageTitle?: string }
-const { blocks, gallery = 'grid', pageTitle } = Astro.props;
+import Block from './Block.astro';
+import { groupRows, layoutRow, mobileRow, nestOverlays, PAGE_WIDTH } from '../lib/rows';
+// rows=false renders every block in one column, ignoring Wix's layout boxes (for pages laid out
+// by hand, e.g. the basic pages in Basic.astro).
+interface Props { blocks: any[]; gallery?: 'stack' | 'grid'; pageTitle?: string; rows?: boolean }
+const { blocks, gallery = 'grid', pageTitle, rows: useRows = true } = Astro.props;
+const MEDIA = new Set(['image', 'gallery', 'video', 'embed']);
+const isMedia = (b: any) => MEDIA.has(b.type);
+const vars = (o: Record<string, number | string>) => Object.entries(o).map(([k, v]) => `--${k}: ${v}`).join('; ');
+// Each row of blocks with Wix layout boxes (src/lib/rows.ts) becomes a .block-row of .cells: a flex
+// row on desktop sized from the boxes; on mobile one column, unless Wix keeps the row side by side
+// there too (data-mrow). Blocks lying inside another block's box are laid over it (.stage). Blocks
+// without a box render as before, one per line.
+const rows = (useRows ? groupRows(blocks) : blocks.map((b) => [b])).map((row) => {
+  if (!useRows || !row[0].box) return { plain: row };
+  const nested = nestOverlays(row);
+  const tops = nested.map((n) => n.block);
+  const mobile = mobileRow(tops);
+  const cells = layoutRow(tops).map((c) => {
+    const m = mobile?.findIndex((x) => x.block === c.block) ?? -1;
+    // Wix crops an image to its box (display mode "fill"): keep the box's shape on each layout.
+    const b = c.block;
+    const ar = b.type === 'image' ? { ar: `${b.box.w} / ${b.box.h}`, mar: b.mbox?.h ? `${b.mbox.w} / ${b.mbox.h}` : 'auto' } : {};
+    const style = vars({ w: `${c.width}%`, o: `${c.offset}%`, ...ar,
+      ...(m >= 0 ? { mw: `${mobile![m].width}%`, mo: `${mobile![m].offset}%`, mord: m } : {}) });
+    const px = Math.round(PAGE_WIDTH * c.width / 100);
+    const overlays = nested.find((n) => n.block === c.block)!.overlays.map((o) => ({
+      block: o.block,
+      px: Math.round(px * o.width / 100),
+      style: vars({ l: `${o.left}%`, t: `${o.top}%`, ow: `${o.width}%`, ar: `${o.block.box.w} / ${o.block.box.h}`,
+        mar: o.block.mbox?.h ? `${o.block.mbox.w} / ${o.block.mbox.h}` : 'auto',
+        ...(o.mobile ? { mw: `${o.mobile.width}%`, mo: `${o.mobile.offset}%` } : {}) }),
+    }));
+    return { block: c.block, style, px, overlays, ar: `${c.block.box.w} / ${c.block.box.h}` };
+  });
+  return { cells, media: row.every(isMedia), mrow: !!mobile };
+});
 ---
-{blocks.map((b) => {
-  if (b.type === 'text') return <div class="block-text" set:html={renderMd(b.md)} />;
-  // The only content link to the home page is Wix's "← BACK TO PROJECTS", whose data-anchor
-  // scrolls home to the All Projects section.
-  if (b.type === 'link') return <p class="block-link"><a href={withBase(backLinkHref(b.href))}>{b.label}</a></p>;
-  if (b.type === 'image') {
-    const img = isGif(b.src)
-      ? <img src={b.src.src} width={b.src.width} height={b.src.height} alt={b.alt} loading="lazy" decoding="async" />
-      : <Image src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 980px) 100vw, 980px" />;
-    return b.href ? <a class="block-image" href={withBase(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
+{rows.map((r) => r.plain
+  ? r.plain.map((b) => <Block block={b} gallery={gallery} pageTitle={pageTitle} />)
+  : (
+    <div class="block-row" data-media={r.media ? '' : undefined} data-mrow={r.mrow ? '' : undefined}>
+      {r.cells!.map((c) => (
+        <div class="cell" data-media={isMedia(c.block) ? '' : undefined} style={c.style}>
+          {c.overlays.length === 0
+            ? <Block block={c.block} gallery={gallery} pageTitle={pageTitle} width={c.px} />
+            : (
+              <div class="stage" style={`--ar: ${c.ar}`}>
+                {/* Wix hides the base of an overlay group on mobile when it has no mobile box. */}
+                <div class="stage-base" data-mhide={c.block.mbox ? undefined : ''}>
+                  <Block block={c.block} gallery={gallery} pageTitle={pageTitle} width={c.px} />
+                </div>
+                {c.overlays.map((o) => (
+                  <div class="overlay" data-mhide={o.block.mbox ? undefined : ''} style={o.style}>
+                    <Block block={o.block} gallery={gallery} pageTitle={pageTitle} width={o.px} />
+                  </div>
+                ))}
+              </div>
+            )}
+        </div>
+      ))}
+    </div>
+  ))}
+<style>
+  .block-row { display: flex; align-items: flex-start; }
+  .cell { flex: 0 0 var(--w); min-width: 0; margin-left: var(--o); }
+  /* Wix shows an image at its box width, whatever the file's own size. */
+  .cell :global(.block-image img) { width: 100%; aspect-ratio: var(--ar, auto); object-fit: cover; }
+  .stage { position: relative; aspect-ratio: var(--ar); }
+  .stage-base, .stage-base > :global(*) { height: 100%; }
+  .stage-base :global(.block-image img) { height: 100%; object-fit: cover; }
+  .overlay { position: absolute; left: var(--l); top: var(--t); width: var(--ow); }
+  @media (max-width: 767px) {
+    .cell :global(.block-image img) { aspect-ratio: var(--mar, auto); }
+    .block-row:not([data-mrow]) { display: block; }
+    .block-row:not([data-mrow]) > .cell { margin-left: 0; }
+    .block-row[data-mrow] > .cell { flex-basis: var(--mw); margin-left: var(--mo); order: var(--mord); }
+    .stage { aspect-ratio: auto; }
+    .stage-base, .stage-base > :global(*) { height: auto; }
+    .stage-base :global(.block-image img) { height: auto; }
+    .stage [data-mhide] { display: none; }
+    .overlay { position: static; width: var(--mw, 100%); margin-left: var(--mo, 0); }
+    .stage > * + .overlay:not([data-mhide]) { margin-top: calc(10 * var(--m)); }
   }
-  if (b.type === 'gallery') return <Gallery items={b.items} layout={gallery} />;
-  if (b.type === 'video') return <BgVideo src={b.src} poster={b.poster} class="block-video" />;
-  if (b.type === 'embed') return <Embed provider={b.provider} id={b.id} title={pageTitle ? `${pageTitle} video` : undefined} />;
-  return null;
-})}
+</style>

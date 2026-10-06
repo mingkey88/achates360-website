@@ -4,9 +4,12 @@ import Base from './Base.astro';
 import Blocks from '../components/Blocks.astro';
 interface Props { entry: CollectionEntry<'basic'> }
 const { id, data: d } = Astro.props.entry;
+// Pages laid out by hand below from live measurements (their rules key off the block order), so
+// Wix's layout boxes do not regroup their blocks into rows. Any other basic page uses the boxes.
+const HAND_LAID = new Set(['about', 'joinus', 'copy-of-projects']);
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass={`page-basic page-${id}`}>
-  <div class="basic"><Blocks blocks={d.blocks} gallery="grid" pageTitle={d.seo.title} /></div>
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass={`page-basic page-${id}`} background={d.pageBackground}>
+  <div class="basic"><Blocks blocks={d.blocks} gallery="grid" pageTitle={d.seo.title} rows={!HAND_LAID.has(id)} /></div>
 </Base>
 <style>
   /*
@@ -19,12 +22,11 @@ const { id, data: d } = Astro.props.entry;
   .basic :global(.block-text > :last-child) { margin-bottom: 0; }
 
   /*
-   * /about: page background #2f2e2e. Back link top 157, right edge x=1047; text column x=329,
-   * 518 wide, top 218, 20px with 25px lines (each paragraph ends in a blank line); photo
+   * /about: page background #2f2e2e (exported as pageBackground). Back link top 157, right edge
+   * x=1047; text column x=329, 518 wide, top 218, 20px with 25px lines (each paragraph ends in a blank line); photo
    * 798x446 at x=328, top 780; 65px to the footer.
    * Mobile: text 20/144, 280 wide, 14px; then the back link (280x78, centred); photo 25 below.
    */
-  :global(body.page-about) { background: var(--color-page-dark); }
   :global(.page-about) .basic { width: min(798px, 100% - 2 * var(--gutter)); margin-left: max(var(--gutter), calc(50% - 392px)); padding: 153px 0 65px; }
   :global(.page-about) .basic :global(.block-link) { margin: 0; padding-right: 79px; text-align: right; font: var(--weight-light) var(--size-ui) / var(--leading-ui) var(--font-ui); }
   :global(.page-about) .basic :global(.block-link a) { color: #fff; text-decoration: none; }
@@ -33,15 +35,14 @@ const { id, data: d } = Astro.props.entry;
   :global(.page-about) .basic :global(.block-image) { margin-top: 37px; }
 
   /*
-   * /joinus: page background #f2f2f2. "Join us" 56px Helvetica Bold at x=183, top 136; the image
-   * 452x452 below it (top 211); the job text column starts at x=618 (Wix lets the image overlap
+   * /joinus: page background #f2f2f2 (exported). "Join us" 56px Helvetica Bold at x=183, top 136;
+   * the image 452x452 below it (top 211); the job text column starts at x=618 (Wix lets the image overlap
    * it by 17px), 544 wide, top 211: h4 28px/39.2px bold orange, copy 15px/21px with a blank line
    * after each paragraph except bold labels; "Apply Now" is a 117x42 white pill with a 2px
    * #c74300 border; 100px to the footer.
    * Mobile: everything stacked at x=10: title 31px (top 100), image 280x280, text 26px heading,
    * "Apply Now" 160x42 centred.
    */
-  :global(body.page-joinus) { background: var(--color-page-alt); }
   :global(.page-joinus) .basic {
     display: grid; grid-template-columns: minmax(0, 435fr) minmax(0, 544fr); align-items: start;
     width: min(979px, 100% - 2 * var(--gutter)); margin-left: max(var(--gutter), calc(50% - 537px)); padding: 132px 0 100px;
@@ -66,10 +67,9 @@ const { id, data: d } = Astro.props.entry;
   }
 
   /*
-   * /copy-of-projects (a duplicate of /projects): page background #f2f2f2; 956px column; each
-   * section heading is a 28px h2, the 3-column gallery 25px below it.
+   * /copy-of-projects (a duplicate of /projects): page background #f2f2f2 (exported); 956px
+   * column; each section heading is a 28px h2, the 3-column gallery 25px below it.
    */
-  :global(body.page-copy-of-projects) { background: var(--color-page-alt); }
   :global(.page-copy-of-projects) .basic { width: min(956px, 100% - 2 * var(--gutter)); padding: 77px 0 60px; }
   :global(.page-copy-of-projects) .basic :global(.block-text) { margin-bottom: 25px; }
   :global(.page-copy-of-projects) .basic :global(h2) { margin: 0; }

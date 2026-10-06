@@ -17,6 +17,26 @@ const seoOf = (raw) => ({
 
 const image = (n) => ({ src: imgRef(n.file), alt: n.alt, ...(n.href ? { href: n.href } : {}) });
 
+// Wix's computed colours ("rgb(r, g, b)") as lowercase hex; anything else (e.g. a translucent
+// rgba) is kept verbatim.
+export function toHex(color) {
+  const m = color?.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(1|1\.0+))?\)$/);
+  return m ? '#' + m.slice(1, 4).map((v) => Number(v).toString(16).padStart(2, '0')).join('') : color;
+}
+// Case-study body copy colour (src/styles/tokens.css --color-text): a text block in this colour
+// needs no colour of its own.
+export const DEFAULT_TEXT_COLOR = '#605e5e';
+const WHITE = '#ffffff';
+const TRANSPARENT = /^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/;
+// The page background, only when it is not white (the clone's default --color-page).
+function pageBackground(raw) {
+  const bg = raw.pageBackground;
+  if (!bg || TRANSPARENT.test(bg) || toHex(bg) === WHITE) return {};
+  return { pageBackground: toHex(bg) };
+}
+// Desktop (1440) and mobile (iPhone 13) boxes of a node, when the render recorded them.
+const layout = (n) => ({ ...(n.box ? { box: n.box } : {}), ...(n.mbox ? { mbox: n.mbox } : {}) });
+
 function galleryItems(items) {
   return items.filter((i) => i.file).map((i) => ({
     title: i.title,
@@ -29,14 +49,23 @@ function galleryItems(items) {
 }
 
 export function toBlock(n) {
+  const block = blockOf(n);
+  return block && { ...block, ...layout(n) };
+}
+
+function blockOf(n) {
   switch (n.kind) {
     case 'text': {
       const md = htmlToMarkdown(n.html);
-      return md ? { type: 'text', md } : null;
+      const color = n.color && toHex(n.color);
+      return md ? { type: 'text', md, ...(color && color !== DEFAULT_TEXT_COLOR ? { color } : {}) } : null;
     }
     case 'image': return { type: 'image', ...image(n) };
     case 'gallery': return { type: 'gallery', items: galleryItems(n.items) };
     case 'bgvideo': return { type: 'video', src: videoRef(n.videoId), poster: imgRef(n.poster) };
+    // A Wix-hosted player not served from video.wixstatic.com has no file to download: reported
+    // as unmapped (export log) rather than linked to a third-party URL.
+    case 'player': return n.videoId ? { type: 'video', src: videoRef(n.videoId), poster: imgRef(n.poster), controls: true } : null;
     case 'embed': return { type: 'embed', provider: n.provider, id: n.id };
     case 'link': return { type: 'link', href: n.href, label: n.text };
     default: return null;
@@ -54,6 +83,7 @@ function describeNode(n) {
     : n.kind === 'link' ? `${JSON.stringify(n.text)} -> ${n.href}`
     : n.kind === 'image' ? n.file
     : n.kind === 'bgvideo' ? n.videoId
+    : n.kind === 'player' ? n.src
     : n.kind === 'embed' ? `${n.provider}:${n.id}`
     : n.kind === 'gallery' ? `${n.items.length} items`
     : '';
@@ -80,7 +110,7 @@ export function toProject(raw) {
   const after = raw.nodes.slice(backIdx + 1);
 
   const heroNode = before.find((n) => n.kind === 'image' || n.kind === 'bgvideo');
-  const badges = before.filter((n) => n.kind === 'image' && n !== heroNode).map(image);
+  const badges = before.filter((n) => n.kind === 'image' && n !== heroNode).map((n) => ({ ...image(n), ...(n.box ? { box: n.box } : {}) }));
 
   const textIdx = after.map((n, i) => (n.kind === 'text' ? i : -1)).filter((i) => i >= 0);
   if (textIdx.length === 0) throw new MappingError(`${raw.slug}: no title after back link`);
@@ -106,6 +136,7 @@ export function toProject(raw) {
     ...(captions.length ? { heroCaption: captions.map((n) => n.text).join('\n') } : {}),
     badges,
     backLink: { label: raw.nodes[backIdx].text, href: raw.nodes[backIdx].href },
+    ...pageBackground(raw),
     seo: seoOf(raw),
     blocks: blocksOf(rest),
   };
@@ -156,7 +187,7 @@ export function toCard(raw) {
   };
 }
 
-export const toBasic = (raw) => ({ seo: seoOf(raw), blocks: blocksOf(raw.nodes) });
+export const toBasic = (raw) => ({ ...pageBackground(raw), seo: seoOf(raw), blocks: blocksOf(raw.nodes) });
 
 export function mapBasic(raw) {
   const lost = notBlockable(raw.nodes);

@@ -7,18 +7,9 @@ import BgVideo from '../components/BgVideo.astro';
 import { withBase, backLinkHref } from '../lib/paths';
 interface Props { entry: CollectionEntry<'projects'> }
 const d = Astro.props.entry.data;
-// Case studies Wix shows on a #f2f2f2 page instead of white (sampled from docs/reference/<slug>/
-// desktop.png and mobile.png); the export does not record the page background.
-const ALT_BACKGROUND = new Set([
-  'building-memories-artbook', 'changi-airport-group', 'dxv', 'journal-of-aviation-management', 'kaplan',
-  'moving-memories', 'national-theatre-pop-up-kit', 'nokia', 'samsung-tablets-tactical-campaigns',
-  'singapore-aviation-academy', 'singapore-conference-hall-sg5050', 'socialspace',
-  'the-art-of-tan-ping-chiang', 'the-ritz-kids-programme-guide', 'the-skyline',
-]);
-const bodyClass = ALT_BACKGROUND.has(Astro.props.entry.id) ? 'page-project page-alt' : 'page-project';
 const external = (href: string) => /^https?:\/\//.test(href);
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass={bodyClass}>
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="page-project" background={d.pageBackground}>
   {d.hero && (
     <div class="hero">
       {d.hero.type === 'video'
@@ -33,7 +24,9 @@ const external = (href: string) => /^https?:\/\//.test(href);
       {d.badges.length > 0 && (
         <div class="badges">
           {d.badges.map((b) => {
-            const img = <Image src={b.src} alt={b.alt} width={112} height={110} densities={[1, 2]} />;
+            // Wix's badge box (112x110 for most award badges) when the export recorded it.
+            const [w, h] = b.box ? [b.box.w, b.box.h] : [112, 110];
+            const img = <Image src={b.src} alt={b.alt} width={w} height={h} densities={[1, 2]} style={`width: ${w}px; height: ${h}px`} />;
             return b.href
               ? <a href={withBase(b.href)} {...(external(b.href) ? { target: '_blank', rel: 'noreferrer noopener' } : {})}>{img}</a>
               : img;
@@ -68,12 +61,11 @@ const external = (href: string) => /^https?:\/\//.test(href);
    * band, client 10 below it, first block ~40 below that, 10 between media, the copyright and then
    * the back link (a 280x78 box, text centred) come last.
    */
-  :global(body.page-alt) { background: var(--color-page-alt); }
   .hero { position: relative; height: 787px; overflow: hidden; }
   .hero :global(.hero-media) { position: absolute; left: 0; top: -11px; width: 100%; height: 900px; max-width: none; object-fit: cover; }
   .badges { position: absolute; right: max(var(--gutter), calc(50% - 462px)); bottom: 13px; display: flex; gap: 12px; }
   .badges a { display: block; line-height: 0; }
-  .badges :global(img) { width: 112px; height: 110px; object-fit: cover; }
+  .badges :global(img) { object-fit: cover; }
 
   /* Wix's column sits ~10px left of centre (x=237..250 for text and images on a 1440 page). */
   .project { padding-bottom: 40px; margin-left: max(var(--gutter), calc(50% - 480px)); }
@@ -89,9 +81,11 @@ const external = (href: string) => /^https?:\/\//.test(href);
 
   .blocks { margin-top: 56px; }
   .blocks > :global(* + *) { margin-top: 30px; }
-  .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo) + :is(.block-image, .gallery, .embed, .bgvideo)) { margin-top: 10px; }
+  .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media]) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: 10px; }
   .blocks :global(.block-image) { display: block; line-height: 0; }
   .blocks :global(.block-text) { max-width: 640px; line-height: var(--leading-copy); }
+  /* A text with a Wix layout box takes the box's width (Blocks.astro). */
+  .blocks :global(.cell .block-text) { max-width: none; }
   .blocks :global(.block-text :is(p, ul, ol, h5)) { margin: 0 0 var(--leading-copy); }
   .blocks :global(.block-text > :last-child) { margin-bottom: 0; }
   .blocks :global(.block-text h5) { color: var(--color-text); line-height: normal; }
@@ -116,8 +110,11 @@ const external = (href: string) => /^https?:\/\//.test(href);
     .copyright { margin-top: calc(20 * var(--m)); }
     .blocks { margin-top: calc(40 * var(--m)); }
     .blocks > :global(* + *) { margin-top: calc(30 * var(--m)); }
-    .blocks > :global(:is(.block-text, .block-link) + :is(.block-image, .gallery, .embed, .bgvideo)) { margin-top: calc(10 * var(--m)); }
-    .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo) + :is(.block-image, .gallery, .embed, .bgvideo)) { margin-top: calc(10 * var(--m)); }
+    .blocks > :global(:is(.block-text, .block-link, .block-row:not([data-media])) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
+    .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media]) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
+    /* A desktop row that Wix stacks on mobile: its cells are spaced like separate blocks. */
+    .blocks :global(.block-row:not([data-mrow]) > .cell + .cell) { margin-top: calc(30 * var(--m)); }
+    .blocks :global(.block-row:not([data-mrow]) > .cell[data-media] + .cell[data-media]) { margin-top: calc(10 * var(--m)); }
     .blocks :global(.block-text) { max-width: none; line-height: var(--leading-copy-m); }
     .blocks :global(.block-text :is(p, ul, ol, h5)) { margin-bottom: var(--leading-copy-m); }
     .blocks :global(.block-text h5) { font-size: calc(21 * var(--m)); }

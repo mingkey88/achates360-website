@@ -1,0 +1,15 @@
+---
+import { getImage } from 'astro:assets';
+import { mediaUrl } from '../lib/paths';
+// A Wix-hosted video player (Wix's VideoPlayer component, e.g. on /dxv): a plain video with the
+// browser's controls, poster first, nothing loads beyond metadata until the visitor plays it.
+interface Props { src: string; poster: ImageMetadata; label?: string }
+const { src, poster, label } = Astro.props;
+const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
+---
+<div class="player">
+  <video src={/^https?:\/\//.test(src) ? src : mediaUrl(src)} poster={posterUrl} controls preload="metadata" playsinline aria-label={label}></video>
+</div>
+<style>
+  .player video { display: block; width: 100%; height: auto; background: #000; }
+</style>

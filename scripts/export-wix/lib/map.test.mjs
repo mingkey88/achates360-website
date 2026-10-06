@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { extractPage } from './extract.mjs';
-import { classify, mapPage, mapHome, mapProjectsIndex, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, MappingError } from './map.mjs';
+import { DEFAULT_TEXT_COLOR, classify, mapPage, mapHome, mapProjectsIndex, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, MappingError } from './map.mjs';
 
 // Gallery item data Wix loaded over the network while rendering (written by render.mjs).
 const side = (s) => {
@@ -54,7 +54,7 @@ describe('toProject', () => {
     const p = toProject(notter);
     expect(p.badges.length).toBeGreaterThanOrEqual(1);
     expect(p.blocks.find((b) => b.type === 'gallery').items.length).toBeGreaterThanOrEqual(9);
-    expect(p.blocks.find((b) => b.type === 'embed')).toEqual({ type: 'embed', provider: 'vimeo', id: '766942392' });
+    expect(p.blocks.find((b) => b.type === 'embed')).toMatchObject({ type: 'embed', provider: 'vimeo', id: '766942392' });
   });
   it('throws MappingError when there is no title after the back link', () => {
     expect(() => toProject({ ...dbs, nodes: dbs.nodes.filter((n) => n.kind !== 'text') })).toThrow(MappingError);
@@ -288,5 +288,43 @@ describe('Ruling 19b: off-canvas copyright text in the hero', () => {
 
   it('pages without it have no heroCaption', () => {
     expect(toProject(dbs)).not.toHaveProperty('heroCaption');
+  });
+});
+
+describe('layout data (Task 11b)', () => {
+  const box = { x: 240, y: 973, w: 129, h: 120 };
+  const mbox = { x: 20, y: 215, w: 90, h: 89 };
+  it('passes boxes through to blocks', () => {
+    expect(toBlock({ kind: 'image', file: 'a~mv2.jpg', alt: 'A', href: null, box, mbox }))
+      .toEqual({ type: 'image', src: '../../assets/wix/a.jpg', alt: 'A', box, mbox });
+    expect(toBlock({ kind: 'embed', provider: 'vimeo', id: '1', box })).toEqual({ type: 'embed', provider: 'vimeo', id: '1', box });
+  });
+  it('keeps a text colour only when it differs from the default body colour', () => {
+    expect(toBlock({ kind: 'text', html: '<p>Hi</p>', color: 'rgb(255, 255, 255)', box }))
+      .toEqual({ type: 'text', md: 'Hi', color: '#ffffff', box });
+    expect(toBlock({ kind: 'text', html: '<p>Hi</p>', color: 'rgb(96, 94, 94)' })).toEqual({ type: 'text', md: 'Hi' });
+    expect(DEFAULT_TEXT_COLOR).toBe('#605e5e');
+  });
+  it('maps a Wix-hosted player to a video block with controls', () => {
+    expect(toBlock({ kind: 'player', src: 'https://video.wixstatic.com/video/v1/720p/mp4/file.mp4', videoId: 'v1', quality: '720p', poster: 'v1f000.jpg', box }))
+      .toEqual({ type: 'video', src: 'media/video/v1.mp4', poster: '../../assets/wix/v1f000.jpg', controls: true, box });
+  });
+  it('reports a player that is not Wix-hosted instead of mapping it', () => {
+    const n = { kind: 'player', src: 'https://example.com/a.mp4', videoId: null, quality: null, poster: null, section: 's' };
+    expect(toBlock(n)).toBeNull();
+    const r = mapPage({ ...about, nodes: [...about.nodes, n] });
+    expect(r.warnings.join(' ')).toContain('player https://example.com/a.mp4');
+  });
+  it('records the page background only when it is not white', () => {
+    expect(toProject({ ...dbs, pageBackground: 'rgb(242, 242, 242)' }).pageBackground).toBe('#f2f2f2');
+    expect(toProject({ ...dbs, pageBackground: 'rgb(255, 255, 255)' })).not.toHaveProperty('pageBackground');
+    expect(toProject({ ...dbs, pageBackground: 'rgba(0, 0, 0, 0)' })).not.toHaveProperty('pageBackground');
+    expect(mapPage({ ...about, pageBackground: 'rgb(47, 46, 46)' }).data.pageBackground).toBe('#2f2e2e');
+  });
+  it('gives badges their box', () => {
+    const hero = { kind: 'image', file: 'h.jpg', alt: '', href: null, section: 's' };
+    const badge = { kind: 'image', file: 'b.png', alt: 'B', href: null, section: 's', box: { x: 1070, y: 668, w: 112, h: 110 } };
+    const nodes = [hero, badge, ...dbs.nodes.filter((n) => n.kind !== 'image')];
+    expect(toProject({ ...dbs, nodes }).badges).toEqual([{ src: '../../assets/wix/b.png', alt: 'B', box: badge.box }]);
   });
 });

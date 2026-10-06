@@ -8,8 +8,10 @@ import Footer from '../components/Footer.astro';
 import '../styles/tokens.css';
 import '../styles/base.css';
 
-interface Props { title: string; description?: string; ogImage?: ImageMetadata; bodyClass?: string; }
-const { title, description, ogImage, bodyClass } = Astro.props;
+// background: the page's Wix background colour, when it is not the default white (exported as
+// pageBackground).
+interface Props { title: string; description?: string; ogImage?: ImageMetadata; bodyClass?: string; background?: string }
+const { title, description, ogImage, bodyClass, background } = Astro.props;
 const site = (await getEntry('site', 'site'))!.data;
 const robots = robotsMeta(SITE_ENV);
 const og = ogImage ? new URL((await getImage({ src: ogImage, width: 1200, format: 'jpg' })).src, Astro.site).href : undefined;
@@ -31,7 +33,7 @@ const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), A
     <meta property="og:site_name" content="Achates 360" />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <body class={bodyClass}>
+  <body class={bodyClass} style={background ? `background: ${background}` : undefined}>
     <Logo logo={site.logo} />
     <main id="top"><slot /></main>
     <Footer blocks={site.footer} />

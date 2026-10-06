@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { extractPage, extractRoutes } from './extract.mjs';
+import { groupRows } from '../../../src/lib/rows.ts';
 
 const fx = (s) => readFileSync(new URL(`../__fixtures__/${s}.html`, import.meta.url), 'utf8');
 // Gallery item data Wix loaded over the network while rendering (written by render.mjs).
@@ -174,5 +175,77 @@ describe('extractPage: sections', () => {
     for (const m of menu.items) {
       if (m.target !== 'top' && m.target !== 'footer') expect(sections.has(m.target)).toBe(true);
     }
+  });
+});
+
+// Layout annotations written by render.mjs (Task 11b): data-box / data-mbox on components,
+// data-color on rich text, data-page-bg on <body>, data-player-* on Wix-hosted video players.
+const ANNOTATED = `<!doctype html><html><head><title>T</title></head>
+<body data-page-bg="rgb(242, 242, 242)"><main id="PAGES_CONTAINER">
+<section id="comp-sec1" data-box="0,0,1440,2000">
+  <div id="comp-txt1" data-testid="richTextElement" data-box="240,100,557,40" data-color="rgb(255, 255, 255)"><p>Hello</p></div>
+  <div id="comp-img1" data-box="240,200,129,120" data-mbox="20,215,90,89"><img src="https://static.wixstatic.com/media/abc_1~mv2.jpg/v1/fill/w_129,h_120/a.jpg" alt="A"></div>
+  <div id="comp-pl1" data-box="240,400,947,527"
+    data-player-src="https://video.wixstatic.com/video/e9d9c2_0f5e/720p/mp4/file.mp4"
+    data-player-poster="https://static.wixstatic.com/media/e9d9c2_0f5ef000.jpg/v1/fill/w_947,h_527/a.jpg">
+    <video src="https://video.wixstatic.com/video/e9d9c2_0f5e/720p/mp4/file.mp4"></video>
+    <img src="https://static.wixstatic.com/media/e9d9c2_0f5ef000.jpg/v1/fill/w_947,h_527/a.jpg" alt="">
+  </div>
+  <div id="comp-pl2" data-box="240,1000,600,300" data-player-src="https://example.com/clip.mp4" data-player-poster=""><video src="https://example.com/clip.mp4"></video></div>
+</section></main><footer id="SITE_FOOTER"></footer></body></html>`;
+
+describe('extractPage: layout annotations', () => {
+  const p = extractPage(ANNOTATED, 'syn', []);
+  it('gives nodes the box of their nearest annotated component', () => {
+    expect(p.nodes.find((n) => n.kind === 'text').box).toEqual({ x: 240, y: 100, w: 557, h: 40 });
+    expect(p.nodes.find((n) => n.kind === 'image')).toMatchObject({
+      box: { x: 240, y: 200, w: 129, h: 120 }, mbox: { x: 20, y: 215, w: 90, h: 89 } });
+  });
+  it('reads the text colour', () => {
+    expect(p.nodes.find((n) => n.kind === 'text').color).toBe('rgb(255, 255, 255)');
+  });
+  it('reads the page background', () => {
+    expect(p.pageBackground).toBe('rgb(242, 242, 242)');
+  });
+  it('emits a Wix-hosted player as a player node, not its poster image', () => {
+    const players = p.nodes.filter((n) => n.kind === 'player');
+    expect(players[0]).toEqual(expect.objectContaining({
+      kind: 'player', videoId: 'e9d9c2_0f5e', quality: '720p', poster: 'e9d9c2_0f5ef000.jpg',
+      src: 'https://video.wixstatic.com/video/e9d9c2_0f5e/720p/mp4/file.mp4', box: { x: 240, y: 400, w: 947, h: 527 } }));
+    expect(p.nodes.some((n) => n.kind === 'image' && n.file.startsWith('e9d9c2_0f5e'))).toBe(false);
+    expect(p.videos.get('e9d9c2_0f5e')).toBe('720p');
+  });
+  it('keeps a non-Wix player URL as is, with no video id', () => {
+    const pl = p.nodes.filter((n) => n.kind === 'player')[1];
+    expect(pl).toMatchObject({ src: 'https://example.com/clip.mp4', videoId: null, poster: null });
+  });
+  it('leaves the fields out when a render has no annotations', () => {
+    const old = fx('notter').replace(/ data-(m?box|color|page-bg|player-src|player-poster)="[^"]*"/g, '');
+    const q = extractPage(old, 'notter', side('notter'));
+    expect(q.pageBackground).toBeUndefined();
+    expect(q.nodes.length).toBeGreaterThan(5);
+    for (const n of q.nodes) {
+      expect(n).not.toHaveProperty('box');
+      expect(n).not.toHaveProperty('mbox');
+      expect(n).not.toHaveProperty('color');
+    }
+    expect(q.nodes.some((n) => n.kind === 'player')).toBe(false);
+  });
+});
+
+describe('extractPage: layout of the annotated notter fixture', () => {
+  const p = load('notter');
+  it('puts the SPSA and DRIVENxDESIGN award logos on one row', () => {
+    const logos = p.nodes.filter((n) => n.kind === 'image' && /SPSA|certificate/.test(n.alt));
+    expect(logos).toHaveLength(2);
+    for (const n of logos) expect(n.box).toEqual(expect.objectContaining({ w: expect.any(Number), h: expect.any(Number) }));
+    expect(groupRows(logos)).toHaveLength(1);
+  });
+  it('reads the awards text as white, as Wix renders it', () => {
+    const t = p.nodes.find((n) => n.kind === 'text' && n.text.startsWith('Nötter Nuts has won'));
+    expect(t.color).toBe('rgb(255, 255, 255)');
+  });
+  it('records the white page background', () => {
+    expect(p.pageBackground).toBe('rgb(255, 255, 255)');
   });
 });

@@ -4,8 +4,27 @@ import { findRoutes, findGalleries, findGalleryItems, normalizeGalleryItem } fro
 
 const SELECTOR = [
   '[data-testid="richTextElement"]', 'img', 'iframe', '[data-video-info]', 'a[href]',
-  '[data-hook="item-container"]', '.wixui-anchor-menu', 'form',
+  '[data-hook="item-container"]', '.wixui-anchor-menu', 'form', '[data-player-src]',
 ].join(', ');
+
+// Layout annotations written by render.mjs at the 1440x900 desktop render (and the iPhone 13
+// render for data-mbox): "x,y,w,h" in CSS px, document coordinates. Absent on old renders.
+function parseBox(attr) {
+  if (!attr) return undefined;
+  const [x, y, w, h] = attr.split(',').map(Number);
+  return [x, y, w, h].every(Number.isFinite) ? { x, y, w, h } : undefined;
+}
+// Both boxes come from the same component, so a component Wix hides on mobile never borrows
+// the mobile box of the section around it.
+function layoutOf($el) {
+  const $comp = $el.closest('[data-box]');
+  const box = parseBox($comp.attr('data-box'));
+  const mbox = parseBox($comp.attr('data-mbox'));
+  return { ...(box ? { box } : {}), ...(mbox ? { mbox } : {}) };
+}
+
+// A Wix-hosted player's file: https://video.wixstatic.com/video/<videoId>/<quality>/mp4/file.mp4
+const WIX_VIDEO = /^https:\/\/video\.wixstatic\.com\/video\/([^/]+)\/(\d+p)\//;
 
 const readJson = ($, id) => {
   const raw = $(`#${id}`).text();
@@ -46,11 +65,13 @@ export function extractPage(html, slug, sidecar = []) {
       const base = {
         comp: $el.closest('[id^="comp-"]').attr('id') ?? null,
         section: outerSection($, $el),
+        ...layoutOf($el),
       };
       const inGallery = $el.closest('[data-hook="item-container"]').length > 0;
       const inForm = $el.closest('form').length > 0 && !$el.is('form');
       const inMenu = $el.closest('.wixui-anchor-menu').length > 0 && !$el.is('.wixui-anchor-menu');
       const inRichText = $el.parents('[data-testid="richTextElement"]').length > 0;
+      const inPlayer = $el.closest('[data-player-src]').length > 0 && !$el.is('[data-player-src]');
 
       if ($el.is('form')) {
         nodes.push({ kind: 'form', ...base, ...readForm($, $el) });
@@ -62,11 +83,19 @@ export function extractPage(html, slug, sidecar = []) {
         seenGalleries.add(galleryComp);
         const items = readGallery($, galleryComp, galleryData.get(galleryComp) ?? [], loadedItems, routes);
         for (const it of items) if (it.video) videos.set(it.video.videoId, it.video.quality);
-        nodes.push({ kind: 'gallery', ...base, comp: galleryComp, items });
-      } else if (inGallery || inForm || inMenu) {
-        // owned by the gallery / form / menu node
+        nodes.push({ kind: 'gallery', ...base, ...layoutOf($(`#${galleryComp}`)), comp: galleryComp, items });
+      } else if (inGallery || inForm || inMenu || inPlayer) {
+        // owned by the gallery / form / menu / player node
+      } else if ($el.is('[data-player-src]')) {
+        const src = $el.attr('data-player-src');
+        const m = src.match(WIX_VIDEO);
+        const posterUrl = $el.attr('data-player-poster') ?? '';
+        const poster = /wixstatic\.com\/media\//.test(posterUrl) ? mediaFileName(posterUrl) : m ? `${m[1]}f000.jpg` : null;
+        if (m) videos.set(m[1], videos.has(m[1]) ? bestQuality([{ quality: videos.get(m[1]) }, { quality: m[2] }]) : m[2]);
+        nodes.push({ kind: 'player', ...base, src, videoId: m ? m[1] : null, quality: m ? m[2] : null, poster });
       } else if ($el.is('[data-testid="richTextElement"]')) {
-        nodes.push({ kind: 'text', ...base, ...readRichText($, $el) });
+        const color = $el.attr('data-color');
+        nodes.push({ kind: 'text', ...base, ...readRichText($, $el), ...(color ? { color } : {}) });
       } else if ($el.is('[data-video-info]')) {
         let info;
         try { info = JSON.parse($el.attr('data-video-info')); } catch { return; }
@@ -108,9 +137,11 @@ export function extractPage(html, slug, sidecar = []) {
     if (!chromeComps.some((other) => other !== comp && $(comp).parents().is(other))) chromeRoot.append($(comp).clone());
   }
 
+  const pageBackground = $('body').attr('data-page-bg');
   return {
     slug,
     seo,
+    ...(pageBackground ? { pageBackground } : {}),
     nodes: walk($('#PAGES_CONTAINER')),
     footer: walk($('#SITE_FOOTER')),
     chrome: walk(chromeRoot),

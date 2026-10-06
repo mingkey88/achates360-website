@@ -24,13 +24,18 @@ const linkedImage = (image: ImageFunction) => z.object({
   src: image(), alt: z.string(), href: z.string().optional(),
 }).strict();
 
+// A component's rendered box on the live Wix site (CSS px, document coordinates): `box` at the
+// 1440x900 desktop render, `mbox` in Wix's 320px mobile layout (see src/lib/rows.ts).
+const box = z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }).strict();
+const layout = { box: box.optional(), mbox: box.optional() };
+
 const block = (image: ImageFunction) => z.discriminatedUnion('type', [
-  z.object({ type: z.literal('text'), md: z.string() }).strict(),
-  z.object({ type: z.literal('image'), src: image(), alt: z.string(), href: z.string().optional() }).strict(),
-  z.object({ type: z.literal('gallery'), items: z.array(galleryItem(image)) }).strict(),
-  z.object({ type: z.literal('video'), src: z.string(), poster: image() }).strict(),
-  z.object({ type: z.literal('embed'), provider: z.enum(['vimeo', 'youtube']), id: z.string() }).strict(),
-  z.object({ type: z.literal('link'), href: z.string(), label: z.string() }).strict(),
+  z.object({ type: z.literal('text'), md: z.string(), color: z.string().optional(), ...layout }).strict(),
+  z.object({ type: z.literal('image'), src: image(), alt: z.string(), href: z.string().optional(), ...layout }).strict(),
+  z.object({ type: z.literal('gallery'), items: z.array(galleryItem(image)), ...layout }).strict(),
+  z.object({ type: z.literal('video'), src: z.string(), poster: image(), controls: z.boolean().optional(), ...layout }).strict(),
+  z.object({ type: z.literal('embed'), provider: z.enum(['vimeo', 'youtube']), id: z.string(), ...layout }).strict(),
+  z.object({ type: z.literal('link'), href: z.string(), label: z.string(), ...layout }).strict(),
 ]);
 
 const media = (image: ImageFunction) => z.discriminatedUnion('type', [
@@ -51,8 +56,9 @@ const projects = defineCollection({
     listed: z.boolean(),
     order: z.number().optional(),
     hero: media(image).optional(),
-    badges: z.array(linkedImage(image)),
+    badges: z.array(z.object({ src: image(), alt: z.string(), href: z.string().optional(), box: box.optional() }).strict()),
     backLink: z.object({ label: z.string(), href: z.string() }).strict().optional(),
+    pageBackground: z.string().optional(),
     seo: seo(image),
     blocks: z.array(block(image)),
   }).strict(),
@@ -76,7 +82,7 @@ const cards = defineCollection({
 
 const basic = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/basic' }),
-  schema: ({ image }) => z.object({ seo: seo(image), blocks: z.array(block(image)) }).strict(),
+  schema: ({ image }) => z.object({ pageBackground: z.string().optional(), seo: seo(image), blocks: z.array(block(image)) }).strict(),
 });
 
 const formSchema = z.object({

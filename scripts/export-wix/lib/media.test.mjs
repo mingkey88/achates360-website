@@ -36,6 +36,13 @@ describe('collectMedia', () => {
       expect(v[0].url).toBe('https://video.wixstatic.com/video/vidQ/1080p/mp4/file.mp4');
     }
   });
+  it('fetches the poster of a Wix-hosted player, and its video from the videos map', () => {
+    const r = { ...fakeRaw, seo: { ogImage: null }, footer: [], videos: new Map([['pv', '720p']]),
+      nodes: [{ kind: 'player', src: 'https://video.wixstatic.com/video/pv/720p/mp4/file.mp4', videoId: 'pv', quality: '720p', poster: 'pvf000.jpg' },
+        { kind: 'player', src: 'https://example.com/a.mp4', videoId: null, quality: null, poster: null }] };
+    const jobs = collectMedia([r], []);
+    expect(jobs.map((j) => j.dest).sort()).toEqual(['public/media/video/pv.mp4', 'src/assets/wix/pvf000.jpg']);
+  });
   it('dedupes jobs by dest', () => {
     const r = { ...fakeRaw, seo: { ogImage: null }, nodes: [{ kind: 'image', file: 'a~mv2.jpg' }, { kind: 'image', file: 'a.jpg' }], footer: [], videos: new Map() };
     const jobs = collectMedia([r], [{ slug: 'abby', vcfUrl: 'u1' }, { slug: 'abby', vcfUrl: 'u1' }]);
