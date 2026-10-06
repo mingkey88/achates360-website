@@ -17,13 +17,17 @@
  *   same 90px info area, rows 22 Wix px apart.
  *   Video tiles show a play button (60px translucent white disc, dark triangle) and start playing
  *   the video in place on hover; the button hides while it plays.  -> layout="grid"
+ *
+ * Home "All Projects" gallery: the same grid with the description shown under the title
+ *   (Helvetica Light 15px/18px #2f2e2e, 6px below the title)  -> description, and the page sets
+ *   the column count, gap and `sizes` for its wider tiles.
  */
 import { Image } from 'astro:assets';
 import { withBase, mediaUrl } from '../lib/paths';
 import { isGif } from '../lib/images';
 interface Item { title: string; description: string; href?: string; thumb: ImageMetadata; alt: string; video?: string }
-interface Props { items: Item[]; layout?: 'stack' | 'grid'; columns?: number; showInfo?: boolean }
-const { items, layout = 'grid', columns = layout === 'stack' ? 1 : 3, showInfo = layout === 'grid' } = Astro.props;
+interface Props { items: Item[]; layout?: 'stack' | 'grid'; columns?: number; showInfo?: boolean; description?: boolean; sizes?: string }
+const { items, layout = 'grid', columns = layout === 'stack' ? 1 : 3, showInfo = layout === 'grid', description = false, sizes } = Astro.props;
 const external = (href: string) => /^https?:\/\//.test(href);
 ---
 <ul class:list={['gallery', `gallery-${layout}`]} style={`--cols:${columns}`}>
@@ -32,7 +36,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
       ? <img src={it.thumb.src} width={it.thumb.width} height={it.thumb.height} alt={it.alt} loading="lazy" decoding="async" />
       : layout === 'stack'
         ? <Image src={it.thumb} alt={it.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 767px) 100vw, 940px" />
-        : <Image src={it.thumb} alt={it.alt} widths={[320, 640, 960]} sizes={`(max-width: 767px) 100vw, ${Math.round(940 / columns)}px`} />;
+        : <Image src={it.thumb} alt={it.alt} widths={sizes ? [320, 640, 960, 1280] : [320, 640, 960]} sizes={sizes ?? `(max-width: 767px) 100vw, ${Math.round(940 / columns)}px`} />;
     const media = (
       <div class="thumb">
         {img}
@@ -40,7 +44,12 @@ const external = (href: string) => /^https?:\/\//.test(href);
         {it.video && <span class="play" aria-hidden="true"></span>}
       </div>
     );
-    const info = showInfo && it.title && <div class="info"><p class="title">{it.title}</p></div>;
+    const info = showInfo && it.title && (
+      <div class:list={['info', { 'with-desc': description }]}>
+        <p class="title">{it.title}</p>
+        {description && it.description && <p class="desc">{it.description}</p>}
+      </div>
+    );
     return (
       <li>
         {it.href
@@ -93,6 +102,11 @@ const external = (href: string) => /^https?:\/\//.test(href);
     font-size: var(--size-gallery-title); line-height: var(--gallery-title-leading); color: var(--color-heading);
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
+  .info.with-desc { height: auto; min-height: 90px; }
+  .info .desc {
+    margin: 6px 0 0; font-family: var(--font-body); font-weight: var(--weight-light);
+    font-size: 15px; line-height: 18px; color: var(--color-heading);
+  }
 
   @media (max-width: 767px) {
     .gallery { grid-template-columns: minmax(0, 1fr); }
@@ -100,6 +114,8 @@ const external = (href: string) => /^https?:\/\//.test(href);
     .gallery-grid { gap: calc(22 * var(--m)); }
     .info { height: calc(90 * var(--m)); padding-top: calc(15 * var(--m)); }
     .info .title { font-size: calc(22 * var(--m)); line-height: calc(27 * var(--m)); }
+    .info.with-desc { min-height: calc(90 * var(--m)); }
+    .info .desc { margin-top: calc(6 * var(--m)); font-size: calc(15 * var(--m)); line-height: calc(18 * var(--m)); }
     .play { width: calc(60 * var(--m)); height: calc(60 * var(--m)); }
     .play::after { left: calc(24 * var(--m)); top: calc(20 * var(--m)); border-width: calc(10 * var(--m)) 0 calc(10 * var(--m)) calc(16 * var(--m)); }
   }
