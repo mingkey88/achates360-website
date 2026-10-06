@@ -22,8 +22,14 @@ const external = (href: string) => /^https?:\/\//.test(href);
   {d.hero && (
     <div class="hero">
       {d.hero.type === 'video'
-        ? <BgVideo src={d.hero.src} poster={d.hero.poster} class="hero-media" />
-        : <Image class="hero-media" src={d.hero.src} alt={d.hero.alt} widths={[768, 1440, 1920, 2560]} sizes="100vw" loading="eager" fetchpriority="high" />}
+        ? <BgVideo src={d.hero.src} poster={d.hero.poster} class="hero-media" desktopOnly />
+        : (
+          <picture>
+            {/* Wix's mobile layout has no hero: an empty source keeps phones from fetching it. */}
+            <source media="(max-width: 767px)" srcset="data:," />
+            <Image class="hero-media" src={d.hero.src} alt={d.hero.alt} widths={[768, 1440, 1920, 2560]} sizes="100vw" loading="eager" fetchpriority="high" />
+          </picture>
+        )}
       {d.badges.length > 0 && (
         <div class="badges">
           {d.badges.map((b) => {
@@ -34,14 +40,16 @@ const external = (href: string) => /^https?:\/\//.test(href);
           })}
         </div>
       )}
-      {d.heroCaption && <p class="sr-only">{d.heroCaption}</p>}
     </div>
   )}
+  {/* Wix's off-canvas hero caption (Ruling 19b): kept for screen readers, outside the hero so it
+      survives the hero being hidden on mobile. */}
+  {d.heroCaption && <p class="sr-only">{d.heroCaption}</p>}
   <article class="wrap project">
     {d.backLink && <p class="back"><a href={withBase(backLinkHref(d.backLink.href))}>{d.backLink.label}</a></p>}
     <h2 class="title">{d.title}</h2>
     {d.client && <p class="client">{d.client}</p>}
-    <div class="blocks"><Blocks blocks={d.blocks} gallery="stack" /></div>
+    <div class="blocks"><Blocks blocks={d.blocks} gallery="stack" pageTitle={d.title} /></div>
     {d.copyright && <p class="copyright">{d.copyright}</p>}
   </article>
 </Base>

@@ -6,7 +6,7 @@ interface Props { entry: CollectionEntry<'basic'> }
 const { id, data: d } = Astro.props.entry;
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass={`page-basic page-${id}`}>
-  <div class="basic"><Blocks blocks={d.blocks} gallery="grid" /></div>
+  <div class="basic"><Blocks blocks={d.blocks} gallery="grid" pageTitle={d.seo.title} /></div>
 </Base>
 <style>
   /*
@@ -25,10 +25,10 @@ const { id, data: d } = Astro.props.entry;
    * Mobile: text 20/144, 280 wide, 14px; then the back link (280x78, centred); photo 25 below.
    */
   :global(body.page-about) { background: var(--color-page-dark); }
-  :global(.page-about) .basic { width: 798px; margin-left: calc(50% - 392px); padding: 153px 0 65px; }
+  :global(.page-about) .basic { width: min(798px, 100% - 2 * var(--gutter)); margin-left: max(var(--gutter), calc(50% - 392px)); padding: 153px 0 65px; }
   :global(.page-about) .basic :global(.block-link) { margin: 0; padding-right: 79px; text-align: right; font: var(--weight-light) var(--size-ui) / var(--leading-ui) var(--font-ui); }
   :global(.page-about) .basic :global(.block-link a) { color: #fff; text-decoration: none; }
-  :global(.page-about) .basic :global(.block-text) { width: 518px; margin: 41px 0 0 1px; color: var(--color-on-dark); font-size: 20px; line-height: 25px; }
+  :global(.page-about) .basic :global(.block-text) { width: min(518px, 100%); margin: 41px 0 0 1px; color: var(--color-on-dark); font-size: 20px; line-height: 25px; }
   :global(.page-about) .basic :global(.block-text p) { margin: 0; }
   :global(.page-about) .basic :global(.block-image) { margin-top: 37px; }
 
@@ -43,11 +43,11 @@ const { id, data: d } = Astro.props.entry;
    */
   :global(body.page-joinus) { background: var(--color-page-alt); }
   :global(.page-joinus) .basic {
-    display: grid; grid-template-columns: 435px 544px; align-items: start;
-    width: 979px; margin-left: calc(50% - 537px); padding: 132px 0 100px;
+    display: grid; grid-template-columns: minmax(0, 435fr) minmax(0, 544fr); align-items: start;
+    width: min(979px, 100% - 2 * var(--gutter)); margin-left: max(var(--gutter), calc(50% - 537px)); padding: 132px 0 100px;
   }
   :global(.page-joinus) .basic > :global(:nth-child(1)) { grid-area: 1 / 1 / 2 / 3; }
-  :global(.page-joinus) .basic > :global(:nth-child(2)) { grid-area: 2 / 1 / 4 / 2; position: relative; z-index: 1; width: 452px; margin-top: 8px; }
+  :global(.page-joinus) .basic > :global(:nth-child(2)) { grid-area: 2 / 1 / 4 / 2; position: relative; z-index: 1; width: calc(100% + 17px); margin-top: 8px; }
   :global(.page-joinus) .basic > :global(:nth-child(3)) { grid-area: 2 / 2; margin-top: 8px; }
   :global(.page-joinus) .basic > :global(:nth-child(4)) { grid-area: 3 / 2; }
   :global(.page-joinus) .basic :global(h1) { margin: 0; font-size: 56px; font-weight: 700; line-height: normal; }

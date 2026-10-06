@@ -6,8 +6,8 @@ import { isGif } from '../lib/images';
 import BgVideo from './BgVideo.astro';
 import Embed from './Embed.astro';
 import Gallery from './Gallery.astro';
-interface Props { blocks: any[]; gallery?: 'stack' | 'grid' }
-const { blocks, gallery = 'grid' } = Astro.props;
+interface Props { blocks: any[]; gallery?: 'stack' | 'grid'; pageTitle?: string }
+const { blocks, gallery = 'grid', pageTitle } = Astro.props;
 ---
 {blocks.map((b) => {
   if (b.type === 'text') return <div class="block-text" set:html={renderMd(b.md)} />;
@@ -22,6 +22,6 @@ const { blocks, gallery = 'grid' } = Astro.props;
   }
   if (b.type === 'gallery') return <Gallery items={b.items} layout={gallery} />;
   if (b.type === 'video') return <BgVideo src={b.src} poster={b.poster} class="block-video" />;
-  if (b.type === 'embed') return <Embed provider={b.provider} id={b.id} />;
+  if (b.type === 'embed') return <Embed provider={b.provider} id={b.id} title={pageTitle ? `${pageTitle} video` : undefined} />;
   return null;
 })}
