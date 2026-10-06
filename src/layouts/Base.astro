@@ -2,7 +2,7 @@
 import { getEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { SITE_ENV } from 'astro:env/server';
-import { robotsMeta } from '../lib/seo';
+import { robotsMeta, canonicalUrl } from '../lib/seo';
 import { pagePath } from '../lib/paths';
 import Logo from '../components/Logo.astro';
 import Footer from '../components/Footer.astro';
@@ -19,8 +19,8 @@ const { title, description, ogImage, bodyClass, background } = Astro.props;
 const site = (await getEntry('site', 'site'))!.data;
 const robots = robotsMeta(SITE_ENV);
 const og = ogImage ? new URL((await getImage({ src: ogImage, width: 1200, format: 'jpg' })).src, Astro.site).href : undefined;
-// build.format 'file' reports /x.html and /index.html; the live URLs are /x and /.
-const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), Astro.site).href;
+// build.format 'file' reports /x.html and /index.html; the live URLs are /x and / (see canonicalUrl).
+const canonical = canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL);
 const path = pagePath(Astro.url.pathname);
 // Wix's icon sizes: 32 (favicon), 192 (icon) and 180 (apple-touch-icon), all from one PNG.
 const icon = async (w: number) => site.favicon && (await getImage({ src: site.favicon.src, width: w, height: w, format: 'png' })).src;

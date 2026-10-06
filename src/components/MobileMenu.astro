@@ -107,7 +107,7 @@ const { menu, path } = Astro.props;
       font: 700 calc(20 * var(--m)) / calc(28 * var(--m)) var(--font-heading);
     }
     .sub a { font-size: calc(18 * var(--m)); }
-    .item.current > a, .row a[aria-current], .sub .current a { color: #f2f2f2; }
+    .item.current > a, .row a[aria-current], .sub .current a { color: var(--color-page-alt); }
     .row { display: flex; justify-content: center; }
     .row a { padding-left: 0; }
     /* The button turns into the X: the dialog's own close button takes its place. */

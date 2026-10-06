@@ -14,7 +14,7 @@ const icon = (prefix: string) => d.links.find((l) => l.href.startsWith(prefix) &
 const phoneIcon = icon('tel:');
 const mailIcon = icon('mailto:');
 // Every card page has the same Wix page background (data-page-bg rgb(235, 210, 197)).
-const PAGE_BG = '#ebd2c5';
+const PAGE_BG = 'var(--color-card-bg)';
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="card-page" background={PAGE_BG}>
   <section class="card-section">
@@ -87,9 +87,9 @@ const PAGE_BG = '#ebd2c5';
   .mail { left: calc(376 * var(--d)); }
   .contact .icon {
     flex: none; display: grid; place-items: center; width: calc(47 * var(--d)); height: calc(47 * var(--d));
-    margin-right: calc(11 * var(--d)); border-radius: 50%; background: #282626; transition: background 0.2s ease;
+    margin-right: calc(11 * var(--d)); border-radius: 50%; background: var(--color-button); transition: background 0.2s ease;
   }
-  .contact .icon:hover { background: #ebd2c5; }
+  .contact .icon:hover { background: var(--color-card-bg); }
   .contact .icon svg { width: calc(18 * var(--d)); height: calc(18 * var(--d)); fill: #fff; }
   .contact .text { margin-top: calc(12.5 * var(--d)); line-height: normal; text-decoration: none; overflow-wrap: anywhere; }
   .phone .text { width: calc(135 * var(--d)); }
@@ -97,10 +97,10 @@ const PAGE_BG = '#ebd2c5';
   .vcard {
     left: calc(130 * var(--d)); top: calc(338 * var(--d)); width: calc(246 * var(--d)); height: calc(45 * var(--d));
     display: flex; align-items: center; justify-content: center; gap: calc(8 * var(--d));
-    border-radius: 50px; background: #2f2e2e; color: #fff; text-decoration: none; transition: background 0.2s ease;
+    border-radius: 50px; background: var(--color-heading); color: #fff; text-decoration: none; transition: background 0.2s ease;
     font: var(--weight-light) calc(20 * var(--d)) / 1 var(--font-ui); /* Wix: Avenir Light 20px */
   }
-  .vcard:hover { background: #ebd2c5; }
+  .vcard:hover { background: var(--color-card-bg); }
   .vcard svg { width: calc(37 * var(--d)); height: calc(37 * var(--d)); fill: #fff; transition: inherit; }
   .vcard:hover svg { width: calc(42 * var(--d)); height: calc(42 * var(--d)); }
 

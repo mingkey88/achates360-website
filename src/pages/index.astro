@@ -57,7 +57,7 @@ const FALLBACK: SlideLayout = { cta: [385, 800], m: { h: 227, cta: 162 } };
 const vars = (o: Record<string, number | undefined>) =>
   Object.entries(o).filter(([, v]) => v !== undefined).map(([k, v]) => `--${k}: ${v}`).join('; ');
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="home" background="#f2f2f2">
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="home" background="var(--color-page-alt)">
   <AnchorMenu items={d.menu} variant="dots" labels={false} />
   {d.slides.map((s, i) => {
     const l = LAYOUT[s.id] ?? FALLBACK;
@@ -140,7 +140,7 @@ const vars = (o: Record<string, number | undefined>) =>
   }
   .badge :global(img) { width: 99px; height: 99px; object-fit: contain; }
 
-  .all-projects { position: relative; overflow-x: clip; padding: 79px 0 35px; background: #f2f2f2; }
+  .all-projects { position: relative; overflow-x: clip; padding: 79px 0 35px; background: var(--color-page-alt); }
   .ap-heading { position: absolute; left: 135px; top: 104px; }
   .ap-heading :global(h2) { margin: 0; font-size: 28px; line-height: normal; }
   .ap-heading :global(a) { color: var(--color-heading); text-decoration: none; }
