@@ -12,11 +12,13 @@
  * Wix reports font-weight 400 because the light cut is a separate family; the stand-in reaches the
  * light cut with weight 300, so weight tokens below are 300 where Wix's face is "light".
  *
- * Mobile (-m) values are Wix's mobile-layout values verbatim. Wix lays mobile out at 320 CSS px and
- * zooms it to the device width (viewport meta "width=320"), so on a 390px phone Wix text appears
- * 390/320 = 1.22x larger than these numbers.
+ * Mobile (-m) values (Ruling 21): Wix lays mobile out at a fixed 320 CSS px and zooms it to the
+ * device width (viewport meta "width=320"). The clone keeps width=device-width and instead scales
+ * every mobile length by --m, so each -m token is calc(<measured Wix px> * var(--m)).
  */
 :root {
+  --m: calc(100vw / 320);   /* 1 Wix mobile px: Wix's 320px mobile layout zoomed to the device width (390px phone -> 1.21875px) */
+
   --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Helvetica Light stand-in, use with weight 300 */
   --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;    /* Helvetica Light stand-in, use with weight 300 */
   --font-ui: 'Nunito Sans', 'Avenir Next', Avenir, Helvetica, Arial, sans-serif; /* Avenir Light stand-in (Nunito Sans 300) */
@@ -34,22 +36,22 @@
   --color-header: #2f2e2e;   /* live #SITE_HEADER background rgb(47, 46, 46); pixel (5,5) of notter/mobile.png */
 
   --size-title: 28px;        /* desktop:notter.projectTitle.fontSize */
-  --size-title-m: 23px;      /* mobile:notter.projectTitle.fontSize */
+  --size-title-m: calc(23 * var(--m));      /* mobile:notter.projectTitle.fontSize */
   --size-small-heading: 22px;    /* no desktop smallHeading in styles.json; live computed h5 on /dbs-discretionary-portfolio-management, = desktop:home.footerHeading */
-  --size-small-heading-m: 19px;  /* mobile:projects.smallHeading.fontSize */
+  --size-small-heading-m: calc(19 * var(--m));  /* mobile:projects.smallHeading.fontSize */
   --size-body: 15px;         /* desktop:notter.projectBody.fontSize */
-  --size-body-m: 14px;       /* mobile:notter.projectBody.fontSize */
+  --size-body-m: calc(14 * var(--m));       /* mobile:notter.projectBody.fontSize */
   --size-footer: 15px;       /* desktop:home.footerText.fontSize */
-  --size-footer-m: 14px;     /* mobile:home.footerText.fontSize */
+  --size-footer-m: calc(14 * var(--m));     /* mobile:home.footerText.fontSize */
   --size-footer-heading: 22px;   /* desktop:home.footerHeading.fontSize */
-  --size-footer-heading-m: 18px; /* mobile:home.footerHeading.fontSize */
+  --size-footer-heading-m: calc(18 * var(--m)); /* mobile:home.footerHeading.fontSize */
   --size-gallery-title: 22px;    /* desktop:projects.galleryTitle.fontSize */
   --leading-body: 21px;      /* desktop:notter.projectBody.lineHeight */
-  --leading-body-m: 19.6px;  /* mobile:notter.projectBody.lineHeight */
+  --leading-body-m: calc(19.6 * var(--m));  /* mobile:notter.projectBody.lineHeight */
   --leading-footer: 21px;    /* desktop:home.footerText.lineHeight */
-  --leading-footer-m: 19.6px;        /* mobile:home.footerText.lineHeight */
+  --leading-footer-m: calc(19.6 * var(--m));        /* mobile:home.footerText.lineHeight */
   --leading-footer-heading: 28.6px;  /* desktop:home.footerHeading.lineHeight */
-  --leading-footer-heading-m: 23.4px;/* mobile:home.footerHeading.lineHeight */
+  --leading-footer-heading-m: calc(23.4 * var(--m));/* mobile:home.footerHeading.lineHeight */
   --weight-title: 300;       /* desktop:notter.projectTitle.fontWeight is 400 of the Light face -> 300 in the stand-in (see header) */
 
   --button-radius: 0px;      /* desktop:home.formSubmit.borderRadius */

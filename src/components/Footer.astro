@@ -54,7 +54,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
    * desktop: columns start x=48 / 494 / 982 at 1440 (358 / 709 at 1024 — proportional), labels at
    *   y=43, intro heading and contact heading at y=77, icons at y=82 (39px, 49px step),
    *   legal lines at y=217.
-   * mobile (Wix 320 layout): 20px inset, single column: intro y=38, Contact 144, details 174,
+   * mobile (Wix 320 layout, lengths scaled by --m per Ruling 21): 20px inset, single column: intro y=38, Contact 144, details 174,
    *   Social 351, icons 381 (35px, 50px step), legal 426.
    */
   .site-footer {
@@ -92,13 +92,13 @@ const external = (href: string) => /^https?:\/\//.test(href);
     .site-footer :global(h5 ~ p) { font-size: var(--size-footer-heading-m); line-height: var(--leading-footer-heading-m); }
     .site-footer :global(h5 ~ p + p) { margin-top: var(--leading-footer-heading-m); }
     .site-footer :global(h6) { font-size: var(--size-footer-m); line-height: var(--leading-footer-m); }
-    .grid { display: block; padding: 38px var(--gutter) 130px; }
+    .grid { display: block; padding: calc(38 * var(--m)) calc(20 * var(--m)) calc(130 * var(--m)); }
     .intro { margin: 0; max-width: none; }
-    .col { margin-top: 36px; }
-    .col + .col { margin-top: 37px; }
-    .col > :global(.block-text + .block-text) { margin-top: 10px; }
-    .social { gap: 15px; margin-top: 10px; }
-    .social :global(img) { width: 35px; height: 35px; }
-    .legal { margin-top: 10px; }
+    .col { margin-top: calc(36 * var(--m)); }
+    .col + .col { margin-top: calc(37 * var(--m)); }
+    .col > :global(.block-text + .block-text) { margin-top: calc(10 * var(--m)); }
+    .social { gap: calc(15 * var(--m)); margin-top: calc(10 * var(--m)); }
+    .social :global(img) { width: calc(35 * var(--m)); height: calc(35 * var(--m)); }
+    .legal { margin-top: calc(10 * var(--m)); }
   }
 </style>
