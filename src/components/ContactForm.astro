@@ -52,12 +52,13 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     ))}
     <div class="groups">
       {form.groups.map((g, i) => (
-        <fieldset class="group" data-required={g.required ? 'true' : 'false'}>
+        <fieldset class="group" data-required={g.required ? 'true' : 'false'} aria-describedby={g.required ? `group-error-${i + 1}` : undefined}>
           <legend>{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
           {g.options.map((o) => (
             <label class="option"><input type="checkbox" name={`group-${i + 1}`} value={o} /><span>{o}</span></label>
           ))}
-          <p class="group-error" hidden>Please choose at least one.</p>
+          {/* An alert region, always rendered so screen readers announce the text when it is set. */}
+          {g.required && <p class="group-error" id={`group-error-${i + 1}`} role="alert" data-message="Please choose at least one."></p>}
         </fieldset>
       ))}
     </div>
@@ -76,9 +77,13 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   for (const form of document.querySelectorAll<HTMLFormElement>('form.enquiry')) {
     const status = form.querySelector<HTMLElement>('.status')!;
     const groups = [...form.querySelectorAll<HTMLFieldSetElement>('fieldset[data-required="true"]')];
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const success = form.querySelector<HTMLElement>('.success');
     const checkGroup = (fs: HTMLFieldSetElement) => {
       const any = fs.querySelector('input:checked') !== null;
-      fs.querySelector<HTMLElement>('.group-error')!.hidden = any;
+      const error = fs.querySelector<HTMLElement>('.group-error')!;
+      const text = any ? '' : error.dataset.message!;
+      if (error.textContent !== text) error.textContent = text;
       fs.classList.toggle('invalid', !any);
       return any;
     };
@@ -89,6 +94,10 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     });
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (submit.disabled) return;
+      // A new attempt clears the last outcome.
+      success?.setAttribute('hidden', '');
+      status.textContent = '';
       form.classList.add('tried');
       let ok = form.checkValidity();
       for (const fs of groups) ok = checkGroup(fs) && ok;
@@ -99,15 +108,18 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       }
       if (!PUBLIC_FORM_ENDPOINT) { status.textContent = 'Form not connected on staging'; return; }
       status.textContent = 'Sending…';
+      submit.disabled = true; // no second post while the first is in flight
       try {
         const res = await fetch(PUBLIC_FORM_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
         form.classList.remove('tried');
         status.textContent = '';
-        form.querySelector<HTMLElement>('.success')?.removeAttribute('hidden');
+        success?.removeAttribute('hidden');
       } catch {
         status.textContent = 'Sorry, something went wrong. Please email hello@achates360.com.';
+      } finally {
+        submit.disabled = false;
       }
     });
   }
@@ -153,6 +165,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
   .option input:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 2px; }
   .group-error { margin: 4px 0 0; color: #df3131; white-space: nowrap; font: var(--weight-light) 13px / 18px var(--font-ui); }
+  .group-error:empty { margin: 0; }
 
   textarea.box, .box textarea {
     display: block; width: 347px; height: 106px; margin: 0; padding: 11.25px 10px 3px 7px; resize: none;
@@ -167,6 +180,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     border: 1px solid rgb(48 189 255); border-radius: var(--button-radius); background: var(--color-muted);
     color: #fff; cursor: pointer; font: var(--weight-light) 20px / 28px var(--font-ui);
   }
+  button:disabled { cursor: progress; }
   .status, .success { width: 347px; text-align: center; color: var(--color-text); font: var(--weight-light) 14px / normal var(--font-ui); }
   .status { margin: 13.5px 0 0; }
   /* Kept rendered (not display: none) so screen readers announce it when text arrives. */

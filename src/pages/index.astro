@@ -66,7 +66,7 @@ const vars = (o: Record<string, number | undefined>) =>
       'mh': l.m.h, 'm-cta': l.m.cta, 'm-text': l.m.text,
     });
     return (
-      <section id={s.id} class="slide" style={style}>
+      <section id={s.id} class="slide" style={style} data-bgvideo-viewport>
         <div class="slide-bg">
           {s.media.type === 'video'
             ? (
@@ -100,20 +100,6 @@ const vars = (o: Record<string, number | undefined>) =>
   </section>
   <ContactForm md={d.contact.md} form={d.contact.form} />
 </Base>
-<script>
-  // Play a slide's background video only while its slide is on screen (Wix pauses the others).
-  // BgVideo attaches the source on desktop and leaves videos paused under prefers-reduced-motion.
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      const v = e.target.querySelector<HTMLVideoElement>('.slide-video video');
-      if (!v || !v.getAttribute('src')) continue;
-      if (e.isIntersecting && !reduce.matches) v.play().catch(() => {});
-      else v.pause();
-    }
-  });
-  document.querySelectorAll('.slide').forEach((s) => io.observe(s));
-</script>
 <style>
   /* Dot menu: white rings 59px in from the right, 35.5px apart, filled white when current or hovered. */
   :global(body.home) { --anchor-color: #fff; --anchor-active: #fff; }

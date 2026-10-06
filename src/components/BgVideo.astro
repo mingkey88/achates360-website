@@ -1,8 +1,12 @@
 ---
 import { getImage } from 'astro:assets';
 import { mediaUrl } from '../lib/paths';
-// desktopOnly: the video (and its poster) load and play only at >=768px, for media that Wix's mobile
-// layout hides; the script attaches them when the viewport is wide enough, and pauses below it.
+// Background video (muted, looping, no controls). It plays only while on screen and never under
+// prefers-reduced-motion. "On screen" is the video's own box, or the nearest ancestor marked
+// data-bgvideo-viewport when the video sits in a larger layer than the part shown (the
+// homepage's sticky slide backgrounds).
+// desktopOnly: the video (and its poster) load only at >=768px, for media that Wix's mobile layout
+// hides, and only once the video comes within a screen of the viewport.
 interface Props { src: string; poster: ImageMetadata; class?: string; desktopOnly?: boolean }
 const { src, poster, class: cls, desktopOnly = false } = Astro.props;
 const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
@@ -15,20 +19,35 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
 <script>
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const desktop = window.matchMedia('(min-width: 768px)');
-  const apply = () => document.querySelectorAll<HTMLVideoElement>('.bgvideo video').forEach((v) => {
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('.bgvideo video')];
+  const near = new Set<Element>(); // within a screen of the viewport: may load
+  const seen = new Set<Element>(); // on screen: may play
+  const area = (v: HTMLVideoElement) => v.closest('[data-bgvideo-viewport]') ?? v;
+
+  const update = (v: HTMLVideoElement) => {
+    if (reduce.matches) v.removeAttribute('autoplay');
     if (v.dataset.src !== undefined) {
       if (!desktop.matches) { v.pause(); return; }
       if (!v.getAttribute('src')) {
+        if (!near.has(area(v))) return;
         if (v.dataset.poster) v.poster = v.dataset.poster;
         v.preload = 'metadata';
         v.src = v.dataset.src;
       }
     }
-    if (reduce.matches) { v.pause(); v.removeAttribute('autoplay'); } else { v.play().catch(() => {}); }
-  });
-  apply();
-  reduce.addEventListener('change', apply);
-  desktop.addEventListener('change', apply);
+    if (seen.has(area(v)) && !reduce.matches) v.play().catch(() => {});
+    else v.pause();
+  };
+  const watch = (set: Set<Element>, rootMargin: string) => new IntersectionObserver((entries) => {
+    for (const e of entries) e.isIntersecting ? set.add(e.target) : set.delete(e.target);
+    for (const v of videos) if (entries.some((e) => e.target === area(v))) update(v);
+  }, { rootMargin });
+  const nearIO = watch(near, '100% 0px');
+  const seenIO = watch(seen, '0px');
+  for (const el of new Set(videos.map(area))) { nearIO.observe(el); seenIO.observe(el); }
+  for (const v of videos) update(v);
+  reduce.addEventListener('change', () => videos.forEach(update));
+  desktop.addEventListener('change', () => videos.forEach(update));
 </script>
 <style>
   .bgvideo { position: relative; overflow: hidden; }
