@@ -5,7 +5,7 @@ import { ORIGIN } from './lib/urls.mjs';
 
 export const pageUrl = (slug) => (slug === 'home' ? ORIGIN + '/' : `${ORIGIN}/${slug}`);
 
-async function settle(page) {
+export async function settle(page) {
   // Wix keeps analytics connections open, so 'networkidle' never fires.
   await page.waitForTimeout(1000);
   for (let i = 0; i < 40; i++) {
@@ -22,6 +22,7 @@ async function settle(page) {
 }
 
 export async function renderPage(browser, slug, { htmlDir, shotDir, mobileContext } = {}) {
+  if (shotDir && !mobileContext) throw new Error('renderPage: mobileContext is required when shotDir is set');
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   try {
     await page.goto(pageUrl(slug), { waitUntil: 'load', timeout: 60000 });
