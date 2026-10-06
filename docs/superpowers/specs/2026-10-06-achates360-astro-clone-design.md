@@ -311,3 +311,36 @@ The export adds to this list.
 
 2. Redesign — direction, design system, page designs, built on this codebase.
 3. Cutover — DNS from Wix, production `SITE_ENV`, Search Console, form live, Wix retirement.
+
+---
+
+## 12. Revisions after technical research (2026-10-06, before planning)
+
+Findings from probing the live site that refine — not change — the approved design:
+
+1. **Export renders pages in a real browser.** Gallery images and Vimeo/YouTube players are
+   injected by Wix's JS and are absent from the server HTML (e.g. Notter: 7 images in raw HTML,
+   13 after render). The export uses Playwright; Wix never reaches network-idle, so it waits for
+   `load` then scrolls the page to trigger lazy content.
+2. **Mobile references need a mobile user agent.** Wix picks its mobile layout server-side by UA,
+   not viewport width; the 390px screenshots use Playwright's iPhone device profile.
+3. **Homepage is not a carousel.** It is full-screen sections with a Wix anchor menu labelled
+   `·, 1, 3, 4, 5, Sales Lead, Footer` (there is no "2" — logged as a query), followed by an
+   "All Projects" gallery and the enquiry form.
+4. **Gallery data comes from Wix's embedded JSON.** `#wix-warmup-data` holds each gallery item's
+   title, client line, link (as a Wix pageId) and video metadata; `#wix-viewer-model` maps pageIds
+   to URLs. It also lists **77 routes vs 69 sitemap URLs** — hidden routes are logged, not cloned.
+5. **No site header.** The logo is a site-wide element; there is no nav bar.
+6. **Enquiry form has no message field**, though an option reads "Others ( Pls specify in
+   message)" — logged as a query.
+7. **Media is stored flat**, keyed by Wix file id, in `src/assets/wix/` (images, deduplicated —
+   the same image is reused by galleries and case studies) and `public/media/video/` (video).
+   Local filenames drop Wix's `~mv2` suffix.
+8. **Collections:** `projects`, `cards`, `basic` (about, joinus, and any page that does not fit
+   the project shape, e.g. `copy-of-projects`), `home`, `projectsIndex`, `site` (logo, footer).
+   Projects, cards and basic pages all render through `[slug].astro`.
+9. **Project field `year` becomes `copyright`**, holding the verbatim line (e.g. `© 2020`), and
+   projects gain `badges` (award images above the back link) and `backLink` (verbatim label and
+   target, currently `/`).
+10. **Card links are stored per link.** The icon link and the visible text link can have
+    different targets (Angeline: icon → `angeline@`, text → `jamillie@`), so each is kept.
