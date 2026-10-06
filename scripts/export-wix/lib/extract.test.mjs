@@ -3,11 +3,16 @@ import { readFileSync } from 'node:fs';
 import { extractPage, extractRoutes } from './extract.mjs';
 
 const fx = (s) => readFileSync(new URL(`../__fixtures__/${s}.html`, import.meta.url), 'utf8');
+// Gallery item data Wix loaded over the network while rendering (written by render.mjs).
+const side = (s) => {
+  try { return JSON.parse(readFileSync(new URL(`../__fixtures__/${s}.gallery.json`, import.meta.url), 'utf8')); } catch { return []; }
+};
+const load = (s) => extractPage(fx(s), s, side(s));
 const kinds = (p) => p.nodes.map((n) => n.kind);
 const texts = (p) => p.nodes.filter((n) => n.kind === 'text').map((n) => n.text);
 
 describe('extractPage: case study with YouTube (DBS)', () => {
-  const p = extractPage(fx('dbs-discretionary-portfolio-management'), 'dbs-discretionary-portfolio-management');
+  const p = load('dbs-discretionary-portfolio-management');
   it('reads SEO verbatim', () => {
     expect(p.seo.title).toBe('DBS Discretionary Portfolio Management | Achates 360');
     expect(p.seo.description).toMatch(/^Achates 360 developed investment communications/);
@@ -30,7 +35,7 @@ describe('extractPage: case study with YouTube (DBS)', () => {
 });
 
 describe('extractPage: case study with Vimeo and a gallery (Notter)', () => {
-  const p = extractPage(fx('notter'), 'notter');
+  const p = load('notter');
   it('captures the Vimeo embed', () => {
     expect(p.nodes.find((n) => n.kind === 'embed')).toMatchObject({ provider: 'vimeo', id: '766942392' });
   });
@@ -54,7 +59,7 @@ describe('extractPage: case study with Vimeo and a gallery (Notter)', () => {
 });
 
 describe('extractPage: business card (Angeline)', () => {
-  const p = extractPage(fx('angeline'), 'angeline');
+  const p = load('angeline');
   it('keeps link targets exactly as Wix has them', () => {
     const hrefs = [...p.nodes.filter((n) => n.kind === 'link').map((n) => n.href),
       ...p.nodes.flatMap((n) => (n.kind === 'text' ? n.links.map((l) => l.href) : []))];
@@ -70,7 +75,7 @@ describe('extractPage: business card (Angeline)', () => {
 });
 
 describe('extractPage: home', () => {
-  const p = extractPage(fx('home'), 'home');
+  const p = load('home');
   it('finds the four background videos with best quality', () => {
     const v = p.nodes.filter((n) => n.kind === 'bgvideo');
     expect(v.map((n) => n.videoId)).toEqual([
@@ -102,23 +107,43 @@ describe('extractPage: home', () => {
     expect(f.groups.every((g) => g.required)).toBe(true);
     expect(f.submitLabel).toBe('Submit');
   });
+  it('reads checkbox-group labels without the required markers', () => {
+    expect(p.nodes.find((n) => n.kind === 'form').groups.map((g) => g.label)).toEqual(['Services you are looking at?', 'Selection 2']);
+  });
+  it('keeps the rich text inside the form (the success message)', () => {
+    const f = p.nodes.find((n) => n.kind === 'form');
+    expect(f.texts.map((t) => t.text)).toContain('Thanks for submitting!');
+    expect(f.texts[0]).toMatchObject({ html: expect.any(String), links: expect.any(Array) });
+  });
   it('the All Projects gallery links items to pages', () => {
     const g = p.nodes.find((n) => n.kind === 'gallery');
     expect(g.items.length).toBeGreaterThan(30);
-    // Wix ships link data (#wix-warmup-data) for only the first 25 of 58 items
-    // (totalItemsCount: 58); the rest arrive by XHR, so the saved page cannot link them.
-    expect(g.items.filter((i) => i.href).length).toBeGreaterThanOrEqual(25);
+    expect(g.items.filter((i) => i.href).length).toBeGreaterThan(30);
+  });
+  it('resolves the network-loaded video tiles', () => {
+    const g = p.nodes.find((n) => n.kind === 'gallery');
+    for (const title of ['GROHE Quarterly Campaigns', 'DXV Microsite & Design Inspiration Book', 'The Ritz Kids Programme Guide']) {
+      expect(g.items.find((i) => i.title === title)).toMatchObject({
+        href: expect.stringMatching(/^\//), video: { videoId: expect.stringMatching(/^\w+_\w+$/), quality: expect.stringMatching(/^\d+p$/) } });
+    }
+  });
+  it('falls back to DOM title and description for a tile with no Wix data', () => {
+    const html = fx('home').replace(/data-id="e0fc695e-0954-4820-a19f-b5a3ea953baa"/g, 'data-id="not-in-any-data"');
+    const g = extractPage(html, 'home', []).nodes.find((n) => n.kind === 'gallery');
+    expect(g.items.find((i) => i.itemId === 'not-in-any-data')).toMatchObject({
+      title: '‘Building Memories’ Art Book [Award Winning]', description: 'Achates 360', href: null });
   });
   it('collects every video in the videos map', () => {
     expect(p.videos.get('9766c0_a95ab9ebfe8a49038442d749baa6de8d')).toBe('1080p');
   });
-  it('finds the logo outside the page container', () => {
+  it('finds the logo outside the page container, once', () => {
+    expect(p.chrome).toHaveLength(1);
     expect(p.chrome.some((n) => n.kind === 'image' && /logo/i.test(n.alt))).toBe(true);
   });
 });
 
 describe('extractPage: projects index', () => {
-  const p = extractPage(fx('projects'), 'projects');
+  const p = load('projects');
   it('has nine category galleries preceded by headings', () => {
     expect(p.nodes.filter((n) => n.kind === 'gallery')).toHaveLength(9);
     expect(texts(p)).toContain('Strategic Branding');
@@ -129,6 +154,7 @@ describe('extractPage: projects index', () => {
     expect(all.find((i) => i.title === 'Grab Brand App Campaign')).toMatchObject({ description: 'Grab, Singapore', href: '/grab-brand-app-campaign' });
     expect(all.find((i) => i.title.startsWith('DXV Microsite'))).toMatchObject({
       href: '/dxv', video: { videoId: '9766c0_d7653d55673a48afa5a77e57faf2ee44', quality: '720p' } });
+    expect(all.find((i) => i.title === 'Samsung The Freestyle')).toMatchObject({ href: '/samsung-the-freestyle' });
   });
 });
 

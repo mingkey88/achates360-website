@@ -2,6 +2,7 @@ import { chromium, devices } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { ORIGIN } from './lib/urls.mjs';
+import { findGalleryItems } from './lib/wixdata.mjs';
 
 export const pageUrl = (slug) => (slug === 'home' ? ORIGIN + '/' : `${ORIGIN}/${slug}`);
 
@@ -21,15 +22,37 @@ export async function settle(page) {
   await page.waitForTimeout(500);
 }
 
+// Wix embeds only the first items of each gallery in the page; its gallery widget fetches
+// the rest (today from /pro-gallery-webapp/v1/galleries/<id>?offset=…) inside a web worker.
+// Keep every JSON response body that contains gallery items, whatever its URL.
+function recordGalleryResponses(context) {
+  const pending = [];
+  const onResponse = (res) => {
+    if (!/json/.test(res.headers()['content-type'] ?? '')) return;
+    pending.push(res.json().then(
+      (body) => (findGalleryItems(body).length ? body : null),
+      () => null,
+    ));
+  };
+  // Context level, so requests made by the page's workers are seen too.
+  context.on('response', onResponse);
+  return async () => {
+    context.off('response', onResponse);
+    return (await Promise.all(pending)).filter(Boolean);
+  };
+}
+
 export async function renderPage(browser, slug, { htmlDir, shotDir, mobileContext } = {}) {
   if (shotDir && !mobileContext) throw new Error('renderPage: mobileContext is required when shotDir is set');
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const galleryBodies = recordGalleryResponses(page.context());
   try {
     await page.goto(pageUrl(slug), { waitUntil: 'load', timeout: 60000 });
     await settle(page);
     const html = await page.content();
     await mkdir(htmlDir, { recursive: true });
     await writeFile(`${htmlDir}/${slug}.html`, html);
+    await writeFile(`${htmlDir}/${slug}.gallery.json`, JSON.stringify(await galleryBodies(), null, 1) + '\n');
     if (shotDir) {
       await mkdir(`${shotDir}/${slug}`, { recursive: true });
       await page.screenshot({ path: `${shotDir}/${slug}/desktop.png`, fullPage: true });

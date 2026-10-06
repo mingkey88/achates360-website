@@ -1,15 +1,11 @@
 import * as cheerio from 'cheerio';
 import { mediaFileName, parseEmbed, normalizeHref, bestQuality } from './urls.mjs';
-import { findRoutes, findGalleries, normalizeGalleryItem } from './wixdata.mjs';
+import { findRoutes, findGalleries, findGalleryItems, normalizeGalleryItem } from './wixdata.mjs';
 
 const SELECTOR = [
   '[data-testid="richTextElement"]', 'img', 'iframe', '[data-video-info]', 'a[href]',
   '[data-hook="item-container"]', '.wixui-anchor-menu', 'form',
 ].join(', ');
-
-// Wix writes some hrefs with literal spaces (e.g. `mailto:…?subject=From e-card`);
-// a browser serialises those as %20, so do the same before normalising.
-const toHref = (raw) => normalizeHref(raw.trim().replace(/[\t\n\r]/g, '').replace(/ /g, '%20'));
 
 const readJson = ($, id) => {
   const raw = $(`#${id}`).text();
@@ -20,10 +16,14 @@ export function extractRoutes(html) {
   return findRoutes(readJson(cheerio.load(html), 'wix-viewer-model'));
 }
 
-export function extractPage(html, slug) {
+// sidecar: parsed bodies of the gallery-data network responses render.mjs recorded
+// (<slug>.gallery.json). Wix embeds only the first items of a gallery in the page;
+// the rest arrive over the network, so they are the fallback for missing items.
+export function extractPage(html, slug, sidecar = []) {
   const $ = cheerio.load(html);
   const routes = findRoutes(readJson($, 'wix-viewer-model'));
   const galleryData = findGalleries(readJson($, 'wix-warmup-data'));
+  const loadedItems = new Map(findGalleryItems(sidecar).map((it) => [it.itemId, it]));
   const videos = new Map();
 
   const seo = {
@@ -60,14 +60,13 @@ export function extractPage(html, slug) {
         const galleryComp = $el.closest('[id^="comp-"]').attr('id');
         if (seenGalleries.has(galleryComp)) return;
         seenGalleries.add(galleryComp);
-        const items = readGallery($, galleryComp, galleryData.get(galleryComp) ?? [], routes);
+        const items = readGallery($, galleryComp, galleryData.get(galleryComp) ?? [], loadedItems, routes);
         for (const it of items) if (it.video) videos.set(it.video.videoId, it.video.quality);
         nodes.push({ kind: 'gallery', ...base, comp: galleryComp, items });
       } else if (inGallery || inForm || inMenu) {
         // owned by the gallery / form / menu node
       } else if ($el.is('[data-testid="richTextElement"]')) {
-        const links = $el.find('a[href]').map((_, a) => ({ href: toHref($(a).attr('href')), text: $(a).text().trim() })).get();
-        nodes.push({ kind: 'text', ...base, html: $el.html() ?? '', text: $el.text().replace(/\s+/g, ' ').trim(), links });
+        nodes.push({ kind: 'text', ...base, ...readRichText($, $el) });
       } else if ($el.is('[data-video-info]')) {
         let info;
         try { info = JSON.parse($el.attr('data-video-info')); } catch { return; }
@@ -85,12 +84,12 @@ export function extractPage(html, slug) {
         const file = mediaFileName(src);
         if ([...bgVideoIds].some((id) => file.startsWith(id))) return; // poster frame
         const a = $el.closest('a[href]');
-        nodes.push({ kind: 'image', ...base, file, alt: $el.attr('alt') ?? '', href: a.length ? toHref(a.attr('href')) : null });
+        nodes.push({ kind: 'image', ...base, file, alt: $el.attr('alt') ?? '', href: a.length ? normalizeHref(a.attr('href')) : null });
       } else if ($el.is('a[href]')) {
         if (inRichText || $el.find('img').length) return;
         const text = $el.text().trim();
         if (!text) return;
-        nodes.push({ kind: 'link', ...base, href: toHref($el.attr('href')), text });
+        nodes.push({ kind: 'link', ...base, href: normalizeHref($el.attr('href')), text });
       }
     });
     return nodes;
@@ -119,6 +118,11 @@ export function extractPage(html, slug) {
   };
 }
 
+function readRichText($, $el) {
+  const links = $el.find('a[href]').map((_, a) => ({ href: normalizeHref($(a).attr('href')), text: $(a).text().trim() })).get();
+  return { html: $el.html() ?? '', text: $el.text().replace(/\s+/g, ' ').trim(), links };
+}
+
 function readMenu($, $menu) {
   return $menu.find('a[data-anchor-comp-id]').map((_, a) => {
     const id = $(a).attr('data-anchor-comp-id');
@@ -130,14 +134,14 @@ function readMenu($, $menu) {
   }).get();
 }
 
-function readGallery($, comp, data, routes) {
+function readGallery($, comp, data, loadedItems, routes) {
   const byId = new Map(data.map((d) => [d.itemId, normalizeGalleryItem(d, routes)]));
   const items = [];
   $(`#${comp}`).find('[data-hook="item-container"]').each((_, el) => {
     const id = $(el).attr('data-id');
     const domSrc = $(el).find('img').attr('src');
     const domFile = domSrc && /wixstatic\.com\/media\//.test(domSrc) ? mediaFileName(domSrc) : null;
-    const known = byId.get(id);
+    const known = byId.get(id) ?? (loadedItems.has(id) ? normalizeGalleryItem(loadedItems.get(id), routes) : undefined);
     items.push(known
       ? { ...known, file: domFile ?? known.file }
       : { itemId: id, title: $(el).find('[data-hook="item-title"]').text().trim(),
@@ -171,5 +175,7 @@ function readForm($, $form) {
       options: $fs.find('[data-testid="text"]').map((_, t) => $(t).text().trim()).get(),
     };
   }).get();
-  return { fields, groups, submitLabel: $form.find('button').last().text().trim() };
+  // Rich text inside the form, e.g. the "Thanks for submitting!" success message.
+  const texts = $form.find('[data-testid="richTextElement"]').map((_, el) => readRichText($, $(el))).get();
+  return { fields, groups, texts, submitLabel: $form.find('button').last().text().trim() };
 }
