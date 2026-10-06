@@ -332,7 +332,8 @@ Findings from probing the live site that refine — not change — the approved 
    to URLs. It also lists **77 routes vs 69 sitemap URLs** — hidden routes are logged, not cloned.
 5. **No site header.** The logo is a site-wide element; there is no nav bar.
 6. **Enquiry form has no message field**, though an option reads "Others ( Pls specify in
-   message)" — logged as a query.
+   message)" — logged as a query. *Superseded during the build (§13): the form does have a message
+   box (a nameless required textarea); the clone posts it as `message`.*
 7. **Media is stored flat**, keyed by Wix file id, in `src/assets/wix/` (images, deduplicated —
    the same image is reused by galleries and case studies) and `public/media/video/` (video).
    Local filenames drop Wix's `~mv2` suffix.
@@ -344,3 +345,46 @@ Findings from probing the live site that refine — not change — the approved 
    target, currently `/`).
 10. **Card links are stored per link.** The icon link and the visible text link can have
     different targets (Angeline: icon → `angeline@`, text → `jamillie@`), so each is kept.
+
+## 13. Decisions during the build (2026-10-06)
+
+Rulings made while building, which supersede the sections above where they differ (full ledger:
+`.superpowers/sdd/2026-10-06-achates360-astro-clone/progress.md`):
+
+1. **Fonts (Ruling 7).** Wix's headings and body copy are Helvetica Light, not Avenir; small UI
+   text is Avenir Light. The clone uses stand-ins: Helvetica Neue / Helvetica / Arial at weight 300
+   for Helvetica Light, and Nunito Sans 300 for Avenir Light (§4.6 assumed Avenir throughout).
+2. **The enquiry form has a message field (Ruling 9).** §12.6 was wrong: Wix's form has a
+   nameless required textarea ("Type Your Message here..."). The clone renders it and posts it as
+   `message`; its placeholder is its accessible name (Ruling 31).
+3. **Media (Rulings 15, 18).** Images are committed capped at 2560 px wide (same format, high
+   quality); untouched originals stay in the git-ignored `.cache/originals/`. The 800 MB / 95 MB
+   hosting limits apply to the built `dist/`, checked by `npm run verify`.
+4. **Reference screenshots are local only (Ruling 15).** `docs/reference/<slug>/*.png` is
+   git-ignored; only `docs/reference/styles.json` is committed (§4.1, §5.1 step 7).
+5. **Pages not cloned (Ruling 16).** Pages Wix links to but serves behind a password or as a 404
+   are listed in `scripts/export-wix/known-missing.json`; links to them stay as they are.
+6. **Layout data in the export (Ruling 24).** The export records each block's desktop box, text
+   colour, page background and Wix video-player sources, so side-by-side rows, text widths and
+   colours match Wix (Task 11b).
+7. **Snapshot policy and live drift (Rulings 26, 29).** The live site changed during the build
+   (`/joseph-chan` now redirects to `/joseph`; new pages and gallery items). The clone is a
+   snapshot of the 68 exported pages (§1 counted 69 sitemap URLs before the build; the export
+   took 68). The §7 "export re-run diff is empty" check is an offline re-export from the cached
+   renders (`npm run export -- --offline`), which must leave `src/content` unchanged. A live
+   export keeps every existing content file it does not export unless `--allow-removals` is
+   given, and `npm run verify` requires every path in `scripts/export-wix/permanent-urls.json`.
+   Live-site drift is logged in `CONTENT-QUERIES.md`.
+8. **Phone layout (Rulings 21, 27).** Wix's 320 px phone layout is scaled to the device width.
+   On the business cards the clone shows the name and role below the photo, where Wix hides them
+   behind it (logged in `CONTENT-QUERIES.md`).
+9. **Site chrome (Rulings 22, 28, 31).** The desktop and phone menus and the favicon are captured
+   by the exporter, and the phone back-to-top button is rebuilt; Wix's own "…" quick-action
+   button is platform UI and is not cloned.
+10. **Video (Ruling 30).** Wix's own video transcodes are served unchanged; re-encoding is left to
+    the redesign.
+11. **Structure (Ruling 31).** Wix's heading levels are kept (no h1 on case studies or
+    `/projects`); the SEO pass belongs to the redesign.
+12. **Known rendering differences** (gallery sliders shown as stacks, stand-in fonts, embeds not
+    autoplaying and others) are listed in `CONTENT-QUERIES.md` under "Known differences from the
+    Wix site".

@@ -2,7 +2,9 @@
 
 Copy is reproduced from the live Wix site **exactly**, including the items below: no text has
 been changed in the clone. Where the clone's layout or behaviour differs from Wix, or where it
-leaves out a live-site change made after the snapshot, the item says so (items 19–23 and 27).
+leaves out a live-site change made after the snapshot, the item says so (items 19–27). Differences
+in how the clone renders the site, which need no content decision, are listed at the end under
+"Known differences from the Wix site".
 Each item needs a ruling from the Art Director / Managing Director; each is a one-line fix once
 decided.
 
@@ -97,14 +99,14 @@ and side-by-side checks of the live site against the clone.
 
 10. **Case studies not linked from `/projects`.** These pages are live on Wix
    but no card on `/projects` points to them:
-   [`/bank-of-singapore`](/bank-of-singapore),
-   [`/copy-of-grohe-quarterly-campaigns`](/copy-of-grohe-quarterly-campaigns) (titled "GROHE Social Media", a separate page whose URL begins "copy-of-"; keep, link or remove?),
-   [`/dbs-discretionary-portfolio-management`](/dbs-discretionary-portfolio-management),
-   [`/international-green-building-conference`](/international-green-building-conference),
-   [`/redpacket`](/redpacket),
-   [`/ritz-carlton-mid-autumn`](/ritz-carlton-mid-autumn),
-   [`/singapore-aviation-academy`](/singapore-aviation-academy),
-   [`/uel-annual-report`](/uel-annual-report).
+   `/bank-of-singapore`,
+   `/copy-of-grohe-quarterly-campaigns` (titled "GROHE Social Media", a separate page whose URL begins "copy-of-"; keep, link or remove?),
+   `/dbs-discretionary-portfolio-management`,
+   `/international-green-building-conference`,
+   `/redpacket`,
+   `/ritz-carlton-mid-autumn`,
+   `/singapore-aviation-academy`,
+   `/uel-annual-report`.
    Intentional archive, or should they be listed?
    *One-line fix once decided:* add a card for each page to `src/content/projectsIndex/projects.md`
    (or leave as is).
@@ -115,9 +117,10 @@ and side-by-side checks of the live site against the clone.
     site menu.) Confirm `/fullscreen-page` is not needed.
     *One-line fix once decided:* none if confirmed unneeded; otherwise supply the content.
 
-12. **88 images have no alt text on Wix; kept empty** (the largest counts are `/projects` 23,
-    `/copy-of-projects` 22, `/` 13, `/st-regis-tearoom-patisserie` 11; the rest are on eight
-    case-study pages). Supplying alt text is a copy decision.
+12. **79 images have no alt text on Wix; kept empty.** They are on eight pages: `/projects` 23,
+    `/copy-of-projects` 22, `/` (home) 13, `/st-regis-tearoom-patisserie` 11,
+    `/the-art-of-tan-ping-chiang` 6, `/singapore-aviation-academy` 2, `/bumitama-annual-report` 1
+    and `/konicaminolta` 1. Supplying alt text is a copy decision.
     *One-line fix once decided:* add `alt` text to the affected images in the content files.
 
 ## New text needing approval
@@ -193,3 +196,39 @@ up once reviewed.
     Mobility Week 2026" (`/alstom-singapore-urban-mobility-week-2026`). The pages are not in the
     snapshot, so the clone's menus leave these three entries out (logged in
     `docs/export-log.md`).
+
+## Known differences from the Wix site
+
+These are differences in how the clone renders the site. None of them changes any text. They are
+listed so that staging is reviewed against an accurate baseline.
+
+- **Galleries with a slider, collage or grid layout are shown as a one-column stack.** Wix shows a
+  slider on `/kaplan`, `/samsung-micro-led` and `/the-brooks-clown`, a collage on `/the-skyline`
+  and a 3-column square grid on `/samsung-connected-home`. The export does not record which
+  gallery layout Wix uses, so these galleries show every image, in order, one under another, like
+  the other case-study galleries.
+- **`/copy-of-projects`: Wix's section jump menu is not shown.** The page's content is all there;
+  the menu that jumps between its sections is left out (logged in `docs/export-log.md`).
+- **Image crops.** On phones, Wix crops some images on `/journal-of-aviation-management` around
+  chosen focal points; the clone does not apply those phone crops. Gallery
+  thumbnails on `/`, `/projects` and `/copy-of-projects` are cropped to 16:9 from the centre,
+  where Wix sometimes uses a focal point (for example, more headroom on one tile).
+- **Vertical spacing between blocks on case studies** is not taken from Wix exactly, so some
+  pages are slightly longer or shorter than on Wix.
+- **Fonts are stand-ins.** Wix uses its licensed Helvetica Light and Avenir Light. The clone uses
+  Helvetica Neue / Helvetica / Arial at light weight for Helvetica Light, and Nunito Sans Light for
+  Avenir Light. Letter widths, and so some line breaks, differ slightly. On Windows, which has no
+  light Helvetica, that text appears in Arial at regular weight.
+- **Embedded YouTube and Vimeo players do not start on their own.** On Wix the DBS YouTube embed
+  starts playing muted; in the clone every embedded player waits for a click. The clone's own
+  background videos (homepage slides, case-study heroes) autoplay muted, as on Wix.
+- **Desktop windows 768–1063 px wide (for example an iPad).** Wix shows its 980 px desktop layout
+  scaled down to fit. The clone keeps text and boxes at full size and, at these widths only,
+  moves the homepage enquiry form against the right edge (with a narrower heading beside it),
+  keeps the homepage award badges inside the window and wraps the desktop menu onto two rows.
+  At 1064 px and wider the layout is Wix's.
+- **Windows taller than 1080 px.** Each homepage slide's picture or video fills the window
+  height. This was not compared against Wix at that height.
+- **Not in the final visual audit.** `/about`, `/joinus`, `/bank-julius-baer`, `/konicaminolta`
+  and the two site menus were compared with Wix during the build, but not in the final visual
+  audit of the finished clone.
