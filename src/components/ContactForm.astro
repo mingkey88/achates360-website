@@ -169,7 +169,8 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
   .status, .success { width: 347px; text-align: center; color: var(--color-text); font: var(--weight-light) 14px / normal var(--font-ui); }
   .status { margin: 13.5px 0 0; }
-  .status:empty { display: none; }
+  /* Kept rendered (not display: none) so screen readers announce it when text arrives. */
+  .status:empty { margin: 0; }
   .success { margin-top: 13.5px; }
   .success :global(p) { margin: 0; }
 
