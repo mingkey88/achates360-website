@@ -1,0 +1,58 @@
+/*
+ * Design tokens, sampled from the live Wix site.
+ * Sources: docs/reference/styles.json (computed styles; "desktop:" / "mobile:" page keys),
+ * pixels sampled from docs/reference/<slug>/*.png, and live computed styles where styles.json
+ * has no entry. Each token names its source.
+ *
+ * Fonts (Ruling 7): Wix renders body copy, titles, footer and gallery titles in its licensed
+ * `helvetica-w01-light` (Helvetica Light) and small UI text (back link, VIEW PROJECT, form inputs,
+ * submit label) in `avenir-lt-w01_35-light` (Avenir Light). Neither exists off Wix, so:
+ *   Helvetica Light -> 'Helvetica Neue', Helvetica, Arial at weight 300 (--font-heading, --font-body)
+ *   Avenir Light    -> Nunito Sans 300, self-hosted via @fontsource (--font-ui)
+ * Wix reports font-weight 400 because the light cut is a separate family; the stand-in reaches the
+ * light cut with weight 300, so weight tokens below are 300 where Wix's face is "light".
+ *
+ * Mobile (-m) values are Wix's mobile-layout values verbatim. Wix lays mobile out at 320 CSS px and
+ * zooms it to the device width (viewport meta "width=320"), so on a 390px phone Wix text appears
+ * 390/320 = 1.22x larger than these numbers.
+ */
+:root {
+  --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Helvetica Light stand-in, use with weight 300 */
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;    /* Helvetica Light stand-in, use with weight 300 */
+  --font-ui: 'Nunito Sans', 'Avenir Next', Avenir, Helvetica, Arial, sans-serif; /* Avenir Light stand-in (Nunito Sans 300) */
+  --weight-light: 300;       /* weight that selects the light cut in both stand-ins */
+
+  --color-page: #ffffff;     /* styles.json pageBackground is transparent; pixel (10,2000) of notter/desktop.png and (10,h-800) of home/desktop.png = rgb(255,255,255) */
+  --color-text: #adadac;     /* desktop:notter.projectBody.color rgb(173, 173, 172) */
+  --color-heading: #2f2e2e;  /* desktop:notter.projectTitle.color rgb(47, 46, 46) */
+  --color-muted: #adadac;    /* desktop:notter.projectClient.color rgb(173, 173, 172) */
+  --color-link: #2f2e2e;     /* desktop:notter.backLink.color rgb(47, 46, 46) */
+  --color-footer-bg: #e6e6e6;    /* pixel in footer of notter/desktop.png, home/desktop.png and notter/mobile.png = rgb(230,230,230) */
+  --color-footer-text: #605e5e;  /* desktop:home.footerText.color rgb(96, 94, 94) */
+  --color-footer-label: #adadac; /* live computed colour of footer h6 "Contact"/"Social" rgb(173, 173, 172) */
+  --color-accent: #ffffff;   /* desktop:home.anchorMenu.stroke rgb(255, 255, 255) (white-outlined dot, fill transparent) */
+  --color-header: #2f2e2e;   /* live #SITE_HEADER background rgb(47, 46, 46); pixel (5,5) of notter/mobile.png */
+
+  --size-title: 28px;        /* desktop:notter.projectTitle.fontSize */
+  --size-title-m: 23px;      /* mobile:notter.projectTitle.fontSize */
+  --size-small-heading: 22px;    /* no desktop smallHeading in styles.json; live computed h5 on /dbs-discretionary-portfolio-management, = desktop:home.footerHeading */
+  --size-small-heading-m: 19px;  /* mobile:projects.smallHeading.fontSize */
+  --size-body: 15px;         /* desktop:notter.projectBody.fontSize */
+  --size-body-m: 14px;       /* mobile:notter.projectBody.fontSize */
+  --size-footer: 15px;       /* desktop:home.footerText.fontSize */
+  --size-footer-m: 14px;     /* mobile:home.footerText.fontSize */
+  --size-footer-heading: 22px;   /* desktop:home.footerHeading.fontSize */
+  --size-footer-heading-m: 18px; /* mobile:home.footerHeading.fontSize */
+  --size-gallery-title: 22px;    /* desktop:projects.galleryTitle.fontSize */
+  --leading-body: 21px;      /* desktop:notter.projectBody.lineHeight */
+  --leading-body-m: 19.6px;  /* mobile:notter.projectBody.lineHeight */
+  --leading-footer: 21px;    /* desktop:home.footerText.lineHeight */
+  --leading-footer-m: 19.6px;        /* mobile:home.footerText.lineHeight */
+  --leading-footer-heading: 28.6px;  /* desktop:home.footerHeading.lineHeight */
+  --leading-footer-heading-m: 23.4px;/* mobile:home.footerHeading.lineHeight */
+  --weight-title: 300;       /* desktop:notter.projectTitle.fontWeight is 400 of the Light face -> 300 in the stand-in (see header) */
+
+  --button-radius: 0px;      /* desktop:home.formSubmit.borderRadius */
+  --page-max: 940px;         /* notter/desktop.png content column: images and text run x=238..1178 at 1440 (Wix grid is 980) */
+  --gutter: 20px;            /* Wix mobile side margin (footer and logo inset, mobile layout) */
+}

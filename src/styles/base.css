@@ -1,0 +1,27 @@
+/* Avenir Light stand-in (--font-ui); Helvetica Light uses the system Helvetica Neue at 300. */
+@import '@fontsource/nunito-sans/300.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font: var(--weight-light) var(--size-body) / var(--leading-body) var(--font-body);
+}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: var(--weight-light); color: var(--color-heading); margin: 0 0 0.5em; }
+h2 { font-size: var(--size-title); font-weight: var(--weight-title); line-height: normal; }
+h5 { font-size: var(--size-small-heading); }
+p { margin: 0 0 1em; }
+a { color: var(--color-link); }
+img, video { display: block; max-width: 100%; height: auto; }
+.wrap { width: min(var(--page-max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 767px) {
+  body { font-size: var(--size-body-m); line-height: var(--leading-body-m); }
+  h2 { font-size: var(--size-title-m); }
+  h5 { font-size: var(--size-small-heading-m); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

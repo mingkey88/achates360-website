@@ -1,0 +1,18 @@
+---
+import { Image } from 'astro:assets';
+import { renderMd } from '../lib/markdown';
+import { withBase } from '../lib/paths';
+interface Props { blocks: any[] }
+const { blocks } = Astro.props;
+---
+{blocks.map((b) => {
+  if (b.type === 'text') return <div class="block-text" set:html={renderMd(b.md)} />;
+  if (b.type === 'link') return <p class="block-link"><a href={withBase(b.href)}>{b.label}</a></p>;
+  if (b.type === 'image') {
+    const img = b.src.format === 'gif'
+      ? <img src={b.src.src} width={b.src.width} height={b.src.height} alt={b.alt} loading="lazy" />
+      : <Image src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 980px) 100vw, 980px" />;
+    return b.href ? <a class="block-image" href={withBase(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
+  }
+  return null;
+})}
