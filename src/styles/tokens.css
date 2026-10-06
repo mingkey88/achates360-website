@@ -35,7 +35,9 @@
   --color-accent: #ffffff;   /* desktop:home.anchorMenu.stroke rgb(255, 255, 255) (white-outlined dot, fill transparent) */
   --color-header: #2f2e2e;   /* live #SITE_HEADER background rgb(47, 46, 46); pixel (5,5) of notter/mobile.png */
   --color-page-alt: #f2f2f2; /* page background of joinus and copy-of-projects: pixels (30,500) and (1400,800) of their desktop.png = rgb(242,242,242) */
-  --color-page-dark: #2f2e2e;    /* page background of about: pixels across about/desktop.png and mobile.png = rgb(47,46,46) */
+  --color-page-grey: #adadac;    /* /projects page background: live pageBackground_ layer rgb(173,173,172); pixel (100,500) of projects/desktop.png */
+  --color-page-column: #fafafa;  /* /projects content column (Wix column strip, 980 wide) and mobile page: live rgb(250,250,250); pixel (700,1000) of projects/desktop.png */
+  --color-page-dark: #2f2e2e;   /* page background of about: pixels across about/desktop.png and mobile.png = rgb(47,46,46) */
   --color-on-dark: #ebd2c5;  /* live computed about body text rgb(235, 210, 197) (desktop:about.projectBody.color) */
   --color-button: #282626;   /* live "Read Annual Report" button background rgb(40, 38, 38) (bumitama-annual-report) */
   --color-orange: #f7702a;   /* live joinus job heading colour rgb(247, 112, 42) */

@@ -1,0 +1,94 @@
+---
+/*
+ * Wix anchor menu, as observed on the live site (Playwright, 1440x900 and iPhone 13):
+ *
+ * variant "dots" (desktop /projects; also the home page's dot menu):
+ *   pinned to the viewport's middle right (Wix "pagePinnedMiddleRight": position fixed, vertically
+ *   centred, right edge 20px in), one 22.4px row per item: the label, Helvetica Light 16px/22.4px
+ *   #2f2e2e right-aligned, then 15px further right a 12px ring (2px stroke, transparent fill).
+ *   The current section's item and the hovered item turn black with a filled dot; the first item
+ *   scrolls to the top of the page and is never current. Wix hides the menu on its mobile layout.
+ *   labels={false} keeps the labels for screen readers only (dots alone); a page can set
+ *   --anchor-color / --anchor-active (default #2f2e2e / #000) to draw white rings (home).
+ *
+ * variant "list" (mobile /projects): Wix's mobile layout replaces the anchor menu with a column of
+ *   underlined links, Helvetica Light 19px #605e5e, ~40px apart; no current-section state. Shown
+ *   only on the mobile layout.
+ *
+ * target is an element id on the page; 'top' is Base's <main id="top">, 'footer' the site footer.
+ */
+interface Props { items: { label: string; target: string }[]; variant?: 'dots' | 'list'; labels?: boolean }
+const { items, variant = 'dots', labels = true } = Astro.props;
+---
+<nav class:list={['anchor-menu', variant]} aria-label="Sections">
+  <ul>
+    {items.map((i) => (
+      <li><a href={`#${i.target}`} data-target={i.target}>
+        <span class:list={['label', { 'sr-only': !labels || !i.label }]}>{i.label || 'Top'}</span>
+        {variant === 'dots' && <span class="dot" aria-hidden="true"></span>}
+      </a></li>
+    ))}
+  </ul>
+</nav>
+<script>
+  // Current-section state for dot menus, as Wix does it: an item is current once its target has
+  // scrolled up to where a jump to it lands (its scroll-margin-top below the viewport top); the
+  // last item (footer) once the page is scrolled to the bottom; the 'top' item never.
+  for (const nav of document.querySelectorAll<HTMLElement>('.anchor-menu.dots')) {
+    const pairs = [...nav.querySelectorAll<HTMLAnchorElement>('a[data-target]')]
+      .map((a) => [a, document.getElementById(a.dataset.target!)] as const)
+      .filter((p): p is readonly [HTMLAnchorElement, HTMLElement] => p[1] !== null);
+    const sections = pairs.filter(([a]) => a.dataset.target !== 'top');
+    let queued = false;
+    const update = () => {
+      queued = false;
+      let current: HTMLAnchorElement | undefined;
+      for (const [a, t] of sections) {
+        if (t.getBoundingClientRect().top - parseFloat(getComputedStyle(t).scrollMarginTop) <= 1) current = a;
+      }
+      if (scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2) current = sections.at(-1)?.[0];
+      for (const [a] of pairs) {
+        if (a === current) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      }
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    update();
+  }
+</script>
+<style>
+  /* Wix animates anchor jumps; base.css turns this off for prefers-reduced-motion. */
+  :global(html) { scroll-behavior: smooth; }
+  /* 'top' jumps to the very top, above the header strip/band, as Wix's does (the margin clamps to 0). */
+  :global(#top) { scroll-margin-top: 100vh; }
+  .anchor-menu ul { list-style: none; margin: 0; padding: 0; }
+  .anchor-menu a { text-decoration: none; }
+
+  .dots {
+    position: fixed; right: 20px; top: 50%; translate: 0 -50%; z-index: 40;
+  }
+  .dots a {
+    display: flex; align-items: center; justify-content: flex-end; height: 22.4px;
+    color: var(--anchor-color, var(--color-heading)); white-space: nowrap;
+    font: var(--weight-light) 16px / 22.4px var(--font-heading);
+  }
+  .dots .label { padding-right: 15px; }
+  .dots .dot { flex: none; width: 12px; height: 12px; border: 2px solid currentColor; border-radius: 50%; }
+  .dots a:is(:hover, :focus-visible, [aria-current]) { color: var(--anchor-active, #000); }
+  .dots a:is(:hover, :focus-visible, [aria-current]) .dot { background: currentColor; }
+
+  .list { display: none; }
+  .list a {
+    color: var(--color-text); text-decoration: underline;
+    font: var(--weight-light) 19px / 30.4px var(--font-heading);
+  }
+
+  @media (max-width: 767px) {
+    .dots { display: none; }
+    .list { display: block; }
+    .list li + li { margin-top: calc(9.4 * var(--m)); }
+    .list a { font-size: calc(19 * var(--m)); line-height: calc(30.4 * var(--m)); }
+  }
+</style>
