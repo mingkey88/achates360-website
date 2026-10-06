@@ -1,0 +1,75 @@
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { join, relative, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const MB = 1024 * 1024;
+export const LIMITS = { totalMax: 800 * MB, fileMax: 95 * MB };
+
+const fileFor = (path) => (path === '/' ? 'index.html' : `${path.slice(1)}.html`);
+
+export function missingPages(paths, distFiles) {
+  const have = new Set(distFiles);
+  return paths.filter((p) => !have.has(fileFor(p)));
+}
+
+/**
+ * Internal links with no matching output file. Links to paths listed in `known`
+ * (pages Wix links to but that were not cloned) are not broken; they are pushed
+ * onto `knownOut` as { file, href, reason } so the CLI can report them.
+ */
+export function brokenLinks(pages, distFiles, base, known = [], knownOut = []) {
+  const have = new Set(distFiles);
+  const knownByPath = new Map(known.map((k) => [k.path, k.reason]));
+  const b = base.replace(/\/$/, '');
+  const out = [];
+  for (const { file, html } of pages) {
+    for (const [, href] of html.matchAll(/\s(?:href|src|poster)="([^"]+)"/g)) {
+      if (!href.startsWith('/')) continue; // external, mailto, tel, #anchor
+      const path = href.split('#')[0].split('?')[0];
+      if (b && path !== b && !path.startsWith(b + '/')) { out.push({ file, href }); continue; }
+      const rel = (path.slice(b.length) || '/').replace(/(.)\/$/, '$1');
+      const ok = have.has(rel === '/' ? 'index.html' : rel.slice(1)) || have.has(fileFor(rel));
+      if (ok) continue;
+      if (knownByPath.has(rel)) knownOut.push({ file, href, reason: knownByPath.get(rel) });
+      else out.push({ file, href });
+    }
+  }
+  return out;
+}
+
+/** files: [{ file, size }] in bytes. */
+export function sizeProblems(files, { totalMax, fileMax } = LIMITS) {
+  const total = files.reduce((n, f) => n + f.size, 0);
+  return { total, tooBig: files.filter((f) => f.size > fileMax).map((f) => f.file), overTotal: total > totalMax };
+}
+
+async function listFiles(dir, root = dir) {
+  const out = [];
+  for (const e of await readdir(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) out.push(...(await listFiles(p, root)));
+    else out.push(relative(root, p).split(sep).join('/'));
+  }
+  return out;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const base = process.env.SITE_ENV === 'production' ? '' : '/achates360-website';
+  const distFiles = await listFiles('dist');
+  const paths = JSON.parse(await readFile('scripts/export-wix/sitemap-urls.json', 'utf8'));
+  const known = JSON.parse(await readFile('scripts/export-wix/known-missing.json', 'utf8'));
+  const missing = missingPages(paths, distFiles);
+  const pages = await Promise.all(distFiles.filter((f) => f.endsWith('.html')).map(async (f) => ({ file: f, html: await readFile(join('dist', f), 'utf8') })));
+  const knownHits = [];
+  const broken = brokenLinks(pages, distFiles, base, known, knownHits);
+  const sizes = await Promise.all(distFiles.map(async (f) => ({ file: f, size: (await stat(join('dist', f))).size })));
+  const { total, tooBig, overTotal } = sizeProblems(sizes);
+  console.log(`pages: ${paths.length - missing.length}/${paths.length} sitemap URLs built`);
+  console.log(`dist size: ${(total / MB).toFixed(1)} MB (limit ${LIMITS.totalMax / MB} MB)`);
+  missing.forEach((p) => console.error(`MISSING  ${p}`));
+  broken.forEach((l) => console.error(`BROKEN   ${l.file} -> ${l.href}`));
+  knownHits.forEach((l) => console.log(`KNOWN    ${l.file} -> ${l.href} (${l.reason})`));
+  tooBig.forEach((f) => console.error(`TOO BIG  ${f} (>${LIMITS.fileMax / MB} MB)`));
+  if (overTotal) console.error(`TOO BIG  dist/ total ${(total / MB).toFixed(1)} MB (>${LIMITS.totalMax / MB} MB)`);
+  process.exit(missing.length || broken.length || tooBig.length || overTotal ? 1 : 0);
+}
