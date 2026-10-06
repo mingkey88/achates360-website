@@ -45,7 +45,7 @@ export function extractPage(html, slug, sidecar = []) {
       const $el = $(el);
       const base = {
         comp: $el.closest('[id^="comp-"]').attr('id') ?? null,
-        section: $el.closest('section[id^="comp-"]').attr('id') ?? null,
+        section: outerSection($, $el),
       };
       const inGallery = $el.closest('[data-hook="item-container"]').length > 0;
       const inForm = $el.closest('form').length > 0 && !$el.is('form');
@@ -118,6 +118,15 @@ export function extractPage(html, slug, sidecar = []) {
   };
 }
 
+// Wix nests sections (an outer page section wrapping an inner one). Anchors sit in the outer
+// section beside the inner one, so both nodes and menu targets use the outermost section.
+const SECTION = 'section[id^="comp-"]';
+function outerSection($, $el) {
+  const outer = $el.parents(SECTION).last();
+  if (outer.length) return outer.attr('id');
+  return $el.is(SECTION) ? $el.attr('id') : null;
+}
+
 function readRichText($, $el) {
   const links = $el.find('a[href]').map((_, a) => ({ href: normalizeHref($(a).attr('href')), text: $(a).text().trim() })).get();
   return { html: $el.html() ?? '', text: $el.text().replace(/\s+/g, ' ').trim(), links };
@@ -129,7 +138,7 @@ function readMenu($, $menu) {
     let target;
     if (id === 'PAGE_TOP_ANCHOR') target = 'top';
     else if (id === 'SITE_FOOTER') target = 'footer';
-    else target = $(`#${id}`).closest('section[id^="comp-"]').attr('id') ?? id;
+    else target = outerSection($, $(`#${id}`)) ?? id;
     return { label: $(a).text().trim(), target };
   }).get();
 }

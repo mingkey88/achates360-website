@@ -165,3 +165,14 @@ describe('extractRoutes', () => {
     expect([...r.values()]).toContain('/notter');
   });
 });
+
+describe('extractPage: sections', () => {
+  it('uses the outermost Wix section, so anchor-menu targets and node sections agree', () => {
+    const p = load('home');
+    const sections = new Set(p.nodes.map((n) => n.section));
+    const menu = p.nodes.find((n) => n.kind === 'anchorMenu');
+    for (const m of menu.items) {
+      if (m.target !== 'top' && m.target !== 'footer') expect(sections.has(m.target)).toBe(true);
+    }
+  });
+});

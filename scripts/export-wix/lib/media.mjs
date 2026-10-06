@@ -1,0 +1,127 @@
+import { mkdir, stat, writeFile, copyFile, readdir, readFile } from 'node:fs/promises';
+import { join, dirname, extname } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { originalImageUrl, localName, videoFileUrl } from './urls.mjs';
+
+export function collectMedia(raws, cards) {
+  const images = new Set();
+  const videos = new Map();
+  const visit = (nodes) => {
+    for (const n of nodes) {
+      if (n.kind === 'image') images.add(n.file);
+      if (n.kind === 'bgvideo') images.add(n.poster);
+      if (n.kind === 'gallery') for (const i of n.items) if (i.file) images.add(i.file);
+    }
+  };
+  for (const r of raws) {
+    visit(r.nodes); visit(r.footer); visit(r.chrome);
+    if (r.seo.ogImage) images.add(r.seo.ogImage);
+    for (const [id, q] of r.videos) videos.set(id, q);
+  }
+  return [
+    ...[...images].map((f) => ({ kind: 'image', url: originalImageUrl(f), dest: `src/assets/wix/${localName(f)}` })),
+    ...[...videos].map(([id, q]) => ({ kind: 'video', videoId: id, url: videoFileUrl(id, q), dest: `public/media/video/${id}.mp4` })),
+    ...cards.map((c) => ({ kind: 'vcf', url: c.vcfUrl, dest: `public/cards/${c.slug}.vcf` })),
+  ];
+}
+
+async function size(path) {
+  try { return (await stat(path)).size; } catch { return -1; }
+}
+
+async function findSource(root, sourceMedia, videoId) {
+  if (!sourceMedia) return null;
+  const dir = join(root, sourceMedia);
+  let files;
+  try { files = await readdir(dir); } catch { return null; }
+  let map = {};
+  try { map = JSON.parse(await readFile(join(dir, 'map.json'), 'utf8')); } catch { /* optional */ }
+  const name = map[videoId] ?? files.find((f) => f.includes(videoId));
+  return name ? join(dir, name) : null;
+}
+
+const hasFfmpeg = () => { try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); return true; } catch { return false; } };
+
+export async function runJobs(jobs, { root = process.cwd(), fetchImpl = fetch, sourceMedia, log = console.log, concurrency = 4 } = {}) {
+  const result = { downloaded: 0, skipped: 0, failed: [] };
+  const queue = [...jobs];
+
+  async function one(job) {
+    const dest = join(root, job.dest);
+    await mkdir(dirname(dest), { recursive: true });
+
+    if (job.kind === 'video') {
+      const src = await findSource(root, sourceMedia, job.videoId);
+      if (src) {
+        if (extname(src).toLowerCase() === '.mp4') await copyFile(src, dest);
+        else if (hasFfmpeg()) {
+          execFileSync('ffmpeg', ['-y', '-i', src, '-c:v', 'libx264', '-crf', '20', '-preset', 'slow',
+            '-vf', "scale='min(1920,iw)':-2", '-c:a', 'aac', '-movflags', '+faststart', dest], { stdio: 'ignore' });
+        } else throw new Error(`${src} is not .mp4 and ffmpeg is not installed`);
+        log(`original  ${job.dest}  <- ${src}`);
+        result.downloaded++;
+        return;
+      }
+    }
+
+    const existing = await size(dest);
+    if (existing > 0) {
+      const head = await fetchImpl(job.url, { method: 'HEAD' });
+      const len = Number(head.headers.get('content-length'));
+      if (head.ok && (!len || len === existing)) { result.skipped++; return; }
+    }
+    const res = await fetchImpl(job.url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${job.url}`);
+    await writeFile(dest, Buffer.from(await res.arrayBuffer()));
+    log(`download  ${job.dest}`);
+    result.downloaded++;
+  }
+
+  async function worker() {
+    while (queue.length) {
+      const job = queue.shift();
+      try { await one(job); } catch (e) { result.failed.push({ url: job.url, error: String(e.message ?? e) }); }
+    }
+  }
+  await Promise.all(Array.from({ length: concurrency }, worker));
+  return result;
+}
+
+async function listFiles(dir) {
+  let out = [];
+  let entries;
+  try { entries = await readdir(dir, { withFileTypes: true }); } catch { return out; }
+  for (const e of entries) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) out = out.concat(await listFiles(p));
+    else out.push({ path: p, size: (await stat(p)).size });
+  }
+  return out;
+}
+
+export async function mediaReport(root) {
+  const files = [
+    ...(await listFiles(join(root, 'src/assets/wix'))),
+    ...(await listFiles(join(root, 'public/media'))),
+    ...(await listFiles(join(root, 'public/cards'))),
+  ];
+  const mb = (b) => (b / 1024 / 1024).toFixed(1) + ' MB';
+  const byExt = {};
+  for (const f of files) {
+    const ext = extname(f.path).toLowerCase() || '(none)';
+    byExt[ext] ??= { count: 0, bytes: 0 };
+    byExt[ext].count++; byExt[ext].bytes += f.size;
+  }
+  const total = files.reduce((s, f) => s + f.size, 0);
+  const largest = [...files].sort((a, b) => b.size - a.size).slice(0, 20);
+  const over = total > 800 * 1024 * 1024 || files.some((f) => f.size > 95 * 1024 * 1024);
+  return [
+    '# Media report', '',
+    `Total source media: **${mb(total)}** in ${files.length} files.`, '',
+    over ? '> **THRESHOLD EXCEEDED** — stop and ask the user about media hosting (spec §5.5).' : '> Within GitHub Pages limits (800 MB total, 95 MB per file).', '',
+    '| Type | Files | Size |', '|---|---|---|',
+    ...Object.entries(byExt).sort((a, b) => b[1].bytes - a[1].bytes).map(([e, v]) => `| ${e} | ${v.count} | ${mb(v.bytes)} |`), '',
+    '## 20 largest', '', '| File | Size |', '|---|---|',
+    ...largest.map((f) => `| ${f.path.replace(root + '/', '')} | ${mb(f.size)} |`), '',
+  ].join('\n');
+}
