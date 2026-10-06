@@ -2,26 +2,22 @@
  * Rows from Wix's layout boxes (Task 11b). The exporter records each block's rendered box on the
  * live site at a 1440x900 viewport (`box`) and in Wix's 320px mobile layout (`mbox`), in CSS px
  * and document coordinates. Wix positions every component absolutely; the clone rebuilds the
- * side-by-side arrangements as flex rows and keeps everything else in one column.
+ * side-by-side arrangements as flex rows of columns and keeps everything else in one column.
  */
+import { PAGE_WIDTH, PAGE_LEFT, MOBILE_WIDTH, MOBILE_LEFT } from './layout';
+
 export interface Box { x: number; y: number; w: number; h: number }
 export interface Boxed { box?: Box; mbox?: Box; type?: string }
+export interface Cell<T> { block: T; width: number; offset: number } // % of the enclosing width
+export interface Column<T> { width: number; offset: number; items: Cell<T>[] } // % of the page; items in % of the column
 
 // Only an image can carry blocks laid over it: the clone draws it in its Wix box, while e.g. a
 // gallery renders in another shape (samsung-connected-home's 3-column grid becomes a stack).
 const canHost = (b: Boxed) => b.type === undefined || b.type === 'image';
-export interface Cell<T> { block: T; width: number; offset: number } // percentages of the column
 
-// Desktop content column at the 1440 render: Wix's images, galleries and players run x=238..1178
-// (notter) and 240..1188 (dxv); the clone's column is --page-max (940px) wide, starting at
-// 50% - 480px = 240 at 1440 (src/layouts/Project.astro).
-export const PAGE_WIDTH = 940;
-export const PAGE_LEFT = 240;
-// Wix's mobile layout: a 320px page with a 280px column at x=20 (notter, dxv on iPhone 13).
-export const MOBILE_WIDTH = 280;
-export const MOBILE_LEFT = 20;
+const pct = (px: number, of: number) => +(px / of * 100).toFixed(3);
 
-/** Two boxes sit side by side when their y-ranges share more than half of the shorter one. */
+/** Two boxes share a height when their y-ranges share more than half of the shorter one. */
 export function overlaps(a: Box, b: Box): boolean {
   const shorter = Math.min(a.h, b.h);
   if (shorter <= 0) return false;
@@ -29,78 +25,159 @@ export function overlaps(a: Box, b: Box): boolean {
   return shared > shorter / 2;
 }
 
-// Side by side: the y-ranges overlap (above) and the x-ranges share at most half of the narrower
-// box. Wix text boxes often run on below their words (bumitama's ends 25px into the button under
-// it), so a vertical overlap alone does not make a row.
-function sideBySide(a: Box, b: Box): boolean {
-  const sharedX = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
-  return overlaps(a, b) && sharedX <= Math.min(a.w, b.w) / 2;
-}
+// Same column: the x-ranges share more than half of the narrower one.
+const sameColumn = (a: { x: number; w: number }, b: { x: number; w: number }) =>
+  Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > Math.min(a.w, b.w) / 2;
 
-/**
- * Rows, in the order Wix shows them on desktop:
- * - blocks side by side (sideBySide) form a row, also when Wix's DOM interleaves them with other
- *   blocks (samsung-the-freestyle: embed, caption, embed, caption);
- * - a block lying inside a block of an earlier row joins that row, to be laid over it (Wix's DOM
- *   can list overlay pieces after other content, e.g. konicaminolta's stickers after a heading);
- * - when every block has a box, rows are ordered by their top edge (Wix's DOM order is not always
- *   its visual order); otherwise they keep block order, and a block without a box is its own row.
- */
-export function groupRows<T extends Boxed>(blocks: T[]): T[][] {
-  const rows: T[][] = [];
-  for (const block of blocks) {
-    const b = block.box;
-    // Only rows since the last block without a box: one never moves across it.
-    const recent = rows.slice(rows.findLastIndex((r) => !r.every((x) => x.box)) + 1).reverse();
-    const host = b && recent.find((r) => r.some((x) => canHost(x) && inside(b, x.box!)));
-    // The latest row the block sits beside without landing on top of any of its blocks.
-    const beside = b && recent.find((r) => r.some((x) => sideBySide(x.box!, b))
-      && !r.some((x) => overlaps(x.box!, b) && !sideBySide(x.box!, b)));
-    if (host) host.push(block);
-    else if (beside) beside.push(block);
-    else rows.push([block]);
-  }
-  if (!blocks.every((b) => b.box)) return rows;
-  const top = (r: T[]) => Math.min(...r.map((x) => x.box!.y));
-  return rows.map((r, i) => ({ r, i })).sort((a, b) => top(a.r) - top(b.r) || a.i - b.i).map(({ r }) => r);
-}
+// Side by side: the y-ranges overlap and the blocks are in different columns. Wix text boxes often
+// run on below their words (bumitama's ends 25px into the button under it), so a vertical
+// overlap alone does not make a row.
+const sideBySide = (a: Box, b: Box) => overlaps(a, b) && !sameColumn(a, b);
+// b would land on a: same height, same column.
+const landsOn = (a: Box, b: Box) => overlaps(a, b) && sameColumn(a, b);
 
 // a lies inside c (2px slack for Wix's rounding).
 const inside = (a: Box, c: Box, slack = 2) =>
   a.x >= c.x - slack && a.y >= c.y - slack && a.x + a.w <= c.x + c.w + slack && a.y + a.h <= c.y + c.h + slack;
 
-const pct = (px: number, of: number) => +(px / of * 100).toFixed(3);
-
-// Cells left to right: the first is offset from the column's left edge (never placed left of it),
-// each next one from the right edge of the one before, negative where Wix overlaps them.
-function cells<T>(row: T[], boxOf: (b: T) => Box, width: number, left: number): Cell<T>[] {
-  const sorted = [...row].sort((a, b) => boxOf(a).x - boxOf(b).x);
-  const first = boxOf(sorted[0]);
-  const shift = Math.max(0, left - first.x); // a row starting left of the column moves right
-  const px = sorted.map((block, i) => {
-    const b = boxOf(block);
-    const prev = i > 0 ? boxOf(sorted[i - 1]) : null;
-    return { block, offset: prev ? b.x - (prev.x + prev.w) : first.x + shift - left, width: b.w };
-  });
-  // Wix boxes can run a few px past the column (dxv's 470 + 10 + 466 pair): scale to fit.
-  const extent = Math.max(...sorted.map((b) => boxOf(b).x + boxOf(b).w)) + shift - left;
-  const scale = extent > width ? width / extent : 1;
-  return px.map((c) => ({ block: c.block, width: pct(c.width * scale, width), offset: pct(c.offset * scale, width) }));
+/** Columns of a row: blocks sharing an x-range (sameColumn, transitively), left to right, each top to bottom. */
+function columnsOf<T extends Boxed>(row: T[]): { x: number; w: number; blocks: T[] }[] {
+  const cols: { x: number; w: number; blocks: T[] }[] = [];
+  for (const block of [...row].sort((a, b) => a.box!.x - b.box!.x)) {
+    const b = block.box!;
+    const hits = cols.filter((c) => sameColumn(c, b));
+    const merged = { x: 0, w: 0, blocks: [...hits.flatMap((c) => c.blocks), block] };
+    const left = Math.min(b.x, ...hits.map((c) => c.x));
+    const right = Math.max(b.x + b.w, ...hits.map((c) => c.x + c.w));
+    Object.assign(merged, { x: left, w: right - left });
+    for (const h of hits) cols.splice(cols.indexOf(h), 1);
+    cols.push(merged);
+  }
+  for (const c of cols) c.blocks.sort((a, b) => a.box!.y - b.box!.y);
+  return cols.sort((a, b) => a.x - b.x);
 }
 
-/** Desktop cells of a row whose blocks all have boxes, left to right. */
-export function layoutRow<T extends Boxed>(row: T[]): Cell<T>[] {
-  return cells(row, (b) => b.box!, PAGE_WIDTH, PAGE_LEFT);
+/**
+ * Rows, in the order Wix shows them on desktop:
+ * - a block joins every row it sits beside (sideBySide with one of its blocks, landing on none),
+ *   and those rows merge: a tall image beside two stacked ones is one row however Wix's DOM
+ *   orders them (bank-julius-baer, singapore-aviation-academy), also when Wix interleaves other
+ *   blocks (samsung-the-freestyle: embed, caption, embed, caption);
+ * - a block lying inside an image of an earlier row joins that row, to be laid over it
+ *   (konicaminolta's stickers come after a heading in Wix's DOM);
+ * - a row of several blocks that each sit under a different column of the multi-column row above
+ *   folds into it (a 2x2 grid; captions under embeds), so phones read them column by column;
+ * - rows are ordered by their top edge (Wix's DOM order is not always its visual order); a block
+ *   without a box is its own row, which stays in place and which nothing moves across.
+ * Blocks within a row keep content order.
+ */
+export function groupRows<T extends Boxed>(blocks: T[]): T[][] {
+  const order = new Map(blocks.map((b, i) => [b, i]));
+  const byOrder = (r: T[]) => r.sort((a, b) => order.get(a)! - order.get(b)!);
+  let rows: T[][] = [];
+  let segment = 0; // rows before this index are behind a block without a box
+  for (const block of blocks) {
+    const b = block.box;
+    if (!b) { rows.push([block]); segment = rows.length; continue; }
+    const recent = rows.slice(segment);
+    const host = [...recent].reverse().find((r) => r.some((x) => canHost(x) && inside(b, x.box!)));
+    if (host) { host.push(block); continue; }
+    const beside = recent.filter((r) => r.some((x) => sideBySide(x.box!, b)) && !r.some((x) => landsOn(x.box!, b)));
+    if (!beside.length) { rows.push([block]); continue; }
+    const at = rows.indexOf(beside[0]);
+    rows = rows.filter((r) => !beside.includes(r));
+    rows.splice(at, 0, byOrder([...beside.flat(), block]));
+  }
+  // Order and fold each run of boxed rows; a row without a box stays where it is.
+  const out: T[][] = [];
+  let run: T[][] = [];
+  const flush = () => { out.push(...orderAndFold(run, byOrder)); run = []; };
+  for (const r of rows) {
+    if (r.every((x) => x.box)) run.push(r);
+    else { flush(); out.push(r); }
+  }
+  flush();
+  return out;
+}
+
+// Rows by their top edge; then a row that sits under the columns of the row above folds into it.
+function orderAndFold<T extends Boxed>(rows: T[][], byOrder: (r: T[]) => T[]): T[][] {
+  const top = (r: T[]) => Math.min(...r.map((x) => x.box!.y));
+  const bottom = (r: T[]) => Math.max(...r.map((x) => x.box!.y + x.box!.h));
+  const sorted = rows.map((r, i) => ({ r, i })).sort((a, b) => top(a.r) - top(b.r) || a.i - b.i).map(({ r }) => r);
+  const folded: T[][] = [];
+  for (const row of sorted) {
+    const above = folded.at(-1);
+    if (above && fitsUnder(row, above) && top(row) >= bottom(above) - 2) above.splice(0, above.length, ...byOrder([...above, ...row]));
+    else folded.push(row);
+  }
+  return folded;
+}
+
+// Every block of `row` sits in a different column of the multi-column row `above`.
+function fitsUnder<T extends Boxed>(row: T[], above: T[]): boolean {
+  const cols = columnsOf(above);
+  if (cols.length < 2 || row.length < 2) return false;
+  const used = row.map((x) => cols.filter((c) => sameColumn(c, x.box!)));
+  return used.every((u) => u.length === 1) && new Set(used.map((u) => u[0])).size === row.length;
+}
+
+/**
+ * Desktop columns of a row whose blocks all have boxes, left to right. The first column is offset
+ * from the page column's left edge (never placed left of it), each next one from the right edge of
+ * the one before (never overlapping it). Items are sized and offset within their column.
+ */
+export function layoutRow<T extends Boxed>(row: T[]): Column<T>[] {
+  const cols = columnsOf(row);
+  let prevRight = PAGE_LEFT;
+  const px = cols.map((c) => {
+    const offset = Math.max(0, c.x - prevRight);
+    prevRight = c.x + c.w;
+    return { c, offset };
+  });
+  // Wix boxes can run a few px past the column (dxv's 470 + 10 + 466 pair): scale to fit.
+  const extent = px.reduce((s, p) => s + p.offset + p.c.w, 0);
+  const scale = extent > PAGE_WIDTH ? PAGE_WIDTH / extent : 1;
+  return px.map(({ c, offset }) => ({
+    width: pct(c.w * scale, PAGE_WIDTH),
+    offset: pct(offset * scale, PAGE_WIDTH),
+    items: c.blocks.map((block) => ({ block, width: pct(block.box!.w, c.w), offset: pct(block.box!.x - c.x, c.w) })),
+  }));
 }
 
 /**
  * Mobile cells, only for a row of several blocks that Wix's mobile layout also keeps side by side
- * (e.g. notter's two award logos). Any other row stacks into the single mobile column.
+ * (e.g. notter's two award logos), left to right. Any other row stacks into the single mobile
+ * column, in mobileOrder.
  */
 export function mobileRow<T extends Boxed>(row: T[]): Cell<T>[] | null {
   if (row.length < 2 || !row.every((b) => b.mbox && b.mbox.w > 0)) return null;
   if (!row.every((b, i) => i === 0 || row.slice(0, i).some((a) => overlaps(a.mbox!, b.mbox!)))) return null;
-  return cells(row, (b) => b.mbox!, MOBILE_WIDTH, MOBILE_LEFT);
+  const sorted = [...row].sort((a, b) => a.mbox!.x - b.mbox!.x);
+  let prevRight = MOBILE_LEFT;
+  const px = sorted.map((block) => {
+    const m = block.mbox!;
+    const offset = Math.max(0, m.x - prevRight);
+    prevRight = m.x + m.w;
+    return { block, offset, width: m.w };
+  });
+  const extent = px.reduce((s, p) => s + p.offset + p.width, 0);
+  const scale = extent > MOBILE_WIDTH ? MOBILE_WIDTH / extent : 1;
+  return px.map((p) => ({ block: p.block, width: pct(p.width * scale, MOBILE_WIDTH), offset: pct(p.offset * scale, MOBILE_WIDTH) }));
+}
+
+/**
+ * Reading order of a row that stacks on mobile: by the block's position in Wix's mobile layout;
+ * a block Wix's mobile layout does not show keeps its place after the block before it in content
+ * order.
+ */
+export function mobileOrder<T extends Boxed>(row: T[]): T[] {
+  let key = -Infinity;
+  const keyed = row.map((block, i) => {
+    if (block.mbox) key = block.mbox.y;
+    return { block, key, i };
+  });
+  return keyed.sort((a, b) => a.key - b.key || a.i - b.i).map((k) => k.block);
 }
 
 export interface Overlay<T> {
@@ -110,9 +187,9 @@ export interface Overlay<T> {
 }
 
 /**
- * Blocks whose desktop box lies inside another block's box in the same row are laid over it
+ * Blocks whose desktop box lies inside an image's box in the same row are laid over it
  * (konicaminolta's GIF stickers on a background image): they become overlays of the largest such
- * block, positioned in % of its box. The rest of the row is returned in order, each with its
+ * image, positioned in % of its box. The rest of the row is returned in order, each with its
  * overlays.
  */
 export function nestOverlays<T extends Boxed>(row: T[]): { block: T; overlays: Overlay<T>[] }[] {

@@ -69,6 +69,8 @@
   --weight-title: 300;       /* desktop:notter.projectTitle.fontWeight is 400 of the Light face -> 300 in the stand-in (see header) */
 
   --button-radius: 0px;      /* desktop:home.formSubmit.borderRadius */
-  --page-max: 940px;         /* notter/desktop.png content column: images and text run x=238..1178 at 1440 (Wix grid is 980) */
+  --page-max: 940px;         /* notter/desktop.png content column: images and text run x=238..1178 at 1440 (Wix grid is 980). Same number as PAGE_WIDTH in src/lib/layout.ts (scripts/layout.test.mjs checks) */
+  --column-shift: 10px;      /* Wix's case-study column sits ~10px left of centre (x=238..250 at 1440). = COLUMN_SHIFT in src/lib/layout.ts */
+  --color-video-bg: #000000; /* letterbox behind embeds and players before they load (Wix's player and embed backgrounds are black) */
   --gutter: 20px;            /* Wix mobile side margin (footer and logo inset, mobile layout) */
 }

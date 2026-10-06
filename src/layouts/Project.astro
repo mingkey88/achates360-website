@@ -68,7 +68,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
   .badges :global(img) { object-fit: cover; }
 
   /* Wix's column sits ~10px left of centre (x=237..250 for text and images on a 1440 page). */
-  .project { padding-bottom: 40px; margin-left: max(var(--gutter), calc(50% - 480px)); }
+  .project { padding-bottom: 40px; margin-left: max(var(--gutter), calc(50% - var(--page-max) / 2 - var(--column-shift))); }
   .back { margin: 24px 0 0; text-align: right; font: var(--weight-light) var(--size-ui) / var(--leading-ui) var(--font-ui); }
   .back a { color: var(--color-link); text-decoration: none; }
   .back a:hover { text-decoration: underline; }
@@ -85,7 +85,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
   .blocks :global(.block-image) { display: block; line-height: 0; }
   .blocks :global(.block-text) { max-width: 640px; line-height: var(--leading-copy); }
   /* A text with a Wix layout box takes the box's width (Blocks.astro). */
-  .blocks :global(.cell .block-text) { max-width: none; }
+  .blocks :global(.item .block-text) { max-width: none; }
   .blocks :global(.block-text :is(p, ul, ol, h5)) { margin: 0 0 var(--leading-copy); }
   .blocks :global(.block-text > :last-child) { margin-bottom: 0; }
   .blocks :global(.block-text h5) { color: var(--color-text); line-height: normal; }
@@ -112,9 +112,6 @@ const external = (href: string) => /^https?:\/\//.test(href);
     .blocks > :global(* + *) { margin-top: calc(30 * var(--m)); }
     .blocks > :global(:is(.block-text, .block-link, .block-row:not([data-media])) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
     .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media]) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
-    /* A desktop row that Wix stacks on mobile: its cells are spaced like separate blocks. */
-    .blocks :global(.block-row:not([data-mrow]) > .cell + .cell) { margin-top: calc(30 * var(--m)); }
-    .blocks :global(.block-row:not([data-mrow]) > .cell[data-media] + .cell[data-media]) { margin-top: calc(10 * var(--m)); }
     .blocks :global(.block-text) { max-width: none; line-height: var(--leading-copy-m); }
     .blocks :global(.block-text :is(p, ul, ol, h5)) { margin-bottom: var(--leading-copy-m); }
     .blocks :global(.block-text h5) { font-size: calc(21 * var(--m)); }

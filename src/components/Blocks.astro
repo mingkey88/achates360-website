@@ -1,6 +1,7 @@
 ---
 import Block from './Block.astro';
-import { groupRows, layoutRow, mobileRow, nestOverlays, PAGE_WIDTH } from '../lib/rows';
+import { groupRows, layoutRow, mobileRow, mobileOrder, nestOverlays } from '../lib/rows';
+import { PAGE_WIDTH } from '../lib/layout';
 // rows=false renders every block in one column, ignoring Wix's layout boxes (for pages laid out
 // by hand, e.g. the basic pages in Basic.astro).
 interface Props { blocks: any[]; gallery?: 'stack' | 'grid'; pageTitle?: string; rows?: boolean }
@@ -9,82 +10,108 @@ const MEDIA = new Set(['image', 'gallery', 'video', 'embed']);
 const isMedia = (b: any) => MEDIA.has(b.type);
 const vars = (o: Record<string, number | string | undefined>) =>
   Object.entries(o).filter(([, v]) => v !== undefined).map(([k, v]) => `--${k}: ${v}`).join('; ');
-// Each row of blocks with Wix layout boxes (src/lib/rows.ts) becomes a .block-row of .cells: a flex
-// row on desktop sized from the boxes; on mobile one column, unless Wix keeps the row side by side
-// there too (data-mrow). Blocks lying inside another block's box are laid over it (.stage). Blocks
-// without a box render as before, one per line.
+// Wix crops an image to its box (display mode "fill") and sizes a player or embed to it: keep
+// the box's shape on each layout.
+const shape = (b: any) => ['image', 'embed', 'video'].includes(b.type)
+  ? { ar: `${b.box.w} / ${b.box.h}`, mar: b.mbox?.h ? `${b.mbox.w} / ${b.mbox.h}` : 'auto' } : {};
+/*
+ * Each row of blocks with Wix layout boxes (src/lib/rows.ts) becomes a .block-row of .cols, each
+ * a stack of .items:
+ * - desktop: a flex row of columns sized and offset from the boxes; a column stacks its blocks
+ *   (e.g. two images beside a tall one) with the media gap;
+ * - mobile: the columns dissolve (display: contents) and the items run in one column in Wix's
+ *   mobile reading order (--mord), unless Wix keeps the row side by side there too (data-mrow,
+ *   items sized from their mobile boxes).
+ * Blocks lying inside an image's box are laid over it (.stage). Blocks without a box render as
+ * before, one per line.
+ */
 const rows = (useRows ? groupRows(blocks) : blocks.map((b) => [b])).map((row) => {
   if (!useRows || !row[0].box) return { plain: row };
   const nested = nestOverlays(row);
   const tops = nested.map((n) => n.block);
   const mobile = mobileRow(tops);
-  const cells = layoutRow(tops).map((c) => {
-    const m = mobile?.findIndex((x) => x.block === c.block) ?? -1;
-    // Wix crops an image to its box (display mode "fill") and sizes a player or embed to it: keep
-    // the box's shape on each layout.
-    const b = c.block;
-    const ar = ['image', 'embed', 'video'].includes(b.type) ? { ar: `${b.box.w} / ${b.box.h}`, mar: b.mbox?.h ? `${b.mbox.w} / ${b.mbox.h}` : 'auto' } : {};
-    const style = vars({ w: `${c.width}%`, o: `${c.offset}%`, ...ar,
-      ...(m >= 0 ? { mw: `${mobile![m].width}%`, mo: `${mobile![m].offset}%`, mord: m } : {}) });
-    const px = Math.round(PAGE_WIDTH * c.width / 100);
-    const overlays = nested.find((n) => n.block === c.block)!.overlays.map((o) => ({
-      block: o.block,
-      px: Math.round(px * o.width / 100),
-      style: vars({ l: `${o.left}%`, t: `${o.top}%`, ow: `${o.width}%`, ar: `${o.block.box.w} / ${o.block.box.h}`,
-        mar: o.block.mbox?.h ? `${o.block.mbox.w} / ${o.block.mbox.h}` : 'auto',
-        ...(o.mobile ? { mw: `${o.mobile.width}%`, mo: `${o.mobile.offset}%` } : {}) }),
-    }));
-    return { block: c.block, style, px, overlays, ar: `${c.block.box.w} / ${c.block.box.h}` };
+  const order = mobile ? mobile.map((c) => c.block) : mobileOrder(tops);
+  const cols = layoutRow(tops).map((col) => {
+    const colPx = PAGE_WIDTH * col.width / 100;
+    return {
+      style: vars({ w: `${col.width}%`, o: `${col.offset}%` }),
+      items: col.items.map((it) => {
+        const m = mobile?.find((x) => x.block === it.block);
+        const px = Math.round(colPx * it.width / 100);
+        const overlays = nested.find((n) => n.block === it.block)!.overlays.map((o) => ({
+          block: o.block,
+          px: Math.round(px * o.width / 100),
+          style: vars({ l: `${o.left}%`, t: `${o.top}%`, ow: `${o.width}%`, ...shape(o.block),
+            mw: o.mobile && `${o.mobile.width}%`, mo: o.mobile && `${o.mobile.offset}%` }),
+        }));
+        return {
+          block: it.block, px, overlays,
+          ar: `${it.block.box.w} / ${it.block.box.h}`,
+          style: vars({ iw: `${it.width}%`, io: `${it.offset}%`, mord: order.indexOf(it.block), ...shape(it.block),
+            mw: m && `${m.width}%`, mo: m && `${m.offset}%` }),
+        };
+      }),
+    };
   });
-  return { cells, media: row.every(isMedia), mrow: !!mobile };
+  return { cols, media: row.every(isMedia), mrow: !!mobile };
 });
 ---
 {rows.map((r) => r.plain
   ? r.plain.map((b) => <Block block={b} gallery={gallery} pageTitle={pageTitle} />)
   : (
     <div class="block-row" data-media={r.media ? '' : undefined} data-mrow={r.mrow ? '' : undefined}>
-      {r.cells!.map((c) => (
-        <div class="cell" data-media={isMedia(c.block) ? '' : undefined} style={c.style}>
-          {c.overlays.length === 0
-            ? <Block block={c.block} gallery={gallery} pageTitle={pageTitle} width={c.px} />
-            : (
-              <div class="stage" style={`--ar: ${c.ar}`}>
-                {/* Wix hides the base of an overlay group on mobile when it has no mobile box. */}
-                <div class="stage-base" data-mhide={c.block.mbox ? undefined : ''}>
-                  <Block block={c.block} gallery={gallery} pageTitle={pageTitle} width={c.px} />
-                </div>
-                {c.overlays.map((o) => (
-                  <div class="overlay" data-mhide={o.block.mbox ? undefined : ''} style={o.style}>
-                    <Block block={o.block} gallery={gallery} pageTitle={pageTitle} width={o.px} />
+      {r.cols!.map((col) => (
+        <div class="col" style={col.style}>
+          {col.items.map((it) => (
+            <div class="item" data-media={isMedia(it.block) ? '' : undefined} style={it.style}>
+              {it.overlays.length === 0
+                ? <Block block={it.block} gallery={gallery} pageTitle={pageTitle} width={it.px} />
+                : (
+                  <div class="stage" style={`--ar: ${it.ar}`}>
+                    {/* Wix hides the base of an overlay group on mobile when it has no mobile box. */}
+                    <div class="stage-base" data-mhide={it.block.mbox ? undefined : ''}>
+                      <Block block={it.block} gallery={gallery} pageTitle={pageTitle} width={it.px} />
+                    </div>
+                    {it.overlays.map((o) => (
+                      <div class="overlay" data-mhide={o.block.mbox ? undefined : ''} style={o.style}>
+                        <Block block={o.block} gallery={gallery} pageTitle={pageTitle} width={o.px} />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                )}
+            </div>
+          ))}
         </div>
       ))}
     </div>
   ))}
 <style>
   .block-row { display: flex; align-items: flex-start; }
-  .cell { flex: 0 0 var(--w); min-width: 0; margin-left: var(--o); }
-  /* Wix shows an image at its box width, whatever the file's own size. */
-  .cell :global(.block-image img) { width: 100%; aspect-ratio: var(--ar, auto); object-fit: cover; }
-  .cell :global(:is(.embed, .player video)) { aspect-ratio: var(--ar, 16 / 9); }
+  .col { display: flex; flex-direction: column; gap: 10px; flex: 0 0 var(--w); min-width: 0; margin-left: var(--o); }
+  .item { width: var(--iw); margin-left: var(--io); }
+  /* Wix shows an image at its box width and shape, whatever the file's own size. */
+  .item :global(.block-image img) { width: 100%; aspect-ratio: var(--ar, auto); object-fit: cover; }
+  .item :global(:is(.embed, .player video)) { aspect-ratio: var(--ar, 16 / 9); }
   .stage { position: relative; aspect-ratio: var(--ar); }
   .stage-base, .stage-base > :global(*) { height: 100%; }
   .stage-base :global(.block-image img) { height: 100%; object-fit: cover; }
   .overlay { position: absolute; left: var(--l); top: var(--t); width: var(--ow); }
+  .overlay :global(.block-image img) { width: 100%; aspect-ratio: var(--ar, auto); object-fit: cover; }
   @media (max-width: 767px) {
-    .cell :global(.block-image img) { aspect-ratio: var(--mar, auto); }
-    .cell :global(:is(.embed, .player video)) { aspect-ratio: var(--mar, 16 / 9); }
-    .block-row:not([data-mrow]) { display: block; }
-    .block-row:not([data-mrow]) > .cell { margin-left: 0; }
-    .block-row[data-mrow] > .cell { flex-basis: var(--mw); margin-left: var(--mo); order: var(--mord); }
+    .col { display: contents; }
+    .item { order: var(--mord); width: auto; margin-left: 0; }
+    .block-row:not([data-mrow]) { flex-direction: column; align-items: stretch; gap: calc(10 * var(--m)); }
+    /* Text between media keeps the 30px rhythm of separate blocks. */
+    .block-row:not([data-mrow]) > .col > .item:not([data-media]) { margin-block: calc(20 * var(--m)); }
+    .block-row[data-mrow] > .col > .item { flex: 0 0 var(--mw); margin-left: var(--mo); }
+    .item :global(.block-image img) { aspect-ratio: var(--mar, auto); }
+    .item :global(:is(.embed, .player video)) { aspect-ratio: var(--mar, 16 / 9); }
     .stage { aspect-ratio: auto; }
     .stage-base, .stage-base > :global(*) { height: auto; }
     .stage-base :global(.block-image img) { height: auto; }
     .stage [data-mhide] { display: none; }
     .overlay { position: static; width: var(--mw, 100%); margin-left: var(--mo, 0); }
+    .overlay :global(.block-image img) { aspect-ratio: var(--mar, auto); }
     .stage > * + .overlay:not([data-mhide]) { margin-top: calc(10 * var(--m)); }
   }
 </style>
