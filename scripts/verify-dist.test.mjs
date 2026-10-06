@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { missingPages, brokenLinks, sizeProblems } from './verify-dist.mjs';
 
-const dist = ['index.html', 'dxv.html', 'angeline.html', 'cards/angeline.vcf', 'media/video/v1.mp4', '_astro/x.webp', 'projects.html'];
+const dist = ['index.html', 'dxv.html', 'angeline.html', 'cards/angeline.vcf', 'media/video/v1.mp4', '_astro/x.webp', 'projects.html', 'media/my file.mp4'];
 
 describe('missingPages', () => {
   it('maps sitemap paths to file-format output', () => {
@@ -36,10 +36,39 @@ describe('brokenLinks', () => {
   it('does not count known-missing paths as broken, but still flags unknown ones', () => {
     const html = `<a href="${B}/secret#x">s</a><a href="${B}/gone">g</a>`;
     const known = [{ path: '/secret', reason: 'password-protected', linkedFrom: ['home'] }];
-    const unknown = [];
-    expect(brokenLinks([{ file: 'index.html', html }], dist, B, known, unknown))
+    const knownHits = [];
+    expect(brokenLinks([{ file: 'index.html', html }], dist, B, known, knownHits))
       .toEqual([{ file: 'index.html', href: `${B}/gone` }]);
-    expect(unknown).toEqual([{ file: 'index.html', href: `${B}/secret#x`, reason: 'password-protected' }]);
+    expect(knownHits).toEqual([{ file: 'index.html', href: `${B}/secret#x`, reason: 'password-protected' }]);
+  });
+});
+
+describe('brokenLinks: srcset, quoting, encoding', () => {
+  const B = '/achates360-website';
+  const run = (html) => brokenLinks([{ file: 'index.html', html }], dist, B);
+  it('passes a valid multi-candidate srcset', () => {
+    expect(run(`<img srcset="${B}/_astro/x.webp 400w, ${B}/_astro/x.webp 800w, ${B}/media/my%20file.mp4 2x">`)).toEqual([]);
+  });
+  it('flags a broken srcset candidate', () => {
+    expect(run(`<img srcset="${B}/_astro/x.webp 400w, ${B}/_astro/gone.webp 800w">`))
+      .toEqual([{ file: 'index.html', href: `${B}/_astro/gone.webp` }]);
+  });
+  it('checks data-src and root-relative content, skips absolute content', () => {
+    expect(run(`<img data-src="${B}/nope.png"><meta content="${B}/nope2"><meta property="og:image" content="https://x.com/a.png">`))
+      .toEqual([{ file: 'index.html', href: `${B}/nope.png` }, { file: 'index.html', href: `${B}/nope2` }]);
+  });
+  it('accepts single-quoted attributes', () => {
+    expect(run(`<a href='${B}/dxv'>a</a><a href='${B}/gone'>b</a>`)).toEqual([{ file: 'index.html', href: `${B}/gone` }]);
+  });
+  it('skips protocol-relative URLs', () => {
+    expect(run(`<script src="//cdn/x.js"></script>`)).toEqual([]);
+  });
+  it('decodes percent-encoding before lookup', () => {
+    expect(run(`<video src="${B}/media/my%20file.mp4"></video>`)).toEqual([]);
+    expect(run(`<video src="${B}/media/bad%E0%A4.mp4"></video>`)).toHaveLength(1);
+  });
+  it('resolves trailing slash and query on non-base paths', () => {
+    expect(run(`<a href="${B}/dxv/">a</a><a href="${B}/dxv?x=1">b</a>`)).toEqual([]);
   });
 });
 

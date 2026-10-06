@@ -12,6 +12,22 @@ export function missingPages(paths, distFiles) {
   return paths.filter((p) => !have.has(fileFor(p)));
 }
 
+const ATTR_RE = /\s(href|src|poster|data-src|content|srcset)=(?:"([^"]*)"|'([^']*)')/g;
+
+function* urlsIn(html) {
+  for (const m of html.matchAll(ATTR_RE)) {
+    const value = m[2] ?? m[3];
+    if (m[1] === 'srcset') {
+      for (const cand of value.split(',')) {
+        const url = cand.trim().split(/\s+/)[0];
+        if (url) yield url;
+      }
+    } else yield value;
+  }
+}
+
+const decode = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
+
 /**
  * Internal links with no matching output file. Links to paths listed in `known`
  * (pages Wix links to but that were not cloned) are not broken; they are pushed
@@ -22,15 +38,17 @@ export function brokenLinks(pages, distFiles, base, known = [], knownOut = []) {
   const knownByPath = new Map(known.map((k) => [k.path, k.reason]));
   const b = base.replace(/\/$/, '');
   const out = [];
+  const exists = (rel) => have.has(rel === '/' ? 'index.html' : rel.slice(1)) || have.has(fileFor(rel));
   for (const { file, html } of pages) {
-    for (const [, href] of html.matchAll(/\s(?:href|src|poster)="([^"]+)"/g)) {
-      if (!href.startsWith('/')) continue; // external, mailto, tel, #anchor
+    for (const href of urlsIn(html)) {
+      if (!href.startsWith('/') || href.startsWith('//')) continue; // external, protocol-relative, mailto, tel, #anchor
       const path = href.split('#')[0].split('?')[0];
       if (b && path !== b && !path.startsWith(b + '/')) { out.push({ file, href }); continue; }
       const rel = (path.slice(b.length) || '/').replace(/(.)\/$/, '$1');
-      const ok = have.has(rel === '/' ? 'index.html' : rel.slice(1)) || have.has(fileFor(rel));
-      if (ok) continue;
-      if (knownByPath.has(rel)) knownOut.push({ file, href, reason: knownByPath.get(rel) });
+      const decoded = decode(rel);
+      if (exists(rel) || exists(decoded)) continue;
+      const reason = knownByPath.get(rel) ?? knownByPath.get(decoded);
+      if (reason !== undefined) knownOut.push({ file, href, reason });
       else out.push({ file, href });
     }
   }
