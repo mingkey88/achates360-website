@@ -367,6 +367,19 @@ export function mapPage(raw) {
   }
 }
 
+/**
+ * A `--only` run without /projects cannot work out a project's listing (categories, listed,
+ * order), so it keeps the values from the project's existing content file (`previous`, its
+ * frontmatter data, or null for a new page) instead of resetting them. Key order matches
+ * applyListing, so an unchanged page is rewritten byte for byte.
+ */
+export function carryListing(project, previous) {
+  if (!previous) return;
+  if ('listed' in previous) project.data.listed = previous.listed;
+  if ('categories' in previous) project.data.categories = previous.categories;
+  if ('order' in previous) project.data.order = previous.order;
+}
+
 export function applyListing(projects, index) {
   let order = 0;
   const seen = new Map();

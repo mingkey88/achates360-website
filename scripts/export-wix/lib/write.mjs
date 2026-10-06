@@ -1,5 +1,5 @@
 import { stringify, parse } from 'yaml';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export function toFrontmatter(data) {
@@ -18,6 +18,29 @@ export function setFrontmatterKeys(text, fields, keys) {
   for (const k of keys) delete data[k];
   for (const k of keys) if (fields[k] !== undefined) data[k] = fields[k];
   return toFrontmatter(data);
+}
+
+/**
+ * Which of the existing generated content files a full export may delete before it writes.
+ * `existing` is [{ collection, id }] (one per .md file), `ids` the ids this run writes.
+ * A file whose page this run writes is cleared, so a page whose collection changed (e.g. a
+ * fallback to basic) is never left in two collections. A file whose page this run does NOT write
+ * (it left the live sitemap, like /joseph-chan after Wix redirected it) is kept unless removals
+ * are explicitly allowed: the card slugs and every snapshot URL are permanent.
+ */
+export function planCleanup(existing, ids, { allowRemovals = false } = {}) {
+  const remove = [];
+  const keep = [];
+  for (const f of existing) (ids.has(f.id) || allowRemovals ? remove : keep).push(f);
+  return { remove, keep };
+}
+
+/** The frontmatter data of an existing content file, or null when there is none. */
+export async function readRecord(root, collection, id) {
+  let text;
+  try { text = await readFile(join(root, 'src/content', collection, `${id}.md`), 'utf8'); } catch { return null; }
+  const m = text.match(/^---\n([\s\S]*)---\n$/);
+  return m ? parse(m[1]) : null;
 }
 
 export async function writeRecord(root, { collection, id, data }) {

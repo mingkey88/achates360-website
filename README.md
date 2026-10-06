@@ -14,7 +14,9 @@ builds on it.
     npm run build      # astro check + build
     npm run verify     # every Wix URL built, no broken internal links, size limits
 
-`npm run verify` checks the built `dist/`: every sitemap URL has a page, no internal link is broken
+`npm run verify` checks the built `dist/`: every sitemap URL and every permanent URL
+(`scripts/export-wix/permanent-urls.json`: the 68 snapshot pages, including the six business
+cards on printed QR codes) has a page, no internal link is broken
 (links to the known-missing pages below are reported, not failed), no file is over **95 MB** and
 the whole site is under **800 MB** (GitHub Pages limits). CI runs it on every pull request and every push to `main`.
 
@@ -55,10 +57,17 @@ on Wix but must stay for printed QR codes. **Never run a full live export withou
 the live-site drift** and deciding what to take.
 
     npm run export -- --offline       # rebuild src/content from the cached renders (no network)
-    npm run export -- --only=notter   # re-render and re-export named pages from the live site
+    npm run export -- --only=notter   # re-export named pages (from the cache; add --fresh to re-render live)
     npm run export                    # live: every page (uses cached renders in .cache/rendered)
     npm run export -- --fresh         # live: re-render every page
     node scripts/export-wix/chrome.mjs  # re-capture the site menus and mobile-only homepage text
+
+A full export never deletes a content file whose page it did not export (for example a page that
+has left the live sitemap): it keeps the file, prints `KEPT …` and logs it in `docs/export-log.md`.
+Pass `--allow-removals` to delete such files — and only after deciding that the URL may go; verify
+still requires every path in `permanent-urls.json`. A `--only` run leaves `sitemap-urls.json` as
+it is and keeps each project's listing fields (`categories`, `listed`, `order`) from its existing
+file, since it does not export `/projects`.
 
 `--offline` reads the page list from `scripts/export-wix/sitemap-urls.json`, renders nothing and
 downloads no media: it re-runs extraction, mapping and writing over `.cache/rendered/`. With an

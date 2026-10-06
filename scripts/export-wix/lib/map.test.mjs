@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { extractPage } from './extract.mjs';
-import { DEFAULT_TEXT_COLOR, classify, mapPage, mapHome, mapProjectsIndex, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, MappingError } from './map.mjs';
+import { DEFAULT_TEXT_COLOR, classify, mapPage, mapHome, mapProjectsIndex, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, carryListing, MappingError } from './map.mjs';
 
 // Gallery item data Wix loaded over the network while rendering (written by render.mjs).
 const side = (s) => {
@@ -156,6 +156,20 @@ describe('applyListing', () => {
     expect(ps[0].data.categories.indexOf('Strategic Branding')).toBe(0);
     expect(typeof ps[0].data.order).toBe('number');
     expect(ps[1].data.listed).toBe(false);
+  });
+});
+
+describe('carryListing (--only runs without /projects)', () => {
+  it('keeps the listing from the existing file, in applyListing key order', () => {
+    const p = { id: 'notter', data: { title: 'Notter', categories: [], listed: false, blocks: [] } };
+    carryListing(p, { title: 'old', categories: ['Packaging & Merchandise'], listed: true, blocks: [], order: 7 });
+    expect(p.data).toEqual({ title: 'Notter', categories: ['Packaging & Merchandise'], listed: true, blocks: [], order: 7 });
+    expect(Object.keys(p.data)).toEqual(['title', 'categories', 'listed', 'blocks', 'order']);
+  });
+  it('leaves a new page (no existing file) as mapped', () => {
+    const p = { id: 'new', data: { categories: [], listed: false } };
+    carryListing(p, null);
+    expect(p.data).toEqual({ categories: [], listed: false });
   });
 });
 

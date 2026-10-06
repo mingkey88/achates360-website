@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse } from 'yaml';
-import { toFrontmatter, exportLog } from './write.mjs';
+import { toFrontmatter, exportLog, planCleanup } from './write.mjs';
 
 describe('toFrontmatter', () => {
   it('round-trips awkward verbatim strings exactly', () => {
@@ -38,5 +38,26 @@ describe('exportLog', () => {
     const md = exportLog(entries);
     expect(md).not.toMatch(/Generated|\d{4}-\d{2}-\d{2}T/);
     expect(exportLog(entries)).toBe(md);
+  });
+});
+
+describe('planCleanup', () => {
+  const existing = [
+    { collection: 'cards', id: 'angeline' }, { collection: 'cards', id: 'joseph-chan' },
+    { collection: 'projects', id: 'notter' }, { collection: 'projects', id: 'copy-of-projects' },
+  ];
+  it('clears files of pages this run writes, even when their collection changes', () => {
+    const ids = new Set(['angeline', 'joseph-chan', 'notter', 'copy-of-projects']);
+    expect(planCleanup(existing, ids)).toEqual({ remove: existing, keep: [] });
+  });
+  it('keeps the file of a page that left the sitemap (e.g. /joseph-chan) without --allow-removals', () => {
+    const ids = new Set(['angeline', 'notter', 'copy-of-projects']);
+    const { remove, keep } = planCleanup(existing, ids);
+    expect(keep).toEqual([{ collection: 'cards', id: 'joseph-chan' }]);
+    expect(remove.map((f) => f.id)).toEqual(['angeline', 'notter', 'copy-of-projects']);
+  });
+  it('deletes it only when removals are allowed', () => {
+    const ids = new Set(['angeline', 'notter', 'copy-of-projects']);
+    expect(planCleanup(existing, ids, { allowRemovals: true })).toEqual({ remove: existing, keep: [] });
   });
 });

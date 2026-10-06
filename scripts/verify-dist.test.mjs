@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { missingPages, brokenLinks, sizeProblems } from './verify-dist.mjs';
+import { readFileSync } from 'node:fs';
+import { missingPages, brokenLinks, sizeProblems, requiredPaths } from './verify-dist.mjs';
+import { CARD_SLUGS } from './export-wix/lib/map.mjs';
 
 const dist = ['index.html', 'dxv.html', 'angeline.html', 'cards/angeline.vcf', 'media/video/v1.mp4', '_astro/x.webp', 'projects.html', 'media/my file.mp4'];
 
@@ -9,6 +11,24 @@ describe('missingPages', () => {
   });
   it('reports what is missing', () => {
     expect(missingPages(['/', '/notter'], dist)).toEqual(['/notter']);
+  });
+});
+
+describe('permanent URLs', () => {
+  const permanent = JSON.parse(readFileSync(new URL('./export-wix/permanent-urls.json', import.meta.url), 'utf8'));
+  it('the committed list holds every snapshot page, including the six business cards', () => {
+    expect(permanent).toHaveLength(68);
+    expect(permanent).toContain('/');
+    for (const slug of CARD_SLUGS) expect(permanent).toContain(`/${slug}`);
+  });
+  it('a page dropped from a re-exported sitemap is still required', () => {
+    const sitemap = ['/', '/angeline']; // e.g. a live export after Wix redirected /joseph-chan
+    const paths = requiredPaths(sitemap, ['/', '/angeline', '/joseph-chan']);
+    expect(paths).toEqual(['/', '/angeline', '/joseph-chan']);
+    expect(missingPages(paths, ['index.html', 'angeline.html'])).toEqual(['/joseph-chan']);
+  });
+  it('new sitemap pages are required too', () => {
+    expect(requiredPaths(['/', '/new-page'], ['/'])).toEqual(['/', '/new-page']);
   });
 });
 

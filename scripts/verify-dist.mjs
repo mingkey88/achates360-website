@@ -7,6 +7,15 @@ export const LIMITS = { totalMax: 800 * MB, fileMax: 95 * MB };
 
 const fileFor = (path) => (path === '/' ? 'index.html' : `${path.slice(1)}.html`);
 
+/**
+ * The paths dist/ must serve: the current sitemap list (rewritten by a live export) plus the
+ * committed permanent list (every snapshot URL, including the six business-card slugs on printed
+ * QR codes), so a live export that drops a page can never pass verification.
+ */
+export function requiredPaths(sitemap, permanent) {
+  return [...new Set([...sitemap, ...permanent])].sort();
+}
+
 export function missingPages(paths, distFiles) {
   const have = new Set(distFiles);
   return paths.filter((p) => !have.has(fileFor(p)));
@@ -74,7 +83,9 @@ async function listFiles(dir, root = dir) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const base = process.env.SITE_ENV === 'production' ? '' : '/achates360-website';
   const distFiles = await listFiles('dist');
-  const paths = JSON.parse(await readFile('scripts/export-wix/sitemap-urls.json', 'utf8'));
+  const sitemap = JSON.parse(await readFile('scripts/export-wix/sitemap-urls.json', 'utf8'));
+  const permanent = JSON.parse(await readFile('scripts/export-wix/permanent-urls.json', 'utf8'));
+  const paths = requiredPaths(sitemap, permanent);
   const known = JSON.parse(await readFile('scripts/export-wix/known-missing.json', 'utf8'));
   const missing = missingPages(paths, distFiles);
   const pages = await Promise.all(distFiles.filter((f) => f.endsWith('.html')).map(async (f) => ({ file: f, html: await readFile(join('dist', f), 'utf8') })));
@@ -82,7 +93,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const broken = brokenLinks(pages, distFiles, base, known, knownHits);
   const sizes = await Promise.all(distFiles.map(async (f) => ({ file: f, size: (await stat(join('dist', f))).size })));
   const { total, tooBig, overTotal } = sizeProblems(sizes);
-  console.log(`pages: ${paths.length - missing.length}/${paths.length} sitemap URLs built`);
+  console.log(`pages: ${paths.length - missing.length}/${paths.length} required URLs built (sitemap ${sitemap.length}, permanent ${permanent.length})`);
   console.log(`dist size: ${(total / MB).toFixed(1)} MB (limit ${LIMITS.totalMax / MB} MB)`);
   missing.forEach((p) => console.error(`MISSING  ${p}`));
   broken.forEach((l) => console.error(`BROKEN   ${l.file} -> ${l.href}`));

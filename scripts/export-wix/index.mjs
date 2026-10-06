@@ -2,10 +2,10 @@ import { mkdir, readFile, writeFile, access, readdir, rm } from 'node:fs/promise
 import { join } from 'node:path';
 import { ORIGIN } from './lib/urls.mjs';
 import { extractPage, extractRoutes } from './lib/extract.mjs';
-import { mapPage, applyListing, toSite, toProjectsIndex } from './lib/map.mjs';
+import { mapPage, applyListing, carryListing, toSite, toProjectsIndex } from './lib/map.mjs';
 import { collectMedia, runJobs, mediaReport, dirSize } from './lib/media.mjs';
 import { fetchSitemapPaths, sitemapRenderFailures } from './lib/sitemap.mjs';
-import { writeRecord, exportLog } from './lib/write.mjs';
+import { writeRecord, readRecord, planCleanup, exportLog } from './lib/write.mjs';
 import { openBrowser, renderPage } from './render.mjs';
 import { captureChrome, CHROME_CACHE } from './chrome.mjs';
 import { toChrome } from './lib/chrome.mjs';
@@ -18,6 +18,9 @@ const fresh = args.includes('--fresh');
 // deterministic without pulling live-site drift into the snapshot.
 const offline = args.includes('--offline');
 if (offline && fresh) throw new Error('--offline and --fresh cannot be combined');
+// A full run never deletes a content file whose page it did not export (e.g. a page that left the
+// live sitemap, like /joseph-chan) unless --allow-removals is given; the kept files are logged.
+const allowRemovals = args.includes('--allow-removals');
 // Accepts both `--only=a,b` and `--only a,b`.
 const onlyIdx = args.findIndex((a) => a === '--only' || a.startsWith('--only='));
 const onlyVal = onlyIdx < 0 ? null : args[onlyIdx].startsWith('--only=') ? args[onlyIdx].slice(7) : args[onlyIdx + 1];
@@ -38,7 +41,8 @@ if (offline) {
   console.log(`sitemap: ${paths.length} pages (offline: scripts/export-wix/sitemap-urls.json)`);
 } else {
   paths = await fetchSitemapPaths(ORIGIN);
-  await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
+  // A --only run exports part of the site, so the committed page list stays as it is.
+  if (!only) await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
   console.log(`sitemap: ${paths.length} pages`);
 }
 
@@ -174,6 +178,9 @@ if (raws.has('projects')) {
   for (const r of records.filter((x) => x.collection === 'projects' && !x.data.listed)) {
     log.push({ level: 'query', page: r.id, message: 'live page not linked from /projects' });
   }
+} else if (only) {
+  // --only without /projects: keep each project's listing from its existing file.
+  for (const r of records.filter((x) => x.collection === 'projects')) carryListing(r, await readRecord(root, 'projects', r.id));
 }
 
 // 6. Content-level anomaly checks
@@ -201,14 +208,24 @@ for (const r of records) {
   if (emptyAlts) log.push({ level: 'info', page: r.id, message: `${emptyAlts} image(s) with no alt text on Wix (kept empty)` });
 }
 
-// 7. Write content. A full run first clears the collections' generated .md files, so a page
-// whose collection changed (e.g. a fallback to basic) is never left in two collections.
+// 7. Write content. A full run first clears the generated .md files of the pages it writes, so a
+// page whose collection changed (e.g. a fallback to basic) is never left in two collections. Files
+// of pages it does not write are kept (permanent URLs) unless --allow-removals is given.
 if (!only) {
+  const existing = [];
   for (const c of COLLECTIONS) {
-    const dir = join(root, 'src/content', c);
     let files = [];
-    try { files = await readdir(dir); } catch { /* not yet created */ }
-    for (const f of files) if (f.endsWith('.md')) await rm(join(dir, f));
+    try { files = await readdir(join(root, 'src/content', c)); } catch { /* not yet created */ }
+    for (const f of files) if (f.endsWith('.md')) existing.push({ collection: c, id: f.slice(0, -3) });
+  }
+  const { remove, keep } = planCleanup(existing, new Set(records.map((r) => r.id)), { allowRemovals });
+  for (const f of remove) await rm(join(root, 'src/content', f.collection, `${f.id}.md`));
+  for (const f of remove.filter((x) => !records.some((r) => r.id === x.id))) {
+    console.log(`REMOVED  src/content/${f.collection}/${f.id}.md (not in this export; --allow-removals)`);
+  }
+  for (const f of keep) {
+    console.log(`KEPT     src/content/${f.collection}/${f.id}.md — not in this export; pass --allow-removals to delete it`);
+    log.push({ level: 'warning', page: f.id, message: `not in this export — kept the existing src/content/${f.collection}/${f.id}.md (run with --allow-removals to delete it)` });
   }
 }
 for (const r of records) await writeRecord(root, r);
