@@ -65,7 +65,8 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     {boxes.map((f) => (
       f.label
         ? <label class="field box"><span class="label">{f.label}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder}></textarea></label>
-        : <textarea class="box" name={fieldName(f)} required={f.required} placeholder={f.placeholder}></textarea>
+        /* Wix's message box has no label: its placeholder (verbatim) names it for screen readers. */
+        : <textarea class="box" name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined}></textarea>
     ))}
     <button type="submit">{form.submitLabel}</button>
     <p class="status" role="status" aria-live="polite"></p>

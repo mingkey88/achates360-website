@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import Base from './Base.astro';
 import Blocks from '../components/Blocks.astro';
 import BgVideo from '../components/BgVideo.astro';
-import { withBase, backLinkHref } from '../lib/paths';
+import { withBase, backLinkHref, BLANK_IMAGE } from '../lib/paths';
 interface Props { entry: CollectionEntry<'projects'> }
 const d = Astro.props.entry.data;
 const external = (href: string) => /^https?:\/\//.test(href);
@@ -17,7 +17,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
         : (
           <picture>
             {/* Wix's mobile layout has no hero: an empty source keeps phones from fetching it. */}
-            <source media="(max-width: 767px)" srcset="data:," />
+            <source media="(max-width: 767px)" srcset={BLANK_IMAGE} />
             <Image class="hero-media" src={d.hero.src} alt={d.hero.alt} widths={[768, 1440, 1920, 2560]} sizes="100vw" loading="eager" fetchpriority="high" />
           </picture>
         )}

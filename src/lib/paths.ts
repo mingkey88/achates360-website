@@ -36,3 +36,10 @@ export function menuCurrent(item: { href: string; items?: { href: string }[] }, 
   if (item.href === path) return 'page';
   return item.items?.some((i) => i.href === path) ? 'parent' : null;
 }
+
+/**
+ * A valid 1x1 transparent GIF for a <picture> <source> that must show nothing (a layout where Wix
+ * hides the image): the browser picks it and fetches no file. Not "data:," — srcset parsing strips
+ * the trailing comma, leaving the invalid URL "data:" (ERR_INVALID_URL in the console).
+ */
+export const BLANK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';

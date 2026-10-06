@@ -33,7 +33,7 @@ import BgVideo from '../components/BgVideo.astro';
 import Gallery from '../components/Gallery.astro';
 import ContactForm from '../components/ContactForm.astro';
 import { renderMd } from '../lib/markdown';
-import { withBase } from '../lib/paths';
+import { withBase, BLANK_IMAGE } from '../lib/paths';
 // Avenir Heavy stand-in for the mobile "Projects" heading (as on the business cards).
 import '@fontsource/nunito-sans/800.css';
 const d = (await getEntry('home', 'home'))!.data;
@@ -75,7 +75,7 @@ const vars = (o: Record<string, number | undefined>) =>
                 {/* Phones only: the empty source keeps desktop from fetching the hidden still. The
                     first four slides fill an iPhone screen, so their stills load eagerly. */}
                 <picture>
-                  <source media="(min-width: 768px)" srcset="data:," />
+                  <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
                   <Image class="slide-still" src={s.media.poster} alt="" widths={[390, 780, 1170]} sizes="100vw" loading={i < 4 ? 'eager' : 'lazy'} />
                 </picture>
               </div>
