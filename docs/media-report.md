@@ -2,8 +2,6 @@
 
 Total committed media: **840.5 MB** in 669 files.
 
-Untouched originals in .cache/originals (not committed): 1130.7 MB in 647 files.
-
 > No source file is over 95 MB. The source total is informational: the binding 800 MB / 95 MB check runs on the built dist/ in Task 15 (spec §5.5).
 
 | Type | Files | Size |
@@ -39,3 +37,8 @@ Untouched originals in .cache/originals (not committed): 1130.7 MB in 647 files.
 | src/assets/wix/dd7c1d_3aa86cb912054c7b83efed9c54d3d068.png | 10.3 MB |
 | src/assets/wix/e9d9c2_f6d70ad28499430aacf3448c2b7fc31a.png | 10.1 MB |
 | src/assets/wix/e9d9c2_541a1c4645f24469ad35b454064a5a98.png | 9.6 MB |
+
+## Unreferenced media
+
+0 files no content file references (kept; first 20 listed).
+

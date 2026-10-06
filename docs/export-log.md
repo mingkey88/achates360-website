@@ -1,7 +1,5 @@
 # Export log
 
-Generated 2026-10-06T06:26:35.073Z.
-
 ## Content queries
 
 - **abby** — phone shows "+65 8909 606" but dials "tel:+6596853533"
@@ -11,10 +9,12 @@ Generated 2026-10-06T06:26:35.073Z.
 - **bank-of-singapore** — live page not linked from /projects
 - **belinda** — phone shows "+65 9694 6302" but dials "tel:+6596853533"
 - **belinda** — email shows "belinda@achates360.com" but opens "jamillie@achates360.com"
+- **bumitama-annual-report** — off-canvas "© 2021 - 2022" in the hero — shown on screens ≳2000px wide and read by screen readers; keep or remove?
 - **chuan** — phone shows "+65 9843 2209" but dials "tel:+6596853533"
 - **chuan** — email shows "chuan@achates360.com" but opens "jamillie@achates360.com"
 - **copy-of-grohe-quarterly-campaigns** — live page not linked from /projects
 - **copy-of-international-green-building** — linked from home, projects, but Wix serves it behind a password — not cloned
+- **copy-of-projects** — duplicate of /projects, live and indexed
 - **corporate-powerpoint-presentations** — linked from home, but Wix serves it behind a password — not cloned
 - **dbs-affluent-segment-ai-assets** — linked from home, copy-of-projects, projects, but Wix serves it behind a password — not cloned
 - **dbs-discretionary-portfolio-management** — live page not linked from /projects
@@ -31,6 +31,7 @@ Generated 2026-10-06T06:26:35.073Z.
 - **ritz-carlton-mid-autumn** — live page not linked from /projects
 - **singapore-aviation-academy** — live page not linked from /projects
 - **uel-annual-report** — live page not linked from /projects
+- **uel-annual-report** — off-canvas "© 2021 - 2022" in the hero — shown on screens ≳2000px wide and read by screen readers; keep or remove?
 
 ## Warnings
 
@@ -38,7 +39,6 @@ Generated 2026-10-06T06:26:35.073Z.
 
 ## Notes
 
-- **bumitama-annual-report** — bumitama-annual-report: hidden duplicate copyright above back link dropped: "© 2021 - 2022" (page copyright line: "© 2022")
 - **bumitama-annual-report** — 1 image(s) with no alt text on Wix (kept empty)
 - **changi-airport-group** — 1 image(s) with no alt text on Wix (kept empty)
 - **copy-of-projects** — 22 image(s) with no alt text on Wix (kept empty)
@@ -51,4 +51,3 @@ Generated 2026-10-06T06:26:35.073Z.
 - **singapore-aviation-academy** — 2 image(s) with no alt text on Wix (kept empty)
 - **st-regis-tearoom-patisserie** — 11 image(s) with no alt text on Wix (kept empty)
 - **the-art-of-tan-ping-chiang** — 6 image(s) with no alt text on Wix (kept empty)
-- **uel-annual-report** — uel-annual-report: hidden duplicate copyright above back link dropped: "© 2021 - 2022" (page copyright line: "© 2014")

@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { ORIGIN } from './lib/urls.mjs';
 import { extractPage, extractRoutes } from './lib/extract.mjs';
 import { mapPage, applyListing, toSite, toProjectsIndex } from './lib/map.mjs';
-import { collectMedia, runJobs, mediaReport } from './lib/media.mjs';
+import { collectMedia, runJobs, mediaReport, dirSize } from './lib/media.mjs';
+import { fetchSitemapPaths, sitemapRenderFailures } from './lib/sitemap.mjs';
 import { writeRecord, exportLog } from './lib/write.mjs';
 import { openBrowser, renderPage } from './render.mjs';
 
@@ -22,19 +23,10 @@ const log = [];
 const exists = (p) => access(p).then(() => true, () => false);
 const slugOf = (path) => (path === '/' ? 'home' : path.slice(1));
 
-// 1. Sitemap
-const index = await (await fetch(`${ORIGIN}/sitemap.xml`)).text();
-const sitemaps = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-const paths = [];
-for (const sm of sitemaps) {
-  const xml = await (await fetch(sm)).text();
-  for (const [, loc] of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
-    const p = new URL(loc).pathname.replace(/\/$/, '') || '/';
-    if (!paths.includes(p)) paths.push(p);
-  }
-}
-if (!paths.length) throw new Error('sitemap: no pages found');
-await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths.sort(), null, 2) + '\n');
+// 1. Sitemap (throws on any failed request rather than export a partial site)
+console.log(`export started ${new Date().toISOString()}`);
+const paths = await fetchSitemapPaths(ORIGIN);
+await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
 console.log(`sitemap: ${paths.length} pages`);
 
 // 2. Render (cached). A cache entry is the HTML, its gallery sidecar and both screenshots;
@@ -117,6 +109,16 @@ for (const [slug, from] of linkers) {
 }
 await browser.close();
 
+// Ruling 20: a sitemap page that failed to render would lose its content in the cleanup below,
+// so abort before anything under src/content is touched.
+const fatal = sitemapRenderFailures(renderFailed, paths);
+if (fatal.length) {
+  await mkdir('.cache', { recursive: true });
+  await writeFile('.cache/export-log.aborted.md', exportLog(log));
+  console.error(`ABORTED: ${fatal.length} sitemap page(s) failed to render: ${fatal.join(',')}. Nothing written to src/content; re-run to retry (cache keeps the rest). Log: .cache/export-log.aborted.md`);
+  process.exit(1);
+}
+
 // 4. Hidden routes (in Wix router, not in sitemap, not linked)
 if (raws.has('home')) {
   const routes = extractRoutes(await readFile(`${CACHE}/home.html`, 'utf8'));
@@ -130,7 +132,6 @@ const records = [];
 for (const raw of raws.values()) {
   const r = mapPage(raw);
   for (const w of r.warnings) log.push({ level: 'warning', page: raw.slug, message: w });
-  for (const n of r.notes) log.push({ level: 'info', page: raw.slug, message: n });
   records.push(r);
 }
 if (raws.has('home')) records.push({ collection: 'site', id: 'site', data: toSite(raws.get('home')) });
@@ -142,7 +143,14 @@ if (raws.has('projects')) {
 }
 
 // 6. Content-level anomaly checks
+// Wix duplicates still live and indexed (named here because their content differs from the
+// original, so they cannot be detected).
+const DUPLICATES = { 'copy-of-projects': '/projects' };
 for (const r of records) {
+  if (DUPLICATES[r.id]) log.push({ level: 'query', page: r.id, message: `duplicate of ${DUPLICATES[r.id]}, live and indexed` });
+  for (const line of r.data.heroCaption?.split('\n') ?? []) {
+    log.push({ level: 'query', page: r.id, message: `off-canvas "${line}" in the hero — shown on screens ≳2000px wide and read by screen readers; keep or remove?` });
+  }
   if (r.collection === 'cards') {
     const d = r.data;
     const telDigits = d.phone.href.replace(/\D/g, '');
@@ -198,7 +206,9 @@ if (!only) {
 }
 const counts = ['query', 'warning', 'info'].map((l) => `${log.filter((e) => e.level === l).length} ${l}`).join(', ');
 console.log(`log: ${counts}`);
+const orig = await dirSize(join(root, '.cache/originals'));
+console.log(`untouched originals in .cache/originals (not committed): ${(orig.bytes / 1024 / 1024).toFixed(1)} MB in ${orig.files} files`);
 if (renderFailed.length) {
-  console.log(`render failed for ${renderFailed.length} page(s): ${renderFailed.join(',')} — re-run to retry (cache keeps the rest)`);
+  console.log(`render failed for ${renderFailed.length} linked page(s): ${renderFailed.join(',')} — re-run to retry (cache keeps the rest)`);
   process.exitCode = 1;
 }

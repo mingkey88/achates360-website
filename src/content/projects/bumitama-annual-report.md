@@ -9,6 +9,7 @@ hero:
   type: image
   src: ../../assets/wix/dd7c1d_efa78c4afb3e4defa9e1c5b30861692c.png
   alt: Bumitama.png
+heroCaption: © 2021 - 2022
 badges: []
 backLink:
   label: ← BACK TO PROJECTS

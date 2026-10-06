@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, mkdir, readFile, truncate } from 'node:fs/promises'
 import sharp from 'sharp';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { collectMedia, runJobs, mediaReport } from './media.mjs';
+import { collectMedia, runJobs, mediaReport, dirSize } from './media.mjs';
 
 // A small real PNG, so derived images can be decoded.
 const png = (width, height = 10) => sharp({ create: { width, height, channels: 3, background: '#c33' } }).png().toBuffer();
@@ -156,7 +156,7 @@ describe('runJobs', () => {
 });
 
 describe('mediaReport', () => {
-  it('measures the committed media and notes the size of the cached originals', async () => {
+  it('measures only the committed media; the originals cache is reported separately', async () => {
     const root = await mkdtemp(join(tmpdir(), 'a360-'));
     await mkdir(join(root, 'src/assets/wix'), { recursive: true });
     await mkdir(join(root, ORIG), { recursive: true });
@@ -164,9 +164,24 @@ describe('mediaReport', () => {
     await writeFile(join(root, ORIG, 'a.png'), Buffer.alloc(3 * 1024 * 1024));
     const md = await mediaReport(root);
     expect(md).toContain('Total committed media: **1.0 MB** in 1 files.');
-    expect(md).toContain('Untouched originals in .cache/originals (not committed): 3.0 MB in 1 files.');
+    expect(md).not.toContain('originals');
     expect(md).not.toContain('THRESHOLD EXCEEDED');
     expect(md).toContain('informational');
+    expect(await dirSize(join(root, '.cache/originals'))).toEqual({ files: 1, bytes: 3 * 1024 * 1024 });
+  });
+
+  it('lists media files no content file references, without deleting them', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    for (const d of ['src/assets/wix', 'public/media/video', 'public/cards', 'src/content/projects']) await mkdir(join(root, d), { recursive: true });
+    for (const f of ['src/assets/wix/used.jpg', 'src/assets/wix/unused.png', 'public/media/video/v1.mp4', 'public/media/video/v2.mp4', 'public/cards/abby.vcf']) await writeFile(join(root, f), 'x');
+    await writeFile(join(root, 'src/content/projects/p.md'), '---\nhero:\n  src: ../../assets/wix/used.jpg\nvideo: media/video/v1.mp4\nvcard: /cards/abby.vcf\n---\n');
+    const md = await mediaReport(root);
+    expect(md).toContain('## Unreferenced media');
+    expect(md).toContain('2 files no content file references');
+    expect(md).toContain('- public/media/video/v2.mp4');
+    expect(md).toContain('- src/assets/wix/unused.png');
+    expect(md).not.toContain('- src/assets/wix/used.jpg');
+    expect(await readFile(join(root, 'src/assets/wix/unused.png'), 'utf8')).toBe('x');
   });
 
   // Sparse files: large sizes without writing the bytes.

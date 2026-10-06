@@ -70,14 +70,13 @@ export function classify(raw) {
   return raw.nodes.some((n) => n.kind === 'link' && BACK.test(n.text)) ? 'project' : 'basic';
 }
 
-export function mapProject(raw) {
-  const notes = [];
+export function toProject(raw) {
   const backIdx = raw.nodes.findIndex((n) => n.kind === 'link' && BACK.test(n.text));
   if (backIdx < 0) throw new MappingError(`${raw.slug}: no back link`);
-  // Ruling 19: a copyright line above the back link (bumitama and uel carry a hidden
-  // "© 2021 - 2022" there, invisible on the live page) is dropped and noted, never silently.
-  const hiddenCopyright = raw.nodes.slice(0, backIdx).filter((n) => n.kind === 'text' && COPYRIGHT.test(n.text));
-  const before = raw.nodes.slice(0, backIdx).filter((n) => !hiddenCopyright.includes(n));
+  // Ruling 19b: copyright-shaped text above the back link (bumitama and uel carry an off-canvas
+  // "© 2021 - 2022" in the hero, visible only on very wide screens) is kept verbatim as heroCaption.
+  const captions = raw.nodes.slice(0, backIdx).filter((n) => n.kind === 'text' && COPYRIGHT.test(n.text));
+  const before = raw.nodes.slice(0, backIdx).filter((n) => !captions.includes(n));
   const after = raw.nodes.slice(backIdx + 1);
 
   const heroNode = before.find((n) => n.kind === 'image' || n.kind === 'bgvideo');
@@ -97,26 +96,20 @@ export function mapProject(raw) {
       ? { type: 'video', src: videoRef(heroNode.videoId), poster: imgRef(heroNode.poster) }
       : { type: 'image', src: imgRef(heroNode.file), alt: heroNode.alt };
 
-  const pageCopyright = copyI >= 0 ? after[copyI].text : null;
-  for (const n of hiddenCopyright) {
-    notes.push(`${raw.slug}: hidden duplicate copyright above back link dropped: ${JSON.stringify(n.text)} (page copyright line: ${JSON.stringify(pageCopyright)})`);
-  }
-  const data = {
+  return {
     title: after[titleI].text,
     ...(clientI !== undefined && clientI !== copyI ? { client: after[clientI].text } : {}),
     ...(copyI >= 0 ? { copyright: after[copyI].text } : {}),
     categories: [],
     listed: false,
     ...(hero ? { hero } : {}),
+    ...(captions.length ? { heroCaption: captions.map((n) => n.text).join('\n') } : {}),
     badges,
     backLink: { label: raw.nodes[backIdx].text, href: raw.nodes[backIdx].href },
     seo: seoOf(raw),
     blocks: blocksOf(rest),
   };
-  return { data, warnings: [], notes };
 }
-
-export const toProject = (raw) => mapProject(raw).data;
 
 export function toCard(raw) {
   const texts = raw.nodes.filter((n) => n.kind === 'text');
@@ -319,18 +312,18 @@ export function toSite(raw) {
 }
 
 const strict = (fn) => (raw) => ({ data: fn(raw), warnings: [] });
-const MAPPERS = { project: ['projects', mapProject], card: ['cards', strict(toCard)], basic: ['basic', mapBasic],
+const MAPPERS = { project: ['projects', strict(toProject)], card: ['cards', strict(toCard)], basic: ['basic', mapBasic],
   home: ['home', mapHome], projectsIndex: ['projectsIndex', mapProjectsIndex] };
 
 export function mapPage(raw) {
   const [collection, fn] = MAPPERS[classify(raw)];
   try {
-    const { data, warnings, notes = [] } = fn(raw);
-    return { collection, id: raw.slug, data, warnings, notes };
+    const { data, warnings } = fn(raw);
+    return { collection, id: raw.slug, data, warnings };
   } catch (e) {
     if (!(e instanceof MappingError)) throw e;
     const basic = mapBasic(raw);
-    return { collection: 'basic', id: raw.slug, data: basic.data, warnings: [`${e.message} — fell back to basic page`, ...basic.warnings], notes: [] };
+    return { collection: 'basic', id: raw.slug, data: basic.data, warnings: [`${e.message} — fell back to basic page`, ...basic.warnings] };
   }
 }
 

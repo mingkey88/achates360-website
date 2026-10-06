@@ -33,4 +33,10 @@ describe('exportLog', () => {
     expect(md).toContain('- **angeline** — phone display differs from link');
     expect(md).toContain('## Warnings');
   });
+  it('is deterministic: no timestamp, same output for the same entries', () => {
+    const entries = [{ level: 'info', page: 'a', message: 'm' }];
+    const md = exportLog(entries);
+    expect(md).not.toMatch(/Generated|\d{4}-\d{2}-\d{2}T/);
+    expect(exportLog(entries)).toBe(md);
+  });
 });

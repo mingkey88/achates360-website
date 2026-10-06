@@ -17,7 +17,7 @@ export async function writeRecord(root, { collection, id, data }) {
 const LEVELS = [['query', 'Content queries'], ['warning', 'Warnings'], ['info', 'Notes']];
 
 export function exportLog(entries) {
-  const lines = ['# Export log', '', `Generated ${new Date().toISOString()}.`, ''];
+  const lines = ['# Export log', ''];
   for (const [level, title] of LEVELS) {
     const xs = entries.filter((e) => e.level === level).sort((a, b) => a.page.localeCompare(b.page));
     if (!xs.length) continue;

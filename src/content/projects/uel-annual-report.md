@@ -8,6 +8,7 @@ hero:
   type: image
   src: ../../assets/wix/483e3e_534ee9748fd44abba2ab06dd58fc858a.jpg
   alt: UnitedEngineersLimited_Publication_header.jpg
+heroCaption: © 2021 - 2022
 badges: []
 backLink:
   label: ← BACK TO PROJECTS

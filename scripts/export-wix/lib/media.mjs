@@ -158,6 +158,17 @@ async function listFiles(dir) {
   return out;
 }
 
+export async function dirSize(dir) {
+  const files = await listFiles(dir);
+  return { files: files.length, bytes: files.reduce((s, f) => s + f.size, 0) };
+}
+
+// Text of every content file, to find media that nothing references.
+async function contentText(root) {
+  const files = (await listFiles(join(root, 'src/content'))).filter((f) => f.path.endsWith('.md'));
+  return (await Promise.all(files.map((f) => readFile(f.path, 'utf8')))).join('\n');
+}
+
 export async function mediaReport(root) {
   const files = [
     ...(await listFiles(join(root, 'src/assets/wix'))),
@@ -172,8 +183,9 @@ export async function mediaReport(root) {
     byExt[ext].count++; byExt[ext].bytes += f.size;
   }
   const total = files.reduce((s, f) => s + f.size, 0);
-  const originals = await listFiles(join(root, '.cache/originals'));
-  const origTotal = originals.reduce((s, f) => s + f.size, 0);
+  const rel = (p) => p.replace(root + '/', '');
+  const text = await contentText(root);
+  const unreferenced = files.map((f) => rel(f.path)).filter((p) => !text.includes(basename(p))).sort();
   const largest = [...files].sort((a, b) => b.size - a.size).slice(0, 20);
   // Ruling 18: spec §5.5's 800 MB / 95 MB limits bind the BUILT output (Astro re-encodes images),
   // checked on dist/ in Task 15. Here the total is informational; a source file over 95 MB is still
@@ -182,12 +194,14 @@ export async function mediaReport(root) {
   return [
     '# Media report', '',
     `Total committed media: **${mb(total)}** in ${files.length} files.`, '',
-    `Untouched originals in .cache/originals (not committed): ${mb(origTotal)} in ${originals.length} files.`, '',
     over ? '> **THRESHOLD EXCEEDED** — a source file is over 95 MB (git rejects files over 100 MB); stop and ask the user about media hosting (spec §5.5).'
       : '> No source file is over 95 MB. The source total is informational: the binding 800 MB / 95 MB check runs on the built dist/ in Task 15 (spec §5.5).', '',
     '| Type | Files | Size |', '|---|---|---|',
     ...Object.entries(byExt).sort((a, b) => b[1].bytes - a[1].bytes).map(([e, v]) => `| ${e} | ${v.count} | ${mb(v.bytes)} |`), '',
     '## 20 largest', '', '| File | Size |', '|---|---|',
-    ...largest.map((f) => `| ${f.path.replace(root + '/', '')} | ${mb(f.size)} |`), '',
+    ...largest.map((f) => `| ${rel(f.path)} | ${mb(f.size)} |`), '',
+    '## Unreferenced media', '',
+    `${unreferenced.length} files no content file references (kept; first 20 listed).`, '',
+    ...unreferenced.slice(0, 20).map((p) => `- ${p}`), '',
   ].join('\n');
 }

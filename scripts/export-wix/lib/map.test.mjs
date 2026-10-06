@@ -260,23 +260,25 @@ describe('Ruling 17: mapper gaps found by the full export', () => {
   });
 });
 
-describe('Ruling 19: hidden copyright above the back link', () => {
+describe('Ruling 19b: off-canvas copyright text in the hero', () => {
   const back = dbs.nodes.findIndex((n) => n.kind === 'link' && /BACK TO PROJECTS/.test(n.text));
   const textNode = (text) => ({ kind: 'text', html: `<p>${text}</p>`, text, links: [], comp: null, section: dbs.nodes[back].section });
-  const withAbove = (text) => ({ ...dbs, slug: 'annual', nodes: [...dbs.nodes.slice(0, back), textNode(text), ...dbs.nodes.slice(back)] });
+  const withAbove = (...texts) => ({ ...dbs, slug: 'annual', nodes: [...dbs.nodes.slice(0, back), ...texts.map(textNode), ...dbs.nodes.slice(back)] });
 
-  it('drops a copyright line above the back link, keeps the page copyright, and notes it', () => {
+  it('keeps a copyright line above the back link verbatim as heroCaption', () => {
     for (const text of ['© 2021 - 2022', '© 2018']) {
       const r = mapPage(withAbove(text));
       expect(r.collection).toBe('projects');
       expect(r.warnings).toEqual([]);
-      expect(r.notes).toHaveLength(1);
-      expect(r.notes[0]).toMatch(/^annual: hidden duplicate copyright above back link dropped/);
-      expect(r.notes[0]).toContain(JSON.stringify(text));
+      expect(r.data.heroCaption).toBe(text);
       expect(r.data.copyright).toBe('© 2018');
-      expect(JSON.stringify(r.data)).not.toContain('2021 - 2022');
-      expect(r.data).toEqual(toProject(dbs));
+      const { heroCaption, ...rest } = r.data;
+      expect(rest).toEqual(toProject(dbs));
     }
+  });
+
+  it('joins several such lines with a newline', () => {
+    expect(toProject(withAbove('© 2021 - 2022', '© 2021-2022')).heroCaption).toBe('© 2021 - 2022\n© 2021-2022');
   });
 
   it('still rejects any other text above the back link', () => {
@@ -284,7 +286,7 @@ describe('Ruling 19: hidden copyright above the back link', () => {
     expect(mapPage(withAbove('Hidden caption')).collection).toBe('basic');
   });
 
-  it('pages without it carry no notes', () => {
-    expect(mapPage(dbs).notes).toEqual([]);
+  it('pages without it have no heroCaption', () => {
+    expect(toProject(dbs)).not.toHaveProperty('heroCaption');
   });
 });
