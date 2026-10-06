@@ -33,23 +33,93 @@ blocks:
       The landing page was structured for clarity and ease of navigation, guiding visitors through the purpose, criteria and submission process in a streamlined manner. Posters were designed to command attention within the office environment while staying true to corporate aesthetics. The videos distilled the essence of the challenge into concise narratives, reinforcing urgency and opportunity without straying from brand discipline.
 
       Every asset was developed with precision and consistency, ensuring that the campaign communicated exactly what the client intended, in the way they intended. The result was a unified communication system that amplified the call for innovation while safeguarding brand integrity.
+    box:
+      x: 238
+      y: 1046
+      w: 669
+      h: 651
+    mbox:
+      x: 20
+      y: 250
+      w: 280
+      h: 1195
   - type: image
     src: ../../assets/wix/1aae46_3ba76f3e600b464189bb0c1c0d113a71.jpg
     alt: Digital-Poster-in-Office-Lobby-01_edited
+    box:
+      x: 246
+      y: 1728
+      w: 947
+      h: 587
+    mbox:
+      x: 20
+      y: 1455
+      w: 280
+      h: 188
   - type: image
     src: ../../assets/wix/1aae46_70a9d65aec5742b1b7c28bc927e4728e.jpg
     alt: Poster-Mockup-in-Office-02.jpg
+    box:
+      x: 246
+      y: 2327
+      w: 947
+      h: 548
+    mbox:
+      x: 20
+      y: 1653
+      w: 280
+      h: 162
   - type: image
     src: ../../assets/wix/1aae46_2808e850e2094daf9680530d66fbb1b5.jpg
     alt: EDM-Mockup-01.jpg
+    box:
+      x: 246
+      y: 2889
+      w: 433
+      h: 363
+    mbox:
+      x: 20
+      y: 1825
+      w: 280
+      h: 232
   - type: image
     src: ../../assets/wix/1aae46_59a2d36591c54178b61b5dcaba0084e4.jpg
     alt: Mobile-Phone-Mockup-01.jpg
+    box:
+      x: 686
+      y: 2889
+      w: 507
+      h: 363
+    mbox:
+      x: 20
+      y: 2067
+      w: 280
+      h: 198
   - type: embed
     provider: vimeo
     id: "1169417100"
+    box:
+      x: 246
+      y: 3262
+      w: 947
+      h: 532
+    mbox:
+      x: 20
+      y: 2275
+      w: 280
+      h: 159
   - type: embed
     provider: vimeo
     id: "1163166364"
+    box:
+      x: 246
+      y: 3806
+      w: 947
+      h: 532
+    mbox:
+      x: 20
+      y: 2444
+      w: 280
+      h: 159
 order: 11
 ---

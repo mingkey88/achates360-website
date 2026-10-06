@@ -1,4 +1,5 @@
 ---
+pageBackground: "#f2f2f2"
 seo:
   title: Project Categories | Achates 360
   description: Browse Achates 360's creative projects by category — branding, digital campaigns, publications and more.
@@ -6,6 +7,17 @@ seo:
 blocks:
   - type: text
     md: "## Strategic Branding"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 81
+      w: 448
+      h: 34
+    mbox:
+      x: 10
+      y: 115
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: St Regis TeaRoom & Patisserie
@@ -65,8 +77,29 @@ blocks:
         href: /the-v-edit-e-zine
         thumb: ../../assets/wix/e9d9c2_bab7215c43334dce83d031dc1cc34325.gif
         alt: The V Edit
+    box:
+      x: 242
+      y: 140
+      w: 956
+      h: 1116
+    mbox:
+      x: 20
+      y: 17251
+      w: 280
+      h: 2949
   - type: text
     md: "## Advertising & Promotions"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 1266
+      w: 448
+      h: 34
+    mbox:
+      x: 10
+      y: 2863
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: Affluent Segment AI Assets
@@ -163,8 +196,29 @@ blocks:
         href: /the-skyline
         thumb: ../../assets/wix/e9d9c2_cb34cfc9759e4bfaacb6576cf1c9cc60.jpg
         alt: SkylinePropert_AdvertisingPromotion_Brochure
+    box:
+      x: 242
+      y: 1340
+      w: 956
+      h: 1688
+    mbox:
+      x: 18
+      y: 2903
+      w: 280
+      h: 4840
   - type: text
     md: "## Graphic Design"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 3081
+      w: 448
+      h: 34
+    mbox:
+      x: 20
+      y: 7769
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: 🏆Julius Baer Festive Collaterals and Packaging
@@ -221,8 +275,29 @@ blocks:
         href: /purple-sage
         thumb: ../../assets/wix/9766c0_08750bdccbab45e58ea9dd1340071fa6.jpg
         alt: PurpleSage_StrategicBranding_Branding__6-1.jpg
+    box:
+      x: 243
+      y: 3138
+      w: 956
+      h: 1116
+    mbox:
+      x: 20
+      y: 7824
+      w: 280
+      h: 2949
   - type: text
     md: "## Content Creation"
+    color: "#2f2e2e"
+    box:
+      x: 244
+      y: 4301
+      w: 448
+      h: 34
+    mbox:
+      x: 14
+      y: 10811
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: "DBS Chief Investment Office videos "
@@ -251,8 +326,29 @@ blocks:
         href: /changi-airport-group
         thumb: ../../assets/wix/e9d9c2_f3f6c9fd452045399d09e6d0ca3d7a7b.jpg
         alt: CAG_Learning_Festival_GameChanger_1.jpg
+    box:
+      x: 238
+      y: 4363
+      w: 956
+      h: 545
+    mbox:
+      x: 20
+      y: 10865
+      w: 280
+      h: 1328
   - type: text
     md: "## Social Media"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 5000
+      w: 448
+      h: 34
+    mbox:
+      x: 18
+      y: 12252
+      w: 280
+      h: 30
   - type: gallery
     items:
       - title: Samsung The Freestyle.png
@@ -294,8 +390,29 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_a034e260302448f78882886a070cf3ed.jpg
         alt: The_Brook_Clown_header-2.jpg
+    box:
+      x: 242
+      y: 5067
+      w: 956
+      h: 830
+    mbox:
+      x: 20
+      y: 12301
+      w: 280
+      h: 2139
   - type: text
     md: "## Publications"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 5990
+      w: 448
+      h: 34
+    mbox:
+      x: 20
+      y: 14474
+      w: 280
+      h: 25
   - type: gallery
     items:
       - title: "🏆‘Building Memories’ Art Book "
@@ -348,8 +465,29 @@ blocks:
         description: China Cultural Centre (Singapore)
         thumb: ../../assets/wix/1aae46_7b1675f0878644eebbf320d371a34877.jpg
         alt: China Cultural Centre
+    box:
+      x: 242
+      y: 6054
+      w: 956
+      h: 1116
+    mbox:
+      x: 20
+      y: 14519
+      w: 280
+      h: 2679
   - type: text
     md: "## Digital Communications"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 7235
+      w: 448
+      h: 34
+    mbox:
+      x: 20
+      y: 17211
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: DBS Chief Investment Office videos
@@ -406,8 +544,29 @@ blocks:
         href: /the-v-edit-e-zine
         thumb: ../../assets/wix/e9d9c2_bab7215c43334dce83d031dc1cc34325.gif
         alt: The V Edit
+    box:
+      x: 242
+      y: 7301
+      w: 956
+      h: 1116
+    mbox:
+      x: 20
+      y: 162
+      w: 280
+      h: 2679
   - type: text
     md: "## Packaging & Merchandise"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 8427
+      w: 448
+      h: 34
+    mbox:
+      x: 20
+      y: 20224
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: 🏆Julius Baer Festive Collaterals and Packaging
@@ -447,8 +606,29 @@ blocks:
         href: /wedding-invitation-wedding-favours
         thumb: ../../assets/wix/e9d9c2_ee9a936cfae64bd49cf1ef8ad75642c2.gif
         alt: ChurchWedding_GraphicDesign_InvitationCard_2-1.gif
+    box:
+      x: 242
+      y: 8489
+      w: 956
+      h: 830
+    mbox:
+      x: 20
+      y: 20285
+      w: 280
+      h: 1869
   - type: text
     md: "## Events"
+    color: "#2f2e2e"
+    box:
+      x: 242
+      y: 9351
+      w: 448
+      h: 34
+    mbox:
+      x: 10
+      y: 22212
+      w: 300
+      h: 30
   - type: gallery
     items:
       - title: |-
@@ -497,4 +677,14 @@ blocks:
         href: /the-v-edit-e-zine
         thumb: ../../assets/wix/e9d9c2_bab7215c43334dce83d031dc1cc34325.gif
         alt: The V Edit
+    box:
+      x: 242
+      y: 9411
+      w: 956
+      h: 830
+    mbox:
+      x: 20
+      y: 22253
+      w: 280
+      h: 2409
 ---

@@ -31,15 +31,45 @@ blocks:
       The Bazaar took on a colourful approach with colonial and bohemian design elements. Apart from providing the design solutions, the agency also conceptualised and created the convivial street atmosphere by introducing pop up carts selling flowers, antique stalls, caricature stall, gypsy fortune teller, while recommending the use of different scarfs to differentiate tiers of customers.
 
       The event EDM uses an animated typography approach with a kaleidoscope of colors to induce a psychedelic finishing. Multi-colored tablemats were introduced to add vibrancy to the dining experience, polished with gold foil finishing to add a touch of lavishness. The colourful masthead created alongside with the colonial bohemian patterns were used throughout from the flyers, goodie bags, and food trucks to enhance the thematic identity.
+    box:
+      x: 238
+      y: 994
+      w: 669
+      h: 567
+    mbox:
+      x: 20
+      y: 250
+      w: 280
+      h: 1058
   - type: embed
     provider: vimeo
     id: "354175113"
+    box:
+      x: 238
+      y: 1617
+      w: 960
+      h: 595
+    mbox:
+      x: 20
+      y: 1343
+      w: 280
+      h: 158
   - type: text
     md: |-
       **SuperBrunch 12th edition: The Voyage**
 
         
       The 12th edition, themed “The Voyage”, was  set against the backdrop of the 19th century, an era of exploration and expeditions. Collaterals created include personalised invitation cards in the form of steamship tickets, a menu styled to resemble a passport, and placemats printed with an antiquarian world map.
+    box:
+      x: 238
+      y: 2273
+      w: 960
+      h: 105
+    mbox:
+      x: 20
+      y: 1531
+      w: 280
+      h: 196
   - type: gallery
     items:
       - title: The Ritz-Carlton SuperBrunch 01.jpg
@@ -58,11 +88,31 @@ blocks:
         description: ""
         thumb: ../../assets/wix/9766c0_ce16bfbdea294202b9c0297cefdff42d.jpg
         alt: The Ritz-Carlton SuperBrunch 04.jpg
+    box:
+      x: 240
+      y: 2403
+      w: 960
+      h: 2578
+    mbox:
+      x: 20
+      y: 1737
+      w: 280
+      h: 769
   - type: text
     md: |-
       **SuperBrunch 13th edition: Under Construction**
 
       The 13th edition was scheduled prior to the renovation of the Greenhouse and Summer Pavilion restaurants. Aptly themed “Under Construction”, this edition was designed in anticipation of the impending transformation. The concept was presented through fusing the image of a construction worker and a chef. A visual persona was created to portray the chef and his team as ‘food architects’. Accompanying thematic souvenir items include placemats mimicking a under construction sign, lanyard and name-tag for construction sites.
+    box:
+      x: 240
+      y: 5053
+      w: 960
+      h: 126
+    mbox:
+      x: 20
+      y: 2543
+      w: 280
+      h: 314
   - type: gallery
     items:
       - title: The-Ritz-Carlton-SuperBrunch-05.jpg
@@ -81,5 +131,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e7c864_245b584dae2e4350aeb7438c876c9965.jpg
         alt: The-Ritz-Carlton-SuperBrunch-08.jpg
+    box:
+      x: 240
+      y: 5205
+      w: 960
+      h: 2590
+    mbox:
+      x: 20
+      y: 2871
+      w: 280
+      h: 772
 order: 50
 ---

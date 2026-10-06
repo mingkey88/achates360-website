@@ -22,13 +22,43 @@ seo:
 blocks:
   - type: text
     md: Sustainability is increasingly playing an integral role in investments. We presented this crucial message from DBS’s Chief Sustainability Officer with the visual aid of animated infographics and supers to ease understanding of the concepts shared in the video interview.
+    box:
+      x: 250
+      y: 1000
+      w: 630
+      h: 57
+    mbox:
+      x: 20
+      y: 226
+      w: 280
+      h: 126
   - type: embed
     provider: youtube
     id: qkasTH721NI
+    box:
+      x: 250
+      y: 1097
+      w: 938
+      h: 529
+    mbox:
+      x: 20
+      y: 379
+      w: 280
+      h: 158
   - type: text
     md: |-
       ##### About the video
 
       Sustainability is increasingly playing an integral role in investors' decision-making investment philosophy and process. With sustainable investing, you can make a positive impact socially and environmentally without sacrificing returns.
+    box:
+      x: 250
+      y: 1654
+      w: 938
+      h: 85
+    mbox:
+      x: 20
+      y: 566
+      w: 280
+      h: 152
 order: 13
 ---

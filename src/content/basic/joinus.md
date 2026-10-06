@@ -1,4 +1,5 @@
 ---
+pageBackground: "#f2f2f2"
 seo:
   title: Careers | Join Our Creative Team in Singapore | Achates 360
   description: Love design? Achates 360 is hiring in Singapore. Join a team creating intelligent branding, annual reports and digital campaigns for leading brands.
@@ -6,9 +7,30 @@ seo:
 blocks:
   - type: text
     md: "# Join us"
+    color: "#2f2e2e"
+    box:
+      x: 183
+      y: 136
+      w: 394
+      h: 67
+    mbox:
+      x: 10
+      y: 100
+      w: 300
+      h: 37
   - type: image
     src: ../../assets/wix/dd7c1d_2f5f7a3f60ec41d285ff1dcec447c951.png
     alt: Account Servicing.png
+    box:
+      x: 183
+      y: 211
+      w: 452
+      h: 452
+    mbox:
+      x: 10
+      y: 157
+      w: 280
+      h: 280
   - type: text
     md: |-
       #### **CLIENT ACCOUNT EXECUTIVE / MANAGER** 
@@ -78,7 +100,28 @@ blocks:
       **Company Overview**
 
       Achates 360 is an independent integrated full-service creative agency from Singapore. Founded in 2006, the name Achates \[uh-key-teez\] reflects our philosophy of being a "faithful companion and trusted friend" to our clients. Relationships are central to our company ethos and we believe strongly that close collaboration is key to effectively meeting our customers' needs.
+    color: "#f7702a"
+    box:
+      x: 618
+      y: 211
+      w: 544
+      h: 1357
+    mbox:
+      x: 10
+      y: 457
+      w: 300
+      h: 2066
   - type: link
     href: mailto:hello@achates360.com?subject=Application%20for%20Account%20Servicing
     label: Apply Now
+    box:
+      x: 618
+      y: 1568
+      w: 117
+      h: 42
+    mbox:
+      x: 80
+      y: 2523
+      w: 160
+      h: 42
 ---

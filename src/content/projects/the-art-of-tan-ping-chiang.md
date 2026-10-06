@@ -14,6 +14,7 @@ badges: []
 backLink:
   label: ← BACK TO PROJECTS
   href: /
+pageBackground: "#f2f2f2"
 seo:
   title: The Art Of Tan Ping Chiang | Achates 360
   description: Achates 360 designed exhibition collateral and visual materials for The Art Of Tan Ping Chiang showcase.
@@ -65,6 +66,16 @@ blocks:
       Photographers: Chang Szeling, Lee Hock Kee
 
       All of whom are NAFA Alumni.
+    box:
+      x: 240
+      y: 981
+      w: 573
+      h: 931
+    mbox:
+      x: 20
+      y: 229
+      w: 280
+      h: 1406
   - type: gallery
     items:
       - title: tiles. copy.jpg
@@ -91,5 +102,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_ad3ec7e917534cfb90f0e0507a54830d.jpg
         alt: ""
+    box:
+      x: 240
+      y: 1979
+      w: 949
+      h: 5120
+    mbox:
+      x: 0
+      y: 1665
+      w: 320
+      h: 1861
 order: 39
 ---

@@ -20,20 +20,80 @@ seo:
 blocks:
   - type: text
     md: Usher into the new year with JinHo! Wishing everyone a year of abundance, good fortune and endless luck. Everything Ho, everything Heng Heng. And no matter how much you feast, won't grow Buibui.
+    box:
+      x: 240
+      y: 993
+      w: 570
+      h: 57
+    mbox:
+      x: 20
+      y: 218
+      w: 280
+      h: 114
   - type: image
     src: ../../assets/wix/483e3e_e4c15bb33feb4df78ab20f4e440d81f0.gif
     alt: Money Many Many.gif
+    box:
+      x: 230
+      y: 1132
+      w: 308
+      h: 308
+    mbox:
+      x: 50
+      y: 342
+      w: 220
+      h: 220
   - type: image
     src: ../../assets/wix/483e3e_38e8316dc3dc47ed8d7f5d4be2fc60a1.gif
     alt: 兴旺发.gif
+    box:
+      x: 546
+      y: 1132
+      w: 308
+      h: 307
+    mbox:
+      x: 50
+      y: 800
+      w: 220
+      h: 218
   - type: image
     src: ../../assets/wix/483e3e_3a5a225fb03947eda39adedbc3511851.gif
     alt: 任吃不胖.gif
+    box:
+      x: 868
+      y: 1132
+      w: 310
+      h: 307
+    mbox:
+      x: 50
+      y: 572
+      w: 220
+      h: 218
   - type: link
     href: https://wa.me/6589096062?text=恭喜发财,%20Icon拿来!
     label: WHATSAPP TO GET STICKERS
+    box:
+      x: 490
+      y: 1478
+      w: 420
+      h: 45
+    mbox:
+      x: 28
+      y: 1047
+      w: 262
+      h: 42
   - type: link
     href: https://sticker.ly/s/6JQVUK
     label: INSTALL STICKERLY TO GET STICKERS
+    box:
+      x: 490
+      y: 1534
+      w: 420
+      h: 45
+    mbox:
+      x: 28
+      y: 1095
+      w: 262
+      h: 42
 order: 42
 ---

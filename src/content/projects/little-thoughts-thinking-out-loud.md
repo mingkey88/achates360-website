@@ -28,6 +28,16 @@ blocks:
       The publication showcased the works on display at the exhibition and documented how the 18 designers studied and relooked at the various aspects of the island republic’s unique culinary heritage and gave them a grand makeover with their creations.
 
       A sleek and clean concept was adopted to draw and focus attention on the product design which is the core of the publication. Muted colour tones were selected to complement the classic presentation of each unique design.
+    box:
+      x: 238
+      y: 994
+      w: 669
+      h: 357
+    mbox:
+      x: 20
+      y: 250
+      w: 280
+      h: 647
   - type: gallery
     items:
       - title: LittleThoughtsGroup_ThinkingOutLoud_Publication_CoverDesign_10.jpg
@@ -62,5 +72,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/24d1a3_0c3b11a5e5fc49bfaac56b97c89c9321.jpg
         alt: LittleThoughtsGroup_ThinkingOutLoud_Publication_CoverDesign_1.jpg
+    box:
+      x: 238
+      y: 1453
+      w: 960
+      h: 4583
+    mbox:
+      x: 20
+      y: 906
+      w: 280
+      h: 1378
 order: 45
 ---

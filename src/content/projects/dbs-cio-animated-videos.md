@@ -21,8 +21,28 @@ seo:
 blocks:
   - type: text
     md: Assisting the DBS CIO Office to churn out content on a regular basis (once fortnightly), we turned around short, animated videos to help customers digest financial information for the week easily.
+    box:
+      x: 238
+      y: 1009
+      w: 549
+      h: 57
+    mbox:
+      x: 20
+      y: 233
+      w: 280
+      h: 90
   - type: embed
     provider: youtube
     id: CBQJAf5utqM
+    box:
+      x: 238
+      y: 1082
+      w: 942
+      h: 531
+    mbox:
+      x: 20
+      y: 344
+      w: 280
+      h: 158
 order: 35
 ---

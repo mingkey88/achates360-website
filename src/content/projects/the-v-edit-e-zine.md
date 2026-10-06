@@ -26,6 +26,16 @@ blocks:
       The stylish creation of The V Edit logo, encompasses the use of colourful splashes representing the 4 seasons that is often associated in the fashion and beauty industry, using the type-writer fonts to add the grunge and making it more edgier.
 
       The website was also designed in an easy to use platform to ease the client’s updating of her website with new contents, trends and news. Also a clean and classy design was implemented to give spotlight on each of the products/ contents featured, making the overall look relevant at all season.
+    box:
+      x: 258
+      y: 977
+      w: 640
+      h: 254
+    mbox:
+      x: 20
+      y: 210
+      w: 280
+      h: 378
   - type: gallery
     items:
       - title: TheVEdit_DigitalCommunications_LogoDesign.gif
@@ -44,5 +54,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_ab5e2c28ead24033992e32fb265066d0.jpg
         alt: TheVEdit_DigitalCommunications_WebsiteDesign_3.jpg
+    box:
+      x: 246
+      y: 1231
+      w: 947
+      h: 2029
+    mbox:
+      x: 20
+      y: 598
+      w: 280
+      h: 617
 order: 8
 ---

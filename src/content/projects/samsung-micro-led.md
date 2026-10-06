@@ -29,9 +29,29 @@ blocks:
       Samsung MICRO LED TV Introduction Kit
 
       We created a customised Art Box Easel with handcrafting wood-working and waxing and had leather and artisan leather working customised with the Samsung logo pinned on the easel. Each kit was highly personalised to the recipient also had laser etching on each individual easel for uniquely named set.
+    box:
+      x: 230
+      y: 1138
+      w: 660
+      h: 380
+    mbox:
+      x: 20
+      y: 246
+      w: 282
+      h: 594
   - type: embed
     provider: youtube
     id: a_ukEqiJYC4
+    box:
+      x: 230
+      y: 1537
+      w: 979
+      h: 550
+    mbox:
+      x: 20
+      y: 849
+      w: 280
+      h: 157
   - type: gallery
     items:
       - title: Samsung Micro LED Introduction Kit 1.png
@@ -74,5 +94,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/dd7c1d_83cacbcfccfa42dab8d3b21d8b5a3779.png
         alt: Samsung Micro LED Introduction Kit-Seheon Lee 2.png
+    box:
+      x: 112
+      y: 2261
+      w: 1216
+      h: 464
+    mbox:
+      x: 20
+      y: 1016
+      w: 280
+      h: 107
 order: 48
 ---

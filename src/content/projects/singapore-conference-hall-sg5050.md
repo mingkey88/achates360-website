@@ -16,6 +16,7 @@ badges: []
 backLink:
   label: ← BACK TO PROJECTS
   href: /
+pageBackground: "#f2f2f2"
 seo:
   title: Singapore Conference Hall 50/50 | Achates 360
   description: Achates 360 created branding and event collateral for the Singapore Conference Hall 50/50 anniversary celebration.
@@ -32,6 +33,16 @@ blocks:
       Inspired by mosaic tiles which are still being preserved in some parts of the building, the team thematically applied the design concept to the styling of the structures, layout and displays throughout the exhibition. To enhance the exhibition environment, vinyl stickers with mosaic motifs were created and laid on the entire atrium floor to recreate the original mosaic tile flooring, giving the visitors an immersive and nostalgic experience.
 
       Extensive efforts were put into the research, copywriting and curating of photographs to piece together how SCH has evolved over the 50 years. A handbook was also produced to serve as a guide for the visitors.
+    box:
+      x: 258
+      y: 1046
+      w: 640
+      h: 456
+    mbox:
+      x: 20
+      y: 283
+      w: 280
+      h: 774
   - type: gallery
     items:
       - title: SingaporeConferenceHall_StrategicBranding_EvetCollaterals_18.jpg
@@ -94,5 +105,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_dbd6b76a86374bcf9886220045f76935.jpg
         alt: SingaporeConferenceHall_StrategicBranding_EvetCollaterals_15.jpg
+    box:
+      x: 258
+      y: 1551
+      w: 934
+      h: 11419
+    mbox:
+      x: 20
+      y: 1067
+      w: 280
+      h: 3506
 order: 3
 ---

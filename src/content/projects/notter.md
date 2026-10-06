@@ -14,6 +14,11 @@ hero:
 badges:
   - src: ../../assets/wix/9766c0_6036348ee2774bd19c7a70d777430f5b.png
     alt: AW_W.png
+    box:
+      x: 1070
+      y: 668
+      w: 112
+      h: 110
 backLink:
   label: ← BACK TO PROJECTS
   href: /
@@ -25,18 +30,58 @@ blocks:
   - type: image
     src: ../../assets/wix/9766c0_7e83417bfc6d4068ac9485066680df44.jpg
     alt: SPSA 2021 Logo.jpg
+    box:
+      x: 238
+      y: 973
+      w: 129
+      h: 120
+    mbox:
+      x: 20
+      y: 215
+      w: 90
+      h: 89
   - type: image
     src: ../../assets/wix/9766c0_b73515e5f2f54dc884173b86ede3510c.png
     alt: certificate_silver300.png
     href: https://drivenxdesign.com/NYC21/project.asp?ID=22036
+    box:
+      x: 398
+      y: 973
+      w: 102
+      h: 120
+    mbox:
+      x: 120
+      y: 220
+      w: 70
+      h: 84
   - type: text
     md: |-
       To refresh Nötter’s image to allow it to stand out from its competitors on the shelves of supermarkets, we designed new packaging with a modern look and earthy feel that complemented its organic origins and increased its appeal to the target market of health-conscious youths.
 
       We introduced a gift box where a set of 5-6 mixes could be sold at a time to increase volume of sales. The box was treated with velvet lamination and 3D emboss for a lush finish, making it suitable for both corporate and personal gifting. The nut mixes were given new intuitive names so that the consumer benefit was clearly communicated.
+    box:
+      x: 238
+      y: 1176
+      w: 669
+      h: 152
+    mbox:
+      x: 20
+      y: 348
+      w: 280
+      h: 306
   - type: embed
     provider: vimeo
     id: "766942392"
+    box:
+      x: 238
+      y: 1359
+      w: 940
+      h: 529
+    mbox:
+      x: 20
+      y: 664
+      w: 280
+      h: 158
   - type: gallery
     items:
       - title: Notter_Nuts_packaging5.jpg
@@ -75,6 +120,16 @@ blocks:
         description: ""
         thumb: ../../assets/wix/9766c0_f25363cc09894172939a82fb517708cc.jpg
         alt: Notter_Nuts_packaging0.jpg
+    box:
+      x: 238
+      y: 1901
+      w: 940
+      h: 5879
+    mbox:
+      x: 20
+      y: 832
+      w: 280
+      h: 1794
   - type: text
     md: |-
       Nötter Nuts has won the following awards:
@@ -85,5 +140,16 @@ blocks:
           
 
       [​](https://drivenxdesign.com/HKG20/project.asp?ID=20130)
+    color: "#ffffff"
+    box:
+      x: 238
+      y: 7822
+      w: 540
+      h: 76
+    mbox:
+      x: 19
+      y: 2711
+      w: 280
+      h: 72
 order: 1
 ---

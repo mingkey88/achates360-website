@@ -12,6 +12,7 @@ badges: []
 backLink:
   label: ← BACK TO PROJECTS
   href: /
+pageBackground: "#f2f2f2"
 seo:
   title: Kaplan | Achates 360
   description: Corporate communications and design for Kaplan — professional brand solutions by Achates 360, Singapore's award-winning creative agency.
@@ -24,20 +25,70 @@ blocks:
       This impressive “transformation” was a campaign we collaborated with Kaplan to market some of its core disciplines, namely Post Graduate, Business Management, Accounting, Banking and Finance, to Marina Bay’s commuter profile of Professionals, Managers, Executives and Technicians (PMETs). The aim was to inspire these PMETs to consider upgrading their skills or furthering their education.
 
       The strategic concept was to project the success of the students after entering the workforce in their various industries, becoming great inspirations to others and featured in various media showcases, in line with the digital business landscape. Making waves and breaking away from traditions, they are our next generation of digital disrupters!
+    box:
+      x: 258
+      y: 1012
+      w: 640
+      h: 264
+    mbox:
+      x: 20
+      y: 231
+      w: 280
+      h: 468
   - type: image
     src: ../../assets/wix/e9d9c2_44770922858541c98b7c7f9277a7bcb2.jpg
     alt: Kaplan_3.jpg
+    box:
+      x: 242
+      y: 1376
+      w: 948
+      h: 635
+    mbox:
+      x: 20
+      y: 1085
+      w: 280
+      h: 188
   - type: image
     src: ../../assets/wix/e9d9c2_b4bcd0e7e5b545769d313a7a3c7c9801.jpg
     alt: Kaplan_2.jpg
+    box:
+      x: 242
+      y: 2040
+      w: 948
+      h: 548
+    mbox:
+      x: 20
+      y: 910
+      w: 280
+      h: 162
   - type: image
     src: ../../assets/wix/e9d9c2_71cf924262e74a469b910d9c42a405bc.jpg
     alt: Kaplan_1.jpg
+    box:
+      x: 242
+      y: 2618
+      w: 948
+      h: 549
+    mbox:
+      x: 20
+      y: 736
+      w: 280
+      h: 162
   - type: text
     md: |-
       Different “channels” or “media” were selected in each visual showcase, based on the relevant courses/industry. We used business class seats for the Business Management Course, a resort setting for the Hospitality Course, so that there is a thematic tie-back to the nature of the industry.
 
       The large scale Out-of-Home advertisements took meticulous and precise planning to optimise the space and placements so that we could reach most of the commuters. Central to the communications campaign was the gigantic floor sticker just outside the gantry. Door stickers, in-train panels, concourse overhead banners, concourse level pillars, wall murals, glass panel stickers and window stickers completed the “takeover” of the station.
+    box:
+      x: 258
+      y: 3204
+      w: 640
+      h: 213
+    mbox:
+      x: 20
+      y: 1302
+      w: 280
+      h: 378
   - type: gallery
     items:
       - title: 9.jpg
@@ -84,6 +135,16 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_99cbe49e9308434bbf259ff5cf02617e.jpg
         alt: 4.jpg
+    box:
+      x: 242
+      y: 3429
+      w: 948
+      h: 609
+    mbox:
+      x: 20
+      y: 1696
+      w: 280
+      h: 180
   - type: gallery
     items:
       - title: a.jpg
@@ -98,5 +159,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_e360d51eb0d14408a73e00c4cbbe5729.jpg
         alt: c.jpg
+    box:
+      x: 242
+      y: 4058
+      w: 948
+      h: 609
+    mbox:
+      x: 20
+      y: 1886
+      w: 280
+      h: 180
 order: 21
 ---

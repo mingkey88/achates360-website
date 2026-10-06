@@ -33,6 +33,16 @@ blocks:
       The Tea Room menu design draws inspiration from the lush surroundings of the nearby Singapore Botanic Gardens. Floral elements were incorporated into the design as a subtle nod to this iconic landscape, complementing the serene atmosphere of afternoon tea while maintaining the sophistication expected within a St. Regis setting.
 
       With familiarity in luxury-oriented design, we worked closely with the client to ensure every detail aligned with their expectations and brand standards. The result is a cohesive set of collaterals that complements the newly refreshed spaces while enhancing the overall guest experience.
+    box:
+      x: 238
+      y: 993
+      w: 669
+      h: 651
+    mbox:
+      x: 20
+      y: 250
+      w: 280
+      h: 1176
   - type: gallery
     items:
       - title: ""
@@ -79,5 +89,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/1aae46_ee0287dfe10e4fc9911566273f79f3f9.jpg
         alt: ""
+    box:
+      x: 241
+      y: 1673
+      w: 960
+      h: 9759
+    mbox:
+      x: 20
+      y: 1480
+      w: 280
+      h: 2907
 order: 0
 ---

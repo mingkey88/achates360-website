@@ -14,6 +14,7 @@ badges: []
 backLink:
   label: ← BACK TO PROJECTS
   href: /
+pageBackground: "#f2f2f2"
 seo:
   title: The ‘Skyline’ Property Launch | Achates 360
   description: Achates 360 designed striking launch campaign materials for The Skyline — a premium property development in Singapore.
@@ -28,6 +29,16 @@ blocks:
       With our recommendation, an effective mobile display system adapting the bespoke design identity was fabricated to facilitate the road shows.
 
       The launch campaign was also complemented with bi-lingual press ads, emailers and a sleek brochure in both print and electronic formats to present critical information and floor-plans on the development to potential buyers.
+    box:
+      x: 258
+      y: 973
+      w: 640
+      h: 285
+    mbox:
+      x: 20
+      y: 231
+      w: 280
+      h: 504
   - type: gallery
     items:
       - title: SkylinePropert_AdvertisingPromotion_Backdrop_1.jpg
@@ -66,5 +77,15 @@ blocks:
         description: ""
         thumb: ../../assets/wix/e9d9c2_7cee2a64adff497d8125612f22e725db.jpg
         alt: SkylinePropert_AdvertisingPromotion_Brochure_7.jpg
+    box:
+      x: 258
+      y: 1296
+      w: 934
+      h: 4080
+    mbox:
+      x: 20
+      y: 755
+      w: 280
+      h: 1245
 order: 22
 ---

@@ -29,30 +29,141 @@ blocks:
       Tutorials on how to do the dance, as well as TikTok ad formats were cut for the media buys.
 
       We also filmed a product video to show how you could use The Freestyle in different lifestyle settings and the projector capabilities.
+    box:
+      x: 230
+      y: 1138
+      w: 660
+      h: 294
+    mbox:
+      x: 20
+      y: 246
+      w: 282
+      h: 476
   - type: text
     md: "##### Samsung The Freestyle video"
+    box:
+      x: 230
+      y: 1498
+      w: 412
+      h: 31
+    mbox:
+      x: 20
+      y: 732
+      w: 280
+      h: 25
   - type: embed
     provider: youtube
     id: 6-l-F1zw3RU
+    box:
+      x: 230
+      y: 1553
+      w: 979
+      h: 491
+    mbox:
+      x: 20
+      y: 767
+      w: 280
+      h: 140
   - type: text
     md: "## Samsung The Freestyle TikTok videos"
+    color: "#2f2e2e"
+    box:
+      x: 230
+      y: 2147
+      w: 547
+      h: 39
+    mbox:
+      x: 20
+      y: 917
+      w: 280
+      h: 56
   - type: embed
     provider: youtube
     id: wWLpCG0YJgQ
+    box:
+      x: 230
+      y: 2202
+      w: 308
+      h: 545
+    mbox:
+      x: 20
+      y: 983
+      w: 280
+      h: 140
   - type: text
     md: "##### Dance Tutorial"
+    box:
+      x: 230
+      y: 2747
+      w: 303
+      h: 31
+    mbox:
+      x: 20
+      y: 1123
+      w: 280
+      h: 27
   - type: embed
     provider: youtube
     id: sKBuVladPOQ
+    box:
+      x: 566
+      y: 2202
+      w: 308
+      h: 545
+    mbox:
+      x: 20
+      y: 1345
+      w: 280
+      h: 140
   - type: text
     md: "##### Join the Challenge Ad"
+    box:
+      x: 566
+      y: 2747
+      w: 303
+      h: 31
+    mbox:
+      x: 20
+      y: 1495
+      w: 280
+      h: 25
   - type: embed
     provider: youtube
     id: IMLre9Atdd4
+    box:
+      x: 902
+      y: 2202
+      w: 308
+      h: 545
+    mbox:
+      x: 20
+      y: 1159
+      w: 280
+      h: 140
   - type: text
     md: "##### TikTok 15s Branded Effect Ad"
+    box:
+      x: 902
+      y: 2747
+      w: 303
+      h: 31
+    mbox:
+      x: 20
+      y: 1309
+      w: 280
+      h: 25
   - type: text
     md: "##### Behind the scenes: Production shots"
+    box:
+      x: 230
+      y: 2898
+      w: 660
+      h: 51
+    mbox:
+      x: 20
+      y: 1530
+      w: 282
+      h: 52
   - type: image
     src: ../../assets/wix/dd7c1d_253331161c4a4b47bb57c75ea5e759d8.jpg
     alt: Samsung The Freestyle behind the scenes 1

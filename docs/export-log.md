@@ -40,14 +40,10 @@
 ## Notes
 
 - **bumitama-annual-report** — 1 image(s) with no alt text on Wix (kept empty)
-- **changi-airport-group** — 1 image(s) with no alt text on Wix (kept empty)
 - **copy-of-projects** — 22 image(s) with no alt text on Wix (kept empty)
-- **dxv** — 1 image(s) with no alt text on Wix (kept empty)
 - **home** — 13 image(s) with no alt text on Wix (kept empty)
-- **idm-venture-capital** — 2 image(s) with no alt text on Wix (kept empty)
 - **konicaminolta** — 1 image(s) with no alt text on Wix (kept empty)
 - **projects** — 23 image(s) with no alt text on Wix (kept empty)
-- **samsung-connected-home** — 5 image(s) with no alt text on Wix (kept empty)
 - **singapore-aviation-academy** — 2 image(s) with no alt text on Wix (kept empty)
 - **st-regis-tearoom-patisserie** — 11 image(s) with no alt text on Wix (kept empty)
 - **the-art-of-tan-ping-chiang** — 6 image(s) with no alt text on Wix (kept empty)

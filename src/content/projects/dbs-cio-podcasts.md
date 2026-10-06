@@ -21,8 +21,28 @@ seo:
 blocks:
   - type: text
     md: Assisting the DBS CIO Office to churn out content on a regular basis, we produced podcasts with a turn around time of less than 3 days so their customers can listen in to the latest update at their own leisure time.
+    box:
+      x: 246
+      y: 1003
+      w: 569
+      h: 57
+    mbox:
+      x: 40
+      y: 233
+      w: 280
+      h: 90
   - type: embed
     provider: youtube
     id: 6uyUFAdmkYY
+    box:
+      x: 246
+      y: 1076
+      w: 942
+      h: 531
+    mbox:
+      x: 40
+      y: 360
+      w: 280
+      h: 158
 order: 36
 ---
