@@ -94,7 +94,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     });
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (submit.disabled) return;
+      if (submit.getAttribute('aria-disabled') === 'true') return; // a post is in flight
       // A new attempt clears the last outcome.
       success?.setAttribute('hidden', '');
       status.textContent = '';
@@ -108,7 +108,9 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       }
       if (!PUBLIC_FORM_ENDPOINT) { status.textContent = 'Form not connected on staging'; return; }
       status.textContent = 'Sending…';
-      submit.disabled = true; // no second post while the first is in flight
+      // No second post while the first is in flight. aria-disabled (not disabled) keeps focus on
+      // the button instead of dropping it to <body>.
+      submit.setAttribute('aria-disabled', 'true');
       try {
         const res = await fetch(PUBLIC_FORM_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(String(res.status));
@@ -119,7 +121,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       } catch {
         status.textContent = 'Sorry, something went wrong. Please email hello@achates360.com.';
       } finally {
-        submit.disabled = false;
+        submit.removeAttribute('aria-disabled');
       }
     });
   }
@@ -180,7 +182,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     border: 1px solid rgb(48 189 255); border-radius: var(--button-radius); background: var(--color-muted);
     color: #fff; cursor: pointer; font: var(--weight-light) 20px / 28px var(--font-ui);
   }
-  button:disabled { cursor: progress; }
+  button[aria-disabled='true'] { cursor: progress; }
   .status, .success { width: 347px; text-align: center; color: var(--color-text); font: var(--weight-light) 14px / normal var(--font-ui); }
   .status { margin: 13.5px 0 0; }
   /* Kept rendered (not display: none) so screen readers announce it when text arrives. */

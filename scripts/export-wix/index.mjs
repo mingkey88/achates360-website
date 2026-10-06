@@ -131,12 +131,14 @@ for (const [slug, from] of linkers) {
 await browser?.close();
 
 // Ruling 20: a sitemap page that failed to render would lose its content in the cleanup below,
-// so abort before anything under src/content is touched.
-const fatal = sitemapRenderFailures(renderFailed, paths);
+// so abort before anything under src/content is touched. Offline, the cache is the only input:
+// any page without one (a linked non-sitemap page too) would silently drop out, so all are fatal.
+const fatal = offline ? renderFailed : sitemapRenderFailures(renderFailed, paths);
 if (fatal.length) {
   await mkdir('.cache', { recursive: true });
   await writeFile('.cache/export-log.aborted.md', exportLog(log));
-  console.error(`ABORTED: ${fatal.length} sitemap page(s) failed to render: ${fatal.join(',')}. Nothing written to src/content; re-run to retry (cache keeps the rest). Log: .cache/export-log.aborted.md`);
+  const what = offline ? 'page(s) have no cached render' : 'sitemap page(s) failed to render';
+  console.error(`ABORTED: ${fatal.length} ${what}: ${fatal.join(',')}. Nothing written to src/content; re-run to retry (cache keeps the rest). Log: .cache/export-log.aborted.md`);
   process.exit(1);
 }
 

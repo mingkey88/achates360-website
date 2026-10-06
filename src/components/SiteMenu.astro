@@ -94,6 +94,9 @@ const external = (href: string) => /^https?:\/\//.test(href);
     for (const t of dialog.querySelectorAll<HTMLButtonElement>('.sub-toggle')) {
       t.addEventListener('click', () => setOpen(t, t.getAttribute('aria-expanded') !== 'true'));
     }
+    // Below 768px this menu is hidden (MobileMenu takes over): an open modal would leave the page
+    // inert with nothing visible to close it (e.g. a phone rotated from landscape to portrait).
+    window.matchMedia('(max-width: 767px)').addEventListener('change', (e) => { if (e.matches && dialog.open) dialog.close(); });
   }
 </script>
 <style>

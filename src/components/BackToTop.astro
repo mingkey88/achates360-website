@@ -5,7 +5,7 @@
  * (white disc, #6d8ff1 ring, #566fb8 chevron). It fades in (0.5s) while the visitor scrolls once
  * the page is more than ~650px down, stays while scrolling (up or down), and fades out about
  * 1.5s after scrolling stops. A tap scrolls to the top. Wix shows no such button on desktop.
- * Kept visible while it has keyboard focus or the pointer is over it.
+ * Kept visible while it has keyboard focus or a mouse pointer is over it (not touch hover).
  */
 ---
 <button class="back-to-top" type="button" aria-label="Back to top">
@@ -19,10 +19,12 @@
   const btn = document.querySelector<HTMLButtonElement>('.back-to-top');
   const mobile = window.matchMedia('(max-width: 767px)');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Touch screens keep :hover on a tapped button, so only a real pointer's hover keeps it shown.
+  const hover = window.matchMedia('(hover: hover)');
   if (btn) {
     let timer: number | undefined;
     const hide = () => {
-      if (btn.matches(':focus-visible, :hover')) { timer = window.setTimeout(hide, 1500); return; }
+      if (btn.matches(':focus-visible') || (hover.matches && btn.matches(':hover'))) { timer = window.setTimeout(hide, 1500); return; }
       btn.classList.remove('shown');
     };
     window.addEventListener('scroll', () => {

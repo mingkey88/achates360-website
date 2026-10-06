@@ -22,7 +22,12 @@ the whole site is under **800 MB** (GitHub Pages limits). CI runs it on every pu
 
 Content lives in `src/content/` and was generated from the live Wix site by `npm run export`.
 **Do not reword copy** — it is verbatim from the client; raise changes in `CONTENT-QUERIES.md`.
-**Do not hand-edit `src/content/`** — change the exporter and re-run it (offline, see below).
+**Do not hand-edit `src/content/`** to fix how the site was exported — change the exporter and
+re-run it (offline, see below).
+**Approved copy changes** (the one-line fixes in `CONTENT-QUERIES.md`, once signed off) are made
+by editing the content file directly. Any later export, even `--offline`, rewrites the files it
+exports and would undo them: after an export, check `git diff src/content` and keep the approved
+edits (from then on an offline export is no longer an exact no-op on those files).
 
 | Collection | Path | URL |
 |---|---|---|
