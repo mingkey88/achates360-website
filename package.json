@@ -1,0 +1,36 @@
+{
+  "name": "achates360-website",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "export": "node scripts/export-wix/index.mjs",
+    "render": "node scripts/export-wix/render.mjs",
+    "verify": "node scripts/verify-dist.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  "dependencies": {
+    "@fontsource/nunito-sans": "^5.3.0",
+    "astro": "^7.3.5",
+    "marked": "^18.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "cheerio": "^1.2.0",
+    "playwright": "^1.63.0",
+    "turndown": "^7.2.4",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.3",
+    "yaml": "^2.9.1"
+  }
+}

@@ -1,0 +1,14 @@
+---
+import { SITE_ENV } from 'astro:env/server';
+import { robotsMeta } from '../lib/seo';
+const robots = robotsMeta(SITE_ENV);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    {robots && <meta name="robots" content={robots} />}
+    <title>Achates 360</title>
+  </head>
+  <body>scaffold</body>
+</html>
