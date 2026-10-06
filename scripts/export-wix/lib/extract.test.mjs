@@ -219,6 +219,17 @@ describe('extractPage: layout annotations', () => {
     const pl = p.nodes.filter((n) => n.kind === 'player')[1];
     expect(pl).toMatchObject({ src: 'https://example.com/clip.mp4', videoId: null, poster: null });
   });
+  it('drops a box that several nodes share: it is a container, not theirs', () => {
+    const html = ANNOTATED.replace('</section>', `<div id="comp-show" data-box="230,2949,979,948" data-mbox="20,1592,280,561">
+      <img src="https://static.wixstatic.com/media/s1.jpg" alt="s1"><img src="https://static.wixstatic.com/media/s2.jpg" alt="s2"></div></section>`);
+    const q = extractPage(html, 'syn', []);
+    for (const alt of ['s1', 's2']) {
+      const n = q.nodes.find((x) => x.alt === alt);
+      expect(n).not.toHaveProperty('box');
+      expect(n).not.toHaveProperty('mbox');
+    }
+    expect(q.nodes.find((x) => x.alt === 'A').box).toEqual({ x: 240, y: 200, w: 129, h: 120 });
+  });
   it('leaves the fields out when a render has no annotations', () => {
     const old = fx('notter').replace(/ data-(m?box|color|page-bg|player-src|player-poster)="[^"]*"/g, '');
     const q = extractPage(old, 'notter', side('notter'));

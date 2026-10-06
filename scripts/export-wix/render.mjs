@@ -93,7 +93,8 @@ export async function annotate(page, mobileBoxes = {}) {
       .filter((u) => u.closest('#PAGES_CONTAINER, [id^="bgLayers_pageBackground_"]'))
       .map((u) => { const r = u.getBoundingClientRect(); return { c: getComputedStyle(u).backgroundColor, x: r.x, y: r.y + window.scrollY, w: r.width, h: r.height }; })
       .filter((u) => opaque(u.c) && u.w > 0 && u.h > 0);
-    const pc = document.getElementById('PAGES_CONTAINER').getBoundingClientRect();
+    // Pages Wix serves without content (404, password) have no page container: no samples.
+    const pc = document.getElementById('PAGES_CONTAINER')?.getBoundingClientRect() ?? { y: 0, height: 0 };
     const counts = new Map();
     for (let y = pc.y + window.scrollY + 25; y < pc.y + window.scrollY + pc.height; y += 50) {
       const hit = underlays.filter((u) => u.x <= 5 && u.x + u.w > 5 && u.y <= y && u.y + u.h > y).at(-1);

@@ -26,6 +26,18 @@ describe('groupRows', () => {
     const blocks = [{ id: 'a', box: b(240, 0, 400, 100) }, { id: 'b' }, { id: 'c', box: b(700, 0, 200, 100) }];
     expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['a'], ['b'], ['c']]);
   });
+  it('stacks blocks that share most of their x-range even when their boxes overlap vertically', () => {
+    // bumitama: Wix's text box runs on past its words; the button below sits in its last 25px.
+    const blocks = [{ id: 'text', box: b(237, 1003, 682, 409) }, { id: 'button', box: b(230, 1387, 194, 40) }];
+    expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['text'], ['button']]);
+  });
+  it('rejoins an earlier row at the same height when Wix interleaves blocks', () => {
+    // samsung-the-freestyle: three portrait embeds, each followed by its caption in DOM order.
+    const ids = ['e1', 'c1', 'e2', 'c2', 'e3', 'c3'];
+    const xs = [230, 230, 566, 566, 902, 902];
+    const blocks = ids.map((id, i) => ({ id, box: id[0] === 'e' ? b(xs[i], 2202, 308, 545) : b(xs[i], 2747, 303, 31) }));
+    expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['e1', 'e2', 'e3'], ['c1', 'c2', 'c3']]);
+  });
   it('joins a block that overlaps any block already in the row', () => {
     const blocks = [{ id: 'a', box: b(240, 0, 300, 100) }, { id: 'b', box: b(560, 0, 300, 400) }, { id: 'c', box: b(880, 300, 60, 100) }];
     expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['a', 'b', 'c']]);
@@ -44,7 +56,8 @@ describe('groupRows: overlays out of DOM order', () => {
     { id: 'link', box: b(635, 2229, 240, 68) },
   ];
   it('puts a block lying inside a block of an earlier row into that row, and orders rows by their top', () => {
-    expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['copy'], ['heading', 'logo'], ['bg', 's1', 's2'], ['link']]);
+    // The logo lies over the heading's box (after its words on Wix), so it stacks above it.
+    expect(groupRows(blocks).map((r) => r.map((x) => x.id))).toEqual([['copy'], ['logo'], ['heading'], ['bg', 's1', 's2'], ['link']]);
   });
   it('keeps block order when some block has no box', () => {
     const rows = groupRows([{ id: 'a', box: b(0, 500, 10, 10) }, { id: 'b' }, { id: 'c', box: b(0, 0, 10, 10) }]);
@@ -107,6 +120,12 @@ describe('nestOverlays', () => {
   it('sizes an overlay for the mobile column from its mobile box', () => {
     expect(nestOverlays([bg, s1])[0].overlays[0].mobile).toMatchObject({ width: +(140 / 280 * 100).toFixed(3), offset: +(50 / 280 * 100).toFixed(3) });
     expect(nestOverlays([bg, s2])[0].overlays[0].mobile).toBeUndefined();
+  });
+  it('lays blocks only over images: a gallery renders in a different shape from its Wix box', () => {
+    // samsung-connected-home: a video tile inside the box of a 3-column Wix grid gallery.
+    const blocks = [{ type: 'gallery', box: b(230, 5183, 951, 2230) }, { type: 'video', box: b(870, 7103, 307, 310) }];
+    expect(groupRows(blocks)).toHaveLength(2);
+    expect(nestOverlays(blocks).map((n) => n.overlays.length)).toEqual([0, 0]);
   });
   it('leaves side-by-side blocks alone', () => {
     const nested = nestOverlays([{ box: b(240, 0, 470, 310) }, { box: b(720, 0, 466, 309) }]);

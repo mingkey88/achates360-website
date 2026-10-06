@@ -5,7 +5,11 @@
  * side-by-side arrangements as flex rows and keeps everything else in one column.
  */
 export interface Box { x: number; y: number; w: number; h: number }
-export interface Boxed { box?: Box; mbox?: Box }
+export interface Boxed { box?: Box; mbox?: Box; type?: string }
+
+// Only an image can carry blocks laid over it: the clone draws it in its Wix box, while e.g. a
+// gallery renders in another shape (samsung-connected-home's 3-column grid becomes a stack).
+const canHost = (b: Boxed) => b.type === undefined || b.type === 'image';
 export interface Cell<T> { block: T; width: number; offset: number } // percentages of the column
 
 // Desktop content column at the 1440 render: Wix's images, galleries and players run x=238..1178
@@ -25,9 +29,18 @@ export function overlaps(a: Box, b: Box): boolean {
   return shared > shorter / 2;
 }
 
+// Side by side: the y-ranges overlap (above) and the x-ranges share at most half of the narrower
+// box. Wix text boxes often run on below their words (bumitama's ends 25px into the button under
+// it), so a vertical overlap alone does not make a row.
+function sideBySide(a: Box, b: Box): boolean {
+  const sharedX = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+  return overlaps(a, b) && sharedX <= Math.min(a.w, b.w) / 2;
+}
+
 /**
  * Rows, in the order Wix shows them on desktop:
- * - consecutive blocks whose desktop boxes overlap vertically form a row;
+ * - blocks side by side (sideBySide) form a row, also when Wix's DOM interleaves them with other
+ *   blocks (samsung-the-freestyle: embed, caption, embed, caption);
  * - a block lying inside a block of an earlier row joins that row, to be laid over it (Wix's DOM
  *   can list overlay pieces after other content, e.g. konicaminolta's stickers after a heading);
  * - when every block has a box, rows are ordered by their top edge (Wix's DOM order is not always
@@ -36,11 +49,15 @@ export function overlaps(a: Box, b: Box): boolean {
 export function groupRows<T extends Boxed>(blocks: T[]): T[][] {
   const rows: T[][] = [];
   for (const block of blocks) {
-    const row = rows.at(-1);
     const b = block.box;
-    if (b && row?.every((r) => r.box) && row.some((r) => overlaps(r.box!, b))) { row.push(block); continue; }
-    const host = b && rows.slice(0, -1).reverse().find((r) => r.every((x) => x.box) && r.some((x) => inside(b, x.box!)));
+    // Only rows since the last block without a box: one never moves across it.
+    const recent = rows.slice(rows.findLastIndex((r) => !r.every((x) => x.box)) + 1).reverse();
+    const host = b && recent.find((r) => r.some((x) => canHost(x) && inside(b, x.box!)));
+    // The latest row the block sits beside without landing on top of any of its blocks.
+    const beside = b && recent.find((r) => r.some((x) => sideBySide(x.box!, b))
+      && !r.some((x) => overlaps(x.box!, b) && !sideBySide(x.box!, b)));
     if (host) host.push(block);
+    else if (beside) beside.push(block);
     else rows.push([block]);
   }
   if (!blocks.every((b) => b.box)) return rows;
@@ -102,7 +119,7 @@ export function nestOverlays<T extends Boxed>(row: T[]): { block: T; overlays: O
   const area = (b: T) => b.box!.w * b.box!.h;
   const host = new Map<T, T>();
   for (const b of row) {
-    const containers = row.filter((c) => c !== b && area(c) > area(b) && inside(b.box!, c.box!));
+    const containers = row.filter((c) => c !== b && canHost(c) && area(c) > area(b) && inside(b.box!, c.box!));
     if (containers.length) host.set(b, containers.reduce((x, y) => (area(y) > area(x) ? y : x)));
   }
   // An overlay's container is never itself an overlay: climb to the outermost one.

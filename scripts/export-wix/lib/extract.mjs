@@ -20,7 +20,19 @@ function layoutOf($el) {
   const $comp = $el.closest('[data-box]');
   const box = parseBox($comp.attr('data-box'));
   const mbox = parseBox($comp.attr('data-mbox'));
-  return { ...(box ? { box } : {}), ...(mbox ? { mbox } : {}) };
+  return box ? { box, ...(mbox ? { mbox } : {}), boxOf: $comp.get(0) } : {};
+}
+
+// A box several nodes share belongs to a container around them (e.g. a Wix slideshow whose
+// slides have no component of their own), not to any one of them: leave those nodes unboxed.
+function dropSharedBoxes(nodes) {
+  const count = new Map();
+  for (const n of nodes) if (n.boxOf) count.set(n.boxOf, (count.get(n.boxOf) ?? 0) + 1);
+  for (const n of nodes) {
+    if (n.boxOf && count.get(n.boxOf) > 1) { delete n.box; delete n.mbox; }
+    delete n.boxOf;
+  }
+  return nodes;
 }
 
 // A Wix-hosted player's file: https://video.wixstatic.com/video/<videoId>/<quality>/mp4/file.mp4
@@ -121,7 +133,7 @@ export function extractPage(html, slug, sidecar = []) {
         nodes.push({ kind: 'link', ...base, href: normalizeHref($el.attr('href')), text });
       }
     });
-    return nodes;
+    return dropSharedBoxes(nodes);
   };
 
   // Chrome = components holding images/links outside the page and footer (the logo).
