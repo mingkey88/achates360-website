@@ -259,3 +259,32 @@ describe('Ruling 17: mapper gaps found by the full export', () => {
     expect(r.data).toEqual(toCard(angeline));
   });
 });
+
+describe('Ruling 19: hidden copyright above the back link', () => {
+  const back = dbs.nodes.findIndex((n) => n.kind === 'link' && /BACK TO PROJECTS/.test(n.text));
+  const textNode = (text) => ({ kind: 'text', html: `<p>${text}</p>`, text, links: [], comp: null, section: dbs.nodes[back].section });
+  const withAbove = (text) => ({ ...dbs, slug: 'annual', nodes: [...dbs.nodes.slice(0, back), textNode(text), ...dbs.nodes.slice(back)] });
+
+  it('drops a copyright line above the back link, keeps the page copyright, and notes it', () => {
+    for (const text of ['© 2021 - 2022', '© 2018']) {
+      const r = mapPage(withAbove(text));
+      expect(r.collection).toBe('projects');
+      expect(r.warnings).toEqual([]);
+      expect(r.notes).toHaveLength(1);
+      expect(r.notes[0]).toMatch(/^annual: hidden duplicate copyright above back link dropped/);
+      expect(r.notes[0]).toContain(JSON.stringify(text));
+      expect(r.data.copyright).toBe('© 2018');
+      expect(JSON.stringify(r.data)).not.toContain('2021 - 2022');
+      expect(r.data).toEqual(toProject(dbs));
+    }
+  });
+
+  it('still rejects any other text above the back link', () => {
+    expect(() => toProject(withAbove('Hidden caption'))).toThrow(MappingError);
+    expect(mapPage(withAbove('Hidden caption')).collection).toBe('basic');
+  });
+
+  it('pages without it carry no notes', () => {
+    expect(mapPage(dbs).notes).toEqual([]);
+  });
+});

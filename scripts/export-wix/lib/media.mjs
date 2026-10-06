@@ -175,12 +175,16 @@ export async function mediaReport(root) {
   const originals = await listFiles(join(root, '.cache/originals'));
   const origTotal = originals.reduce((s, f) => s + f.size, 0);
   const largest = [...files].sort((a, b) => b.size - a.size).slice(0, 20);
-  const over = total > 800 * 1024 * 1024 || files.some((f) => f.size > 95 * 1024 * 1024);
+  // Ruling 18: spec §5.5's 800 MB / 95 MB limits bind the BUILT output (Astro re-encodes images),
+  // checked on dist/ in Task 15. Here the total is informational; a source file over 95 MB is still
+  // a stop, since git rejects files over 100 MB.
+  const over = files.some((f) => f.size > 95 * 1024 * 1024);
   return [
     '# Media report', '',
     `Total committed media: **${mb(total)}** in ${files.length} files.`, '',
     `Untouched originals in .cache/originals (not committed): ${mb(origTotal)} in ${originals.length} files.`, '',
-    over ? '> **THRESHOLD EXCEEDED** — stop and ask the user about media hosting (spec §5.5).' : '> Within GitHub Pages limits (800 MB total, 95 MB per file).', '',
+    over ? '> **THRESHOLD EXCEEDED** — a source file is over 95 MB (git rejects files over 100 MB); stop and ask the user about media hosting (spec §5.5).'
+      : '> No source file is over 95 MB. The source total is informational: the binding 800 MB / 95 MB check runs on the built dist/ in Task 15 (spec §5.5).', '',
     '| Type | Files | Size |', '|---|---|---|',
     ...Object.entries(byExt).sort((a, b) => b[1].bytes - a[1].bytes).map(([e, v]) => `| ${e} | ${v.count} | ${mb(v.bytes)} |`), '',
     '## 20 largest', '', '| File | Size |', '|---|---|',

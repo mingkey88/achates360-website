@@ -130,6 +130,7 @@ const records = [];
 for (const raw of raws.values()) {
   const r = mapPage(raw);
   for (const w of r.warnings) log.push({ level: 'warning', page: raw.slug, message: w });
+  for (const n of r.notes) log.push({ level: 'info', page: raw.slug, message: n });
   records.push(r);
 }
 if (raws.has('home')) records.push({ collection: 'site', id: 'site', data: toSite(raws.get('home')) });

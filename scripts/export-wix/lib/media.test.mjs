@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mkdtemp, writeFile, mkdir, readFile } from 'node:fs/promises';
+import { mkdtemp, writeFile, mkdir, readFile, truncate } from 'node:fs/promises';
 import sharp from 'sharp';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -165,6 +165,27 @@ describe('mediaReport', () => {
     const md = await mediaReport(root);
     expect(md).toContain('Total committed media: **1.0 MB** in 1 files.');
     expect(md).toContain('Untouched originals in .cache/originals (not committed): 3.0 MB in 1 files.');
-    expect(md).toContain('Within GitHub Pages limits');
+    expect(md).not.toContain('THRESHOLD EXCEEDED');
+    expect(md).toContain('informational');
+  });
+
+  // Sparse files: large sizes without writing the bytes.
+  const sparse = async (path, mb) => { await writeFile(path, ''); await truncate(path, mb * 1024 * 1024); };
+
+  it('treats the source total as informational: over 800 MB is not a stop (Ruling 18)', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
+    for (let i = 0; i < 9; i++) await sparse(join(root, `src/assets/wix/f${i}.png`), 94);
+    const md = await mediaReport(root);
+    expect(md).toContain('Total committed media: **846.0 MB**');
+    expect(md).not.toContain('THRESHOLD EXCEEDED');
+    expect(md).toMatch(/binding .*dist\//);
+  });
+
+  it('still stops on a source file over 95 MB', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'public/media/video'), { recursive: true });
+    await sparse(join(root, 'public/media/video/big.mp4'), 96);
+    expect(await mediaReport(root)).toContain('THRESHOLD EXCEEDED');
   });
 });
