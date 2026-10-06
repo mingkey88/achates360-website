@@ -1,4 +1,4 @@
-import { bestQuality, videoIdFromPoster } from './urls.mjs';
+import { bestQuality, videoIdFromPoster, mediaFileName, normalizeHref } from './urls.mjs';
 
 function walk(obj, visit) {
   if (!obj || typeof obj !== 'object') return;
@@ -31,11 +31,48 @@ export function findGalleries(warmup) {
   return galleries;
 }
 
+// pro-gallery-webapp (/pro-gallery-webapp/v1/galleries/<id>?offset=…) returns items as
+// { id, mediaUrl, title, description, alt, dataType, link: { url, wixLinkData }, videoMetadata };
+// convert them to the embedded #wix-warmup-data shape { itemId, mediaUrl, metaData }.
+function fromWebapp(it) {
+  const isVideo = it.dataType === 'Video';
+  const pageId = it.link?.wixLinkData?.page?.pageId;
+  let link;
+  // Keep the URL beside the pageId: it still resolves if the pageId is missing from the route map.
+  if (pageId) link = { type: 'wix', data: { type: 'PageLink', pageId, url: it.link.url } };
+  else if (it.link?.url) link = { type: 'wix', data: { type: 'ExternalLink', url: it.link.url } };
+  const metaData = { title: it.title, description: it.description, alt: it.alt, name: it.name, link };
+  if (isVideo) {
+    const vm = it.videoMetadata ?? {};
+    Object.assign(metaData, {
+      type: 'video',
+      posters: (vm.posters ?? []).map((p) => ({ ...p, url: mediaFileName(p.url) })),
+      qualities: (vm.resolutions ?? []).map((r) => ({ quality: r.videoMode })),
+    });
+  }
+  return { itemId: it.id, mediaUrl: isVideo ? undefined : mediaFileName(it.mediaUrl ?? ''), metaData };
+}
+
+// Every gallery item found anywhere in obj, in either the embedded or the network shape.
+export function findGalleryItems(obj) {
+  const items = new Map();
+  walk(obj, (o) => {
+    if (typeof o.itemId === 'string' && o.metaData && typeof o.metaData === 'object') {
+      if (!items.has(o.itemId)) items.set(o.itemId, o);
+    } else if (typeof o.id === 'string' && typeof o.mediaUrl === 'string' && typeof o.dataType === 'string') {
+      if (!items.has(o.id)) items.set(o.id, fromWebapp(o));
+    }
+  });
+  return [...items.values()];
+}
+
 export function normalizeGalleryItem(item, routes) {
   const md = item.metaData ?? {};
   const link = md.link ?? {};
   const pageId = link.data?.pageId?.replace(/^#/, '');
-  const href = pageId ? routes.get(pageId) ?? null : link.url ?? null;
+  const url = link.data?.url ?? link.url ?? null;
+  const raw = pageId ? routes.get(pageId) ?? url : url;
+  const href = raw === null ? null : normalizeHref(raw);
   const isVideo = md.type === 'video';
   const file = isVideo ? md.posters?.[0]?.url ?? '' : item.mediaUrl ?? md.name ?? '';
   return {

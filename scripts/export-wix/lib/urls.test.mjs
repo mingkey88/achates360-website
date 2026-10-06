@@ -62,4 +62,10 @@ describe('internalPath / normalizeHref', () => {
     expect(normalizeHref('mailto:jamillie@achates360.com?subject=From%20e-card')).toBe('mailto:jamillie@achates360.com?subject=From%20e-card');
     expect(normalizeHref('https://www.achates360.com/projects')).toBe('/projects');
   });
+  it('normalizeHref percent-encodes literal spaces, as a browser serialises them', () => {
+    expect(normalizeHref('mailto:a@b.c?subject=From e-card')).toBe('mailto:a@b.c?subject=From%20e-card');
+  });
+  it('internalPath collapses the doubled slash Wix puts in gallery link URLs', () => {
+    expect(internalPath('https://www.achates360.com//grohe-quarterly-campaigns')).toBe('/grohe-quarterly-campaigns');
+  });
 });

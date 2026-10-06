@@ -33,8 +33,16 @@ export function internalPath(href) {
   try { u = new URL(href); } catch { return null; }
   if (!/^https?:$/.test(u.protocol)) return null;
   if (u.hostname.replace(/^www\./, '') !== 'achates360.com') return null;
-  const path = u.pathname.replace(/\/$/, '') || '/';
+  // Wix gallery link URLs can carry a doubled slash (https://www.achates360.com//dxv).
+  const path = u.pathname.replace(/\/{2,}/g, '/').replace(/\/$/, '') || '/';
   return path + u.hash;
 }
 
-export const normalizeHref = (href) => internalPath(href) ?? href;
+// Wix writes some hrefs with literal spaces (e.g. `mailto:…?subject=From e-card`);
+// a browser serialises those as %20, so do the same.
+const serialiseHref = (href) => href.trim().replace(/[\t\n\r]/g, '').replace(/ /g, '%20');
+
+export const normalizeHref = (href) => {
+  const h = serialiseHref(href);
+  return internalPath(h) ?? h;
+};

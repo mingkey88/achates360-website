@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findRoutes, findGalleries, normalizeGalleryItem } from './wixdata.mjs';
+import { findRoutes, findGalleries, findGalleryItems, normalizeGalleryItem } from './wixdata.mjs';
 
 const viewerModel = {
   siteFeaturesConfigs: { router: { routes: {
@@ -69,5 +69,39 @@ describe('normalizeGalleryItem', () => {
     expect(normalizeGalleryItem(ext, routes).href).toBe('https://vimeo.com/1');
     const none = { itemId: 'z', mediaUrl: 'f.jpg', metaData: {} };
     expect(normalizeGalleryItem(none, routes)).toMatchObject({ href: null, title: '', description: '', alt: '' });
+  });
+});
+
+describe('normalizeGalleryItem: link shapes', () => {
+  const routes = findRoutes(viewerModel);
+  it('reads the real external-link shape link.data.url and normalises it', () => {
+    const item = { itemId: 's', mediaUrl: 'f.png', metaData: { title: 'Samsung The Freestyle',
+      link: { type: 'wix', data: { type: 'ExternalLink', url: 'https://www.achates360.com/samsung-the-freestyle' } } } };
+    expect(normalizeGalleryItem(item, routes).href).toBe('/samsung-the-freestyle');
+  });
+});
+
+describe('findGalleryItems', () => {
+  it('collects embedded {itemId, metaData} items anywhere in an object', () => {
+    const found = findGalleryItems([{ deep: warmup }, { x: { itemId: 'q', metaData: { title: 'Q' } } }]);
+    expect(found.map((i) => i.itemId)).toEqual(['q']);
+  });
+  it('converts pro-gallery-webapp items (the network shape) into the embedded shape', () => {
+    const body = { gallery: { id: 'g', totalItemsCount: 2, items: [
+      { id: 'p1', mediaUrl: 'https://static.wixstatic.com/media/e9d9c2_06b3~mv2.png', title: 'Photo', description: 'Achates 360',
+        alt: 'P.png', dataType: 'Photo',
+        link: { type: 'Internal', url: 'https://www.achates360.com//dxv', wixLinkData: { page: { pageId: '#csao3' } } } },
+      { id: 'v1', mediaUrl: 'https://video.wixstatic.com/video/483e3e_a341/360p/mp4/file.mp4', title: 'GROHE Quarterly Campaigns',
+        description: 'LIXIL, GROHE', dataType: 'Video',
+        link: { type: 'Internal', url: 'https://www.achates360.com//grohe', wixLinkData: { page: { pageId: '#gone' } } },
+        videoMetadata: { posters: [{ url: 'https://static.wixstatic.com/media/483e3e_a341f000.jpg' }],
+          resolutions: [{ videoMode: '360p' }] } },
+    ] } };
+    const routes = findRoutes(viewerModel);
+    const [p, v] = findGalleryItems([body]).map((i) => normalizeGalleryItem(i, routes));
+    expect(p).toEqual({ itemId: 'p1', title: 'Photo', description: 'Achates 360', href: '/dxv',
+      file: 'e9d9c2_06b3~mv2.png', alt: 'P.png', video: null });
+    expect(v).toMatchObject({ itemId: 'v1', title: 'GROHE Quarterly Campaigns', href: '/grohe',
+      file: '483e3e_a341f000.jpg', video: { videoId: '483e3e_a341', quality: '360p' } });
   });
 });
