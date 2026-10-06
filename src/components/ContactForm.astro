@@ -128,14 +128,22 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
 </script>
 <style>
-  .contact { position: relative; height: 781px; background: #fff; }
-  .intro { position: absolute; left: calc(50% - 498px); top: 287px; width: 393px; }
+  /* Wix's grid places the heading at grid-8 and the form box at grid+574, which needs a 1064px
+     window. Narrower desktop windows (768-1063px, e.g. an iPad) clamp the form box to the right
+     edge and the heading to the gutter, narrowing the heading so they never overlap or scroll
+     sideways. At 1064px and wider both formulas give Wix's positions. */
+  .contact {
+    --form-x: min(calc(50% + 84px), calc(100% - 448px));
+    --intro-x: max(calc(50% - 498px), var(--gutter));
+    position: relative; height: 781px; background: var(--color-page);
+  }
+  .intro { position: absolute; left: var(--intro-x); top: 287px; width: min(393px, calc(var(--form-x) - var(--intro-x) - var(--gutter))); }
   .intro :global(h2) {
     margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: 45px; line-height: normal;
     color: var(--color-text);
   }
 
-  .enquiry { position: absolute; left: calc(50% + 84px); top: 13px; width: 448px; padding: 28px 42px 0 59px; }
+  .enquiry { position: absolute; left: var(--form-x); top: 13px; width: 448px; padding: 28px 42px 0 59px; }
   .field { display: block; margin-bottom: 34.4px; }
   .label, legend {
     display: block; padding: 0 20px 0 1px; color: var(--color-heading);

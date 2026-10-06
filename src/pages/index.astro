@@ -113,10 +113,11 @@ const vars = (o: Record<string, number | undefined>) =>
   :global(body.home .anchor-menu.dots a) { height: 35.5px; }
 
   .slide { position: relative; height: 1080px; clip-path: inset(0); color: #fff; }
-  /* The reveal: the background box runs one viewport above and below the slide; its 1080px media
-     layer sticks to the viewport top, and the slide's clip shows the part under it. */
+  /* The reveal: the background box runs one viewport above and below the slide; its media layer
+     (1080px, or the window height when the window is taller) sticks to the viewport top, and the
+     slide's clip shows the part under it. */
   .slide-bg { position: absolute; left: 0; right: 0; top: -100vh; bottom: -100vh; }
-  .slide-bg > :global(.slide-media) { position: sticky; top: 0; display: block; width: 100%; height: 1080px; object-fit: cover; }
+  .slide-bg > :global(.slide-media) { position: sticky; top: 0; display: block; width: 100%; height: max(1080px, 100vh); object-fit: cover; }
   .slide-media :global(.slide-video) { width: 100%; height: 100%; }
   .slide-media picture { display: contents; }
   .slide-media :global(.slide-still) { display: none; }
@@ -132,7 +133,11 @@ const vars = (o: Record<string, number | undefined>) =>
   .cta:is(:hover, :focus-visible) { border-color: var(--color-muted); color: var(--color-muted); }
   .slide-text { position: absolute; left: calc(50% - 490px + var(--text-x) * 1px); top: calc(var(--text-y) * 1px); width: 600px; text-align: center; }
   .slide-text :global(h1) { margin: 0; color: #fff; font: 700 28px / 39.2px var(--font-heading); }
-  .badge { position: absolute; left: calc(50% - 490px + var(--b-x) * 1px); top: calc(var(--b-y) * 1px); width: 99px; line-height: 0; }
+  /* Kept inside the window on narrow desktop windows (Wix's grid+841 needs 900px). */
+  .badge {
+    position: absolute; left: min(calc(50% - 490px + var(--b-x) * 1px), calc(100% - 99px - var(--gutter)));
+    top: calc(var(--b-y) * 1px); width: 99px; line-height: 0;
+  }
   .badge :global(img) { width: 99px; height: 99px; object-fit: contain; }
 
   .all-projects { position: relative; overflow-x: clip; padding: 79px 0 35px; background: #f2f2f2; }
