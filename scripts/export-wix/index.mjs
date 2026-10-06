@@ -11,6 +11,11 @@ import { openBrowser, renderPage } from './render.mjs';
 const root = process.cwd();
 const args = process.argv.slice(2);
 const fresh = args.includes('--fresh');
+// --offline (Ruling 29): rebuild src/content from the cached renders only — no sitemap fetch (reads
+// sitemap-urls.json), no rendering, no media downloads. Proves the extract → map → write steps are
+// deterministic without pulling live-site drift into the snapshot.
+const offline = args.includes('--offline');
+if (offline && fresh) throw new Error('--offline and --fresh cannot be combined');
 // Accepts both `--only=a,b` and `--only a,b`.
 const onlyIdx = args.findIndex((a) => a === '--only' || a.startsWith('--only='));
 const onlyVal = onlyIdx < 0 ? null : args[onlyIdx].startsWith('--only=') ? args[onlyIdx].slice(7) : args[onlyIdx + 1];
@@ -25,19 +30,27 @@ const slugOf = (path) => (path === '/' ? 'home' : path.slice(1));
 
 // 1. Sitemap (throws on any failed request rather than export a partial site)
 console.log(`export started ${new Date().toISOString()}`);
-const paths = await fetchSitemapPaths(ORIGIN);
-await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
-console.log(`sitemap: ${paths.length} pages`);
+let paths;
+if (offline) {
+  paths = JSON.parse(await readFile('scripts/export-wix/sitemap-urls.json', 'utf8'));
+  console.log(`sitemap: ${paths.length} pages (offline: scripts/export-wix/sitemap-urls.json)`);
+} else {
+  paths = await fetchSitemapPaths(ORIGIN);
+  await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
+  console.log(`sitemap: ${paths.length} pages`);
+}
 
 // 2. Render (cached). A cache entry is the HTML, its gallery sidecar and both screenshots;
 // anything missing (e.g. an HTML rendered before sidecars existed) means render again.
-const { browser, mobileContext } = await openBrowser();
+const { browser, mobileContext } = offline ? {} : await openBrowser();
 const renderFailed = [];
 async function rendered(slug) {
   const html = `${CACHE}/${slug}.html`;
   const side = `${CACHE}/${slug}.gallery.json`;
-  const parts = [html, side, `${SHOTS}/${slug}/desktop.png`, `${SHOTS}/${slug}/mobile.png`];
+  // Offline needs only what extraction reads; the screenshots are references, not inputs.
+  const parts = offline ? [html, side] : [html, side, `${SHOTS}/${slug}/desktop.png`, `${SHOTS}/${slug}/mobile.png`];
   const cached = !fresh && (await Promise.all(parts.map(exists))).every(Boolean);
+  if (!cached && offline) throw new Error(`offline: no cached render for ${slug} (${parts.join(', ')})`);
   if (!cached) {
     for (let attempt = 1; ; attempt++) {
       console.log(`render ${slug}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
@@ -107,7 +120,7 @@ for (const [slug, from] of linkers) {
     knownMissing.push({ path: `/${slug}`, reason: missing.get(slug), linkedFrom: from });
   }
 }
-await browser.close();
+await browser?.close();
 
 // Ruling 20: a sitemap page that failed to render would lose its content in the cleanup below,
 // so abort before anything under src/content is touched.
@@ -186,10 +199,14 @@ const cards = records.filter((r) => r.collection === 'cards').map((r) => {
   const vcf = raws.get(r.id).nodes.flatMap((n) => (n.kind === 'link' ? [n.href] : n.links?.map((l) => l.href) ?? [])).find((h) => h.includes('.vcf'));
   return { slug: r.id, vcfUrl: vcf.startsWith('/') ? ORIGIN + vcf : vcf };
 });
-const jobs = collectMedia([...raws.values()], cards);
-const res = await runJobs(jobs, { root, sourceMedia: 'source-media' });
-console.log(`media: ${res.downloaded} downloaded, ${res.skipped} unchanged, ${res.derived} derived, ${res.failed.length} failed`);
-for (const f of res.failed) log.push({ level: 'warning', page: 'media', message: `${f.url}: ${f.error}` });
+if (offline) {
+  console.log('media: skipped (offline)');
+} else {
+  const jobs = collectMedia([...raws.values()], cards);
+  const res = await runJobs(jobs, { root, sourceMedia: 'source-media' });
+  console.log(`media: ${res.downloaded} downloaded, ${res.skipped} unchanged, ${res.derived} derived, ${res.failed.length} failed`);
+  for (const f of res.failed) log.push({ level: 'warning', page: 'media', message: `${f.url}: ${f.error}` });
+}
 
 // 9. Reports. A --only run sees part of the site, so its reports go to the cache and never
 // replace the committed full-run reports.
