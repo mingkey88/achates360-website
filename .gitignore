@@ -4,3 +4,5 @@ dist/
 .DS_Store
 source-media/
 .env
+.cache/
+docs/reference/*/

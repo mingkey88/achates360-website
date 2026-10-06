@@ -1,0 +1,1294 @@
+[
+ {
+  "gallery": {
+   "id": "6ffc4947-3e95-4491-9670-8e181859ee06",
+   "totalItemsCount": 58,
+   "items": [
+    {
+     "id": "e0fc695e-0954-4820-a19f-b5a3ea953baa",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_06b3dddc3a1641698b038654c4bd6824~mv2.png",
+     "orderIndex": -1537954024475.1577,
+     "name": "Building Memories Icon.png",
+     "title": "‘Building Memories’ Art Book [Award Winning]",
+     "description": "Achates 360",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Building_Memories Artbook",
+      "url": "https://www.achates360.com//building-memories-artbook",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#tpqld",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 3002,
+      "height": 2060,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-08-31T02:41:59Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ]
+    },
+    {
+     "id": "0864b1f5-3427-4435-a08f-df54662fcb51",
+     "mediaUrl": "https://video.wixstatic.com/video/483e3e_a341ea2aed2648f3be94e41431055ffd/360p/mp4/file.mp4",
+     "orderIndex": -1537751780272.3767,
+     "name": "GROHE - Q1 Euphoria 260 - 5s_600px.mp4",
+     "title": "GROHE Quarterly Campaigns",
+     "description": "LIXIL, GROHE",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//grohe-quarterly-campaigns",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#d2yiv",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Video",
+     "videoMetadata": {
+      "width": 600,
+      "height": 338,
+      "duration": "5000",
+      "source": "Undefined",
+      "posters": [
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_a341ea2aed2648f3be94e41431055ffdf000.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_a341ea2aed2648f3be94e41431055ffdf001.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_a341ea2aed2648f3be94e41431055ffdf002.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_a341ea2aed2648f3be94e41431055ffdf003.jpg",
+        "width": 600,
+        "height": 338
+       }
+      ],
+      "resolutions": [
+       {
+        "videoMode": "360p",
+        "width": 600,
+        "height": 338,
+        "urls": {
+         "mp4": "https://video.wixstatic.com/video/483e3e_a341ea2aed2648f3be94e41431055ffd/360p/mp4/file.mp4"
+        }
+       }
+      ]
+     },
+     "secure": false,
+     "createdDate": "2022-03-10T06:33:05Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": []
+    },
+    {
+     "id": "c9ce081b-ef72-4495-8a54-e14dc8b03089",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_bcbb2ebae0e74674b838cf817d6d7ce9~mv2.jpg",
+     "orderIndex": -1537701219221.6816,
+     "name": "Grab_StrategicBranding_ClarkQuay_PosterDesign_2-1-1.jpg",
+     "title": "Grab Brand App Campaign",
+     "description": "Grab, Singapore",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Grab Brand App Campaign",
+      "url": "https://www.achates360.com//grab-brand-app-campaign",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#zencg",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 885,
+      "focalPoint": {
+       "x": 0.5729166666666666,
+       "y": 0.4583472380785106
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:17:24Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Grab_StrategicBranding_ClarkQuay_PosterDesign_2-1-1.jpg"
+    },
+    {
+     "id": "9d5a62dd-8767-4c3c-835d-67878bde9377",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_091b2727bdb74f40bff15805fd7585f9~mv2.jpg",
+     "orderIndex": -1537675938696.334,
+     "name": "stacked.jpg",
+     "title": "The Art Book Of Tan Ping Chiang",
+     "description": "Tan Ping Chang",
+     "link": {
+      "type": "Internal",
+      "text": "The Art Book Of Tan Ping Chiang",
+      "url": "https://www.achates360.com//the-art-of-tan-ping-chiang",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#qmx8l",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 4327,
+      "height": 2720
+     },
+     "secure": false,
+     "createdDate": "2021-08-15T14:53:38Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ]
+    },
+    {
+     "id": "06d164f2-f929-4151-9a90-abad07811344",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_d081bb585f444f94a2ad8eb90e3831d2~mv2.jpg",
+     "orderIndex": -1537663298433.6602,
+     "name": "Moving_Memories_Cover-2.jpg",
+     "title": "Moving Memories [Award Winning]",
+     "description": "Achates 360",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page moving-memories",
+      "url": "https://www.achates360.com//moving-memories",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#nr60t",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1600,
+      "height": 570,
+      "focalPoint": {
+       "x": 0.32524305555555555,
+       "y": 0.4661506707946336
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:32:27Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Moving_Memories"
+    },
+    {
+     "id": "2e7e6680-64bd-46bc-bec1-6b1d75758443",
+     "mediaUrl": "https://video.wixstatic.com/video/483e3e_0db3190bf57945f19ab76ee68dc1dee8/360p/mp4/file.mp4",
+     "orderIndex": -1537656978302.3232,
+     "name": "DXV_Wix_Video-5s_600px.mp4",
+     "title": "DXV Microsite & Design Inspiration Book",
+     "description": "LIXIL, DXV",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//dxv",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#csao3",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Video",
+     "videoMetadata": {
+      "width": 600,
+      "height": 426,
+      "duration": "5000",
+      "source": "Undefined",
+      "posters": [
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_0db3190bf57945f19ab76ee68dc1dee8f000.jpg",
+        "width": 600,
+        "height": 426
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_0db3190bf57945f19ab76ee68dc1dee8f001.jpg",
+        "width": 600,
+        "height": 426
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_0db3190bf57945f19ab76ee68dc1dee8f002.jpg",
+        "width": 600,
+        "height": 426
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_0db3190bf57945f19ab76ee68dc1dee8f003.jpg",
+        "width": 600,
+        "height": 426
+       }
+      ],
+      "resolutions": [
+       {
+        "videoMode": "360p",
+        "width": 600,
+        "height": 426,
+        "urls": {
+         "mp4": "https://video.wixstatic.com/video/483e3e_0db3190bf57945f19ab76ee68dc1dee8/360p/mp4/file.mp4"
+        }
+       }
+      ]
+     },
+     "secure": false,
+     "createdDate": "2022-03-10T06:33:51Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": []
+    },
+    {
+     "id": "fc3bcc74-3669-43c0-9271-c644325d36c1",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_3d124d1d6bc3428e87fe5d11d3eddcf8~mv2.jpg",
+     "orderIndex": -1537653818236.6548,
+     "name": "The Ritz-Carlton SuperBrunch 02.jpg",
+     "title": "The Ritz-Carlton SuperBrunch",
+     "description": "The Ritz-Carlton Millenia Singapore",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page The Ritz-Carlton SuperBrunch",
+      "url": "https://www.achates360.com//the-ritz-carlton-superbrunch",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#cokf8",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1200,
+      "height": 785,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-01-19T02:42:33Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "The Ritz-Carlton SuperBrunch"
+    },
+    {
+     "id": "b40a2119-b590-4ebf-9a42-6365122225a4",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_f3f6c9fd452045399d09e6d0ca3d7a7b~mv2.jpg",
+     "orderIndex": -1537650658170.9863,
+     "name": "CAG_Learning_Festival_GameChanger_1.jpg",
+     "title": "Changi Airport Group Learning Festival",
+     "description": "Changi Airport Group",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Changi Airport Group",
+      "url": "https://www.achates360.com//changi-airport-group",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#sbl52",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1290
+     },
+     "secure": false,
+     "createdDate": "2021-10-01T01:07:42Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "CAG_Learning_Festival_GameChanger_1.jpg"
+    },
+    {
+     "id": "f5171713-945c-44c4-b769-bac9e59897ab",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_10b5b244a77042b39e3fdce90f7bd6b2~mv2.jpg",
+     "orderIndex": -1507732311333.213,
+     "name": "The_Brook_Clown_header-2.jpg",
+     "title": "The Brook’s Clown [Award Winning]",
+     "description": "Achates 360",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page The Brook’s Clown",
+      "url": "https://www.achates360.com//the-brooks-clown",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#erygv",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 684
+     },
+     "secure": false,
+     "createdDate": "2021-11-06T18:46:23Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "The_Brook_Clown_header-2.jpg"
+    },
+    {
+     "id": "7a04fa1f-b2ae-4d4d-a0bb-fae19aee45a8",
+     "mediaUrl": "https://static.wixstatic.com/media/1aae46_7b1675f0878644eebbf320d371a34877~mv2.jpg",
+     "orderIndex": -1492773137914.3262,
+     "name": "ChinaCultureCentre_CoffeeTableBook_CoverTreatment.jpg",
+     "title": "3rd Anniversary Coffee Table Book",
+     "description": "China Cultural Centre (Singapore)",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com/NOT_SUPPORTED",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#zw6qi",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 3508,
+      "height": 2480,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2023-07-28T04:31:41Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": ""
+    },
+    {
+     "id": "ec9231f8-ead9-479d-9925-d02c50c0d4d7",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_7fb2852c14724d11ba6ad3b556592f87~mv2.jpg",
+     "orderIndex": -1477813964495.4392,
+     "name": "EnablingVillage_StrategicBranding_Branding_Header.jpg",
+     "title": "Enabling Village Branding & Communications",
+     "description": "Ministry of Social and Family Development and SG Enable Ltd",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Enabling Village",
+      "url": "https://www.achates360.com//enabling-village",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#nxcqy",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 600
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:21:46Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "EnablingVillage_StrategicBranding_Branding_Header.jpg"
+    },
+    {
+     "id": "1b14d83b-932f-4b6f-9d16-714a4eec5e5b",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_b81565ed2d6e40d99e33b5b6ef3bd08f~mv2.jpg",
+     "orderIndex": -1462854791076.5522,
+     "name": "SingaporeRoadSafetyCampaign_StrategicBranding_CoprporateCommunication_2.jpg",
+     "title": "Singapore Road Safety Campaign",
+     "description": "Singapore Road Safety Council, Traffic Police, AAS and People’s Association",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Singapore Road Safety Campaign",
+      "url": "https://www.achates360.com//singaporeroadsafetycampaign",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#jcydb",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1379,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-15T02:01:29Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "SingaporeRoadSafetyCampaign_StrategicBranding_CoprporateCommunication"
+    },
+    {
+     "id": "c4976c0b-a938-40e0-abfc-780f4fea8060",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_91625bc84ebd45bdb06c05f927f87743~mv2.jpg",
+     "orderIndex": -1447895617657.6655,
+     "name": "3.jpg",
+     "title": "Kaplan Downtown MRT Take-Over",
+     "description": "Kaplan Singapore",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Kaplan",
+      "url": "https://www.achates360.com//kaplan",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#klucm",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 920
+     },
+     "secure": false,
+     "createdDate": "2021-10-01T01:07:25Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Kaplan Singapore"
+    },
+    {
+     "id": "2281f3a3-c9f8-4397-9bf0-bc805aa55212",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_21b623789fe844b297fe319298cdbfd2~mv2.jpg",
+     "orderIndex": -1440416030948.2222,
+     "name": "Samsung_AdvertisingCampaign_Lightbox_VivianLai_2.jpg",
+     "title": "Samsung Digital Appliances Campaigns",
+     "description": "Samsung Asia Pte Ltd",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page samsung-tablets-tactical-campaigns",
+      "url": "https://www.achates360.com//samsung-tablets-tactical-campaigns",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#uf05j",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1000,
+      "height": 1518,
+      "focalPoint": {
+       "x": 0.3943661971830985,
+       "y": 0.6256953593910115
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:31:12Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Samsung_AdvertisingCampaign_Lightbox_VivianLai_2.jpg"
+    },
+    {
+     "id": "58756955-a25e-4fa0-93ef-35ae09db773f",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_0d0bcaacf3ed4b539079c1a495f3dba9~mv2.jpg",
+     "orderIndex": -1436676237593.5005,
+     "name": "LienCentre_Publications_SocialSpace_Magazine3.jpg",
+     "title": "Social Space Magazine",
+     "description": "Lien Centre",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page SocialSpace",
+      "url": "https://www.achates360.com//socialspace",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#mag1u",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 4000,
+      "height": 2667
+     },
+     "secure": false,
+     "createdDate": "2021-09-30T03:48:04Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ]
+    },
+    {
+     "id": "116367d5-08f5-40ea-8bc0-8ad1bf265390",
+     "mediaUrl": "https://static.wixstatic.com/media/9766c0_08750bdccbab45e58ea9dd1340071fa6~mv2.jpg",
+     "orderIndex": -1434806340916.1396,
+     "name": "PurpleSage_StrategicBranding_Branding__6-1.jpg",
+     "title": "Purple Sage Branding",
+     "description": "Purple Sage Group",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page purple-sage",
+      "url": "https://www.achates360.com//purple-sage",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#i0cnv",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1379
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:25:54Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Purple Sage Group"
+    },
+    {
+     "id": "1d2fe9ef-9007-4a2b-92a4-933aa7b0c743",
+     "mediaUrl": "https://video.wixstatic.com/video/483e3e_17a0d6c3fd3f417d86bce00a2f36e747/360p/mp4/file.mp4",
+     "orderIndex": -1432936444238.7788,
+     "name": "TheRitzCarltonSingapore_TheColony_GraphicDesign_4s_600px.mp4",
+     "title": "The Ritz Kids Programme Guide",
+     "description": "The Ritz-Carlton Millenia Singapore",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//the-ritz-kids-programme-guide",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#zkbb2",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Video",
+     "videoMetadata": {
+      "width": 600,
+      "height": 338,
+      "duration": "4500",
+      "source": "Undefined",
+      "posters": [
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_17a0d6c3fd3f417d86bce00a2f36e747f000.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_17a0d6c3fd3f417d86bce00a2f36e747f001.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_17a0d6c3fd3f417d86bce00a2f36e747f002.jpg",
+        "width": 600,
+        "height": 338
+       },
+       {
+        "url": "https://static.wixstatic.com/media/483e3e_17a0d6c3fd3f417d86bce00a2f36e747f003.jpg",
+        "width": 600,
+        "height": 338
+       }
+      ],
+      "resolutions": [
+       {
+        "videoMode": "360p",
+        "width": 600,
+        "height": 338,
+        "urls": {
+         "mp4": "https://video.wixstatic.com/video/483e3e_17a0d6c3fd3f417d86bce00a2f36e747/360p/mp4/file.mp4"
+        }
+       }
+      ]
+     },
+     "secure": false,
+     "createdDate": "2022-03-10T06:39:01Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": []
+    },
+    {
+     "id": "dacff591-e721-4a82-860e-406ee5a60fa4",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_a280ffd111f245328d69e1699254f798~mv2.jpg",
+     "orderIndex": -1425456857529.3354,
+     "name": "ParkwayPantai_Publication_Mosaic_Magazine_3-1.jpg",
+     "title": "Mosaic Magazine",
+     "description": "Parkway Pantai Limited",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Mosaic Magazine",
+      "url": "https://www.achates360.com//mosaic-magazine",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#js165",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 644
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:27:06Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "ParkwayPantai_Publication_Mosaic_Magazine_3-1.jpg"
+    },
+    {
+     "id": "1a2ad6fc-97dc-4b67-b871-ab8db7ab6957",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_8e8ad7a17ec643af9438625f2d54e34b~mv2.jpg",
+     "orderIndex": -1421717064174.6138,
+     "name": "SingaporeConferenceHall_StrategicBranding_EvetCollaterals_11.jpg",
+     "title": "’50/50\n– A Shared History’ Exhibition",
+     "description": "Singapore Conference Hall",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page singapore-conference-hall-sg5050",
+      "url": "https://www.achates360.com//singapore-conference-hall-sg5050",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#ysv1n",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1127
+     },
+     "secure": false,
+     "createdDate": "2021-10-01T01:06:56Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Singapore Conference Hall"
+    },
+    {
+     "id": "32a73e3b-e4a1-49ad-aaf5-97fe3390379c",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_e8e02d1b9b7d486185a9291562d5c488~mv2.jpg",
+     "orderIndex": -1419847167497.253,
+     "name": "IDMVentureCapital_StrategicBranding_Header.jpg",
+     "title": "Corporate Identity &\nWebsite Development",
+     "description": "IDM Venture Capital",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page IDM",
+      "url": "https://www.achates360.com//idm-venture-capital",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#vteoc",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1682,
+      "height": 908,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.49354838709677423
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:37:22Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "IDMVentureCapital_StrategicBranding"
+    },
+    {
+     "id": "71287268-e1c0-488c-9367-5b352f8939eb",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_cb34cfc9759e4bfaacb6576cf1c9cc60~mv2.jpg",
+     "orderIndex": -1418912219158.5725,
+     "name": "SkylinePropert_AdvertisingPromotion_Brochure_3.jpg",
+     "title": "The ‘Skyline’ Property Launch",
+     "description": "SGPD Corporation",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page The-skyline",
+      "url": "https://www.achates360.com//the-skyline",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#vszn4",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1379
+     },
+     "secure": false,
+     "createdDate": "2021-10-01T01:06:26Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "SkylinePropert_AdvertisingPromotion_Brochure"
+    },
+    {
+     "id": "62286a3a-0c93-4aeb-83db-c4624a1b15a7",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_03d54d90f7db40858a1919dc88a3bb64~mv2.jpg",
+     "orderIndex": -1418444744989.2324,
+     "name": "NT-popup_12.jpg",
+     "title": "Building Memories National Theatre Pop-Up Kit",
+     "description": "Achates 360",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page building-memories-national-theatre-pop-u",
+      "url": "https://www.achates360.com//national-theatre-pop-up-kit",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#sz1ai",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1458,
+      "height": 1000
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:30:28Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Building Memories National Theatre Pop-Up Kit"
+    },
+    {
+     "id": "17524681-d422-4cff-a4d8-0fd9d9a27216",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_bab7215c43334dce83d031dc1cc34325~mv2.gif",
+     "orderIndex": -1418327876446.8975,
+     "name": "TheVEdit_DigitalCommunications_LogoDesign.gif",
+     "title": "The V Edit e-zine",
+     "description": "The V Edit",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page the-v-edit-e-zine",
+      "url": "https://www.achates360.com//the-v-edit-e-zine",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#xxxuv",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 600,
+      "quality": 33,
+      "unsharpMasking": {
+       "amount": 0,
+       "radius": 0,
+       "threshold": 0
+      }
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:27:35Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "The V Edit"
+    },
+    {
+     "id": "c0f4be16-7814-484c-ab56-9ae32dc7a96c",
+     "mediaUrl": "https://static.wixstatic.com/media/e9d9c2_ee9a936cfae64bd49cf1ef8ad75642c2~mv2.gif",
+     "orderIndex": 1636043285004,
+     "name": "ChurchWedding_GraphicDesign_InvitationCard_2-1.gif",
+     "title": "Wedding Invitation & Wedding Favours",
+     "description": "Jowyne & Vernon",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page wedding-invitation-wedding-favours",
+      "url": "https://www.achates360.com//wedding-invitation-wedding-favours",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#awogs",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 881
+     },
+     "secure": false,
+     "createdDate": "2021-11-04T16:28:03Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "ChurchWedding_GraphicDesign_InvitationCard_2-1.gif"
+    },
+    {
+     "id": "270dd18a-02f0-48e9-9c50-528394a8488b",
+     "mediaUrl": "https://static.wixstatic.com/media/24d1a3_bc4b686b00064b369ea3eba497afcea7~mv2.jpg",
+     "orderIndex": 1642570637355,
+     "name": "LittleThoughtsGroup_ThinkingOutLoud_Publication_CoverDesign.jpg",
+     "title": "Little Thoughts: Thinking Out Loud",
+     "description": "Little Thoughts Group",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Little Thoughts: Thinking Out Loud",
+      "url": "https://www.achates360.com//little-thoughts-thinking-out-loud",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#rjvav",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 2010,
+      "height": 900
+     },
+     "secure": false,
+     "createdDate": "2022-01-19T05:37:18Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Little Thoughts Group"
+    }
+   ],
+   "compId": "comp-jbahy0no",
+   "created": "2026-04-15T08:45:19Z",
+   "createdDate": "2026-04-15T08:45:19Z"
+  }
+ },
+ {
+  "gallery": {
+   "id": "6ffc4947-3e95-4491-9670-8e181859ee06",
+   "totalItemsCount": 58,
+   "items": [
+    {
+     "id": "563a5864-9450-4141-9ee1-a1d2358852ca",
+     "mediaUrl": "https://static.wixstatic.com/media/e7c864_fa44c9ab49be4d3f99fba4f54bf85e91~mv2.jpg",
+     "orderIndex": 1643108608022,
+     "name": "SingaporeAviationAcademy_Corporate_2.jpg",
+     "title": "Corporate Brochure",
+     "description": "Singapore Aviation Academy",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Singapore Aviation Academy",
+      "url": "https://www.achates360.com//singapore-aviation-academy",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#cwrps",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1379,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-01-25T11:03:28Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Singapore Aviation Academy"
+    },
+    {
+     "id": "dfb006a4-1ece-4360-9558-a267c478b4b9",
+     "mediaUrl": "https://static.wixstatic.com/media/24d1a3_894dc7e55aa44602b1f3da024ed6ebcf~mv2.jpg",
+     "orderIndex": 1643193541811,
+     "name": "The-Star-Performing-Arts-Centre_StrategicBranding_CoverDesign.jpg",
+     "title": "Marketing Kit and Collaterals",
+     "description": "The Star Performing Arts Centre ",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page The Star Performing Arts Centre Marketin",
+      "url": "https://www.achates360.com//the-star-performing-arts-centre-marketing",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#z998q",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 2010,
+      "height": 900
+     },
+     "secure": false,
+     "createdDate": "2022-01-26T10:39:04Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "The-Star-Performing-Arts-Centre_StrategicBranding_CoverDesign.jpg"
+    },
+    {
+     "id": "67dd6e67-4108-4c88-9df8-57a69a6f6448",
+     "mediaUrl": "https://static.wixstatic.com/media/e7c864_18750385c0d940cea5277401dc69e56d~mv2.jpg",
+     "orderIndex": 1643425930551,
+     "name": "Singapore_AviationAcademy_Publication_Journal_5.jpg",
+     "title": "Journal of Aviation Management",
+     "description": "Singapore Aviation Academy",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page Journal of Aviation Management",
+      "url": "https://www.achates360.com//journal-of-aviation-management",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#exqu5",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1458,
+      "height": 717,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-01-29T03:13:18Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Singapore_AviationAcademy_Publication_Journal_5.jpg"
+    },
+    {
+     "id": "6cd464ee-4638-484f-836a-491e635982e2",
+     "mediaUrl": "https://static.wixstatic.com/media/483e3e_e251918bb217444abc36f8feae9bd949~mv2.jpg",
+     "orderIndex": 1645004628380,
+     "name": "UnitedEngineersLimited_Publication_CoverDesign.jpg",
+     "title": "Annual Report – Building for the Future",
+     "description": "United Engineers Limited",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page UEL Annual Report 2014",
+      "url": "https://www.achates360.com//uel-annual-report",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#rkn5h",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1320,
+      "height": 876,
+      "focalPoint": {
+       "x": 0.790530303030303,
+       "y": 0.7448630136986302
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-02-16T09:43:49Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "United Engineers Limited"
+    },
+    {
+     "id": "3e8ceb55-a085-4fc4-8b50-c9e9266850f4",
+     "mediaUrl": "https://static.wixstatic.com/media/24d1a3_d02b0d59babf4dbaae81c885064e4b40~mv2.jpg",
+     "orderIndex": 1657075892140,
+     "name": "Thumbnail.jpg",
+     "title": "Nokia N-Gage Media Box",
+     "description": "Nokia",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//nokia",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#k8pmk",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 2010,
+      "height": 900,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-07-06T02:51:33Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Nokia N-Gage Media Box"
+    },
+    {
+     "id": "7a02fa26-b927-4c92-8062-c429e1181539",
+     "mediaUrl": "https://static.wixstatic.com/media/e7c864_2750fc46e47e45899c713cc8df939c97~mv2.jpg",
+     "orderIndex": 1658395698412,
+     "name": "Singapore_AviationAcademy_Publication_Journal_header.jpg",
+     "title": "Journal of Aviation Management",
+     "description": "Singapore Aviation Academy",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//journal-of-aviation-management",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#exqu5",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 600
+     },
+     "secure": false,
+     "createdDate": "2022-07-21T09:30:26Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Singapore Aviation Academy"
+    },
+    {
+     "id": "860f8c75-0877-48d9-8d98-3b05b4325521",
+     "mediaUrl": "https://static.wixstatic.com/media/24d1a3_844b87b193254879ade5f1a78f49e5ee~mv2.jpg",
+     "orderIndex": 1658889985930,
+     "name": "Copy of PB lobby-1404x630.jpg",
+     "title": "DBS Private Bank Video Wall",
+     "description": "DBS Private Bank",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//dbs-pb-video-wall",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#nocn7",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1404,
+      "height": 630
+     },
+     "secure": false,
+     "createdDate": "2022-07-27T02:46:27Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "DBS Private Bank Video Wall"
+    },
+    {
+     "id": "308e0651-2fb1-45e0-bcf3-2b3233167fe7",
+     "mediaUrl": "https://static.wixstatic.com/media/24d1a3_5da729051f2f43828af0f3a135ee8426~mv2.png",
+     "orderIndex": 1658892924151,
+     "name": "corporate_ppt_KV.png",
+     "title": "Corporate Powerpoint Presentations",
+     "description": "DBS Private Bank",
+     "link": {
+      "type": "Internal",
+      "text": "Go to Page ",
+      "url": "https://www.achates360.com//corporate-powerpoint-presentations",
+      "target": "_self",
+      "wixLinkData": {
+       "page": {
+        "pageId": "#m5fmd",
+        "target": "_self",
+        "rel": []
+       }
+      }
+     },
+     "dataType": "Photo",
+     "photoMetadata": {
+      "width": 1920,
+      "height": 1080,
+      "focalPoint": {
+       "x": 0.5,
+       "y": 0.5
+      }
+     },
+     "secure": false,
+     "createdDate": "2022-07-27T03:35:26Z",
+     "updatedDate": "2026-04-15T08:45:19Z",
+     "mediaOwner": "Undefined",
+     "tags": [
+      "_fileOrigin_uploaded"
+     ],
+     "alt": "Corporate Powerpoint Presentations"
+    }
+   ],
+   "compId": "comp-jbahy0no",
+   "created": "2026-04-15T08:45:19Z",
+   "createdDate": "2026-04-15T08:45:19Z"
+  }
+ }
+]

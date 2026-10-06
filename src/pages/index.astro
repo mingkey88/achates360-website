@@ -1,0 +1,180 @@
+---
+/*
+ * Home page, as observed on the live site (Playwright, 1440x900, 1920x900 and iPhone 13).
+ *
+ * Desktop: six 1080px slides (fixed height at every width; no scroll snapping) under the 4px
+ *   header strip. Each slide's background (video or image) is "revealed": Wix holds it at the
+ *   viewport top (a 1080px sticky layer in a box running one viewport above and below the slide)
+ *   while the slide scrolls over it, clipped to the slide. Videos autoplay muted and loop.
+ *   VIEW PROJECT: 186x40, 1px border (white; #2f2e2e on the light Building Memories slide),
+ *   radius 20, Avenir Light 14px/19.6px, 800px down at grid+385; on hover border and label turn
+ *   #adadac (0.4s). The red-packet slide has a centred h1 (Helvetica Bold 28px/39.2px white,
+ *   600 wide at grid+213, 407 down) and its button at grid+420, 467 down. Award badges are 99px,
+ *   ~943px down at grid+841/844. (grid = the 980px Wix grid centred in the viewport.)
+ *   The dot menu is pinned middle right, 59px in: 12px white rings (2px stroke) on a 35.5px
+ *   pitch, labels hidden; hover and the current section fill the ring white.
+ *   "All Projects": a 3-column gallery of 587px tiles (16:9 image, title and description below),
+ *   40px apart, 1840px wide and centred 8px left of the viewport centre, so the outer columns run
+ *   off-screen at 1440; it starts 79px into the #f2f2f2 section and ends 35px before the
+ *   enquiry section. The "All Projects" heading (a link to /projects) sits at x=135, 104px down,
+ *   underneath the first tile, so it is not visible on desktop.
+ * Mobile (Wix's 320px layout, lengths x --m): the slides are short stills (each video's poster
+ *   frame, no video), heights 227/265/200/222/200/247 under the 90px header band, no reveal;
+ *   VIEW PROJECT 160x42 at x=80; badges 56px at the top right; the dot menu is hidden. The gallery
+ *   is one 280px column at x=20 (32.5px apart) starting 125px into its section, under a mobile-only
+ *   "Projects" heading (50px in; exported as mobileHeading by scripts/export-wix/chrome.mjs), with
+ *   "All Projects" (32px, centred) 41px below it.
+ */
+import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import AnchorMenu from '../components/AnchorMenu.astro';
+import BgVideo from '../components/BgVideo.astro';
+import Gallery from '../components/Gallery.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { renderMd } from '../lib/markdown';
+import { withBase, linkAttrs, BLANK_IMAGE } from '../lib/paths';
+// Avenir Heavy stand-in for the mobile "Projects" heading (as on the business cards).
+import '@fontsource/nunito-sans/800.css';
+const d = (await getEntry('home', 'home'))!.data;
+
+// Per-slide geometry measured on the live site (not content): desktop offsets from the slide top
+// and the 980px grid's left edge; mobile values in Wix's 320px layout.
+interface SlideLayout {
+  cta: [x: number, y: number]; dark?: boolean; text?: [x: number, y: number];
+  badge?: [x: number, y: number];
+  m: { h: number; cta: number; text?: number; badge?: [x: number, y: number, size: number] };
+}
+const LAYOUT: Record<string, SlideLayout> = {
+  'slide-1': { cta: [385, 800], m: { h: 227, cta: 162 } },
+  'slide-2': { cta: [385, 800], dark: true, badge: [841, 943], m: { h: 265, cta: 209, badge: [249, 17, 56] } },
+  'slide-3': { cta: [385, 800], m: { h: 200, cta: 141 } },
+  'slide-4': { cta: [385, 800], badge: [844, 942], m: { h: 222, cta: 159, badge: [247, 17, 55] } },
+  'slide-5': { cta: [385, 800], m: { h: 200, cta: 136 } },
+  'slide-6': { cta: [420, 467], text: [213, 407], m: { h: 247, cta: 180, text: 95 } },
+};
+const FALLBACK: SlideLayout = { cta: [385, 800], m: { h: 227, cta: 162 } };
+const vars = (o: Record<string, number | undefined>) =>
+  Object.entries(o).filter(([, v]) => v !== undefined).map(([k, v]) => `--${k}: ${v}`).join('; ');
+---
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="home" background="var(--color-page-alt)">
+  <AnchorMenu items={d.menu} variant="dots" labels={false} />
+  {d.slides.map((s, i) => {
+    const l = LAYOUT[s.id] ?? FALLBACK;
+    const style = vars({
+      'cta-x': l.cta[0], 'cta-y': l.cta[1], 'text-x': l.text?.[0], 'text-y': l.text?.[1],
+      'mh': l.m.h, 'm-cta': l.m.cta, 'm-text': l.m.text,
+    });
+    return (
+      <section id={s.id} class="slide" style={style} data-bgvideo-viewport>
+        <div class="slide-bg">
+          {s.media.type === 'video'
+            ? (
+              <div class="slide-media">
+                <BgVideo src={s.media.src} poster={s.media.poster} desktopOnly class="slide-video" />
+                {/* Phones only: the empty source keeps desktop from fetching the hidden still. The
+                    first four slides fill an iPhone screen, so their stills load eagerly. */}
+                <picture>
+                  <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
+                  <Image class="slide-still" src={s.media.poster} alt="" widths={[390, 780, 1170]} sizes="100vw" loading={i < 4 ? 'eager' : 'lazy'} />
+                </picture>
+              </div>
+            )
+            /* Full width on both layouts; the small widths serve phones (slide 2 is their LCP image). */
+            : <Image class="slide-media" src={s.media.src} alt={s.media.alt} widths={[390, 780, 1170, 1440, 1920, 2560]} sizes="100vw" loading={i < 2 ? 'eager' : 'lazy'} />}
+        </div>
+        {s.md && <div class="slide-text" set:html={renderMd(s.md)} />}
+        {s.cta && <a class:list={['cta', { dark: l.dark }]} href={withBase(s.cta.href)} {...linkAttrs(s.cta.href)}>{s.cta.label}</a>}
+        {s.badges.map((b, j) => {
+          const pos = j === 0 && l.badge ? l.badge : [841, 943];
+          const mpos = j === 0 && l.m.badge ? l.m.badge : [249, 17, 56];
+          const img = <Image src={b.src} alt={b.alt} widths={[99, 198]} sizes="99px" />;
+          const bstyle = vars({ 'b-x': pos[0], 'b-y': pos[1], 'mb-x': mpos[0], 'mb-y': mpos[1], 'mb-s': mpos[2] });
+          return b.href
+            ? <a class="badge" style={bstyle} href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a>
+            : <div class="badge" style={bstyle}>{img}</div>;
+        })}
+      </section>
+    );
+  })}
+  <section id="all-projects" class="all-projects">
+    {d.mobileHeading && <div class="ap-mheading" set:html={renderMd(d.mobileHeading)} />}
+    <div class="ap-heading" set:html={renderMd(d.allProjects.md)} />
+    <div class="ap-gallery">
+      <Gallery items={d.allProjects.items} layout="grid" columns={3} description sizes="(max-width: 767px) 88vw, 587px" />
+    </div>
+  </section>
+  <ContactForm md={d.contact.md} form={d.contact.form} />
+</Base>
+<style>
+  /* Dot menu: white rings 59px in from the right, 35.5px apart, filled white when current or hovered. */
+  :global(body.home) { --anchor-color: #fff; --anchor-active: #fff; }
+  :global(body.home .anchor-menu.dots) { right: 59px; }
+  :global(body.home .anchor-menu.dots a) { height: 35.5px; }
+
+  .slide { position: relative; height: 1080px; clip-path: inset(0); color: #fff; }
+  /* The reveal: the background box runs one viewport above and below the slide; its media layer
+     (1080px, or the window height when the window is taller) sticks to the viewport top, and the
+     slide's clip shows the part under it. */
+  .slide-bg { position: absolute; left: 0; right: 0; top: -100vh; bottom: -100vh; }
+  .slide-bg > :global(.slide-media) { position: sticky; top: 0; display: block; width: 100%; height: max(1080px, 100vh); object-fit: cover; }
+  .slide-media :global(.slide-video) { width: 100%; height: 100%; }
+  .slide-media picture { display: contents; }
+  .slide-media :global(.slide-still) { display: none; }
+
+  .cta {
+    position: absolute; left: calc(50% - 490px + var(--cta-x) * 1px); top: calc(var(--cta-y) * 1px);
+    display: flex; align-items: center; justify-content: center; width: 186px; height: 40px;
+    border: 1px solid #fff; border-radius: 20px; color: #fff; text-decoration: none;
+    font: var(--weight-light) var(--size-ui) / var(--leading-ui) var(--font-ui);
+    transition: border-color .4s, color .4s;
+  }
+  .cta.dark { border-color: var(--color-heading); color: var(--color-heading); }
+  .cta:is(:hover, :focus-visible) { border-color: var(--color-muted); color: var(--color-muted); }
+  .slide-text { position: absolute; left: calc(50% - 490px + var(--text-x) * 1px); top: calc(var(--text-y) * 1px); width: 600px; text-align: center; }
+  .slide-text :global(h1) { margin: 0; color: #fff; font: 700 28px / 39.2px var(--font-heading); }
+  /* Kept inside the window on narrow desktop windows (Wix's grid+841 needs 900px). */
+  .badge {
+    position: absolute; left: min(calc(50% - 490px + var(--b-x) * 1px), calc(100% - 99px - var(--gutter)));
+    top: calc(var(--b-y) * 1px); width: 99px; line-height: 0;
+  }
+  .badge :global(img) { width: 99px; height: 99px; object-fit: contain; }
+
+  .all-projects { position: relative; overflow-x: clip; padding: 79px 0 35px; background: var(--color-page-alt); }
+  .ap-heading { position: absolute; left: 135px; top: 104px; }
+  .ap-heading :global(h2) { margin: 0; font-size: 28px; line-height: normal; }
+  .ap-heading :global(a) { color: var(--color-heading); text-decoration: none; }
+  .ap-gallery { position: relative; width: 1840px; margin-left: calc(50% - 928px); --gallery-gap: 40px; }
+  .ap-gallery :global(.gallery-grid) { row-gap: 39.6px; }
+  .ap-mheading { display: none; }
+
+  @media (max-width: 767px) {
+    :global(body.home .anchor-menu.dots) { display: none; }
+    .slide { height: calc(var(--mh) * var(--m)); clip-path: none; overflow: hidden; }
+    .slide-bg { inset: 0; }
+    .slide-bg > :global(.slide-media) { position: absolute; inset: 0; height: 100%; }
+    .slide-media :global(.slide-video) { display: none; }
+    .slide-media :global(.slide-still) { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .cta {
+      left: calc(80 * var(--m)); top: calc(var(--m-cta) * var(--m)); width: calc(160 * var(--m)); height: calc(42 * var(--m));
+      border-radius: calc(21 * var(--m)); font-size: calc(14 * var(--m)); line-height: calc(19.6 * var(--m));
+    }
+    .slide-text { left: calc(20 * var(--m)); top: calc(var(--m-text) * var(--m)); width: calc(280 * var(--m)); }
+    .slide-text :global(h1) { font-size: calc(20 * var(--m)); line-height: calc(28 * var(--m)); }
+    .badge { left: calc(var(--mb-x) * var(--m)); top: calc(var(--mb-y) * var(--m)); width: calc(var(--mb-s) * var(--m)); }
+    .badge :global(img) { width: 100%; height: auto; }
+
+    .all-projects { display: flex; flex-direction: column; padding: calc(125 * var(--m)) 0 calc(66 * var(--m)); }
+    .ap-gallery { order: 1; width: calc(280 * var(--m)); margin: 0 0 0 calc(20 * var(--m)); --gallery-gap: calc(32.5 * var(--m)); }
+    .ap-gallery :global(.gallery-grid) { gap: calc(32.5 * var(--m)); }
+    /* Wix's mobile-only "Projects" heading: (8, 50) in the section, 304 wide, centred, Avenir Heavy
+       20px with 0.2em tracking, #2f2e2e. */
+    .ap-mheading { display: block; position: absolute; top: calc(50 * var(--m)); left: calc(8 * var(--m)); width: calc(304 * var(--m)); text-align: center; }
+    .ap-mheading :global(h2) {
+      margin: 0; color: var(--color-heading); letter-spacing: 0.2em;
+      font: 800 calc(20 * var(--m)) / calc(25 * var(--m)) var(--font-ui);
+    }
+    .ap-heading { order: 2; position: static; margin: calc(41 * var(--m)) calc(20 * var(--m)) 0; text-align: center; }
+    .ap-heading :global(h2) { font-size: calc(32 * var(--m)); }
+  }
+</style>

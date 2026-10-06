@@ -1,0 +1,144 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from './Base.astro';
+import { mediaUrl } from '../lib/paths';
+// Avenir Heavy stand-in for the card name (Nunito Sans, like --font-ui's Avenir Light stand-in).
+import '@fontsource/nunito-sans/800.css';
+interface Props { entry: CollectionEntry<'cards'> }
+const d = Astro.props.entry.data;
+// Icon links are the links whose label is not the visible display text (e.g. "Phone", "Mail").
+// Each link keeps its own verbatim target: on some cards the "Mail" icon and the visible address
+// open different mailboxes, exactly as on Wix (CONTENT-QUERIES.md #1).
+const icon = (prefix: string) => d.links.find((l) => l.href.startsWith(prefix) && l.label !== d.phone.display && l.label !== d.email.display);
+const phoneIcon = icon('tel:');
+const mailIcon = icon('mailto:');
+// Every card page has the same Wix page background (data-page-bg rgb(235, 210, 197)).
+const PAGE_BG = 'var(--color-card-bg)';
+---
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="card-page" background={PAGE_BG}>
+  <section class="card-section">
+    <div class="card">
+      <Image class="photo" src={d.photo.src} alt={d.photo.alt} widths={[180, 360, 540]} sizes="(max-width: 767px) 41vw, 179px" loading="eager" />
+      <h1 class="name">{d.name}</h1>
+      <p class="role">{d.role}</p>
+      <p class="blurb">{d.blurb}</p>
+      <div class="contact phone">
+        {phoneIcon && (
+          <a class="icon" href={phoneIcon.href} aria-label={phoneIcon.label}>
+            {/* Wix's phone icon (StylableButton SVG, copied from the rendered page) */}
+            <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M154.708 115.415a80.404 80.404 0 0 1-17.641-4.416c-6.242-2.359-13.345-.836-18.104 3.896l-6.198 6.229a101.805 101.805 0 0 1-33.919-34.089l6.205-6.237c4.695-4.773 6.21-11.918 3.865-18.193a81.55 81.55 0 0 1-4.401-17.771C83.323 36.349 76.039 30 67.572 30l-.168.001H47.635c-.515 0-1.033.023-1.53.07-4.561.414-8.69 2.589-11.625 6.125-2.937 3.538-4.326 8.015-3.908 12.667C32.79 69.86 40 90.325 51.401 108.016c10.361 16.39 24.455 30.558 40.73 40.953 17.546 11.437 37.809 18.683 58.672 20.961.515.046 1.031.069 1.534.069h.077c9.456-.039 17.118-7.808 17.081-17.302v-19.825c.19-8.733-6.144-16.231-14.787-17.457zm6.845 17.412v19.887c.02 5.1-4.094 9.265-9.173 9.286-.294-.002-.58-.012-.793-.03-19.563-2.137-38.629-8.955-55.17-19.736-15.327-9.79-28.576-23.108-38.334-38.543C47.34 87.021 40.557 67.769 38.477 48.08a9.218 9.218 0 0 1 2.098-6.752 9.138 9.138 0 0 1 7.06-3.326h19.808c.032-.002.062-.002.092-.002 4.566 0 8.476 3.404 9.111 7.918a89.669 89.669 0 0 0 4.834 19.497c1.259 3.366.445 7.194-2.055 9.736l-8.369 8.412a4.022 4.022 0 0 0-.646 4.812c9.73 17.199 23.917 31.461 41.028 41.241a3.948 3.948 0 0 0 4.766-.647l8.353-8.396a9.212 9.212 0 0 1 9.728-2.08 88.214 88.214 0 0 0 19.35 4.85c4.63.656 8.034 4.691 7.918 9.386v.098z" /></svg>
+          </a>
+        )}
+        <a class="text" href={d.phone.href}>{d.phone.display}</a>
+      </div>
+      <div class="contact mail">
+        {mailIcon && (
+          <a class="icon" href={mailIcon.href} aria-label={mailIcon.label}>
+            {/* Wix's mail icon (StylableButton SVG, copied from the rendered page) */}
+            <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M173.694 43H26.306A6.307 6.307 0 0 0 20 49.307v101.385a6.307 6.307 0 0 0 6.306 6.307h147.388a6.307 6.307 0 0 0 6.306-6.307V49.307A6.307 6.307 0 0 0 173.694 43zm-12.977 12.615l-58.092 44.653L39.25 55.615h121.467zm-128.105 88.77V66.368l66.543 46.886a6.3 6.3 0 0 0 7.474-.155l60.759-46.702v77.989H32.612z" /></svg>
+          </a>
+        )}
+        <a class="text" href={d.email.href}>{d.email.display}</a>
+      </div>
+      <a class="vcard" href={mediaUrl(d.vcard.href)} download>
+        <span>{d.vcard.label}</span>
+        {/* Wix's "+" button icon (copied from the rendered page) */}
+        <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M145 96h-41V55h-8v41H55v8h41v41h8v-41h41v-8z" /></svg>
+      </a>
+      <Image class="qr" src={d.qr.src} alt={d.qr.alt} widths={[148, 296, 444]} sizes="(max-width: 767px) 56vw, 148px" />
+    </div>
+  </section>
+</Base>
+<style>
+  /*
+   * Geometry from the live Wix card pages (data-box / data-mbox of each component in
+   * .cache/rendered/<slug>.html), angeline as the reference; colours and fonts from Wix's inline
+   * styles. Desktop: a 710x451 white card whose children Wix places absolutely (left/top below are
+   * card-relative), the photo hanging 90px off its left edge; section 736 tall, card 142 down,
+   * 24px right of centre. --d is 1 desktop px, shrinking the whole card on 768-860px screens
+   * (Wix's desktop page is 980 wide and would scroll there instead).
+   * The blurb box is ~4% narrower than Wix's (394 -> 375, mobile 250 -> 240): the Helvetica Neue
+   * Light stand-in sets ~4% narrower than Wix's Helvetica Light, and this keeps Wix's line breaks.
+   * The role sits 3px below its Wix box top so its text lands on Wix's baseline (Wix's box is a
+   * 28px h2 line holding 18px text).
+   */
+  .card-section { --d: min(1px, calc(100vw / 860)); min-height: calc(736 * var(--d)); padding-top: calc(142 * var(--d)); }
+  .card {
+    position: relative; width: calc(710 * var(--d)); height: calc(451 * var(--d));
+    margin-left: max(calc(100 * var(--d)), calc(50% - 331 * var(--d)));
+    background: #fff;
+  }
+  .card > :global(*) { position: absolute; margin: 0; }
+  .card :global(.photo) {
+    left: calc(-90 * var(--d)); top: calc(140 * var(--d)); width: calc(179 * var(--d)); height: calc(179 * var(--d));
+    max-width: none; border-radius: 50%; object-fit: cover;
+  }
+  .name {
+    left: calc(136 * var(--d)); top: calc(58 * var(--d)); width: calc(315 * var(--d));
+    color: #522662; font: 800 calc(30 * var(--d)) / calc(40 * var(--d)) var(--font-ui); /* Wix: Avenir Heavy 30px */
+  }
+  .role, .blurb, .contact .text { color: var(--color-text); font-family: var(--font-body); font-weight: var(--weight-light); font-size: calc(18 * var(--d)); }
+  .role { left: calc(133 * var(--d)); top: calc(85 * var(--d)); width: calc(310 * var(--d)); line-height: calc(42 * var(--d)); }
+  .blurb { left: calc(133 * var(--d)); top: calc(132 * var(--d)); width: calc(375 * var(--d)); line-height: 1.4; }
+  .card :global(.qr) { left: calc(529 * var(--d)); top: calc(44 * var(--d)); width: calc(148 * var(--d)); height: calc(148 * var(--d)); max-width: none; object-fit: cover; }
+  .contact { top: calc(265 * var(--d)); display: flex; align-items: flex-start; }
+  .phone { left: calc(130 * var(--d)); }
+  .mail { left: calc(376 * var(--d)); }
+  .contact .icon {
+    flex: none; display: grid; place-items: center; width: calc(47 * var(--d)); height: calc(47 * var(--d));
+    margin-right: calc(11 * var(--d)); border-radius: 50%; background: var(--color-button); transition: background 0.2s ease;
+  }
+  .contact .icon:hover { background: var(--color-card-bg); }
+  .contact .icon svg { width: calc(18 * var(--d)); height: calc(18 * var(--d)); fill: #fff; }
+  .contact .text { margin-top: calc(12.5 * var(--d)); line-height: normal; text-decoration: none; overflow-wrap: anywhere; }
+  .phone .text { width: calc(135 * var(--d)); }
+  .mail .text { width: calc(230 * var(--d)); }
+  .vcard {
+    left: calc(130 * var(--d)); top: calc(338 * var(--d)); width: calc(246 * var(--d)); height: calc(45 * var(--d));
+    display: flex; align-items: center; justify-content: center; gap: calc(8 * var(--d));
+    border-radius: 50px; background: var(--color-heading); color: #fff; text-decoration: none; transition: background 0.2s ease;
+    font: var(--weight-light) calc(20 * var(--d)) / 1 var(--font-ui); /* Wix: Avenir Light 20px */
+  }
+  .vcard:hover { background: var(--color-card-bg); }
+  .vcard svg { width: calc(37 * var(--d)); height: calc(37 * var(--d)); fill: #fff; transition: inherit; }
+  .vcard:hover svg { width: calc(42 * var(--d)); height: calc(42 * var(--d)); }
+
+  /*
+   * Mobile (Wix 320px layout, lengths x --m per Ruling 21): photo 130 centred, 34 below the
+   * header; card x20, 280 wide, 95 below the header, so the photo overlaps its top by 69; 20 to
+   * the footer. Wix positions the name and role at the very top of the card, under the photo
+   * (and on some cards above it), so the photo hides most of the name: here name and role flow
+   * centred below the photo (the role across the card's full width), then Wix's own spacing
+   * (angeline): blurb 250 wide (240, see above) at x9, 17px / 23.8; contact rows of a 37px icon at x13 and 17px
+   * text at x62, 46 apart; the button 223x42 at x29, 41 below; QR 177, 20 below; 122 to the card's end.
+   */
+  @media (max-width: 767px) {
+    .card-section { min-height: 0; padding: calc(95 * var(--m)) 0 calc(20 * var(--m)); }
+    .card {
+      width: calc(280 * var(--m)); height: auto; margin-left: calc(20 * var(--m));
+      padding: calc(78 * var(--m)) 0 calc(122 * var(--m));
+    }
+    .card > :global(*) { position: static; }
+    .card :global(.photo) {
+      position: absolute; left: calc(75 * var(--m)); top: calc(-61 * var(--m));
+      width: calc(130 * var(--m)); height: calc(130 * var(--m));
+    }
+    .name { width: calc(180 * var(--m)); margin: 0 auto; text-align: center; font-size: calc(30 * var(--m)); line-height: calc(37.5 * var(--m)); }
+    .role { width: auto; margin: calc(2 * var(--m)) 0 0; text-align: center; font-size: calc(18 * var(--m)); line-height: calc(25 * var(--m)); }
+    .blurb { width: calc(240 * var(--m)); margin: calc(15 * var(--m)) 0 0 calc(9 * var(--m)); font-size: calc(17 * var(--m)); line-height: calc(23.8 * var(--m)); }
+    .contact { margin-left: calc(13 * var(--m)); }
+    .phone { margin-top: calc(21 * var(--m)); }
+    .mail { margin-top: calc(9 * var(--m)); }
+    .contact .icon { width: calc(37 * var(--m)); height: calc(37 * var(--m)); margin-right: calc(12 * var(--m)); }
+    .contact .icon svg { width: calc(16 * var(--m)); height: calc(16 * var(--m)); }
+    .contact .text { width: calc(190 * var(--m)); margin-top: calc(8 * var(--m)); font-size: calc(17 * var(--m)); }
+    .vcard {
+      width: calc(223 * var(--m)); height: calc(42 * var(--m)); margin: calc(41 * var(--m)) 0 0 calc(29 * var(--m));
+      gap: calc(8 * var(--m)); font-size: calc(20 * var(--m));
+    }
+    .vcard svg { width: calc(37 * var(--m)); height: calc(37 * var(--m)); }
+    .vcard:hover svg { width: calc(42 * var(--m)); height: calc(42 * var(--m)); }
+    .card :global(.qr) { width: calc(177 * var(--m)); height: calc(177 * var(--m)); margin: calc(20 * var(--m)) auto 0; }
+  }
+</style>

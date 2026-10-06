@@ -1,0 +1,40 @@
+[
+  {
+    "path": "/copy-of-international-green-building",
+    "reason": "password-protected",
+    "linkedFrom": [
+      "home",
+      "projects"
+    ]
+  },
+  {
+    "path": "/corporate-powerpoint-presentations",
+    "reason": "password-protected",
+    "linkedFrom": [
+      "home"
+    ]
+  },
+  {
+    "path": "/dbs-affluent-segment-ai-assets",
+    "reason": "password-protected",
+    "linkedFrom": [
+      "home",
+      "copy-of-projects",
+      "projects"
+    ]
+  },
+  {
+    "path": "/dbs-pb-video-wall",
+    "reason": "password-protected",
+    "linkedFrom": [
+      "home"
+    ]
+  },
+  {
+    "path": "/NOT_SUPPORTED",
+    "reason": "404",
+    "linkedFrom": [
+      "home"
+    ]
+  }
+]

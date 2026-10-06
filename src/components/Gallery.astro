@@ -1,0 +1,120 @@
+---
+/*
+ * Wix Pro Gallery, as observed on the live site (Playwright, 1440x900 and iPhone 13):
+ *
+ * Case-study galleries (notter, the-v-edit-e-zine, st-regis-tearoom-patisserie and most others):
+ *   one column the width of the content column (940px), each image at its own aspect ratio (no
+ *   crop), 10px between images (8 Wix px on mobile), no titles or descriptions. A few case studies
+ *   use other Wix layouts (sliders on kaplan / samsung-micro-led / the-brooks-clown, a collage on
+ *   the-skyline, a 3-column square grid on samsung-connected-home); the export does not record
+ *   the layout, so those render as the one-column stack too.  -> layout="stack"
+ *
+ * Project-index galleries (/projects, /copy-of-projects):
+ *   3 columns, 301px thumbnails on a 328px step (27px gap) at 1440, rows on a 285.75px step;
+ *   thumbnails cropped to 16:9 (301x168.75); the title sits BELOW the thumbnail (15px gap),
+ *   centred, Helvetica Light 22px/27px #2f2e2e, at most 2 lines (ellipsis); the info area is 90px
+ *   tall; the description is not shown. Mobile: one column, full width (280.84 Wix px), 16:9,
+ *   same 90px info area, rows 22 Wix px apart.
+ *   Video tiles show a play button (60px translucent white disc, dark triangle) and start playing
+ *   the video in place on hover; the button hides while it plays.  -> layout="grid"
+ *
+ * Home "All Projects" gallery: the same grid with the description shown under the title
+ *   (Helvetica Light 15px/18px #2f2e2e, 6px below the title)  -> description, and the page sets
+ *   the column count, gap and `sizes` for its wider tiles.
+ */
+import { Image } from 'astro:assets';
+import { withBase, mediaUrl, linkAttrs } from '../lib/paths';
+interface Item { title: string; description: string; href?: string; thumb: ImageMetadata; alt: string; video?: string }
+interface Props { items: Item[]; layout?: 'stack' | 'grid'; columns?: number; showInfo?: boolean; description?: boolean; sizes?: string }
+const { items, layout = 'grid', columns = layout === 'stack' ? 1 : 3, showInfo = layout === 'grid', description = false, sizes } = Astro.props;
+---
+<ul class:list={['gallery', `gallery-${layout}`]} style={`--cols:${columns}`}>
+  {items.map((it) => {
+    // GIF thumbs go through Astro's image pipeline too: its sharp service keeps every frame, so
+    // they ship as animated WebP at the tile's size instead of the full GIF.
+    const img = layout === 'stack'
+        ? <Image src={it.thumb} alt={it.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 767px) 100vw, 940px" />
+        : <Image src={it.thumb} alt={it.alt} widths={sizes ? [320, 640, 960, 1280] : [320, 640, 960]} sizes={sizes ?? `(max-width: 767px) 100vw, ${Math.round(940 / columns)}px`} />;
+    const media = (
+      <div class="thumb">
+        {img}
+        {it.video && <video class="hover-video" src={mediaUrl(it.video)} muted loop playsinline preload="none" aria-hidden="true"></video>}
+        {it.video && <span class="play" aria-hidden="true"></span>}
+      </div>
+    );
+    const info = showInfo && it.title && (
+      <div class:list={['info', { 'with-desc': description }]}>
+        <p class="title">{it.title}</p>
+        {description && it.description && <p class="desc">{it.description}</p>}
+      </div>
+    );
+    return (
+      <li>
+        {it.href
+          ? <a href={withBase(it.href)} {...linkAttrs(it.href)}>{media}{info}</a>
+          : <div>{media}{info}</div>}
+      </li>
+    );
+  })}
+</ul>
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('.gallery li').forEach((li) => {
+    const v = li.querySelector<HTMLVideoElement>('.hover-video');
+    if (!v) return;
+    li.addEventListener('pointerenter', () => {
+      if (reduce.matches) return;
+      li.classList.add('playing');
+      v.play().catch(() => li.classList.remove('playing'));
+    });
+    li.addEventListener('pointerleave', () => { li.classList.remove('playing'); v.pause(); v.currentTime = 0; });
+  });
+</script>
+<style>
+  .gallery { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+  .gallery a { color: inherit; text-decoration: none; display: block; }
+  .thumb { position: relative; overflow: hidden; }
+  .thumb :global(img) { display: block; width: 100%; height: auto; }
+  .hover-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .2s; }
+  .playing .hover-video { opacity: 1; }
+  .play {
+    position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; translate: -50% -50%;
+    border-radius: 50%; background: rgb(255 255 255 / .78); transition: opacity .2s;
+  }
+  .play::after {
+    content: ''; position: absolute; left: 24px; top: 20px;
+    border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent var(--color-heading);
+  }
+  .playing .play { opacity: 0; }
+
+  /* Case-study stack: natural aspect ratio, 10px apart. */
+  .gallery-stack { gap: 10px; }
+
+  /* Project-index grid: 16:9 crops with the title below. */
+  .gallery-grid { gap: var(--gallery-gap); }
+  .gallery-grid .thumb { aspect-ratio: 16 / 9; }
+  .gallery-grid .thumb :global(img) { height: 100%; object-fit: cover; }
+  .info { height: 90px; padding-top: 15px; text-align: center; }
+  .info .title {
+    margin: 0; font-family: var(--font-heading); font-weight: var(--weight-light);
+    font-size: var(--size-gallery-title); line-height: var(--gallery-title-leading); color: var(--color-heading);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .info.with-desc { height: auto; min-height: 90px; }
+  .info .desc {
+    margin: 6px 0 0; font-family: var(--font-body); font-weight: var(--weight-light);
+    font-size: 15px; line-height: 18px; color: var(--color-heading);
+  }
+
+  @media (max-width: 767px) {
+    .gallery { grid-template-columns: minmax(0, 1fr); }
+    .gallery-stack { gap: calc(8 * var(--m)); }
+    .gallery-grid { gap: calc(22 * var(--m)); }
+    .info { height: calc(90 * var(--m)); padding-top: calc(15 * var(--m)); }
+    .info .title { font-size: calc(22 * var(--m)); line-height: calc(27 * var(--m)); }
+    .info.with-desc { min-height: calc(90 * var(--m)); }
+    .info .desc { margin-top: calc(6 * var(--m)); font-size: calc(15 * var(--m)); line-height: calc(18 * var(--m)); }
+    .play { width: calc(60 * var(--m)); height: calc(60 * var(--m)); }
+    .play::after { left: calc(24 * var(--m)); top: calc(20 * var(--m)); border-width: calc(10 * var(--m)) 0 calc(10 * var(--m)) calc(16 * var(--m)); }
+  }
+</style>

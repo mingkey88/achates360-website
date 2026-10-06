@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import Blocks from './Blocks.astro';
+import { withBase, linkAttrs } from '../lib/paths';
+interface Props { blocks: any[] }
+const { blocks } = Astro.props;
+
+// The site footer is a row of columns; each "###### Label" text block (Contact, Social) opens a
+// new column. The first column holds the intro heading, then the legal lines (which Wix's mobile
+// layout moves to the end of the footer).
+const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
+const columns: any[][] = [[]];
+for (const b of blocks) {
+  if (isLabel(b)) columns.push([]);
+  columns.at(-1)!.push(b);
+}
+const [first, ...rest] = columns;
+const intro = first.slice(0, 1);
+const legal = first.slice(1);
+---
+<footer id="footer" class="site-footer">
+  <div class="grid">
+    <div class="intro"><Blocks blocks={intro} /></div>
+    {rest.map((col) => {
+      const icons = col.filter((b) => b.type === 'image');
+      const others = col.filter((b) => b.type !== 'image');
+      return (
+        <div class="col">
+          <Blocks blocks={others} />
+          {icons.length > 0 && (
+            <ul class="social">
+              {icons.map((b) => {
+                const img = <Image src={b.src} alt={b.alt} width={39} height={39} densities={[1, 2]} />;
+                return (
+                  <li>
+                    {b.href
+                      ? <a href={withBase(b.href)} aria-label={b.alt} {...linkAttrs(b.href)}>{img}</a>
+                      : img}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      );
+    })}
+    {legal.length > 0 && <div class="legal"><Blocks blocks={legal} /></div>}
+  </div>
+</footer>
+<style>
+  /*
+   * Geometry measured on the live site (notter, home; footer box 1440x334 desktop, 320x595 mobile):
+   * desktop: columns start x=48 / 494 / 982 at 1440 (358 / 709 at 1024 — proportional), labels at
+   *   y=43, intro heading and contact heading at y=77, icons at y=82 (39px, 49px step),
+   *   legal lines at y=217.
+   * mobile (Wix 320 layout, lengths scaled by --m per Ruling 21): 20px inset, single column: intro y=38, Contact 144, details 174,
+   *   Social 351, icons 381 (35px, 50px step), legal 426.
+   */
+  .site-footer {
+    background: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    font-size: var(--size-footer);
+    line-height: var(--leading-footer);
+  }
+  .site-footer :global(a) { color: inherit; text-decoration: none; }
+  .site-footer :global(:is(h5, h6, p)) { margin: 0; color: inherit; }
+  .site-footer :global(h5) { font-size: var(--size-footer-heading); line-height: var(--leading-footer-heading); }
+  .site-footer :global(h6) { font-size: var(--size-footer); line-height: var(--leading-footer); color: var(--color-footer-label); }
+  /* Wix holds the contact block in one multi-line h5; the export splits it into h5 + paragraphs
+     (the empty line becomes a paragraph break). Render the trailing lines at h5 size. */
+  .site-footer :global(h5 ~ p) { font-size: var(--size-footer-heading); line-height: var(--leading-footer-heading); }
+  .site-footer :global(h5 ~ p + p) { margin-top: var(--leading-footer-heading); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 446fr 488fr 410fr;
+    padding: 43px 48px 75px;
+  }
+  .intro { grid-column: 1; grid-row: 1; margin-top: 34px; max-width: 360px; }
+  .legal { grid-column: 1; grid-row: 2; margin-top: 54px; }
+  .col { grid-row: 1 / span 2; }
+  .col > :global(.block-text + .block-text) { margin-top: 13px; }
+  .social { list-style: none; display: flex; gap: 10px; margin: 18px 0 0; padding: 0; }
+  .social li { line-height: 0; }
+  .social a { display: block; }
+  .social :global(img) { width: 39px; height: 39px; }
+
+  @media (max-width: 767px) {
+    .site-footer { font-size: var(--size-footer-m); line-height: var(--leading-footer-m); }
+    .site-footer :global(h5),
+    .site-footer :global(h5 ~ p) { font-size: var(--size-footer-heading-m); line-height: var(--leading-footer-heading-m); }
+    .site-footer :global(h5 ~ p + p) { margin-top: var(--leading-footer-heading-m); }
+    .site-footer :global(h6) { font-size: var(--size-footer-m); line-height: var(--leading-footer-m); }
+    .grid { display: block; padding: calc(38 * var(--m)) calc(20 * var(--m)) calc(130 * var(--m)); }
+    .intro { margin: 0; max-width: none; }
+    .col { margin-top: calc(36 * var(--m)); }
+    .col + .col { margin-top: calc(37 * var(--m)); }
+    .col > :global(.block-text + .block-text) { margin-top: calc(10 * var(--m)); }
+    .social { gap: calc(15 * var(--m)); margin-top: calc(10 * var(--m)); }
+    .social :global(img) { width: calc(35 * var(--m)); height: calc(35 * var(--m)); }
+    .legal { margin-top: calc(10 * var(--m)); }
+  }
+</style>

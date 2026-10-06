@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import { withBase } from '../lib/paths';
+interface Props { logo: { src: ImageMetadata; alt: string; href: string } }
+const { logo } = Astro.props;
+---
+<header class="site-header">
+  <a class="logo" href={withBase(logo.href)}>
+    <Image src={logo.src} alt={logo.alt} loading="eager" />
+  </a>
+</header>
+<style>
+  /*
+   * Measured on the live site (notter, home):
+   * desktop 1440: #SITE_HEADER is a 4px sticky #2f2e2e strip; the logo is pinned (position: fixed)
+   *   at left 0, top 20, 264x84 box, image object-fit: cover.
+   * mobile (Wix 320px layout; lengths scaled by --m per Ruling 21): #SITE_HEADER is a 90px #2f2e2e band that scrolls away; the logo
+   *   sits in it at left 18, top 20, 180x54 (Wix crops 2px left / 3px top of the PNG).
+   */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 4px;
+    background: var(--color-header);
+  }
+  .logo { position: fixed; top: 20px; left: 0; z-index: 55; display: block; line-height: 0; }
+  .logo :global(img) { width: 264px; height: 84px; max-width: none; object-fit: cover; }
+  @media (max-width: 767px) {
+    .site-header { position: relative; height: calc(90 * var(--m)); }
+    /* 180x54 window onto the PNG scaled 0.7 and shifted by Wix's crop (x 2, y 3). */
+    .logo { position: absolute; top: calc(20 * var(--m)); left: calc(18 * var(--m)); width: calc(180 * var(--m)); height: calc(54 * var(--m)); overflow: hidden; }
+    .logo :global(img) { width: calc(182.7 * var(--m)); height: calc(58.8 * var(--m)); object-fit: fill; transform: translate(calc(-1.4 * var(--m)), calc(-2.1 * var(--m))); }
+  }
+</style>
