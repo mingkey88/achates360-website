@@ -13,6 +13,16 @@ describe('renderMd', () => {
     expect(html).toContain('href="tel:+65123"');
     expect(html).toContain('href="https://vimeo.com/1"');
   });
+  it('opens external http(s) links in a new tab, as Wix does', () => {
+    expect(renderMd('[Kinokuniya](https://singapore.kinokuniya.com/bw/9789811823077)', B)).toBe(
+      '<p><a target="_blank" rel="noopener noreferrer" href="https://singapore.kinokuniya.com/bw/9789811823077">Kinokuniya</a></p>\n');
+    expect(renderMd('[**bold** site](http://example.com "T")', B)).toBe(
+      '<p><a target="_blank" rel="noopener noreferrer" href="http://example.com" title="T"><strong>bold</strong> site</a></p>\n');
+  });
+  it('keeps internal, mailto and tel links in the same tab', () => {
+    const html = renderMd('[a](/projects) [b](mailto:x@y.com) [c](tel:+65123) [d](#top)', B);
+    expect(html).not.toContain('target=');
+  });
   it('renders escaped characters back to the verbatim text', () => {
     expect(renderMd('Selection 2\\* Required', B)).toBe('<p>Selection 2* Required</p>\n');
   });

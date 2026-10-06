@@ -18,11 +18,10 @@
  * Wix's mobile layout has its own menu (MobileMenu.astro): this one is desktop only.
  */
 import { Image } from 'astro:assets';
-import { withBase, menuCurrent } from '../lib/paths';
+import { withBase, menuCurrent, linkAttrs } from '../lib/paths';
 interface Link { label: string; href: string }
 interface Props { menu: (Link & { items?: Link[] })[]; social?: { src: ImageMetadata; alt: string; href: string }[]; path: string }
 const { menu, social = [], path } = Astro.props;
-const external = (href: string) => /^https?:\/\//.test(href);
 ---
 <button class="menu-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu" aria-label="Menu">
   <svg viewBox="0 0 25.56 22" aria-hidden="true"><path d="M25.56 0v2H0V0h25.56zM25.56 10v2H0v-2h25.56zM25.56 20v2H0v-2h25.56z" /></svg>
@@ -59,7 +58,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
       <ul class="social">
         {social.map((s) => (
           <li>
-            <a href={withBase(s.href)} aria-label={s.alt} {...(external(s.href) ? { target: '_blank', rel: 'noreferrer noopener' } : {})}>
+            <a href={withBase(s.href)} aria-label={s.alt} {...linkAttrs(s.href)}>
               <Image src={s.src} alt="" width={25} height={25} densities={[1, 2]} />
             </a>
           </li>

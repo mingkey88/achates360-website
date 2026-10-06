@@ -33,7 +33,7 @@ import BgVideo from '../components/BgVideo.astro';
 import Gallery from '../components/Gallery.astro';
 import ContactForm from '../components/ContactForm.astro';
 import { renderMd } from '../lib/markdown';
-import { withBase, BLANK_IMAGE } from '../lib/paths';
+import { withBase, linkAttrs, BLANK_IMAGE } from '../lib/paths';
 // Avenir Heavy stand-in for the mobile "Projects" heading (as on the business cards).
 import '@fontsource/nunito-sans/800.css';
 const d = (await getEntry('home', 'home'))!.data;
@@ -84,14 +84,14 @@ const vars = (o: Record<string, number | undefined>) =>
             : <Image class="slide-media" src={s.media.src} alt={s.media.alt} widths={[390, 780, 1170, 1440, 1920, 2560]} sizes="100vw" loading={i < 2 ? 'eager' : 'lazy'} />}
         </div>
         {s.md && <div class="slide-text" set:html={renderMd(s.md)} />}
-        {s.cta && <a class:list={['cta', { dark: l.dark }]} href={withBase(s.cta.href)}>{s.cta.label}</a>}
+        {s.cta && <a class:list={['cta', { dark: l.dark }]} href={withBase(s.cta.href)} {...linkAttrs(s.cta.href)}>{s.cta.label}</a>}
         {s.badges.map((b, j) => {
           const pos = j === 0 && l.badge ? l.badge : [841, 943];
           const mpos = j === 0 && l.m.badge ? l.m.badge : [249, 17, 56];
           const img = <Image src={b.src} alt={b.alt} widths={[99, 198]} sizes="99px" />;
           const bstyle = vars({ 'b-x': pos[0], 'b-y': pos[1], 'mb-x': mpos[0], 'mb-y': mpos[1], 'mb-s': mpos[2] });
           return b.href
-            ? <a class="badge" style={bstyle} href={withBase(b.href)}>{img}</a>
+            ? <a class="badge" style={bstyle} href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a>
             : <div class="badge" style={bstyle}>{img}</div>;
         })}
       </section>

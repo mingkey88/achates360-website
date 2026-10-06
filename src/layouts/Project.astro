@@ -4,10 +4,9 @@ import { Image } from 'astro:assets';
 import Base from './Base.astro';
 import Blocks from '../components/Blocks.astro';
 import BgVideo from '../components/BgVideo.astro';
-import { withBase, backLinkHref, BLANK_IMAGE } from '../lib/paths';
+import { withBase, backLinkHref, BLANK_IMAGE, linkAttrs } from '../lib/paths';
 interface Props { entry: CollectionEntry<'projects'> }
 const d = Astro.props.entry.data;
-const external = (href: string) => /^https?:\/\//.test(href);
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="page-project" background={d.pageBackground}>
   {d.hero && (
@@ -28,7 +27,7 @@ const external = (href: string) => /^https?:\/\//.test(href);
             const [w, h] = b.box ? [b.box.w, b.box.h] : [112, 110];
             const img = <Image src={b.src} alt={b.alt} width={w} height={h} densities={[1, 2]} style={`width: ${w}px; height: ${h}px`} />;
             return b.href
-              ? <a href={withBase(b.href)} {...(external(b.href) ? { target: '_blank', rel: 'noreferrer noopener' } : {})}>{img}</a>
+              ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a>
               : img;
           })}
         </div>

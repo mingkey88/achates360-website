@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { withBase, mediaUrl, backLinkHref, pagePath, menuCurrent } from './paths';
+import { withBase, mediaUrl, backLinkHref, pagePath, menuCurrent, linkAttrs, isExternal } from './paths';
 
 const B = '/achates360-website';
 
@@ -73,5 +73,18 @@ describe('menuCurrent', () => {
     expect(menuCurrent({ href: '/' }, '/')).toBe('page');
     expect(menuCurrent({ href: '/#contact' }, '/')).toBeNull();
     expect(menuCurrent(projects, '/about')).toBeNull();
+  });
+});
+
+describe('linkAttrs', () => {
+  it('opens external http(s) links in a new tab without opener or referrer', () => {
+    expect(linkAttrs('https://www.instagram.com/achates360/')).toEqual({ target: '_blank', rel: 'noopener noreferrer' });
+    expect(linkAttrs('http://www.singaporebookpublishers.sg/index.php')).toEqual({ target: '_blank', rel: 'noopener noreferrer' });
+  });
+  it('leaves internal, anchor, mailto, tel and media links alone', () => {
+    for (const h of ['/', '/projects', '/#all-projects', '#top', 'mailto:a@b.c', 'tel:+65', '/cards/angeline.vcf']) {
+      expect(linkAttrs(h)).toEqual({});
+      expect(isExternal(h)).toBe(false);
+    }
   });
 });

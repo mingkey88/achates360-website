@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { renderMd } from '../lib/markdown';
-import { withBase, backLinkHref } from '../lib/paths';
+import { withBase, backLinkHref, linkAttrs } from '../lib/paths';
 import BgVideo from './BgVideo.astro';
 import Embed from './Embed.astro';
 import Gallery from './Gallery.astro';
@@ -16,11 +16,11 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
 {b.type === 'text' && <div class="block-text" style={b.color ? `color: ${b.color}` : undefined} set:html={renderMd(b.md)} />}
 {/* The only content link to the home page is Wix's "← BACK TO PROJECTS", whose data-anchor
     scrolls home to the All Projects section. */}
-{b.type === 'link' && <p class="block-link"><a href={withBase(backLinkHref(b.href))}>{b.label}</a></p>}
+{b.type === 'link' && <p class="block-link"><a href={withBase(backLinkHref(b.href))} {...linkAttrs(b.href)}>{b.label}</a></p>}
 {b.type === 'image' && (() => {
   // GIFs too: Astro's sharp service keeps every frame (animated WebP), sized to the slot.
   const img = <Image src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} />;
-  return b.href ? <a class="block-image" href={withBase(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
+  return b.href ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
 })()}
 {b.type === 'gallery' && <Gallery items={b.items} layout={gallery} />}
 {b.type === 'video' && (b.controls

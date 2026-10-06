@@ -7,6 +7,19 @@ export function withBase(path: string, base: string = import.meta.env.BASE_URL):
   return b + path;
 }
 
+/** An absolute http(s) link to another site. */
+export function isExternal(href: string): boolean {
+  return /^https?:\/\//i.test(href);
+}
+
+/**
+ * Attributes for a link: Wix opens every external http(s) link in a new tab (all 362 external
+ * links in the cached renders carry target="_blank"), so the clone does too.
+ */
+export function linkAttrs(href: string): { target?: '_blank'; rel?: string } {
+  return isExternal(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+}
+
 export function mediaUrl(path: string, base?: string): string {
   return withBase('/' + path.replace(/^\//, ''), base);
 }
