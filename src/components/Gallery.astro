@@ -24,7 +24,6 @@
  */
 import { Image } from 'astro:assets';
 import { withBase, mediaUrl } from '../lib/paths';
-import { isGif } from '../lib/images';
 interface Item { title: string; description: string; href?: string; thumb: ImageMetadata; alt: string; video?: string }
 interface Props { items: Item[]; layout?: 'stack' | 'grid'; columns?: number; showInfo?: boolean; description?: boolean; sizes?: string }
 const { items, layout = 'grid', columns = layout === 'stack' ? 1 : 3, showInfo = layout === 'grid', description = false, sizes } = Astro.props;
@@ -32,9 +31,9 @@ const external = (href: string) => /^https?:\/\//.test(href);
 ---
 <ul class:list={['gallery', `gallery-${layout}`]} style={`--cols:${columns}`}>
   {items.map((it) => {
-    const img = isGif(it.thumb)
-      ? <img src={it.thumb.src} width={it.thumb.width} height={it.thumb.height} alt={it.alt} loading="lazy" decoding="async" />
-      : layout === 'stack'
+    // GIF thumbs go through Astro's image pipeline too: its sharp service keeps every frame, so
+    // they ship as animated WebP at the tile's size instead of the full GIF.
+    const img = layout === 'stack'
         ? <Image src={it.thumb} alt={it.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 767px) 100vw, 940px" />
         : <Image src={it.thumb} alt={it.alt} widths={sizes ? [320, 640, 960, 1280] : [320, 640, 960]} sizes={sizes ?? `(max-width: 767px) 100vw, ${Math.round(940 / columns)}px`} />;
     const media = (
