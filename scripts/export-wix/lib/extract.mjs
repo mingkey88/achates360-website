@@ -150,9 +150,13 @@ export function extractPage(html, slug, sidecar = []) {
   }
 
   const pageBackground = $('body').attr('data-page-bg');
+  // The site icon(s) Wix links in <head> (favicon, apple-touch-icon): Wix media files.
+  const icons = $('head link[rel]').filter((_, l) => /icon/.test($(l).attr('rel')) && /wixstatic\.com\/media\//.test($(l).attr('href') ?? ''))
+    .map((_, l) => ({ rel: $(l).attr('rel'), file: mediaFileName($(l).attr('href')) })).get();
   return {
     slug,
     seo,
+    ...(icons.length ? { icons } : {}),
     ...(pageBackground ? { pageBackground } : {}),
     nodes: walk($('#PAGES_CONTAINER')),
     footer: walk($('#SITE_FOOTER')),

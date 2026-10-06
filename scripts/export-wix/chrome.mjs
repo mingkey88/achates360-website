@@ -21,7 +21,8 @@ import { openBrowser, pageUrl, settle } from './render.mjs';
 import { extractPage } from './lib/extract.mjs';
 import { toChrome, CHROME_KEYS } from './lib/chrome.mjs';
 import { setFrontmatterKeys } from './lib/write.mjs';
-import { localName } from './lib/urls.mjs';
+import { localName, originalImageUrl } from './lib/urls.mjs';
+import { runJobs } from './lib/media.mjs';
 
 export const CHROME_CACHE = '.cache/rendered/home.chrome.json';
 
@@ -145,8 +146,16 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     const file = join(root, 'src/assets', s.src.replace('../../assets/', ''));
     if (!(await exists(file))) console.log(`warning: social icon ${localName(s.src)} is not in src/assets/wix — run the export for media`);
   }
+  // The site icon is a Wix media file like any other: download it only when it is not already in
+  // src/assets/wix (so --cached runs stay offline once it is there).
+  for (const file of new Set((homeRaw.icons ?? []).map((i) => i.file))) {
+    const dest = `src/assets/wix/${localName(file)}`;
+    if (await exists(join(root, dest))) continue;
+    const res = await runJobs([{ kind: 'image', url: originalImageUrl(file), dest }], { root });
+    if (res.failed.length) console.log(`warning: site icon ${file}: ${res.failed[0].error}`);
+  }
   await setKeys(join(root, 'src/content/site/site.md'), site, CHROME_KEYS.site);
   await setKeys(join(root, 'src/content/home/home.md'), home, CHROME_KEYS.home);
   const n = (xs) => (xs ?? []).reduce((s, x) => s + 1 + (x.items?.length ?? 0), 0);
-  console.log(`site: menu ${n(site.menu)} links, mobileMenu ${n(site.mobileMenu)} links, menuSocial ${site.menuSocial?.length ?? 0}; home: mobileHeading ${home.mobileHeading ? JSON.stringify(home.mobileHeading) : '(none)'}`);
+  console.log(`site: menu ${n(site.menu)} links, mobileMenu ${n(site.mobileMenu)} links, menuSocial ${site.menuSocial?.length ?? 0}, favicon ${site.favicon?.src ?? '(none)'}; home: mobileHeading ${home.mobileHeading ? JSON.stringify(home.mobileHeading) : '(none)'}`);
 }

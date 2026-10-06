@@ -75,6 +75,12 @@ describe('toChrome', () => {
   it('turns the mobile-only text into the home mobileHeading', () => {
     expect(out.home).toEqual({ mobileHeading: '## Projects' });
   });
+  it('takes the site icon from the homepage <head> (one file for every size)', () => {
+    expect(homeRaw.icons?.length).toBeGreaterThan(0);
+    expect(new Set(homeRaw.icons.map((i) => i.rel))).toContain('apple-touch-icon');
+    expect(out.site.favicon).toEqual({ src: `../../assets/wix/${homeRaw.icons[0].file.replace('~mv2', '')}` });
+    expect(toChrome(capture, { homeRaw: { ...homeRaw, icons: undefined }, knownPaths }).site.favicon).toBeUndefined();
+  });
   it('links an unknown anchor to / and warns', () => {
     const r = toChrome({ ...capture, desktop: { popupHtml, anchors: {} } }, { homeRaw, knownPaths });
     expect(r.site.menu[2]).toEqual({ label: 'CONTACT', href: '/' });

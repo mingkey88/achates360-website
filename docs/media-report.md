@@ -1,12 +1,12 @@
 # Media report
 
-Total committed media: **892.4 MB** in 686 files.
+Total committed media: **892.4 MB** in 687 files.
 
 > No source file is over 95 MB. The source total is informational: the binding 800 MB / 95 MB check runs on the built dist/ in Task 15 (spec §5.5).
 
 | Type | Files | Size |
 |---|---|---|
-| .png | 85 | 373.8 MB |
+| .png | 86 | 373.9 MB |
 | .jpg | 533 | 297.3 MB |
 | .mp4 | 29 | 165.3 MB |
 | .gif | 27 | 36.4 MB |

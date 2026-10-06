@@ -135,6 +135,8 @@ const site = defineCollection({
     menu: z.array(navItem).optional(),
     mobileMenu: z.array(navItem).optional(),
     menuSocial: z.array(z.object({ src: image(), alt: z.string(), href: z.string() }).strict()).optional(),
+    // The site icon Wix links in <head> (one file for every size).
+    favicon: z.object({ src: image() }).strict().optional(),
   }).strict(),
 });
 

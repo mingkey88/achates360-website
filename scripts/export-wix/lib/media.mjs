@@ -20,6 +20,7 @@ export function collectMedia(raws, cards) {
   for (const r of raws) {
     visit(r.nodes); visit(r.footer); visit(r.chrome);
     if (r.seo.ogImage) images.add(r.seo.ogImage);
+    for (const i of r.icons ?? []) images.add(i.file);
     for (const [id, q] of r.videos) addVideo(id, q);
   }
   const jobs = [

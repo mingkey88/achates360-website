@@ -300,4 +300,6 @@ menuSocial:
   - src: ../../assets/wix/9c55dab76ec643c5a6fa4be643af2b90.png
     alt: Vimeo
     href: https://vimeo.com/user59372813
+favicon:
+  src: ../../assets/wix/e9d9c2_af9c7830a85c45c89115426014cde8a4.png
 ---

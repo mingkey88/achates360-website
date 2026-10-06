@@ -4,7 +4,7 @@ import { htmlToMarkdown } from './clean.mjs';
 import { homeTarget } from './map.mjs';
 
 /** The content keys the chrome capture owns, per content file (scripts/export-wix/chrome.mjs). */
-export const CHROME_KEYS = { site: ['menu', 'mobileMenu', 'menuSocial'], home: ['mobileHeading'] };
+export const CHROME_KEYS = { site: ['menu', 'mobileMenu', 'menuSocial', 'favicon'], home: ['mobileHeading'] };
 
 const pathOf = (href) => href.split('#')[0] || '/';
 
@@ -15,6 +15,8 @@ const pathOf = (href) => href.split('#')[0] || '/';
  * - site.mobileMenu: Wix's mobile menu, same shape (Wix lets an item be hidden on mobile, so the
  *   two lists can differ);
  * - site.menuSocial: the lightbox's social icons, [{ src, alt, href }];
+ * - site.favicon: { src } — the site icon Wix links in the homepage <head> (from homeRaw: Wix uses
+ *   one file for its favicon, apple-touch-icon and mask-icon sizes);
  * - home.mobileHeading: Markdown of the text Wix's mobile homepage adds (the "Projects" heading).
  * An internal link to a page the snapshot does not have (added on Wix after the export) is left
  * out with a warning, so the clone never links to a page it does not serve. `knownPaths`: every
@@ -64,8 +66,12 @@ export function toChrome(raw, { homeRaw, knownPaths }) {
   const mobileMd = (raw.mobile.mobileTexts ?? []).map((t) => htmlToMarkdown(t.html)).filter(Boolean);
   if (mobileMd.length > 1) warnings.push(`home: ${mobileMd.length} mobile-only texts; only the first is kept: ${mobileMd.slice(1).join(' / ')}`);
 
+  const iconFiles = [...new Set((homeRaw.icons ?? []).map((i) => i.file))];
+  if (iconFiles.length > 1) warnings.push(`site: ${iconFiles.length} different icon files on Wix; the first is used: ${iconFiles.join(', ')}`);
+  const favicon = iconFiles.length ? { src: imgRef(iconFiles[0]) } : undefined;
+
   return {
-    site: { menu, mobileMenu, menuSocial },
+    site: { menu, mobileMenu, menuSocial, ...(favicon ? { favicon } : {}) },
     home: mobileMd.length ? { mobileHeading: mobileMd[0] } : {},
     warnings,
   };

@@ -68,7 +68,7 @@ changes. The cache lives in `.cache/` and is local only.
 The site menus (Wix's desktop lightbox menu and its phone menu) and the "Projects" heading Wix adds
 to the phone homepage exist only once a visitor opens them, so `chrome.mjs` captures them from a
 live render of the homepage into `.cache/rendered/home.chrome.json` and writes only the `menu`,
-`mobileMenu`, `menuSocial` (site) and `mobileHeading` (home) keys. A live export that re-renders the homepage
+`mobileMenu`, `menuSocial`, `favicon` (site; the icon comes from the cached homepage render) and `mobileHeading` (home) keys. A live export that re-renders the homepage
 captures them too; menu links to pages missing from the snapshot are left out and logged.
 
 The export writes `docs/export-log.md` (anomalies) and `docs/media-report.md` (sizes); a `--only`
