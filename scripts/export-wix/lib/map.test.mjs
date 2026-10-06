@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { extractPage } from './extract.mjs';
-import { classify, mapPage, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, MappingError } from './map.mjs';
+import { classify, mapPage, mapHome, mapProjectsIndex, toProject, toCard, toHome, toProjectsIndex, toSite, toBlock, applyListing, MappingError } from './map.mjs';
 
 // Gallery item data Wix loaded over the network while rendering (written by render.mjs).
 const side = (s) => {
@@ -129,6 +129,20 @@ describe('toProjectsIndex', () => {
     expect(p.menu.every((m) => ids.has(m.target))).toBe(true);
     expect(new Set(p.menu.filter((m) => m.target.startsWith('cat-')).map((m) => m.target)).size).toBeGreaterThan(1);
   });
+  it('pins every /projects menu target (labels are the category headings verbatim)', () => {
+    expect(toProjectsIndex(projects).menu).toEqual([
+      { label: 'Strategic Branding', target: 'top' },
+      { label: 'Advertising & Promotions', target: 'cat-2' },
+      { label: 'Graphic Design', target: 'cat-3' },
+      { label: 'Content Creation', target: 'cat-4' },
+      { label: 'Social Media', target: 'cat-5' },
+      { label: 'Publications', target: 'cat-6' },
+      { label: 'Digital Communications', target: 'cat-7' },
+      { label: 'Packaging & Merchandise', target: 'cat-8' },
+      { label: 'Events', target: 'cat-9' },
+      { label: 'Footer', target: 'footer' },
+    ]);
+  });
 });
 
 describe('applyListing', () => {
@@ -161,5 +175,62 @@ describe('toBlock', () => {
       { title: 'B', description: '', href: '/b', file: '', alt: '', video: null }] });
     expect(b.items).toHaveLength(1);
     expect(b.items[0]).not.toHaveProperty('href');
+  });
+});
+
+describe('R13: mappers never discard content silently', () => {
+  const insertAt = (nodes, i, n) => [...nodes.slice(0, i), n, ...nodes.slice(i)];
+
+  it('maps all six fixtures with zero warnings', () => {
+    const all = { home, projects, about, angeline, notter, dbs };
+    for (const [name, r] of Object.entries(all)) expect(mapPage(r).warnings, name).toEqual([]);
+  });
+
+  it('a project with an extra embed above the back link falls back to basic, naming the node', () => {
+    const extra = { kind: 'embed', provider: 'youtube', id: 'EXTRA-EMBED', comp: null, section: dbs.nodes[0].section };
+    expect(() => toProject({ ...dbs, nodes: [extra, ...dbs.nodes] })).toThrow(MappingError);
+    const r = mapPage({ ...dbs, slug: 'dbs-extra', nodes: [extra, ...dbs.nodes] });
+    expect(r.collection).toBe('basic');
+    expect(r.warnings.join(' ')).toMatch(/dbs-extra: unmapped nodes: .*EXTRA-EMBED/);
+    expect(r.data.blocks.some((b) => b.type === 'embed' && b.id === 'EXTRA-EMBED')).toBe(true);
+  });
+
+  it('a card with an extra text falls back to basic with a warning naming it', () => {
+    const i = angeline.nodes.findIndex((n) => n.kind === 'text' && n.text === 'Managing Director');
+    const extra = { kind: 'text', html: '<p>Extra card line</p>', text: 'Extra card line', links: [], comp: null, section: angeline.nodes[i].section };
+    const r = mapPage({ ...angeline, nodes: insertAt(angeline.nodes, i, extra) });
+    expect(r.collection).toBe('basic');
+    expect(r.warnings.join(' ')).toMatch(/angeline: unmapped nodes: .*Extra card line/);
+  });
+
+  it('home with an extra link in a slide group warns but stays in home', () => {
+    const i = home.nodes.findIndex((n) => n.kind === 'link' && n.href === '/dxv');
+    const extra = { kind: 'link', href: '/extra', text: 'EXTRA LINK', comp: null, section: home.nodes[i].section };
+    const changed = { ...home, nodes: insertAt(home.nodes, i + 1, extra) };
+    const r = mapPage(changed);
+    expect(r.collection).toBe('home');
+    expect(r.warnings.join(' ')).toMatch(/EXTRA LINK/);
+    expect(r.data.slides).toHaveLength(6);
+    expect(mapHome(changed).data).toEqual(toHome(changed));
+  });
+
+  it('home warns when a menu target resolves to no section and falls back to top', () => {
+    const changed = { ...home, nodes: home.nodes.map((n) => (n.kind === 'anchorMenu'
+      ? { ...n, items: [...n.items, { label: 'Lost', target: 'comp-nowhere' }] } : n)) };
+    const { data, warnings } = mapHome(changed);
+    expect(data.menu.at(-1)).toEqual({ label: 'Lost', target: 'top' });
+    expect(warnings.join(' ')).toMatch(/Lost/);
+  });
+
+  it('/projects warns on a non-heading text and on a menu label matching no heading, and stays projectsIndex', () => {
+    const g = projects.nodes.findIndex((n) => n.kind === 'gallery');
+    const stray = { kind: 'text', html: '<p>Stray note</p>', text: 'Stray note', links: [], comp: null, section: projects.nodes[g].section };
+    const nodes = insertAt(projects.nodes, g + 1, stray).map((n) => (n.kind === 'anchorMenu'
+      ? { ...n, items: [...n.items, { label: 'Nope', target: projects.nodes[g].section }] } : n));
+    const r = mapPage({ ...projects, nodes });
+    expect(r.collection).toBe('projectsIndex');
+    expect(r.warnings.join(' ')).toMatch(/Stray note/);
+    expect(r.warnings.join(' ')).toMatch(/Nope/);
+    expect(mapProjectsIndex({ ...projects, nodes }).data.sections).toHaveLength(9);
   });
 });

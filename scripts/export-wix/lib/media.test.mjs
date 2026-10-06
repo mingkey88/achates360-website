@@ -22,6 +22,23 @@ describe('collectMedia', () => {
     expect(jobs.find((j) => j.videoId === 'vid2')).toMatchObject({ url: 'https://video.wixstatic.com/video/vid2/1080p/mp4/file.mp4', dest: 'public/media/video/vid2.mp4' });
     expect(jobs.find((j) => j.kind === 'vcf')).toMatchObject({ dest: 'public/cards/angeline.vcf' });
   });
+  it('keeps the highest quality when a video id is seen with several qualities', () => {
+    const r1 = { ...fakeRaw, nodes: [], footer: [], videos: new Map([['vidQ', '1080p']]) };
+    const r2 = { ...fakeRaw, nodes: [], footer: [], videos: new Map([['vidQ', '480p']]) };
+    for (const order of [[r1, r2], [r2, r1]]) {
+      const v = collectMedia(order, []).filter((j) => j.videoId === 'vidQ');
+      expect(v).toHaveLength(1);
+      expect(v[0].url).toBe('https://video.wixstatic.com/video/vidQ/1080p/mp4/file.mp4');
+    }
+  });
+  it('dedupes jobs by dest', () => {
+    const r = { ...fakeRaw, seo: { ogImage: null }, nodes: [{ kind: 'image', file: 'a~mv2.jpg' }, { kind: 'image', file: 'a.jpg' }], footer: [], videos: new Map() };
+    const jobs = collectMedia([r], [{ slug: 'abby', vcfUrl: 'u1' }, { slug: 'abby', vcfUrl: 'u1' }]);
+    const dests = jobs.map((j) => j.dest);
+    expect(dests).toEqual([...new Set(dests)]);
+    expect(dests.filter((d) => d === 'src/assets/wix/a.jpg')).toHaveLength(1);
+    expect(dests.filter((d) => d === 'public/cards/abby.vcf')).toHaveLength(1);
+  });
 });
 
 describe('runJobs', () => {
@@ -54,6 +71,39 @@ describe('runJobs', () => {
       { root, fetchImpl, sourceMedia: 'source-media', log: () => {} });
     expect(res.downloaded).toBe(1);
     expect(await readFile(join(root, 'public/media/video/vid9.mp4'), 'utf8')).toBe('ORIGINAL');
+  });
+
+  it('does not redo a source-media video whose output is newer than the source', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'source-media'), { recursive: true });
+    await writeFile(join(root, 'source-media/master vid9.mp4'), 'ORIGINAL');
+    const fetchImpl = async () => { throw new Error('should not fetch'); };
+    const job = { kind: 'video', videoId: 'vid9', url: 'u', dest: 'public/media/video/vid9.mp4' };
+    const opts = { root, fetchImpl, sourceMedia: 'source-media', log: () => {} };
+    expect(await runJobs([job], opts)).toMatchObject({ downloaded: 1, skipped: 0 });
+    expect(await runJobs([job], opts)).toMatchObject({ downloaded: 0, skipped: 1, failed: [] });
+  });
+
+  it('falls through to GET when HEAD throws', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
+    await writeFile(join(root, 'src/assets/wix/a.jpg'), 'abc');
+    const fetchImpl = async (url, opts = {}) => {
+      if (opts.method === 'HEAD') throw new Error('HEAD not allowed');
+      return new Response('hello', { status: 200 });
+    };
+    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.jpg', dest: 'src/assets/wix/a.jpg' }], { root, fetchImpl, log: () => {} });
+    expect(res).toMatchObject({ downloaded: 1, skipped: 0, failed: [] });
+    expect(await readFile(join(root, 'src/assets/wix/a.jpg'), 'utf8')).toBe('hello');
+  });
+
+  it('re-downloads an existing file when HEAD gives no content-length', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'a360-'));
+    await mkdir(join(root, 'src/assets/wix'), { recursive: true });
+    await writeFile(join(root, 'src/assets/wix/a.jpg'), 'abc');
+    const fetchImpl = async (url, opts = {}) => new Response(opts.method === 'HEAD' ? null : 'hello', { status: 200 });
+    const res = await runJobs([{ kind: 'image', url: 'https://x/a~mv2.jpg', dest: 'src/assets/wix/a.jpg' }], { root, fetchImpl, log: () => {} });
+    expect(res).toMatchObject({ downloaded: 1, skipped: 0 });
   });
 
   it('records failures without throwing', async () => {

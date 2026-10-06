@@ -44,6 +44,23 @@ export function toBlock(n) {
 
 const blocksOf = (nodes) => nodes.map(toBlock).filter(Boolean);
 
+// Controller ruling R13: mappers never discard content silently. A text whose Markdown is empty
+// is a spacer, not content; every other node a mapper does not place is reported.
+const isSpacer = (n) => n.kind === 'text' && !htmlToMarkdown(n.html);
+const notBlockable = (nodes) => nodes.filter((n) => toBlock(n) === null && !isSpacer(n));
+function describeNode(n) {
+  const what = n.kind === 'text' ? JSON.stringify(n.text.slice(0, 40))
+    : n.kind === 'link' ? `${JSON.stringify(n.text)} -> ${n.href}`
+    : n.kind === 'image' ? n.file
+    : n.kind === 'bgvideo' ? n.videoId
+    : n.kind === 'embed' ? `${n.provider}:${n.id}`
+    : n.kind === 'gallery' ? `${n.items.length} items`
+    : '';
+  return what ? `${n.kind} ${what}` : n.kind;
+}
+const describeNodes = (nodes) => nodes.map(describeNode).join(', ');
+const unmapped = (slug, nodes) => `${slug}: unmapped nodes: ${describeNodes(nodes)}`;
+
 export function classify(raw) {
   if (raw.slug === 'home') return 'home';
   if (raw.slug === 'projects') return 'projectsIndex';
@@ -67,6 +84,9 @@ export function toProject(raw) {
   const copyI = after.findIndex((n) => n.kind === 'text' && COPYRIGHT.test(n.text));
 
   const rest = after.filter((_, i) => i !== titleI && i !== clientI && i !== copyI);
+  // Above the back link only the hero and badge images have a place in the record.
+  const unused = [...before.filter((n) => n !== heroNode && n.kind !== 'image' && !isSpacer(n)), ...notBlockable(rest)];
+  if (unused.length) throw new MappingError(unmapped(raw.slug, unused));
   const hero = !heroNode ? undefined
     : heroNode.kind === 'bgvideo'
       ? { type: 'video', src: videoRef(heroNode.videoId), poster: imgRef(heroNode.poster) }
@@ -94,16 +114,22 @@ export function toCard(raw) {
     if (n.kind === 'link') links.push({ label: n.text, href: n.href });
     if (n.kind === 'text') for (const l of n.links) links.push({ label: l.text, href: l.href });
   }
-  const textLink = (prefix) => {
-    const t = texts.find((n) => n.links.some((l) => l.href.startsWith(prefix)));
-    return t && { display: t.text, href: t.links.find((l) => l.href.startsWith(prefix)).href };
-  };
-  const phone = textLink('tel:');
-  const email = textLink('mailto:');
+  const textWithLink = (prefix) => texts.find((n) => n.links.some((l) => l.href.startsWith(prefix)));
+  const textLink = (t, prefix) => t && { display: t.text, href: t.links.find((l) => l.href.startsWith(prefix)).href };
+  const phoneNode = textWithLink('tel:');
+  const emailNode = textWithLink('mailto:');
+  const phone = textLink(phoneNode, 'tel:');
+  const email = textLink(emailNode, 'mailto:');
   const vcf = links.find((l) => l.href.includes('.vcf'));
   if (!phone || !email || !vcf || images.length < 2 || texts.length < 3) {
     throw new MappingError(`${raw.slug}: not a business card layout`);
   }
+  // A text made only of its links is carried verbatim by `links`.
+  const squash = (t) => t.replace(/[\s\u200b]/g, '');
+  const linkOnly = (n) => n.kind === 'text' && n.links.length > 0 && squash(n.text) === squash(n.links.map((l) => l.text).join(''));
+  const used = new Set([texts[0], texts[1], texts.at(-1), phoneNode, emailNode, images[0], images.at(-1)]);
+  const unused = raw.nodes.filter((n) => !used.has(n) && n.kind !== 'link' && !linkOnly(n) && !isSpacer(n));
+  if (unused.length) throw new MappingError(unmapped(raw.slug, unused));
   return {
     name: texts[0].text,
     blurb: texts[1].text,
@@ -120,6 +146,11 @@ export function toCard(raw) {
 
 export const toBasic = (raw) => ({ seo: seoOf(raw), blocks: blocksOf(raw.nodes) });
 
+export function mapBasic(raw) {
+  const lost = notBlockable(raw.nodes);
+  return { data: toBasic(raw), warnings: lost.length ? [unmapped(raw.slug, lost)] : [] };
+}
+
 function groupBySection(nodes) {
   const groups = [];
   for (const n of nodes) {
@@ -130,21 +161,28 @@ function groupBySection(nodes) {
   return groups;
 }
 
-function resolveTargets(menu, sectionOrder, keyBySection) {
-  return menu.items.map((m) => {
-    if (m.target === 'top' || m.target === 'footer') return m;
-    const start = sectionOrder.indexOf(m.target);
-    const hit = start < 0 ? undefined : sectionOrder.slice(start).find((s) => keyBySection.has(s));
-    return { label: m.label, target: hit ? keyBySection.get(hit) : 'top' };
-  });
+function resolveTarget(m, sectionOrder, keyBySection, warn) {
+  if (m.target === 'top' || m.target === 'footer') return { label: m.label, target: m.target };
+  const start = sectionOrder.indexOf(m.target);
+  const hit = start < 0 ? undefined : sectionOrder.slice(start).find((s) => keyBySection.has(s));
+  if (!hit) warn(`menu item ${JSON.stringify(m.label)} -> ${m.target} matches no mapped section; sent to top`);
+  return { label: m.label, target: hit ? keyBySection.get(hit) : 'top' };
 }
 
 // Placeholder is kept only when the field has one; a nameless field keeps name '' (named later).
 const formField = ({ name, type, label, required, placeholder }) =>
   ({ name, type, label, required, ...(placeholder ? { placeholder } : {}) });
 
-export function toHome(raw) {
-  const menuNode = raw.nodes.find((n) => n.kind === 'anchorMenu');
+export function mapHome(raw) {
+  const warnings = [];
+  const warn = (msg) => warnings.push(`${raw.slug}: ${msg}`);
+  const menus = raw.nodes.filter((n) => n.kind === 'anchorMenu');
+  const menuNode = menus[0];
+  if (menus.length > 1) warn(`extra anchor menus ignored: ${menus.slice(1).map((m) => m.items.map((i) => i.label).join('/')).join('; ')}`);
+  const unusedIn = (g, used) => {
+    const lost = g.nodes.filter((n) => !used.includes(n) && n.kind !== 'text' && !isSpacer(n));
+    if (lost.length) warn(`unmapped nodes in section ${g.section}: ${describeNodes(lost)}`);
+  };
   const groups = groupBySection(raw.nodes.filter((n) => n.kind !== 'anchorMenu'));
   const sectionOrder = groups.map((g) => g.section);
   const keyBySection = new Map();
@@ -161,12 +199,15 @@ export function toHome(raw) {
     const gallery = g.nodes.find((n) => n.kind === 'gallery');
     const textsMd = [...pending, ...g.nodes.filter((n) => n.kind === 'text').map((n) => htmlToMarkdown(n.html)).filter(Boolean)];
     const onlyImages = g.nodes.every((n) => n.kind === 'image');
+    const texts = g.nodes.filter((n) => n.kind === 'text');
     if (form) {
+      unusedIn(g, [form]);
       // Rich text inside the <form> (e.g. the "Thanks for submitting!" success message) follows the section texts.
       const formMd = (form.texts ?? []).map((t) => htmlToMarkdown(t.html)).filter(Boolean);
       contact = { md: [...textsMd, ...formMd], form: { fields: form.fields.map(formField), groups: form.groups, submitLabel: form.submitLabel } };
       keyBySection.set(g.section, 'contact');
     } else if (gallery) {
+      unusedIn(g, [gallery]);
       allProjects = { md: textsMd.join('\n\n'), items: galleryItems(gallery.items) };
       keyBySection.set(g.section, 'all-projects');
     } else if (onlyImages && slides.length && pending.length === 0) {
@@ -174,9 +215,10 @@ export function toHome(raw) {
       continue;
     } else {
       const mediaNode = g.nodes.find((n) => n.kind === 'bgvideo') ?? g.nodes.find((n) => n.kind === 'image');
-      if (!mediaNode) { pending = textsMd; continue; }
+      if (!mediaNode) { unusedIn(g, texts); pending = textsMd; continue; }
       const id = `slide-${slides.length + 1}`;
       const cta = g.nodes.find((n) => n.kind === 'link');
+      unusedIn(g, [mediaNode, cta, ...g.nodes.filter((n) => n.kind === 'image')]);
       slides.push({
         id,
         media: mediaNode.kind === 'bgvideo'
@@ -190,47 +232,63 @@ export function toHome(raw) {
     }
     pending = [];
   }
-  if (pending.length) throw new MappingError(`home: trailing text with no section to attach to: ${pending.join(' / ')}`);
+  if (pending.length) warn(`trailing text with no section to attach to: ${pending.join(' / ')}`);
   if (!allProjects || !contact) throw new MappingError('home: missing gallery or form');
-  return {
+  const data = {
     seo: seoOf(raw),
-    menu: menuNode ? resolveTargets(menuNode, sectionOrder, keyBySection) : [],
+    menu: menuNode ? menuNode.items.map((m) => resolveTarget(m, sectionOrder, keyBySection, warn)) : [],
     slides,
     allProjects,
     contact,
   };
+  return { data, warnings };
 }
 
-export function toProjectsIndex(raw) {
+export const toHome = (raw) => mapHome(raw).data;
+
+export function mapProjectsIndex(raw) {
+  const warnings = [];
+  const warn = (msg) => warnings.push(`${raw.slug}: ${msg}`);
   const sections = [];
   let heading = '';
+  let headingNode = null; // a heading text not yet paired with a gallery
+  const lost = [];
   const keyByComp = new Map();
+  const menus = raw.nodes.filter((n) => n.kind === 'anchorMenu');
   for (const n of raw.nodes) {
-    if (n.kind === 'text') heading = n.text;
-    if (n.kind === 'gallery') {
+    if (n.kind === 'text') {
+      if (isSpacer(n)) continue;
+      if (headingNode) lost.push(headingNode);
+      heading = n.text;
+      headingNode = n;
+    } else if (n.kind === 'gallery') {
       const id = `cat-${sections.length + 1}`;
       sections.push({ id, heading, items: galleryItems(n.items) });
+      headingNode = null;
       if (!keyByComp.has(n.section)) keyByComp.set(n.section, id); // first category in a shared section
+    } else if (n.kind !== 'anchorMenu' || n !== menus[0]) {
+      lost.push(n);
     }
   }
-  const menuNode = raw.nodes.find((n) => n.kind === 'anchorMenu');
+  if (headingNode) lost.push(headingNode);
+  if (lost.length) warn(`unmapped nodes: ${describeNodes(lost)}`);
+  const menuNode = menus[0];
   const sectionOrder = [...new Set(raw.nodes.map((n) => n.section))];
   // On /projects every category sits in one Wix section and the menu's anchors sit in an outer
   // section, so section ids cannot tell the categories apart. Each menu label is the category
   // heading verbatim, so an exact label match picks the category; 'top'/'footer' stay as on the
   // live page, and anything unmatched falls back to the section walk.
   const byHeading = new Map(sections.map((s) => [s.heading, s.id]));
-  const menu = menuNode ? resolveTargets(menuNode, sectionOrder, keyByComp).map((m, i) => {
-    const orig = menuNode.items[i].target;
-    if (orig === 'top' || orig === 'footer' || !byHeading.has(m.label)) return m;
-    return { label: m.label, target: byHeading.get(m.label) };
+  const menu = menuNode ? menuNode.items.map((m) => {
+    if (m.target === 'top' || m.target === 'footer') return { label: m.label, target: m.target };
+    if (byHeading.has(m.label)) return { label: m.label, target: byHeading.get(m.label) };
+    warn(`menu label ${JSON.stringify(m.label)} matches no category heading`);
+    return resolveTarget(m, sectionOrder, keyByComp, warn);
   }) : [];
-  return {
-    seo: seoOf(raw),
-    menu,
-    sections,
-  };
+  return { data: { seo: seoOf(raw), menu, sections }, warnings };
 }
+
+export const toProjectsIndex = (raw) => mapProjectsIndex(raw).data;
 
 export function toSite(raw) {
   const logo = raw.chrome.find((n) => n.kind === 'image' && /logo/i.test(n.alt)) ?? raw.chrome.find((n) => n.kind === 'image');
@@ -241,16 +299,19 @@ export function toSite(raw) {
   };
 }
 
-const MAPPERS = { project: ['projects', toProject], card: ['cards', toCard], basic: ['basic', toBasic],
-  home: ['home', toHome], projectsIndex: ['projectsIndex', toProjectsIndex] };
+const strict = (fn) => (raw) => ({ data: fn(raw), warnings: [] });
+const MAPPERS = { project: ['projects', strict(toProject)], card: ['cards', strict(toCard)], basic: ['basic', mapBasic],
+  home: ['home', mapHome], projectsIndex: ['projectsIndex', mapProjectsIndex] };
 
 export function mapPage(raw) {
   const [collection, fn] = MAPPERS[classify(raw)];
   try {
-    return { collection, id: raw.slug, data: fn(raw), warnings: [] };
+    const { data, warnings } = fn(raw);
+    return { collection, id: raw.slug, data, warnings };
   } catch (e) {
     if (!(e instanceof MappingError)) throw e;
-    return { collection: 'basic', id: raw.slug, data: toBasic(raw), warnings: [`${e.message} — fell back to basic page`] };
+    const basic = mapBasic(raw);
+    return { collection: 'basic', id: raw.slug, data: basic.data, warnings: [`${e.message} — fell back to basic page`, ...basic.warnings] };
   }
 }
 

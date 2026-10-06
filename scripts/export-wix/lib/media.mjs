@@ -1,11 +1,13 @@
 import { mkdir, stat, writeFile, copyFile, readdir, readFile } from 'node:fs/promises';
 import { join, dirname, extname } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { originalImageUrl, localName, videoFileUrl } from './urls.mjs';
+import { originalImageUrl, localName, videoFileUrl, bestQuality } from './urls.mjs';
 
 export function collectMedia(raws, cards) {
   const images = new Set();
   const videos = new Map();
+  // A video seen at several qualities (on different pages) is fetched once, at the highest.
+  const addVideo = (id, q) => videos.set(id, videos.has(id) ? bestQuality([{ quality: videos.get(id) }, { quality: q }]) : q);
   const visit = (nodes) => {
     for (const n of nodes) {
       if (n.kind === 'image') images.add(n.file);
@@ -16,17 +18,25 @@ export function collectMedia(raws, cards) {
   for (const r of raws) {
     visit(r.nodes); visit(r.footer); visit(r.chrome);
     if (r.seo.ogImage) images.add(r.seo.ogImage);
-    for (const [id, q] of r.videos) videos.set(id, q);
+    for (const [id, q] of r.videos) addVideo(id, q);
   }
-  return [
+  const jobs = [
     ...[...images].map((f) => ({ kind: 'image', url: originalImageUrl(f), dest: `src/assets/wix/${localName(f)}` })),
     ...[...videos].map(([id, q]) => ({ kind: 'video', videoId: id, url: videoFileUrl(id, q), dest: `public/media/video/${id}.mp4` })),
     ...cards.map((c) => ({ kind: 'vcf', url: c.vcfUrl, dest: `public/cards/${c.slug}.vcf` })),
   ];
+  // One job per destination (e.g. `a~mv2.jpg` and `a.jpg` both land at src/assets/wix/a.jpg); first wins.
+  const byDest = new Map();
+  for (const j of jobs) if (!byDest.has(j.dest)) byDest.set(j.dest, j);
+  return [...byDest.values()];
 }
 
 async function size(path) {
   try { return (await stat(path)).size; } catch { return -1; }
+}
+
+async function mtime(path) {
+  try { return (await stat(path)).mtimeMs; } catch { return -1; }
 }
 
 async function findSource(root, sourceMedia, videoId) {
@@ -53,6 +63,8 @@ export async function runJobs(jobs, { root = process.cwd(), fetchImpl = fetch, s
     if (job.kind === 'video') {
       const src = await findSource(root, sourceMedia, job.videoId);
       if (src) {
+        const [srcTime, destTime] = await Promise.all([mtime(src), mtime(dest)]);
+        if (destTime >= srcTime) { result.skipped++; return; } // output already made from this original
         if (extname(src).toLowerCase() === '.mp4') await copyFile(src, dest);
         else if (hasFfmpeg()) {
           execFileSync('ffmpeg', ['-y', '-i', src, '-c:v', 'libx264', '-crf', '20', '-preset', 'slow',
@@ -66,9 +78,11 @@ export async function runJobs(jobs, { root = process.cwd(), fetchImpl = fetch, s
 
     const existing = await size(dest);
     if (existing > 0) {
-      const head = await fetchImpl(job.url, { method: 'HEAD' });
-      const len = Number(head.headers.get('content-length'));
-      if (head.ok && (!len || len === existing)) { result.skipped++; return; }
+      // Skip only on a positive size match; a HEAD that fails or gives no length means re-download.
+      let head = null;
+      try { head = await fetchImpl(job.url, { method: 'HEAD' }); } catch { /* fall through to GET */ }
+      const len = Number(head?.headers.get('content-length'));
+      if (head?.ok && len > 0 && len === existing) { result.skipped++; return; }
     }
     const res = await fetchImpl(job.url);
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${job.url}`);
