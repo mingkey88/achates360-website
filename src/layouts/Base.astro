@@ -3,8 +3,12 @@ import { getEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { SITE_ENV } from 'astro:env/server';
 import { robotsMeta } from '../lib/seo';
+import { pagePath } from '../lib/paths';
 import Logo from '../components/Logo.astro';
 import Footer from '../components/Footer.astro';
+import SiteMenu from '../components/SiteMenu.astro';
+import MobileMenu from '../components/MobileMenu.astro';
+import BackToTop from '../components/BackToTop.astro';
 import '../styles/tokens.css';
 import '../styles/base.css';
 
@@ -17,6 +21,7 @@ const robots = robotsMeta(SITE_ENV);
 const og = ogImage ? new URL((await getImage({ src: ogImage, width: 1200, format: 'jpg' })).src, Astro.site).href : undefined;
 // build.format 'file' reports /x.html and /index.html; the live URLs are /x and /.
 const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), Astro.site).href;
+const path = pagePath(Astro.url.pathname);
 ---
 <!doctype html>
 <html lang="en">
@@ -35,7 +40,10 @@ const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), A
   </head>
   <body class={bodyClass} style={background ? `background: ${background}` : undefined}>
     <Logo logo={site.logo} />
+    {site.menu && <SiteMenu menu={site.menu} social={site.menuSocial} path={path} />}
+    {site.mobileMenu && <MobileMenu menu={site.mobileMenu} path={path} />}
     <main id="top"><slot /></main>
     <Footer blocks={site.footer} />
+    <BackToTop />
   </body>
 </html>

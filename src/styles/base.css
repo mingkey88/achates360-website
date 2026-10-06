@@ -16,6 +16,8 @@ p { margin: 0 0 1em; }
 a { color: var(--color-link); }
 img, video { display: block; max-width: 100%; height: auto; }
 .wrap { width: min(var(--page-max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+/* An open menu (modal dialog) holds the page still behind it. */
+html:has(dialog[open]) { overflow: hidden; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 767px) {
   body { font-size: var(--size-body-m); line-height: var(--leading-body-m); }

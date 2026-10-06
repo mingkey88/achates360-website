@@ -21,7 +21,8 @@
  * Mobile (Wix's 320px layout, lengths x --m): the slides are short stills (each video's poster
  *   frame, no video), heights 227/265/200/222/200/247 under the 90px header band, no reveal;
  *   VIEW PROJECT 160x42 at x=80; badges 56px at the top right; the dot menu is hidden. The gallery
- *   is one 280px column at x=20 (32.5px apart) starting 125px into its section, with
+ *   is one 280px column at x=20 (32.5px apart) starting 125px into its section, under a mobile-only
+ *   "Projects" heading (50px in; exported as mobileHeading by scripts/export-wix/chrome.mjs), with
  *   "All Projects" (32px, centred) 41px below it.
  */
 import { getEntry } from 'astro:content';
@@ -33,6 +34,8 @@ import Gallery from '../components/Gallery.astro';
 import ContactForm from '../components/ContactForm.astro';
 import { renderMd } from '../lib/markdown';
 import { withBase } from '../lib/paths';
+// Avenir Heavy stand-in for the mobile "Projects" heading (as on the business cards).
+import '@fontsource/nunito-sans/800.css';
 const d = (await getEntry('home', 'home'))!.data;
 
 // Per-slide geometry measured on the live site (not content): desktop offsets from the slide top
@@ -89,6 +92,7 @@ const vars = (o: Record<string, number | undefined>) =>
     );
   })}
   <section id="all-projects" class="all-projects">
+    {d.mobileHeading && <div class="ap-mheading" set:html={renderMd(d.mobileHeading)} />}
     <div class="ap-heading" set:html={renderMd(d.allProjects.md)} />
     <div class="ap-gallery">
       <Gallery items={d.allProjects.items} layout="grid" columns={3} description sizes="(max-width: 767px) 88vw, 587px" />
@@ -144,6 +148,7 @@ const vars = (o: Record<string, number | undefined>) =>
   .ap-heading :global(a) { color: var(--color-heading); text-decoration: none; }
   .ap-gallery { position: relative; width: 1840px; margin-left: calc(50% - 928px); --gallery-gap: 40px; }
   .ap-gallery :global(.gallery-grid) { row-gap: 39.6px; }
+  .ap-mheading { display: none; }
 
   @media (max-width: 767px) {
     :global(body.home .anchor-menu.dots) { display: none; }
@@ -164,6 +169,13 @@ const vars = (o: Record<string, number | undefined>) =>
     .all-projects { display: flex; flex-direction: column; padding: calc(125 * var(--m)) 0 calc(66 * var(--m)); }
     .ap-gallery { order: 1; width: calc(280 * var(--m)); margin: 0 0 0 calc(20 * var(--m)); --gallery-gap: calc(32.5 * var(--m)); }
     .ap-gallery :global(.gallery-grid) { gap: calc(32.5 * var(--m)); }
+    /* Wix's mobile-only "Projects" heading: (8, 50) in the section, 304 wide, centred, Avenir Heavy
+       20px with 0.2em tracking, #2f2e2e. */
+    .ap-mheading { display: block; position: absolute; top: calc(50 * var(--m)); left: calc(8 * var(--m)); width: calc(304 * var(--m)); text-align: center; }
+    .ap-mheading :global(h2) {
+      margin: 0; color: var(--color-heading); letter-spacing: 0.2em;
+      font: 800 calc(20 * var(--m)) / calc(25 * var(--m)) var(--font-ui);
+    }
     .ap-heading { order: 2; position: static; margin: calc(41 * var(--m)) calc(20 * var(--m)) 0; text-align: center; }
     .ap-heading :global(h2) { font-size: calc(32 * var(--m)); }
   }

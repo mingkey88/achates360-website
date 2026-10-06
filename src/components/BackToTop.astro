@@ -1,0 +1,55 @@
+---
+/*
+ * Mobile back-to-top button, as observed on the live site (Playwright, iPhone 13; Wix's 320px
+ * layout, lengths x --m): fixed 20px from the right and 87px from the bottom, 44x44, Wix's icon
+ * (white disc, #6d8ff1 ring, #566fb8 chevron). It fades in (0.5s) while the visitor scrolls once
+ * the page is more than ~650px down, stays while scrolling (up or down), and fades out about
+ * 1.5s after scrolling stops. A tap scrolls to the top. Wix shows no such button on desktop.
+ * Kept visible while it has keyboard focus or the pointer is over it.
+ */
+---
+<button class="back-to-top" type="button" aria-label="Back to top">
+  <svg viewBox="20 20 160 160" aria-hidden="true">
+    <path fill="#fff" d="M180 100c0 44.183-35.817 80-80 80s-80-35.817-80-80 35.817-80 80-80 80 35.817 80 80z" />
+    <path fill="#566fb8" d="M72.087 116.163a7.23 7.23 0 0 1-10.265-.642c-2.66-3.036-2.374-7.67.637-10.351l32.939-29.333a7.228 7.228 0 0 1 9.663.031l32.515 29.333c2.994 2.7 3.25 7.337.571 10.355a7.23 7.23 0 0 1-10.269.576l-27.697-24.987-28.094 25.018z" />
+    <path fill="#6d8ff1" d="M100 24c-41.974 0-76 34.026-76 76s34.026 76 76 76 76-34.026 76-76-34.026-76-76-76zm0-4c44.183 0 80 35.817 80 80s-35.817 80-80 80-80-35.817-80-80 35.817-80 80-80z" />
+  </svg>
+</button>
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.back-to-top');
+  const mobile = window.matchMedia('(max-width: 767px)');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (btn) {
+    let timer: number | undefined;
+    const hide = () => {
+      if (btn.matches(':focus-visible, :hover')) { timer = window.setTimeout(hide, 1500); return; }
+      btn.classList.remove('shown');
+    };
+    window.addEventListener('scroll', () => {
+      if (!mobile.matches) return;
+      // Wix's threshold, ~650px of its 320px layout, scaled to this screen.
+      if (!btn.classList.contains('shown') && window.scrollY < 650 * window.innerWidth / 320) return;
+      btn.classList.add('shown');
+      window.clearTimeout(timer);
+      timer = window.setTimeout(hide, 1500);
+    }, { passive: true });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: reduce.matches ? 'auto' : 'smooth' });
+      // Keyboard users continue from the top of the page.
+      document.querySelector<HTMLElement>('.site-header a')?.focus({ preventScroll: true });
+    });
+  }
+</script>
+<style>
+  .back-to-top { display: none; }
+  @media (max-width: 767px) {
+    .back-to-top {
+      display: block; position: fixed; right: calc(20 * var(--m)); bottom: calc(87 * var(--m)); z-index: 40;
+      width: calc(44 * var(--m)); height: calc(44 * var(--m)); padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer;
+      opacity: 0; visibility: hidden; transition: visibility 0s 0.5s, opacity 0.5s;
+    }
+    .back-to-top.shown { opacity: 1; visibility: visible; transition-delay: 0s; }
+    .back-to-top svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .back-to-top:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 2px; }
+  }
+</style>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { withBase, mediaUrl, backLinkHref } from './paths';
+import { withBase, mediaUrl, backLinkHref, pagePath, menuCurrent } from './paths';
 
 const B = '/achates360-website';
 
@@ -46,5 +46,32 @@ describe('backLinkHref', () => {
   it('leaves other targets alone', () => {
     expect(backLinkHref('/projects')).toBe('/projects');
     expect(backLinkHref('https://example.com')).toBe('https://example.com');
+  });
+});
+
+describe('pagePath', () => {
+  it('strips the base and the .html of build.format file', () => {
+    expect(pagePath('/achates360-website/notter.html', B)).toBe('/notter');
+    expect(pagePath('/achates360-website/index.html', B)).toBe('/');
+    expect(pagePath('/achates360-website', B)).toBe('/');
+  });
+  it('works without a base and in dev (no .html)', () => {
+    expect(pagePath('/notter', '/')).toBe('/notter');
+    expect(pagePath('/', '/')).toBe('/');
+    expect(pagePath('/achates360-website/notter', B)).toBe('/notter');
+  });
+  it('does not strip a base that is only a prefix of the first segment', () => {
+    expect(pagePath('/achates360-website-x/notter', B)).toBe('/achates360-website-x/notter');
+  });
+});
+
+describe('menuCurrent', () => {
+  const projects = { href: '/projects', items: [{ href: '/notter' }] };
+  it('marks the page itself and the parent of a sub-menu page', () => {
+    expect(menuCurrent(projects, '/projects')).toBe('page');
+    expect(menuCurrent(projects, '/notter')).toBe('parent');
+    expect(menuCurrent({ href: '/' }, '/')).toBe('page');
+    expect(menuCurrent({ href: '/#contact' }, '/')).toBeNull();
+    expect(menuCurrent(projects, '/about')).toBeNull();
   });
 });

@@ -19,3 +19,20 @@ export const HOME_PROJECTS_ANCHOR = '#all-projects';
 export function backLinkHref(href: string): string {
   return href === '/' ? '/' + HOME_PROJECTS_ANCHOR : href;
 }
+
+/**
+ * The live-site path of the page being built ("/" or "/slug") from Astro.url.pathname, which
+ * carries the base and, with build.format 'file', a ".html" ending.
+ */
+export function pagePath(pathname: string, base: string = import.meta.env.BASE_URL): string {
+  const b = base.replace(/\/$/, '');
+  let p = pathname.replace(/(\/index)?\.html$/, '');
+  if (b && (p === b || p.startsWith(b + '/'))) p = p.slice(b.length);
+  return p.replace(/\/$/, '') || '/';
+}
+
+/** Whether a menu link is the current page ('page') or holds it in its sub-menu ('parent'). */
+export function menuCurrent(item: { href: string; items?: { href: string }[] }, path: string): 'page' | 'parent' | null {
+  if (item.href === path) return 'page';
+  return item.items?.some((i) => i.href === path) ? 'parent' : null;
+}

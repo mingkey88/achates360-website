@@ -86,7 +86,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   console.log(`dist size: ${(total / MB).toFixed(1)} MB (limit ${LIMITS.totalMax / MB} MB)`);
   missing.forEach((p) => console.error(`MISSING  ${p}`));
   broken.forEach((l) => console.error(`BROKEN   ${l.file} -> ${l.href}`));
-  knownHits.forEach((l) => console.log(`KNOWN    ${l.file} -> ${l.href} (${l.reason})`));
+  // The site menus link the known-missing pages from every page: one line per target.
+  for (const [href, hits] of Object.entries(Object.groupBy(knownHits, (l) => l.href))) {
+    console.log(`KNOWN    ${href} (${hits[0].reason}) — linked from ${new Set(hits.map((l) => l.file)).size} page(s)`);
+  }
   tooBig.forEach((f) => console.error(`TOO BIG  ${f} (>${LIMITS.fileMax / MB} MB)`));
   if (overTotal) console.error(`TOO BIG  dist/ total ${(total / MB).toFixed(1)} MB (>${LIMITS.totalMax / MB} MB)`);
   process.exit(missing.length || broken.length || tooBig.length || overTotal ? 1 : 0);
