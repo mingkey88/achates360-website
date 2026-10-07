@@ -12,7 +12,8 @@ import { loadExtras } from '../lib/extras';
 import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
-// The six homepage slides as sticky stacking cards (spec §4.1); motion adds the scale-back.
+// The six homepage slides (spec §4.1). Without motion they are sticky stacking cards; stack.ts
+// turns them into one pinned deck whose waiting cards peek out below the front one.
 interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString }
 const { items, eyebrow } = Astro.props;
 const { text } = await loadExtras();
@@ -59,11 +60,16 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
 </section>
 <style>
   .stack { list-style: none; padding: 0; margin-top: var(--s-5); display: grid; gap: var(--s-6); }
+  .stack { --card-h: min(76svh, 760px); }
   .stack-card {
     position: sticky; top: calc(var(--header-h) + var(--s-3) + var(--i) * 10px);
-    height: min(76svh, 760px); border-radius: var(--r-block); overflow: hidden; color: var(--white);
-    transform-origin: 50% 0;
+    height: var(--card-h); border-radius: var(--r-block); overflow: hidden; color: var(--white);
   }
+  /* Pinned deck (stack.ts): every card in one place; the waiting ones peek out 18px each below. */
+  .stack.is-stacked { display: block; position: relative; height: calc(var(--card-h) + 3 * 18px); perspective: 1800px; }
+  .stack.is-stacked .stack-card { position: absolute; inset: 0 0 auto; will-change: transform; }
+  /* A waiting card's pause button would peek out of its strip; it returns when the card comes forward. */
+  .stack.is-stacked [data-bgvideo-hold] :global(.bv-toggle) { visibility: hidden; }
   .sc-media { position: absolute; inset: 0; background: var(--teal-ink); }
   .sc-media :global(:is(.sc-video, .sc-still, .sc-image)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .sc-pic { display: contents; }
@@ -80,5 +86,5 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
     .sc-media :global(.sc-still) { display: none; }
     .sc-text { padding: var(--s-8); }
   }
-  @media (max-width: 767px) { .sc-media :global(.sc-video) { display: none; } .stack-card { height: min(64svh, 520px); } }
+  @media (max-width: 767px) { .sc-media :global(.sc-video) { display: none; } .stack { --card-h: min(64svh, 520px); } }
 </style>
