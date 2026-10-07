@@ -1,0 +1,11 @@
+---
+// The Achates360 logo (figures + "achates 360"), outlined from brand/logo/Achates360_LogoRGB.pdf.
+// Fills with currentColor so it follows the surrounding text colour. With a label it is the
+// image's accessible name; without one it is decorative.
+import svg from '../../assets/logo-horizontal.svg?raw';
+interface Props { label?: string; class?: string }
+const { label, class: cls } = Astro.props;
+const a11y = label ? `role="img" aria-label="${label.replace(/"/g, '&quot;')}"` : 'aria-hidden="true" focusable="false"';
+const html = svg.replace('<svg ', `<svg class="logo${cls ? ` ${cls}` : ''}" ${a11y} `);
+---
+<Fragment set:html={html} />

@@ -6,7 +6,8 @@ served by the site. Copy what a page needs into `public/` or `src/assets/`.
 - `logo/Achates360_Logo.ai`, `logo/Achates360_LogoRGB.pdf`: vector masters.
 - `logo/*.png`: transparent backgrounds (black, white, turquoise, lime green).
 - `logo/*.jpg`: on solid backgrounds, square 300/1080 px (orange, black, purple) and wide lockups.
-- Logo orange sampled from the artwork: about `#f48840`.
+- `logo/Achates360_Logo-horizontal.svg`, `logo/Achates360_Logo-stacked.svg`: clean one-colour SVGs outlined from the PDF (the site uses the horizontal one, via `src/assets/logo-horizontal.svg`).
+- Colours, tagline and type: see `BRAND-NOTES.md`.
 
 Left out of the repo on purpose (it is public):
 - Corporate typeface (Officina Sans / Serif OTF and TTF): commercial font, and committing it would redistribute it.

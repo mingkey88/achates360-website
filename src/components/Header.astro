@@ -1,13 +1,14 @@
 ---
 import { withBase, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
+import Logo from './ui/Logo.astro';
 interface Link { label: string; href: string }
 interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString }
 const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
 ---
 <header class="site-header" data-over-hero={overHero ? '' : undefined}>
   <div class="bar">
-    <a class="wordmark" href={withBase('/')}><span aria-hidden="true">//&nbsp;</span>{wordmark.text}</a>
+    <a class="wordmark" href={withBase('/')}><Logo label={wordmark.text} /></a>
     <nav class="primary" aria-label={navLabel.text}>
       <ul>
         {menu.map((it) => {
@@ -50,7 +51,9 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
   .site-header.is-solid { background: var(--paper); box-shadow: 0 1px 0 var(--line); }
   .site-header.is-hidden { transform: translateY(-100%); }
   .bar { display: flex; align-items: center; gap: var(--s-5); height: var(--header-h); padding-inline: var(--gutter); }
-  .wordmark { margin-right: auto; font: 400 1.625rem/1 var(--font-display); letter-spacing: .02em; text-decoration: none; white-space: nowrap; }
+  .wordmark { flex: none; margin-right: auto; display: flex; padding-block: 4px; }
+  .wordmark :global(.logo) { display: block; height: 40px; width: auto; }
+  @media (min-width: 768px) { .wordmark :global(.logo) { height: 46px; } }
   .primary ul { display: none; list-style: none; margin: 0; padding: 0; gap: var(--s-5); }
   .primary a { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 500; letter-spacing: .08em; text-decoration: none; }
   .primary a::before { content: ''; width: 7px; height: 7px; border: 1.5px solid currentColor; border-radius: 50%; }
