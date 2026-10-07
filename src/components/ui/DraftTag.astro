@@ -1,0 +1,15 @@
+---
+import { SITE_ENV } from 'astro:env/server';
+// Staging-only marker on placeholder copy (spec §6.3). Production builds never get this far with
+// placeholders (assertPublishable), and the tag is never rendered there.
+interface Props { when: boolean }
+const show = Astro.props.when && SITE_ENV !== 'production';
+---
+{show && <span class="draft-tag" aria-hidden="true">Draft</span>}
+<style>
+  .draft-tag {
+    display: inline-block; margin-left: .4em; padding: 1px 6px; vertical-align: .6em;
+    border: 1px dashed currentColor; border-radius: 4px;
+    font: 500 9px/1.3 var(--font-text); letter-spacing: .1em; text-transform: uppercase; opacity: .8;
+  }
+</style>

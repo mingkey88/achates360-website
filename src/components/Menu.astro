@@ -1,0 +1,66 @@
+---
+import { withBase, linkAttrs, menuCurrent } from '../lib/paths';
+import type { UiString } from '../lib/strings';
+interface Link { label: string; href: string }
+interface Props { menu: (Link & { items?: Link[] })[]; social: { alt: string; href: string }[]; path: string; closeLabel: UiString; navLabel: UiString }
+const { menu, social, path, closeLabel, navLabel } = Astro.props;
+---
+<dialog id="site-menu" class="site-menu on-dark">
+  <div class="inner wrap">
+    <button class="menu-close" type="button">
+      <span class="sr-only">{closeLabel.text}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg>
+    </button>
+    <nav aria-label={navLabel.text}>
+      <ul class="top">
+        {menu.map((it) => (
+          <li>
+            <a class="big" href={withBase(it.href)} aria-current={menuCurrent(it, path) === 'page' ? 'page' : undefined}>{it.label}</a>
+            {it.items && it.items.length > 0 && (
+              <ul class="sub" aria-label={it.label}>
+                {it.items.map((s) => <li><a href={withBase(s.href)} aria-current={s.href === path ? 'page' : undefined}>{s.label}</a></li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+    {social.length > 0 && (
+      <ul class="social">{social.map((s) => <li><a href={withBase(s.href)} {...linkAttrs(s.href)}>{s.alt}</a></li>)}</ul>
+    )}
+  </div>
+</dialog>
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#site-menu');
+  const opener = document.querySelector<HTMLButtonElement>('.menu-open');
+  if (dialog && opener) {
+    opener.addEventListener('click', () => { dialog.showModal(); opener.setAttribute('aria-expanded', 'true'); });
+    dialog.querySelector('.menu-close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => { opener.setAttribute('aria-expanded', 'false'); opener.focus(); });
+    // An in-page link (e.g. /#contact while on the homepage) must close the menu too.
+    dialog.addEventListener('click', (e) => { if ((e.target as Element).closest('a')) dialog.close(); });
+  }
+</script>
+<style>
+  .site-menu {
+    position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+    margin: 0; padding: 0; border: 0; overflow-y: auto; overscroll-behavior: contain;
+  }
+  .site-menu::backdrop { background: rgb(13 13 13 / .6); }
+  .inner { display: grid; gap: var(--s-7); padding-block: calc(var(--header-h) + var(--s-6)) var(--s-8); }
+  .menu-close {
+    position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: var(--gutter);
+    width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
+    border: 1.5px solid currentColor; border-radius: 50%; background: none; color: inherit; cursor: pointer;
+  }
+  .menu-close svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .top { display: grid; gap: var(--s-3); }
+  .big { font: 400 clamp(3rem, 2rem + 6vw, 7.5rem)/.9 var(--font-display); text-decoration: none; overflow-wrap: anywhere; }
+  .big:hover, .big[aria-current] { color: var(--accent); }
+  .sub { columns: 2 220px; column-gap: var(--s-6); margin: var(--s-4) 0 var(--s-5); font-size: var(--fs-small); }
+  .sub li { break-inside: avoid; padding-block: 3px; }
+  .sub a { text-decoration: none; opacity: .85; }
+  .sub a:hover, .sub a[aria-current] { opacity: 1; text-decoration: underline; }
+  .social { display: flex; flex-wrap: wrap; gap: var(--s-5); font-size: var(--fs-small); letter-spacing: .08em; text-transform: uppercase; }
+</style>
