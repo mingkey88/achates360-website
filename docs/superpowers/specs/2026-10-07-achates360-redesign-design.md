@@ -185,7 +185,8 @@ Contrast rules:
 ### 4.1 Homepage (`src/pages/index.astro`) — work first
 
 1. **Hero**
-   - Full-bleed slide-1 video (DXV).
+   - Full-bleed slide-1 video (DXV). As in the clone, the video loads at 768px and wider; phones show its
+     poster still (saves mobile data). Looping videos get a pause button (WCAG 2.2.2).
    - A dark gradient sits over it so the text reads.
    - `--fs-mega` "ACHATES 360".
    - A "SINCE 2001" sticker (placeholder: its wording needs approval).
@@ -231,9 +232,9 @@ Contrast rules:
    - The first text block renders as `--fs-lead`; later ones as body text.
    - Images are grouped into rows using the existing `rows.ts` side-by-side grouping. Each row renders as
      a 1-, 2- or 3-up grid; rows wider than 3 wrap.
-   - `gallery` becomes a grid of `MediaCard`s with the existing lightbox/viewer behaviour.
+   - `gallery` becomes a grid of `MediaCard`s (the clone has no lightbox, and none is added).
    - `video` → `MediaCard` with controls.
-   - `embed` → a 16:9 rounded frame (Vimeo/YouTube, click-to-load as now).
+   - `embed` → a 16:9 rounded frame (Vimeo/YouTube, lazy-loaded iframe as now).
    - `link` → `Pill`.
 4. **Back link:** the existing `backLink` label (verbatim), as a `Pill` above the next band.
 5. **Next project band:**
@@ -328,15 +329,19 @@ All copy is placeholder. Media is reused from real projects.
 `box`/`mbox` fields stay. Layout code reads them only through `rows.ts`, for side-by-side grouping.
 Nothing in `src/content/` that came from the export is edited.
 
-### 6.2 New collection: `extras` (`src/content/extras/*.yaml`, `file()` loader, strict schemas)
+### 6.2 New collections (`src/content/extras/*.yaml`, one `file()`-loader collection per file, strict schemas)
+
+New sections reference real media by **project slug**: they use that project's hero, rather than copying
+image paths. A timeline entry also takes its year (the first year in the project's `copyright`) and its
+label (the project's `title`) from that project. As a result, no year or milestone is invented.
 
 | File | Entry fields |
 |---|---|
-| `services.yaml` | `id`, `title`, `tags: string[]`, `media` (image/video, reusing existing assets), `order`, `placeholder` |
+| `services.yaml` | `id`, `order`, `title`, `body`, `tags: string[]` (existing project category names, verbatim), `project` (slug whose hero is the media), `placeholder` |
 | `process.yaml` | `id`, `step`, `title`, `body`, `placeholder` |
-| `timeline.yaml` | `id`, `year`, `label`, `body`, `image`, `placeholder` |
-| `stats.yaml` | `id`, `value`, `suffix?`, `label`, `placeholder` |
-| `clients.yaml` | `id`, `name`, `logo?`, `placeholder` |
+| `timeline.yaml` | `id`, `order`, `project` (slug: gives year, label and image), `body`, `placeholder` |
+| `stats.yaml` | `id`, `order`, `value` (a number, or `listed-projects` = count of listed projects at build), `suffix?`, `label`, `placeholder` |
+| `clients.yaml` | `id`, `name` (verbatim from a project's `client` field), `placeholder` |
 | `testimonials.yaml` | `id`, `quote`, `name`, `role`, `placeholder` |
 | `strings.yaml` | `id`, `text`, `placeholder` — every new UI string (hero tagline, sticker labels, "Learn more", "NEXT PROJECT", marquee line, section eyebrows) |
 
@@ -362,7 +367,8 @@ Nothing in `src/content/` that came from the export is edited.
 
 - **Removed** (presentation layer from the clone):
   - `tokens.css`, `base.css`
-  - `Blocks`, `Block`, `Gallery`, `AnchorMenu`, `SiteMenu`, `MobileMenu`, `BackToTop`, `Footer`, `Logo`
+  - `Blocks`, `Gallery`, `AnchorMenu`, `SiteMenu`, `MobileMenu`, `BackToTop`, `Logo`, the old `Footer`
+    (`Block.astro` is rewritten in place for the new design)
   - the clone versions of `Base`/`Project`/`Basic`/`Card`
   - the `--m` mobile scaling
 
@@ -378,8 +384,9 @@ Nothing in `src/content/` that came from the export is edited.
   - `src/styles/{tokens,base,type}.css`
   - `src/components/ui/*` (§3.4)
   - `src/components/{Header,Menu,Footer,NextProject,MediaRows,LetsConnect,…}.astro`
-  - `src/layouts/{Base,Project,Page,Card}.astro`
-  - `src/pages/services.astro`; `/about` is rendered by a dedicated template branch in `[slug].astro`
+  - `src/layouts/{Base,Project,About,JoinUs,Categories,Page,Card}.astro`
+  - `src/pages/services.astro`; `[slug].astro` sends `about`, `joinus` and `copy-of-projects` to their own
+    layouts, and any other basic page to `Page.astro`
   - `src/scripts/motion/*`
   - `src/lib/{placeholders,next-project}.ts`
 - `README.md` is updated for the new structure. `CONTENT-QUERIES.md` gets the "Redesign" section.
