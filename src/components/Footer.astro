@@ -39,12 +39,12 @@ const [[intro, ...legal], ...rest] = columns;
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
   .intro :global(:is(h1, h2, h3, h4, h5, h6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); max-width: 18ch; text-wrap: balance; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
-  .md :global(h6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .md :global(h6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: rgb(233 228 225 / .7); }
   .md :global(h5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
   .md :global(p) { margin: 0; }
   .md :global(a), .social a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
   .social { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); text-transform: uppercase; letter-spacing: .08em; }
-  .legal { font-size: var(--fs-label); color: var(--muted); }
+  .legal { font-size: var(--fs-label); color: rgb(233 228 225 / .7); }
   .mega-mark {
     margin: var(--s-8) 0 0; padding-inline: var(--gutter); white-space: nowrap;
     font: 400 var(--fs-mega)/.78 var(--font-display);

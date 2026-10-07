@@ -2,10 +2,10 @@
 import { withBase, linkAttrs, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 interface Link { label: string; href: string }
-interface Props { menu: (Link & { items?: Link[] })[]; social: { alt: string; href: string }[]; path: string; closeLabel: UiString; navLabel: UiString }
-const { menu, social, path, closeLabel, navLabel } = Astro.props;
+interface Props { menu: (Link & { items?: Link[] })[]; social: { alt: string; href: string }[]; path: string; menuLabel: UiString; closeLabel: UiString; navLabel: UiString }
+const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
 ---
-<dialog id="site-menu" class="site-menu on-dark">
+<dialog id="site-menu" class="site-menu on-dark" aria-label={menuLabel.text}>
   <div class="inner wrap">
     <button class="menu-close" type="button">
       <span class="sr-only">{closeLabel.text}</span>

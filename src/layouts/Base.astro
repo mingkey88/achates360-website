@@ -56,7 +56,7 @@ const menu = site.menu ?? [];
   </head>
   <body data-page={page} data-over-hero={overHero ? '' : undefined} class={bodyClass} style={background ? `background: ${background}` : undefined}>
     <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} />
-    <Menu menu={menu} social={site.menuSocial ?? []} path={path} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
+    <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
     <main id="main"><slot /></main>
     <Footer blocks={site.footer} wordmark={text('wordmark')} />
   </body>
