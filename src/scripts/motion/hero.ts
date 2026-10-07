@@ -31,7 +31,8 @@ export function hero(): void {
   });
   tl.from(q('.lg-ch'), { opacity: 0, x: (i) => (i - 4.5) * 16, duration: 1.5, stagger: .045 }, 2.1)
     .from(q('.hh-tagline'), { opacity: 0, y: 14, letterSpacing: '.9em', duration: 1.8 }, 2.6)
-    .from(q('.hh-ring'), { opacity: 0, scale: .5, duration: 2.8 }, 2.3);
+    // Fade through --fade, never the ring's own opacity (that flattens its 3D until the fade ends).
+    .from(q('.hh-ring'), { '--fade': 0, scale: .5, duration: 2.8 }, 2.3);
 
   // The orbit: angle advances every frame; each card's place comes from --s/--c (sin/cos) in CSS.
   const ring = { angle: 0, speed: LAUNCH, boost: 0 };
