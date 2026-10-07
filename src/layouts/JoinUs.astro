@@ -22,6 +22,7 @@ for (const b of rest) {
   if (b.type === 'image') { pending = b; continue; }
   if (b.type === 'link' && roles.length && !roles[roles.length - 1].apply) { roles[roles.length - 1].apply = { href: b.href, label: b.label }; continue; }
   const split = b.type === 'text' ? splitRoleHeading(b.md) : null;
+  if (split?.lead) throw new Error('/joinus: text before the role heading would be dropped; extend JoinUs.astro');
   if (split) { roles.push({ title: split.title, md: split.rest, image: pending }); pending = undefined; }
   else others.push(b);
 }
@@ -56,8 +57,8 @@ if (others.length) throw new Error(`/joinus: ${others.length} block(s) not place
   .role { border-radius: var(--r-card); background: var(--white); padding: var(--s-6); }
   summary { display: grid; justify-items: start; gap: var(--s-3); cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
-  summary h2::after { content: ' +'; color: var(--accent); }
-  .role[open] summary h2::after { content: ' –'; }
+  summary h2::after { content: ' +' / ''; color: var(--accent); }
+  .role[open] summary h2::after { content: ' –' / ''; }
   .role-body { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
   .apply { margin: var(--s-6) 0 0; }
   .role-body :global(.role-img) { width: 100%; height: auto; border-radius: var(--r-card); }

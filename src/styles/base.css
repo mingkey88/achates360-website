@@ -14,6 +14,12 @@ button { font: inherit; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
+.skip-link {
+  position: fixed; top: var(--s-3); left: var(--s-3); z-index: 60; padding: 12px 20px; border-radius: var(--r-pill);
+  background: var(--ink); color: var(--paper); font: 500 var(--fs-small)/1.2 var(--font-text); text-decoration: none;
+}
+.skip-link:not(:focus-visible) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link:focus-visible { outline: 2px solid var(--peach); outline-offset: 2px; }
 .wrap { width: min(100% - 2 * var(--gutter), var(--max)); margin-inline: auto; }
 .section { padding-block: var(--section-y); }
 .on-dark { background: var(--charcoal); color: var(--peach); }
@@ -27,7 +33,7 @@ body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + env(safe
 }
 
 /* No-JS: the Menu button and autoplay controls do nothing, so show the full nav and poster stills. */
-html:not(.js) .menu-open, html:not(.js) .bv-toggle { display: none; }
+html:not(.js) .menu-open, html:not(.js) .bv-toggle, html:not(.js) .mq-toggle { display: none; }
 html:not(.js) .site-header .primary ul { display: flex; flex-wrap: wrap; row-gap: 4px; }
 html:not(.js) .site-header .bar { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
 @media (max-width: 1023px) { html:not(.js) body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + 64px + env(safe-area-inset-top, 0px)); } }

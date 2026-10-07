@@ -55,7 +55,7 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   @media (min-width: 768px) {
-    .grid { grid-template-columns: 2fr repeat(auto-fit, minmax(160px, 1fr)); }
+    .grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(160px, 1fr)); }
     .legal { grid-column: 1 / -1; }
   }
 </style>

@@ -46,7 +46,7 @@ const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i
 <style>
   .pi-head { padding-block: var(--s-8) var(--s-6); }
   .chips-bar { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 10; background: var(--paper); border-block: 1px solid var(--line); }
-  .chips-bar ul { list-style: none; margin-inline: auto; padding: var(--s-3) 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .chips-bar ul { list-style: none; margin-inline: auto; padding: var(--s-3) 4px; scroll-padding-inline: 4px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
   .chips-bar a {
     display: inline-block; white-space: nowrap; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
     font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .08em; text-transform: uppercase; text-decoration: none;

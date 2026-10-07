@@ -59,6 +59,7 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>
   </head>
   <body data-page={page} data-over-hero={overHero ? '' : undefined}>
+    <a class="skip-link" href="#main" data-placeholder={text('skip-link').placeholder ? '' : undefined}>{text('skip-link').text}</a>
     <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} />
     <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
     <main id="main"><slot /></main>

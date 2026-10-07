@@ -1,5 +1,6 @@
 ---
 import Marquee from './ui/Marquee.astro';
+import MarqueeToggle from './ui/MarqueeToggle.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import DraftTag from './ui/DraftTag.astro';
@@ -7,18 +8,21 @@ import type { UiString } from '../lib/strings';
 interface Props { line: UiString; cta?: UiString; href?: string }
 const { line, cta, href } = Astro.props;
 ---
-<section class="connect" data-placeholder={line.placeholder ? '' : undefined} aria-label={line.text}>
-  <Marquee speed={36}><span class="solid">{line.text}</span></Marquee>
-  <div aria-hidden="true"><Marquee speed={44} reverse><span class="outline">{line.text}</span></Marquee></div>
+<section class="connect" data-mq-scope data-placeholder={line.placeholder ? '' : undefined} aria-label={line.text}>
+  <Marquee speed={36} controls={false}><span class="solid">{line.text}</span></Marquee>
+  <div aria-hidden="true"><Marquee speed={44} reverse controls={false}><span class="outline">{line.text}</span></Marquee></div>
+  <MarqueeToggle />
   <div class="wrap"><DraftTag when={line.placeholder} /></div>
   {cta && href && <div class="cta"><Pill href={href} variant="fill"><T s={cta} /></Pill></div>}
 </section>
 <style>
   .connect { position: relative; padding-block: var(--section-y); overflow: hidden; --mq-gap: 2.5rem; }
-  @media (prefers-reduced-motion: no-preference) { .connect :global(.marquee) { pointer-events: none; } }
   .solid, .outline { font: 400 clamp(4rem, 2rem + 9vw, 11rem)/.9 var(--font-display); white-space: nowrap; }
   .solid { color: #8f8888; }
   .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
-  .cta { position: absolute; inset: 0; display: grid; place-items: center; }
+  /* The overlay spans the section but only the pill takes pointer events, so the marquees and the
+     pause button underneath stay reachable. */
+  .cta { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .cta :global(.pill) { pointer-events: auto; }
   .cta :global(.pill) { font-size: clamp(1.25rem, 1rem + 1vw, 2rem); padding: 14px 28px 11px; }
 </style>

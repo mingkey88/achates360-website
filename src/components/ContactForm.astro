@@ -1,28 +1,13 @@
 ---
 /*
- * The home page enquiry section, as observed on the live site (Playwright, 1440x900 and iPhone 13).
+ * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
+ * submit label come verbatim from home.md; only the styling is the redesign's (a full-bleed accent
+ * block, pill inputs, ink text).
  *
- * Desktop: a 781px white section. The heading (Helvetica Bold 45px, #605e5e) sits 8px left of
- *   the 980px grid and 287px down, 393px wide. The form box is 448px wide at grid+574, 13px down;
- *   its fields run 59px in, 347px wide:
- *   - Name / Company / Email: label Helvetica Light 20px/20px #2f2e2e with Wix's " *", input 29px
- *     below (Avenir Light 14px/19.6px, 1px #2f2e2e underline, padding 3 3 3 7), a 90px pitch;
- *   - the two checkbox groups side by side (second at +160): legend 20px black in a 40px box,
- *     options on a 27px pitch, an 18px white box with a 1px black border, text Helvetica Light
- *     15px black 26px in. Wix colours the second group's legend ("Selection 2") white on the
- *     white page, so only screen readers get it;
- *   - the message box (347x106, 1px black border, white, padding 11.25 10 3 7, placeholder grey);
- *   - Submit: 347x40, #adadac with a 1px rgb(48,189,255) border, label Avenir Light 20px white;
- *   - "Thanks for submitting!" (Avenir Light 14px #605e5e, centred) under it, hidden until sent.
- *   An empty submit outlines every missing field in #df3131 (Wix shows no message text).
- * Mobile (Wix's 320px layout, lengths x --m): a 1033px section; heading 23px, centred, at
- *   (17, 71) 287 wide; form at (10, 169) 300 wide, fields 20 in and 260 wide on a 77px pitch,
- *   inputs 38 tall at 15px; the two groups stack (options 10 in, 27 pitch, the second group's
- *   blank legend takes no room); message box 260x42; Submit 260x35, label 18.67px.
- *
- * Field names: Wix's message box has no name, so it posts as `message`; the checkbox groups post
- * as group-1 / group-2 (Wix's comp-… ids mean nothing to a form backend). Labels and placeholders
- * are verbatim.
+ * Field names: the message box has no name in the export, so it posts as `message`; the checkbox
+ * groups post as group-1 / group-2. Submit posts the FormData to PUBLIC_FORM_ENDPOINT (staging
+ * without one says so). Each required checkbox group is validated in script, with an alert region
+ * per group and a dashed outline once a submit has been tried.
  */
 import { renderMd } from '../lib/markdown';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }

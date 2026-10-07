@@ -33,3 +33,6 @@
 - { id: about-stats-eyebrow, text: In numbers, placeholder: true }
 - { id: timeline-heading, text: Our story, placeholder: true }
 - { id: role-sticker, text: "We're hiring", placeholder: true }
+- { id: marquee-pause, text: Pause animation, placeholder: true }
+- { id: marquee-play, text: Play animation, placeholder: true }
+- { id: skip-link, text: Skip to content, placeholder: true }

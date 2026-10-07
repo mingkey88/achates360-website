@@ -48,6 +48,12 @@ describe('renderMd demote', () => {
   it('never goes past h6', () => {
     expect(renderMd('##### Contact', '/', { demote: 3 })).toContain('<h6');
   });
+  it('accepts negative values to promote headings', () => {
+    expect(renderMd('##### A', '/', { demote: -3 })).toContain('<h2');
+  });
+  it('clamps to h1 when promoted too far', () => {
+    expect(renderMd('##### A', '/', { demote: -9 })).toContain('<h1');
+  });
   it('leaves headings alone by default', () => {
     expect(renderMd('# Join us', '/')).toContain('<h1');
   });

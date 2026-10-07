@@ -243,7 +243,7 @@ replaced. Existing copy from the Wix site is unchanged.
 1. Accent colour signal orange-red `#ff4b1f`, with charcoal `#2f2e2e` and peach `#ebd2c5` used as large colour blocks.
 2. Fonts: Bebas Neue (headings) and DM Sans (text) replace Helvetica Light and Avenir Light. Both are free for commercial use, which closes the Avenir web-licence question.
 3. New page `/services` and a SERVICES item in the menu after PROJECTS.
-4. The wordmark "// ACHATES 360" set in type in the header, homepage hero and footer.
+4. The wordmark set in type: "// ACHATES 360" in the header (the "//" prefix appears only there); the homepage hero and the footer read "ACHATES 360".
 
 **Copy to supply** (file: `src/content/extras/`; each is a one-line change once decided)
 5. Services: four titles, descriptions and tag lists (`services.yaml`). Tags currently reuse the site's own category names.
@@ -252,7 +252,7 @@ replaced. Existing copy from the Wix site is unchanged.
 8. Stats: confirm "Founded 2001" and "Featured projects" (counted from the site), and supply two more figures or remove them (`stats.yaml`).
 9. Clients: confirm each of the 12 names may be listed (`clients.yaml`), and supply logo files cleared for web use if logos are wanted.
 10. Testimonials: up to three real quotes with the client's written permission, name and role (`testimonials.yaml`). Until then they read "Client name".
-11. Interface text (`strings.yaml`): hero line "Design is thinking made visual", sticker "Since 2001", section labels (Selected work, Inside the studio, What we do, Trusted by, Client feedback, In numbers, Our story, How we work), buttons (Learn more, All services, Get in touch), "Let's connect and let's work together", "Next project", meta labels (Client, Year, Services, Recognition), "We're hiring", the Services page title and description, and the screen-reader labels (Menu, Back to site, Site, Sections, Pause video, Play video).
+11. Interface text (`strings.yaml`): hero line "Design is thinking made visual", sticker "Since 2001", section labels (Selected work, Inside the studio, What we do, Trusted by, Client feedback, In numbers, Our story, How we work), buttons (Learn more, All services, Get in touch), "Let's connect and let's work together", "Next project", meta labels (Client, Year, Services, Recognition), "We're hiring", the Services page title and description, and the screen-reader labels (Menu, Back to site, Site, Sections, Pause video, Play video, Pause animation, Play animation, Skip to content).
 
 **Found while checking the finished pages** (these need files or answers from the studio, not code)
 12. **Low-resolution images.** The pictures on the About timeline and in the project grids come from the Wix export, and some are small banners (for example 375×117 pixels). The redesign shows them larger than Wix did, so they look soft. Please supply higher-resolution originals where you have them.

@@ -15,7 +15,10 @@ describe('sentenceStarting', () => {
 describe('splitRoleHeading', () => {
   it('takes the first heading as the role title without markdown markers', () => {
     const md = '#### **CLIENT ACCOUNT EXECUTIVE / MANAGER** \n\n**Job Description**\n\nThe Account Executive…';
-    expect(splitRoleHeading(md)).toEqual({ title: 'CLIENT ACCOUNT EXECUTIVE / MANAGER', rest: '**Job Description**\n\nThe Account Executive…' });
+    expect(splitRoleHeading(md)).toEqual({ title: 'CLIENT ACCOUNT EXECUTIVE / MANAGER', lead: '', rest: '**Job Description**\n\nThe Account Executive…' });
+  });
+  it('returns lead-in text before the heading in lead', () => {
+    expect(splitRoleHeading('We are hiring.\n\n#### **Designer**\n\nBody')).toEqual({ title: 'Designer', lead: 'We are hiring.', rest: 'Body' });
   });
   it('is null without a heading', () => expect(splitRoleHeading('Just text')).toBeNull());
 });

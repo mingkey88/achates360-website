@@ -8,16 +8,21 @@ const { blocks, pageTitle } = Astro.props;
 const segments = toSegments(blocks);
 const firstText = blocks.find((b) => b.type === 'text');
 const isText = (b: any) => b.type === 'text' || b.type === 'link';
+// Case-study copy uses ##### / ###### for styling, which jumps from the page's h1 to h5/h6. Shift
+// every text block by the same amount so the shallowest heading becomes h2 (tags only; the words
+// are untouched).
+const depths = blocks.filter((b) => b.type === 'text').flatMap((b) => [...b.md.matchAll(/^\s*(#{1,6})\s/gm)].map((m) => m[1].length));
+const demote = depths.length ? 2 - Math.min(...depths) : 0;
 ---
 <div class="media-rows">
   {segments.map((s) => {
     if (s.kind === 'single') {
-      return <div class:list={['seg', isText(s.block) ? 'seg-text' : 'seg-media']}><Block block={s.block} pageTitle={pageTitle} lead={s.block === firstText} /></div>;
+      return <div class:list={['seg', isText(s.block) ? 'seg-text' : 'seg-media']}><Block block={s.block} pageTitle={pageTitle} lead={s.block === firstText} demote={demote} /></div>;
     }
     if (s.kind === 'grid') {
       return (
         <div class="seg seg-grid" style={`--cols: ${s.cols}`}>
-          {s.blocks.map((b) => <Block block={b} pageTitle={pageTitle} sizes={`(max-width: 767px) 100vw, ${Math.round(92 / s.cols)}vw`} />)}
+          {s.blocks.map((b) => <Block block={b} pageTitle={pageTitle} demote={demote} sizes={`(max-width: 767px) 100vw, ${Math.round(92 / s.cols)}vw`} />)}
         </div>
       );
     }
@@ -26,9 +31,9 @@ const isText = (b: any) => b.type === 'text' || b.type === 'link';
         <div class="seg seg-stage" style={`--cols: ${Math.min(s.items.length, 3)}`}>
           {s.items.map((it) => (
             <div class="stage" style={it.block.box ? `aspect-ratio: ${it.block.box.w} / ${it.block.box.h}` : undefined}>
-              <Block block={it.block} pageTitle={pageTitle} />
+              <Block block={it.block} pageTitle={pageTitle} demote={demote} />
               {it.overlays.map((o) => (
-                <div class="overlay" style={`left: ${o.left}%; top: ${o.top}%; width: ${o.width}%`}><Block block={o.block} pageTitle={pageTitle} sizes="(max-width: 767px) 50vw, 25vw" /></div>
+                <div class="overlay" style={`left: ${o.left}%; top: ${o.top}%; width: ${o.width}%`}><Block block={o.block} pageTitle={pageTitle} demote={demote} sizes="(max-width: 767px) 50vw, 25vw" /></div>
               ))}
             </div>
           ))}
@@ -37,7 +42,7 @@ const isText = (b: any) => b.type === 'text' || b.type === 'link';
     }
     return (
       <div class="seg seg-split">
-        {s.blocks.map((b) => <div class={isText(b) ? 'cell-text' : 'cell-media'}><Block block={b} pageTitle={pageTitle} lead={b === firstText} sizes="(max-width: 767px) 100vw, 46vw" /></div>)}
+        {s.blocks.map((b) => <div class={isText(b) ? 'cell-text' : 'cell-media'}><Block block={b} pageTitle={pageTitle} lead={b === firstText} demote={demote} sizes="(max-width: 767px) 100vw, 46vw" /></div>)}
       </div>
     );
   })}

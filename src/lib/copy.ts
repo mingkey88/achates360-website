@@ -10,13 +10,14 @@ export function sentenceStarting(md: string, prefix: string): string | null {
   return null;
 }
 
-/** A Join us role block: its first heading (markers stripped) and the markdown after it. */
-export function splitRoleHeading(md: string): { title: string; rest: string } | null {
+/** A Join us role block: its first heading (markers stripped), the markdown before it (`lead`,
+ *  which the template must not drop) and the markdown after it. */
+export function splitRoleHeading(md: string): { title: string; lead: string; rest: string } | null {
   const m = md.match(/^[ \t]*#{1,6}[ \t]+(.+?)[ \t]*$/m);
   if (!m || m.index === undefined) return null;
   const title = m[1].replace(/\*\*|__/g, '').trim();
   const rest = md.slice(m.index + m[0].length).replace(/^\s*\n/, '');
-  return { title, rest };
+  return { title, lead: md.slice(0, m.index).trim(), rest };
 }
 
 /** "Project Categories | Achates 360" → "Project Categories". */

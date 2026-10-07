@@ -126,6 +126,8 @@ Breakpoints (mobile-first): 480 / 768 / 1024 / 1440.
 | `#5d5654` (subtitles) | paper | 6.41 | 4.5 |
 | accent (stat numbers) | paper | **2.98** (fails) | 3 |
 | accent-deep `#e03c10` (stat numbers) | paper | 3.88 | 3 |
+| accent `#ff4b1f` (menu hover/current, large text only) | charcoal `#2f2e2e` | 4.05 | 3 |
+| form placeholder `#5c5757` | form field (paper at 90% over accent, ≈ `#f7e0d9`) | 5.62 | 4.5 |
 
 Accent on paper misses 3:1, so large numerals on light grounds use `--accent-deep`. Accent on
 black (homepage stats band) is fine.
@@ -157,6 +159,15 @@ the full navigation is shown, and videos fall back to their poster stills.
     npm run build            # astro check + build (staging)
     npm run verify           # URLs, links, size limits, JS budget (80 KB gzip per page)
     npm run check:overflow   # Playwright: no sideways scroll on every page at 320 and 375 px
+
+`npm run verify` also checks every built page for: exactly one `<h1>`; the site header and
+footer; a link to `/services`; the "next project" band on case studies; the 3 s motion fallback
+script wherever `data-split` / `data-reveal` hooks appear; a JS budget of 80 KB gzip, with any
+script it cannot resolve failing the check; and placeholder markup (`data-placeholder`, Draft
+tags), which is rejected only when `SITE_ENV=production`.
+
+`npm run check:overflow` starts its own preview and loads every page at 320 and 375 px,
+failing on any horizontal scroll.
 
 ## Open inputs
 

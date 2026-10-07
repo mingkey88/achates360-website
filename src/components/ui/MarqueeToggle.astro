@@ -1,0 +1,38 @@
+---
+import { loadExtras } from '../../lib/extras';
+// Pause/play for moving text (WCAG 2.2.2). It sets data-paused on its nearest [data-mq-scope]
+// ancestor, which stops every marquee track inside. Hidden under reduced motion (marquees are
+// static there) and with JS off (it would do nothing).
+const { text } = await loadExtras();
+const pause = text('marquee-pause');
+const play = text('marquee-play');
+const draft = pause.placeholder || play.placeholder;
+---
+<button class="mq-toggle" type="button" data-state="playing" data-placeholder={draft ? '' : undefined} data-pause={pause.text} data-play={play.text}>
+  <span class="sr-only">{pause.text}</span>
+  <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>
+  <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg>
+</button>
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.mq-toggle')) {
+    const scope = btn.closest<HTMLElement>('[data-mq-scope]')!;
+    const label = btn.querySelector('.sr-only')!;
+    btn.addEventListener('click', () => {
+      const paused = scope.hasAttribute('data-paused');
+      if (paused) scope.removeAttribute('data-paused'); else scope.setAttribute('data-paused', '');
+      btn.dataset.state = paused ? 'playing' : 'paused';
+      label.textContent = paused ? btn.dataset.pause! : btn.dataset.play!;
+    });
+  }
+</script>
+<style>
+  .mq-toggle {
+    position: absolute; right: var(--gutter); top: 50%; translate: 0 -50%; z-index: 3; width: 44px; height: 44px;
+    display: grid; place-items: center; padding: 0; border: 1.5px solid var(--ink); border-radius: 50%;
+    background: var(--paper); color: var(--ink); cursor: pointer;
+  }
+  .mq-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+  .mq-toggle .i-play, .mq-toggle[data-state='paused'] .i-pause { display: none; }
+  .mq-toggle[data-state='paused'] .i-play { display: block; }
+  @media (prefers-reduced-motion: reduce) { .mq-toggle { display: none; } }
+</style>
