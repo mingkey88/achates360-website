@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "export": "node scripts/export-wix/index.mjs",
     "render": "node scripts/export-wix/render.mjs",
-    "verify": "node scripts/verify-dist.mjs"
+    "verify": "node scripts/verify-dist.mjs",
+    "check:overflow": "node scripts/check-overflow.mjs"
   },
   "keywords": [],
   "author": "",
