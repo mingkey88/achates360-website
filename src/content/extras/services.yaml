@@ -1,0 +1,30 @@
+# Services (spec §4.4). Titles and bodies are placeholder copy for the Art Director / MD.
+# tags: existing project category names, verbatim. project: slug whose hero is the media.
+- id: branding
+  order: 1
+  title: Branding & Identity
+  body: "[Draft] Two lines on what this service covers, to be supplied by the Art Director."
+  tags: [Strategic Branding, Graphic Design, Packaging & Merchandise]
+  project: notter
+  placeholder: true
+- id: publications
+  order: 2
+  title: Publications & Reports
+  body: "[Draft] Two lines on what this service covers, to be supplied by the Art Director."
+  tags: [Publications, Content Creation]
+  project: bumitama-annual-report
+  placeholder: true
+- id: campaigns
+  order: 3
+  title: Campaigns & Promotions
+  body: "[Draft] Two lines on what this service covers, to be supplied by the Art Director."
+  tags: [Advertising & Promotions, Events]
+  project: dxv
+  placeholder: true
+- id: digital
+  order: 4
+  title: Digital & Social
+  body: "[Draft] Two lines on what this service covers, to be supplied by the Art Director."
+  tags: [Digital Communications, Social Media]
+  project: dbs-wealth-feed
+  placeholder: true

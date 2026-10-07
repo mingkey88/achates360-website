@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
+import { glob, file } from 'astro/loaders';
 import type { SchemaContext } from 'astro:content';
 
 type ImageFunction = SchemaContext['image'];
@@ -140,4 +140,39 @@ const site = defineCollection({
   }).strict(),
 });
 
-export const collections = { projects, cards, basic, home, projectsIndex, site };
+// Redesign content (spec §6.2): one YAML file per collection. `placeholder` is required, never
+// defaulted, so every entry states whether its copy is approved.
+const flagged = { id: z.string(), placeholder: z.boolean() };
+const services = defineCollection({
+  loader: file('src/content/extras/services.yaml'),
+  schema: z.object({ ...flagged, order: z.number(), title: z.string(), body: z.string(), tags: z.array(z.string()).min(1), project: z.string() }).strict(),
+});
+const processSteps = defineCollection({
+  loader: file('src/content/extras/process.yaml'),
+  schema: z.object({ ...flagged, step: z.number().int().positive(), title: z.string(), body: z.string() }).strict(),
+});
+const timeline = defineCollection({
+  loader: file('src/content/extras/timeline.yaml'),
+  schema: z.object({ ...flagged, order: z.number(), project: z.string(), body: z.string() }).strict(),
+});
+const stats = defineCollection({
+  loader: file('src/content/extras/stats.yaml'),
+  schema: z.object({ ...flagged, order: z.number(), value: z.union([z.number(), z.literal('listed-projects')]), suffix: z.string().optional(), label: z.string() }).strict(),
+});
+const clients = defineCollection({
+  loader: file('src/content/extras/clients.yaml'),
+  schema: z.object({ ...flagged, name: z.string() }).strict(),
+});
+const testimonials = defineCollection({
+  loader: file('src/content/extras/testimonials.yaml'),
+  schema: z.object({ ...flagged, quote: z.string(), name: z.string(), role: z.string() }).strict(),
+});
+const strings = defineCollection({
+  loader: file('src/content/extras/strings.yaml'),
+  schema: z.object({ ...flagged, text: z.string() }).strict(),
+});
+
+export const collections = {
+  projects, cards, basic, home, projectsIndex, site,
+  services, process: processSteps, timeline, stats, clients, testimonials, strings,
+};

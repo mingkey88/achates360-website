@@ -1,0 +1,4 @@
+# Never attach an invented quote to a real person or client: placeholders stay generic.
+- { id: t1, quote: "[Draft] A short client testimonial goes here, quoted with the client's permission.", name: Client name, role: "Role, Company", placeholder: true }
+- { id: t2, quote: "[Draft] A short client testimonial goes here, quoted with the client's permission.", name: Client name, role: "Role, Company", placeholder: true }
+- { id: t3, quote: "[Draft] A short client testimonial goes here, quoted with the client's permission.", name: Client name, role: "Role, Company", placeholder: true }

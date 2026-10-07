@@ -1,0 +1,14 @@
+# Client wall: names verbatim from projects' `client` fields. Placeholder until the MD confirms
+# each client may be listed.
+- { id: dbs, name: DBS Bank, placeholder: true }
+- { id: samsung, name: Samsung Electronics, placeholder: true }
+- { id: ritz-carlton, name: The Ritz-Carlton, placeholder: true }
+- { id: st-regis, name: The St. Regis Singapore, placeholder: true }
+- { id: mann-hummel, name: MANN+HUMMEL, placeholder: true }
+- { id: nokia, name: Nokia, placeholder: true }
+- { id: kaplan, name: Kaplan Singapore, placeholder: true }
+- { id: konica-minolta, name: Konica Minolta Business Solutions Asia, placeholder: true }
+- { id: parkway-pantai, name: Parkway Pantai Limited, placeholder: true }
+- { id: sco, name: Singapore Chinese Orchestra Co Ltd, placeholder: true }
+- { id: uel, name: United Engineers Limited, placeholder: true }
+- { id: vp-bank, name: VP Bank Ltd Singapore, placeholder: true }

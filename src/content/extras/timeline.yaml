@@ -1,0 +1,10 @@
+# About timeline (spec §4.5). Year = first year of the project's copyright; label = project title;
+# image = project hero. Only the body is new copy.
+- { id: purple-sage, order: 1, project: purple-sage, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: nokia, order: 2, project: nokia, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: road-safety, order: 3, project: singaporeroadsafetycampaign, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: building-memories, order: 4, project: building-memories-artbook, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: dxv, order: 5, project: dxv, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: notter, order: 6, project: notter, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: bumitama, order: 7, project: bumitama-annual-report, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
+- { id: st-regis, order: 8, project: st-regis-tearoom-patisserie, body: "[Draft] What this milestone meant for the studio.", placeholder: true }
