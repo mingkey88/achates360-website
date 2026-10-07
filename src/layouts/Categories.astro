@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from './Base.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import Block from '../components/Block.astro';
+import { renderMd } from '../lib/markdown';
+import { titleFromSeo } from '../lib/copy';
+// /copy-of-projects (spec §4.3): each "## Category" text block heads the gallery after it.
+interface Props { entry: CollectionEntry<'basic'> }
+const d = Astro.props.entry.data;
+---
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="categories">
+  <header class="wrap cat-head"><h1 class="display h1" data-split>{titleFromSeo(d.seo.title)}</h1></header>
+  <div class="wrap cat-body">
+    {d.blocks.map((b: any) => {
+      if (b.type === 'text') return <div class="cat-heading" set:html={renderMd(b.md)} />;
+      if (b.type === 'gallery') return <ProjectGrid items={b.items} />;
+      return <Block block={b} />;
+    })}
+  </div>
+</Base>
+<style>
+  .cat-head { padding-block: var(--s-8) var(--s-6); }
+  .cat-body { padding-bottom: var(--s-9); }
+  .cat-heading :global(h2) { margin: var(--s-9) 0 var(--s-6); font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); }
+</style>

@@ -4,6 +4,7 @@ import { assertUniqueSlugs } from '../lib/routes';
 import Project from '../layouts/Project.astro';
 import Card from '../layouts/Card.astro';
 import Basic from '../layouts/Basic.astro';
+import Categories from '../layouts/Categories.astro';
 
 type Props =
   | { kind: 'project'; entry: CollectionEntry<'projects'> }
@@ -30,4 +31,4 @@ const props = Astro.props as Props;
 ---
 {props.kind === 'project' && <Project entry={props.entry} />}
 {props.kind === 'card' && <Card entry={props.entry} />}
-{props.kind === 'basic' && <Basic entry={props.entry} />}
+{props.kind === 'basic' && (props.entry.id === 'copy-of-projects' ? <Categories entry={props.entry} /> : <Basic entry={props.entry} />)}
