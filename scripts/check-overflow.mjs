@@ -1,5 +1,7 @@
 // Every built page at 320 and 375 CSS px wide must not scroll sideways (spec §1, plan Review
 // Focus 4). Serves dist/ with `astro preview`, loads each page in Chromium, compares widths.
+// A second pass, with motion on, fails any page whose first screen is still hidden by a scroll
+// reveal that never started: those only show once the visitor scrolls, so the page looks empty.
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { readdir } from 'node:fs/promises';
@@ -40,10 +42,25 @@ try {
     }
     await ctx.close();
   }
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const tab = await ctx.newPage();
+  for (const f of pages) {
+    const path = f === 'index.html' ? '/' : `/${f.replace(/\.html$/, '')}`;
+    await tab.goto(`http://localhost:${PORT}${BASE}${path}`, { waitUntil: 'load' });
+    await tab.waitForTimeout(1000); // a started reveal has moved off its start state by now
+    const stuck = await tab.evaluate(() => {
+      const onScreen = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight * 0.85; };
+      const chars = [...document.querySelectorAll('[data-split] [style*="translate(0%, 110%)"]')].filter(onScreen);
+      const blocks = [...document.querySelectorAll('[data-reveal], [data-split]')].filter((el) => onScreen(el) && getComputedStyle(el).opacity === '0');
+      return chars.length + blocks.length;
+    });
+    if (stuck) failures.push(`1440px ${path}: ${stuck} element(s) on the first screen never revealed`);
+  }
+  await ctx.close();
 } finally {
   await browser?.close();
   stop();
 }
-failures.forEach((f) => console.error(`OVERFLOW ${f}`));
-console.log(`overflow: ${pages.length} pages × 2 widths, ${failures.length} problem(s)`);
+failures.forEach((f) => console.error(`FAIL ${f}`));
+console.log(`overflow + first-screen reveal: ${pages.length} pages, ${failures.length} problem(s)`);
 process.exit(failures.length ? 1 : 0);
