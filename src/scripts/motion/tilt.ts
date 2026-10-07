@@ -8,6 +8,7 @@ export function tilt(): void {
     const rx = gsap.quickTo(el, 'rotationX', { duration: .4, ease: 'power3' });
     const ry = gsap.quickTo(el, 'rotationY', { duration: .4, ease: 'power3' });
     el.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
       const r = el.getBoundingClientRect();
       ry(((e.clientX - r.left) / r.width - .5) * 8);
       rx(-((e.clientY - r.top) / r.height - .5) * 8);

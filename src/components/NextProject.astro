@@ -8,7 +8,7 @@ const { href, title, label } = Astro.props;
 <section class="next-project">
   <a class="np wrap" href={withBase(href)}>
     <span class="label"><T s={label} /></span>
-    <span class="np-title" data-split>{typeof title === 'string' ? title : <T s={title} />}</span>
+    <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />}</span>
     <span class="np-arrow" aria-hidden="true">→</span>
   </a>
 </section>

@@ -6,7 +6,7 @@ interface Props { value: number; suffix?: string; label: string; placeholder: bo
 const { value, suffix, label, placeholder } = Astro.props;
 ---
 <div class="stat" data-placeholder={placeholder ? '' : undefined}>
-  <p class="stat-num"><span data-count={value < 1000 ? value : undefined}>{value}</span>{suffix}</p>
+  <p class="stat-num"><span data-count={Number.isInteger(value) && value < 1000 ? value : undefined}>{value}</span>{suffix}</p>
   <p class="stat-label">{label}<DraftTag when={placeholder} /></p>
 </div>
 <style>

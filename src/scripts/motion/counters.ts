@@ -4,7 +4,7 @@ import { gsap } from './index';
 export function counters(): void {
   for (const el of document.querySelectorAll<HTMLElement>('[data-count]')) {
     const end = Number(el.dataset.count);
-    if (!Number.isFinite(end)) continue;
+    if (!Number.isInteger(end)) continue;
     const o = { v: 0 };
     gsap.to(o, {
       v: end, duration: 1.6, ease: 'power2.out',

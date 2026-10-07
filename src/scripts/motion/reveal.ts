@@ -4,13 +4,18 @@ import { gsap, SplitText } from './index';
 export function reveal(): void {
   for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
     if (el.closest('[data-hero]')) continue;
+    // SplitText adds aria-label and hides the letters: only safe on real headings, never on a span in a link.
+    if (!/^H[1-6]$/.test(el.tagName)) {
+      gsap.from(el, { y: 40, opacity: 0, duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'clamp(top 92%)', once: true } });
+      continue;
+    }
     const split = SplitText.create(el, { type: 'words,chars', mask: 'words' });
     gsap.from(split.chars, {
       yPercent: 110, duration: .8, ease: 'expo.out', stagger: .018,
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      scrollTrigger: { trigger: el, start: 'clamp(top 88%)', once: true },
     });
   }
   for (const el of document.querySelectorAll<HTMLElement>('[data-reveal]')) {
-    gsap.from(el, { y: 40, opacity: 0, duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
+    gsap.from(el, { y: 40, opacity: 0, duration: .9, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'clamp(top 92%)', once: true } });
   }
 }

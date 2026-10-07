@@ -14,11 +14,15 @@ export { gsap, ScrollTrigger, SplitText };
  */
 export function run(...mods: Array<() => void>): void {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.documentElement.classList.add('motion-ready');
-  if (reduced) return;
+  const root = document.documentElement;
+  // Already ready means the 3s fallback fired before the bundle arrived: content is visible, so don't re-hide it.
+  const late = root.classList.contains('motion-ready');
+  root.classList.add('motion-ready');
+  if (reduced || late) return;
   for (const m of mods) {
     try { m(); } catch (e) { console.error('[motion]', e); }
   }
+  ScrollTrigger.sort(); // creation order != page order once something pins
   // Trigger positions are measured now; fonts and media settling afterwards would leave them stale.
   const refresh = () => ScrollTrigger.refresh();
   if (document.readyState === 'complete') refresh();
