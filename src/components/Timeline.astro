@@ -30,6 +30,6 @@ const { items, heading } = Astro.props;
   .tl-item { flex: 0 0 min(80vw, 380px); scroll-snap-align: start; display: grid; align-content: start; justify-items: start; gap: var(--s-4); }
   .tl-year { font-size: clamp(5rem, 3rem + 7vw, 10rem); line-height: .8; }
   .tl-body { margin: 0; padding-top: var(--s-4); border-top: 1px solid var(--line); font-size: var(--fs-small); }
-  .tl-item :global(.tl-img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-card); }
+  .tl-item :global(.tl-img) { width: 100%; height: auto; border-radius: var(--r-card); }
   .timeline:global(.is-pinned) .tl-track { overflow: visible; scroll-snap-type: none; width: max-content; }
 </style>

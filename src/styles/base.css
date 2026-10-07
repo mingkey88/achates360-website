@@ -25,3 +25,12 @@ body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + env(safe
 @media (prefers-reduced-motion: no-preference) {
   .js:not(.motion-ready) :is([data-split], [data-reveal], [data-hero-title], [data-hero-sticker]) { opacity: 0; }
 }
+
+/* No-JS: the Menu button and autoplay controls do nothing, so show the full nav and poster stills. */
+html:not(.js) .menu-open, html:not(.js) .bv-toggle { display: none; }
+html:not(.js) .site-header .primary ul { display: flex; flex-wrap: wrap; row-gap: 4px; }
+html:not(.js) .site-header .bar { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+@media (max-width: 1023px) { html:not(.js) body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + 64px + env(safe-area-inset-top, 0px)); } }
+html:not(.js) .hero-media .hm-still, html:not(.js) .sc-media .sc-still { display: block !important; }
+html:not(.js) .hm-video, html:not(.js) .sc-video { display: none !important; }
+html:not(.js) .bgvideo video[data-src] { display: none; }

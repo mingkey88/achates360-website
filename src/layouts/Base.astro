@@ -10,6 +10,8 @@ import type { PageKind } from '../lib/page-kind';
 import Header from '../components/Header.astro';
 import Menu from '../components/Menu.astro';
 import Footer from '../components/Footer.astro';
+import bebasLatin from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url';
+import dmSansLatin from '@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2?url';
 import '@fontsource/bebas-neue/400.css';
 import '@fontsource/dm-sans/300.css';
 import '@fontsource/dm-sans/400.css';
@@ -37,6 +39,8 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={bebasLatin} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={dmSansLatin} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {robots && <meta name="robots" content={robots} />}

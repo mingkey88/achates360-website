@@ -13,13 +13,16 @@ for (const b of blocks) {
   columns.at(-1)!.push(b);
 }
 const [[intro, ...legal], ...rest] = columns;
+// The export's footer copy uses ##### / ###### for styling, which skips heading levels on every
+// page. Keep the words, render those two as styled paragraphs (the copy itself is unchanged).
+const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/?)h([56])\b([^>]*)>/g, (_m, close, n, attrs) => close ? '</p>' : `<p class="fh${n}"${attrs}>`);
 ---
 <footer class="site-footer">
   <div class="wrap grid">
-    {intro && <div class="intro" set:html={renderMd(intro.md)} />}
+    {intro && <div class="intro" set:html={md(intro.md)} />}
     {rest.map((col) => (
       <div class="col">
-        {col.filter((b) => b.type === 'text').map((b) => <div class="md" set:html={renderMd(b.md)} />)}
+        {col.filter((b) => b.type === 'text').map((b) => <div class="md" set:html={md(b.md)} />)}
         {col.some((b) => b.type === 'image') && (
           <ul class="social">
             {col.filter((b) => b.type === 'image').map((b) => (
@@ -29,7 +32,7 @@ const [[intro, ...legal], ...rest] = columns;
         )}
       </div>
     ))}
-    <div class="legal">{legal.map((b) => <div class="md" set:html={renderMd(b.md)} />)}</div>
+    <div class="legal">{legal.map((b) => <div class="md" set:html={md(b.md)} />)}</div>
   </div>
   <p class="mega-mark" aria-hidden="true">{wordmark.text}</p>
 </footer>
@@ -39,10 +42,10 @@ const [[intro, ...legal], ...rest] = columns;
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
   .intro :global(:is(h1, h2, h3, h4, h5, h6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); max-width: 18ch; text-wrap: balance; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
-  .md :global(h6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: rgb(233 228 225 / .7); }
-  .md :global(h5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
+  .md :global(.fh6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: rgb(233 228 225 / .7); }
+  .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
   .md :global(p) { margin: 0; }
-  .md :global(a), .social a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .md :global(a), .social a { display: inline-block; padding-block: 6px; text-decoration-color: var(--accent); text-underline-offset: 3px; }
   .social { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); text-transform: uppercase; letter-spacing: .08em; }
   .legal { font-size: var(--fs-label); color: rgb(233 228 225 / .7); }
   .mega-mark {

@@ -8,7 +8,7 @@ interface Props {
   image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string;
   previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [320, 640, 960, 1280], tilt = false, eager = false } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false } = Astro.props;
 const Wrap = href ? 'a' : 'div';
 const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
 ---

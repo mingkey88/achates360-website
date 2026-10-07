@@ -7,7 +7,7 @@ export default defineConfig({
   site: production ? 'https://www.achates360.com' : 'https://mingkey88.github.io',
   base: production ? '/' : '/achates360-website',
   trailingSlash: 'never',
-  build: { format: 'file' },
+  build: { format: 'file', inlineStylesheets: 'always' },
   env: {
     schema: {
       SITE_ENV: envField.enum({

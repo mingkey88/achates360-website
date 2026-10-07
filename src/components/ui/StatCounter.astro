@@ -10,6 +10,6 @@ const { value, suffix, label, placeholder } = Astro.props;
   <p class="stat-label">{label}<DraftTag when={placeholder} /></p>
 </div>
 <style>
-  .stat-num { margin: 0; font: 400 clamp(3.5rem, 2.5rem + 4vw, 6.5rem)/.9 var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat-num { margin: 0; font: 400 clamp(3.5rem, 2.5rem + 4vw, 6.5rem)/.9 var(--font-display); color: var(--stat-color, var(--accent)); font-variant-numeric: tabular-nums; }
   .stat-label { margin: var(--s-2) 0 0; font-size: var(--fs-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
 </style>

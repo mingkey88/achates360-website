@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BgVideo from '../BgVideo.astro';
 import { BLANK_IMAGE } from '../../lib/paths';
 import { loadExtras } from '../../lib/extras';
@@ -10,6 +10,7 @@ type Media = { type: 'image'; src: ImageMetadata; alt: string } | { type: 'video
 interface Props { media: Media; class?: string; eager?: boolean }
 const { media, class: cls, eager = true } = Astro.props;
 const { text } = await loadExtras();
+const stillUrl = media.type === 'video' ? (await getImage({ src: media.poster, width: 1440, format: 'webp' })).src : undefined;
 const load = eager ? 'eager' : 'lazy';
 ---
 <div class:list={['hero-media', cls]} data-bgvideo-viewport>
@@ -20,6 +21,7 @@ const load = eager ? 'eager' : 'lazy';
         <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
         <Image class="hm-still" src={media.poster} alt="" widths={[480, 960, 1440]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
       </picture>
+      <noscript><img class="hm-still" src={stillUrl} alt="" /></noscript>
     </>
   ) : (
     <Image class="hm-image" src={media.src} alt={media.alt} widths={[480, 960, 1440, 1920, 2560]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />

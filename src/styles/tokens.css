@@ -8,6 +8,7 @@
   --black: #0d0d0d;
   --accent: #ff4b1f;
   --muted: #8f8888;
+  --accent-deep: #e03c10; /* accent for large text on light grounds; ~3.9:1 on paper */
   --line: rgb(21 20 20 / .12);
 
   --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;

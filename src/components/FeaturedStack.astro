@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BgVideo from './BgVideo.astro';
 import Sticker from './ui/Sticker.astro';
@@ -16,6 +16,7 @@ type Project = CollectionEntry<'projects'>['data'];
 interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString }
 const { items, eyebrow } = Astro.props;
 const { text } = await loadExtras();
+const stills = await Promise.all(items.map(async ({ slide }) => slide.media.type === 'video' ? (await getImage({ src: slide.media.poster, width: 1440, format: 'webp' })).src : undefined));
 const videoDraft = text('video-pause').placeholder || text('video-play').placeholder;
 ---
 <section class="featured section" aria-labelledby="featured-title">
@@ -31,6 +32,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
                 <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
                 <Image class="sc-still" src={slide.media.poster} alt="" widths={[480, 960]} sizes="100vw" />
               </picture>
+              <noscript><img class="sc-still" src={stills[i]} alt="" /></noscript>
             </>
           ) : (
             <Image class="sc-image" src={slide.media.src} alt={slide.media.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 1440px) 92vw, 1320px" />
@@ -78,5 +80,5 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
     .sc-media :global(.sc-still) { display: none; }
     .sc-text { padding: var(--s-8); }
   }
-  @media (max-width: 767px) { .sc-media :global(.sc-video) { display: none; } }
+  @media (max-width: 767px) { .sc-media :global(.sc-video) { display: none; } .stack-card { height: min(64svh, 520px); } }
 </style>

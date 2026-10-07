@@ -7,10 +7,12 @@ import Embed from './Embed.astro';
 import Player from './Player.astro';
 import MediaCard from './ui/MediaCard.astro';
 import Pill from './ui/Pill.astro';
+import { loadExtras } from '../lib/extras';
 // One exported content block in the new design. Copy is rendered verbatim; the clone's per-block
 // colours (b.color) belonged to Wix's layout and are not used.
 interface Props { block: any; pageTitle?: string; lead?: boolean; sizes?: string; demote?: number }
 const { block: b, pageTitle, lead = false, sizes = '(max-width: 767px) 100vw, (max-width: 1440px) 92vw, 1320px', demote = 0 } = Astro.props;
+const { text } = await loadExtras();
 const label = pageTitle ? `${pageTitle} video` : undefined;
 ---
 {b.type === 'text' && <div class:list={['block-text', 'prose', { lead }]} data-reveal set:html={renderMd(b.md, undefined, { demote })} />}
@@ -20,10 +22,10 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
   : <div class="block-image" data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></div>)}
 {b.type === 'gallery' && (
   <ul class="block-gallery">
-    {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} title={it.href ? it.title : undefined} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) 100vw, 45vw" /></li>)}
+    {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} title={it.href ? it.title : undefined} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) calc(100vw - 32px), 45vw" /></li>)}
   </ul>
 )}
 {b.type === 'video' && (b.controls
   ? <Player src={b.src} poster={b.poster} label={label} />
-  : <BgVideo src={b.src} poster={b.poster} class="block-video" />)}
+  : <BgVideo src={b.src} poster={b.poster} class="block-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />)}
 {b.type === 'embed' && <Embed provider={b.provider} id={b.id} title={label} />}
