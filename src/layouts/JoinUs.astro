@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from './Base.astro';
+import Sticker from '../components/ui/Sticker.astro';
+import T from '../components/ui/T.astro';
+import Pill from '../components/ui/Pill.astro';
+import { renderMd } from '../lib/markdown';
+import { splitRoleHeading } from '../lib/copy';
+import { loadExtras } from '../lib/extras';
+// /joinus (spec §4.6): the first text block is the page heading ("# Join us"); each later text
+// block with a heading is a role, with the image just before it as its picture, and a link block
+// right after it ("Apply Now") as its apply button. Native <details> works without JS.
+interface Props { entry: CollectionEntry<'basic'> }
+const d = Astro.props.entry.data;
+const { text } = await loadExtras();
+const [head, ...rest] = d.blocks as any[];
+const roles: { title: string; md: string; image?: any; apply?: { href: string; label: string } }[] = [];
+const others: any[] = [];
+let pending: any;
+for (const b of rest) {
+  if (b.type === 'image') { pending = b; continue; }
+  if (b.type === 'link' && roles.length && !roles[roles.length - 1].apply) { roles[roles.length - 1].apply = { href: b.href, label: b.label }; continue; }
+  const split = b.type === 'text' ? splitRoleHeading(b.md) : null;
+  if (split?.lead) throw new Error('/joinus: text before the role heading would be dropped; extend JoinUs.astro');
+  if (split) { roles.push({ title: split.title, md: split.rest, image: pending }); pending = undefined; }
+  else others.push(b);
+}
+if (pending) others.push(pending);
+// Nothing may silently disappear: a block shape this template does not place fails the build.
+if (others.length) throw new Error(`/joinus: ${others.length} block(s) not placed in a role card; extend JoinUs.astro`);
+---
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="joinus">
+  <header class="wrap ju-head" set:html={renderMd(head.md)} />
+  <div class="wrap roles">
+    {roles.map((r, i) => (
+      <details class="role" open={i === 0} data-reveal>
+        <summary>
+          <Sticker><T s={text('role-sticker')} /></Sticker>
+          <h2 class="display h2">{r.title}</h2>
+        </summary>
+        <div class="role-body">
+          {r.image && <Image class="role-img" src={r.image.src} alt={r.image.alt} widths={[480, 960]} sizes="(max-width: 1023px) 100vw, 40vw" />}
+          <div class="role-copy">
+            <div class="prose" set:html={renderMd(r.md)} />
+            {r.apply && <p class="apply"><Pill href={r.apply.href} variant="fill">{r.apply.label}</Pill></p>}
+          </div>
+        </div>
+      </details>
+    ))}
+  </div>
+</Base>
+<style>
+  .ju-head { padding-block: var(--s-8) var(--s-6); }
+  .ju-head :global(h1) { margin: 0; font: 400 var(--fs-h1)/var(--lh-display) var(--font-display); }
+  .roles { display: grid; gap: var(--s-5); padding-bottom: var(--s-9); }
+  .role { border-radius: var(--r-card); background: var(--white); padding: var(--s-6); }
+  summary { display: grid; justify-items: start; gap: var(--s-3); cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary h2::after { content: ' +' / ''; color: var(--accent); }
+  .role[open] summary h2::after { content: ' –' / ''; }
+  .role-body { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
+  .apply { margin: var(--s-6) 0 0; }
+  .role-body :global(.role-img) { width: 100%; height: auto; border-radius: var(--r-card); }
+  @media (min-width: 1024px) { .role-body { grid-template-columns: 2fr 3fr; align-items: start; } }
+</style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  run(reveal);
+</script>

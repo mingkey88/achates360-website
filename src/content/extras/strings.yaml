@@ -1,0 +1,38 @@
+# Every new UI string (spec §6.2). Read in templates via text('<id>').
+- { id: wordmark, text: ACHATES 360, placeholder: false }
+- { id: nav-label, text: Site, placeholder: true }
+- { id: menu-open, text: Menu, placeholder: true }
+- { id: menu-close, text: Back to site, placeholder: true }
+- { id: menu-services, text: SERVICES, placeholder: true }
+- { id: video-pause, text: Pause video, placeholder: true }
+- { id: video-play, text: Play video, placeholder: true }
+- { id: hero-sticker, text: Since 2001, placeholder: true }
+- { id: hero-tagline, text: Design is thinking made visual, placeholder: true }
+- { id: featured-eyebrow, text: Selected work, placeholder: true }
+- { id: intro-eyebrow, text: Inside the studio, placeholder: true }
+- { id: intro-cta, text: Learn more, placeholder: true }
+- { id: services-eyebrow, text: What we do, placeholder: true }
+- { id: services-cta, text: All services, placeholder: true }
+- { id: clients-eyebrow, text: Trusted by, placeholder: true }
+- { id: testimonials-eyebrow, text: Client feedback, placeholder: true }
+- { id: connect-line, text: "Let's connect and let's work together", placeholder: true }
+- { id: connect-cta, text: Get in touch, placeholder: true }
+- { id: next-project, text: Next project, placeholder: true }
+- { id: next-fallback, text: All projects, placeholder: true }
+- { id: meta-client, text: Client, placeholder: true }
+- { id: meta-year, text: Year, placeholder: true }
+- { id: meta-services, text: Services, placeholder: true }
+- { id: meta-recognition, text: Recognition, placeholder: true }
+- { id: sections-label, text: Sections, placeholder: true }
+- { id: services-heading, text: Services, placeholder: true }
+- { id: services-sticker, text: Full service, placeholder: true }
+- { id: process-heading, text: How we work, placeholder: true }
+- { id: process-step, text: Step, placeholder: true }
+- { id: reel-left, text: Play, placeholder: true }
+- { id: reel-right, text: Reel, placeholder: true }
+- { id: about-stats-eyebrow, text: In numbers, placeholder: true }
+- { id: timeline-heading, text: Our story, placeholder: true }
+- { id: role-sticker, text: "We're hiring", placeholder: true }
+- { id: marquee-pause, text: Pause animation, placeholder: true }
+- { id: marquee-play, text: Play animation, placeholder: true }
+- { id: skip-link, text: Skip to content, placeholder: true }

@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { withBase, mediaUrl, linkAttrs } from '../../lib/paths';
+import Sticker from './Sticker.astro';
+// A rounded image card. previewVideo: a muted preview that plays on hover, only on hover-capable
+// pointers and without reduced motion (Review Focus 5).
+interface Props {
+  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string;
+  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean;
+}
+const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false } = Astro.props;
+const Wrap = href ? 'a' : 'div';
+const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
+---
+<Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal>
+  <div class="mc-media" style={`aspect-ratio: ${ratio}`}>
+    <Image src={image} alt={alt} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+    {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}
+    {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
+  </div>
+  {(title || subtitle) && (
+    <div class="mc-text">
+      {title && <p class="mc-title">{title}</p>}
+      {subtitle && <p class="mc-sub">{subtitle}</p>}
+    </div>
+  )}
+</Wrap>
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const hover = window.matchMedia('(hover: hover)');
+  for (const card of document.querySelectorAll<HTMLElement>('.media-card[data-preview]')) {
+    const v = card.querySelector<HTMLVideoElement>('.mc-preview')!;
+    card.addEventListener('pointerenter', () => {
+      if (reduce.matches || !hover.matches) return;
+      if (!v.getAttribute('src')) v.src = v.dataset.src!;
+      card.classList.add('is-playing');
+      v.play().catch(() => card.classList.remove('is-playing'));
+    });
+    card.addEventListener('pointerleave', () => { card.classList.remove('is-playing'); v.pause(); });
+  }
+</script>
+<style>
+  .media-card { display: block; color: inherit; text-decoration: none; }
+  .mc-media { position: relative; overflow: hidden; border-radius: var(--r-card); background: var(--peach); }
+  .mc-media :global(img), .mc-preview { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease-out); }
+  .mc-preview { position: absolute; inset: 0; opacity: 0; transition: opacity .25s; }
+  .is-playing .mc-preview { opacity: 1; }
+  a.media-card:hover .mc-media :global(img) { transform: scale(1.04); }
+  .mc-media :global(.mc-sticker) { position: absolute; top: var(--s-3); right: var(--s-3); }
+  .mc-text { padding-top: var(--s-3); }
+  .mc-title { margin: 0; font: 400 clamp(1.375rem, 1.1rem + .8vw, 1.875rem)/1 var(--font-display); overflow-wrap: anywhere; }
+  .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: #5d5654; }
+  @media (prefers-reduced-motion: reduce) { .mc-media :global(img) { transition: none; } }
+</style>

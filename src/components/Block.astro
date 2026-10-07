@@ -4,26 +4,28 @@ import { renderMd } from '../lib/markdown';
 import { withBase, backLinkHref, linkAttrs } from '../lib/paths';
 import BgVideo from './BgVideo.astro';
 import Embed from './Embed.astro';
-import Gallery from './Gallery.astro';
 import Player from './Player.astro';
-// One content block. `width` is its desktop display width in px when Wix's layout box is known
-// (Blocks.astro), so images ask for a fitting size.
-interface Props { block: any; gallery?: 'stack' | 'grid'; pageTitle?: string; width?: number }
-const { block: b, gallery = 'grid', pageTitle, width } = Astro.props;
-const sizes = width ? `(max-width: 767px) 100vw, ${width}px` : '(max-width: 980px) 100vw, 980px';
+import MediaCard from './ui/MediaCard.astro';
+import Pill from './ui/Pill.astro';
+import { loadExtras } from '../lib/extras';
+// One exported content block in the new design. Copy is rendered verbatim; the clone's per-block
+// colours (b.color) belonged to Wix's layout and are not used.
+interface Props { block: any; pageTitle?: string; lead?: boolean; sizes?: string; demote?: number }
+const { block: b, pageTitle, lead = false, sizes = '(max-width: 767px) 100vw, (max-width: 1440px) 92vw, 1320px', demote = 0 } = Astro.props;
+const { text } = await loadExtras();
 const label = pageTitle ? `${pageTitle} video` : undefined;
 ---
-{b.type === 'text' && <div class="block-text" style={b.color ? `color: ${b.color}` : undefined} set:html={renderMd(b.md)} />}
-{/* The only content link to the home page is Wix's "← BACK TO PROJECTS", whose data-anchor
-    scrolls home to the All Projects section. */}
-{b.type === 'link' && <p class="block-link"><a href={withBase(backLinkHref(b.href))} {...linkAttrs(b.href)}>{b.label}</a></p>}
-{b.type === 'image' && (() => {
-  // GIFs too: Astro's sharp service keeps every frame (animated WebP), sized to the slot.
-  const img = <Image src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} />;
-  return b.href ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : <div class="block-image">{img}</div>;
-})()}
-{b.type === 'gallery' && <Gallery items={b.items} layout={gallery} />}
+{b.type === 'text' && <div class:list={['block-text', 'prose', { lead }]} data-reveal set:html={renderMd(b.md, undefined, { demote })} />}
+{b.type === 'link' && <p class="block-link"><Pill href={backLinkHref(b.href)}>{b.label}</Pill></p>}
+{b.type === 'image' && (b.href
+  ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)} data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></a>
+  : <div class="block-image" data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></div>)}
+{b.type === 'gallery' && (
+  <ul class="block-gallery">
+    {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} title={it.href ? it.title : undefined} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) calc(100vw - 32px), 45vw" /></li>)}
+  </ul>
+)}
 {b.type === 'video' && (b.controls
   ? <Player src={b.src} poster={b.poster} label={label} />
-  : <BgVideo src={b.src} poster={b.poster} class="block-video" />)}
+  : <BgVideo src={b.src} poster={b.poster} class="block-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />)}
 {b.type === 'embed' && <Embed provider={b.provider} id={b.id} title={label} />}

@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import { withBase, linkAttrs } from '../lib/paths';
+import { metaColumns, type MetaKey } from '../lib/meta';
+import type { UiString } from '../lib/strings';
+import Chip from './ui/Chip.astro';
+import T from './ui/T.astro';
+interface Props {
+  client?: string; copyright?: string; categories: string[];
+  badges: { src: ImageMetadata; alt: string; href?: string }[]; labels: Record<MetaKey, UiString>;
+}
+const { client, copyright, categories, badges, labels } = Astro.props;
+const cols = metaColumns({ client, copyright, categories, badges });
+---
+{cols.length > 0 && (
+  <dl class="meta wrap">
+    {cols.map((k) => (
+      <div class="meta-col">
+        <dt class="label"><T s={labels[k]} /></dt>
+        <dd>
+          {k === 'client' && client}
+          {k === 'year' && copyright}
+          {k === 'services' && <ul class="chips">{categories.map((c) => <li><Chip>{c}</Chip></li>)}</ul>}
+          {k === 'recognition' && (
+            <ul class="badges">
+              {badges.map((b) => {
+                const img = <Image src={b.src} alt={b.alt} height={72} densities={[1, 2]} />;
+                return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
+              })}
+            </ul>
+          )}
+        </dd>
+      </div>
+    ))}
+  </dl>
+)}
+<style>
+  .meta { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); margin-block: 0; padding-block: var(--s-6); border-bottom: 1px solid var(--line); }
+  .meta-col { min-width: 0; }
+  dt { margin-bottom: var(--s-2); color: #5d5654; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  .chips, .badges { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .badges :global(img) { height: 72px; width: auto; }
+</style>

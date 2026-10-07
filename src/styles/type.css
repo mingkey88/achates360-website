@@ -1,0 +1,17 @@
+.display {
+  margin-block: 0; font-family: var(--font-display); font-weight: 400; line-height: var(--lh-display);
+  letter-spacing: .005em; text-wrap: balance; overflow-wrap: anywhere;
+}
+.mega { font-size: var(--fs-mega); line-height: .82; }
+.h1 { font-size: var(--fs-h1); }
+.h2 { font-size: var(--fs-h2); }
+.h3 { font-size: var(--fs-h3); line-height: .95; }
+.label { font-size: var(--fs-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+.lead { font-size: var(--fs-lead); line-height: 1.35; font-weight: 300; }
+.prose { max-width: 68ch; overflow-wrap: anywhere; }
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+.prose :is(p, ul, ol) { margin: 0 0 1em; }
+.prose :is(h1, h2, h3, h4, h5, h6) { font: 400 var(--fs-h3) / .95 var(--font-display); margin: 1.2em 0 .4em; text-wrap: balance; }
+.prose a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.prose li::marker { color: var(--accent); }

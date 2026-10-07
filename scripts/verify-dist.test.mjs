@@ -102,3 +102,70 @@ describe('sizeProblems', () => {
     expect(r).toEqual({ total: 12 * MB, tooBig: ['a'], overTotal: true });
   });
 });
+
+describe('extra required paths', () => {
+  it('requires new redesign pages alongside the sitemap and permanent lists', () => {
+    expect(requiredPaths(['/'], ['/', '/angeline'], ['/services'])).toEqual(['/', '/angeline', '/services']);
+  });
+  it('the committed new-pages list holds /services', () => {
+    const extra = JSON.parse(readFileSync(new URL('./new-pages.json', import.meta.url), 'utf8'));
+    expect(extra).toEqual(['/services']);
+  });
+});
+
+import { pageChecks, scriptFiles, importsOf, jsWeights, JS_BUDGET } from './verify-dist.mjs';
+import { gzipSync } from 'node:zlib';
+
+const page = (body, attrs = 'data-page="page"') =>
+  `<html><head><script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script></head><body ${attrs}><header class="site-header"><a href="/b/services">S</a></header><main>${body}</main><footer class="site-footer"></footer></body></html>`;
+
+describe('pageChecks', () => {
+  const opts = { production: false, base: '/b' };
+  it('passes a well-formed page', () => {
+    expect(pageChecks([{ file: 'a.html', html: page('<h1>A</h1>') }], opts)).toEqual([]);
+  });
+  it('requires exactly one h1', () => {
+    expect(pageChecks([{ file: 'a.html', html: page('<h2>x</h2>') }], opts)[0].problem).toMatch(/h1/);
+    expect(pageChecks([{ file: 'a.html', html: page('<h1>a</h1><h1>b</h1>') }], opts)[0].problem).toMatch(/2 h1/);
+  });
+  it('requires the site header, footer and the services link', () => {
+    const html = '<body data-page="page"><h1>x</h1></body>';
+    const problems = pageChecks([{ file: 'a.html', html }], opts).map((p) => p.problem).join(' | ');
+    expect(problems).toMatch(/site-header/);
+    expect(problems).toMatch(/site-footer/);
+    expect(problems).toMatch(/services/);
+  });
+  it('requires the next-project band on case studies', () => {
+    expect(pageChecks([{ file: 'p.html', html: page('<h1>P</h1>', 'data-page="project"') }], opts)[0].problem).toMatch(/next-project/);
+  });
+  it('rejects placeholder markup in a production build only', () => {
+    const html = page('<h1>A</h1><span data-placeholder>x</span>');
+    expect(pageChecks([{ file: 'a.html', html }], opts)).toEqual([]);
+    expect(pageChecks([{ file: 'a.html', html }], { ...opts, production: true })[0].problem).toMatch(/placeholder/);
+  });
+  it('requires the 3s motion fallback wherever content waits for a reveal', () => {
+    const html = page('<h1 data-split>A</h1>').replace(/setTimeout[^<]*/, '');
+    expect(pageChecks([{ file: 'a.html', html }], opts)[0].problem).toMatch(/fallback/);
+  });
+});
+
+describe('JS budget', () => {
+  it('finds module script files and their static imports', () => {
+    expect(scriptFiles('<script type="module" src="/b/_astro/a.js"></script><script src="/x.js"></script>')).toEqual(['/b/_astro/a.js']);
+    expect(importsOf('import{a}from"./c.js";import"./d.js";const x=import("./lazy.js")')).toEqual(['./c.js', './d.js']);
+  });
+  it('sums gzipped bytes of each page’s scripts and their imports, counting shared chunks once', async () => {
+    const files = { '/b/_astro/a.js': 'import"./c.js";' + 'a'.repeat(500), '/b/_astro/c.js': 'c'.repeat(500) };
+    const pages = [{ file: 'a.html', html: '<script type="module" src="/b/_astro/a.js"></script>' }];
+    const [w] = await jsWeights(pages, async (p) => files[p] ?? null);
+    expect(w.bytes).toBe(gzipSync(files['/b/_astro/a.js']).length + gzipSync(files['/b/_astro/c.js']).length);
+    expect(JS_BUDGET).toBe(81920);
+    expect(w.unresolved).toEqual([]);
+  });
+  it('reports scripts it cannot read instead of counting them as 0 bytes', async () => {
+    const files = { '/b/_astro/a.js': 'import"./c.js";' + 'a'.repeat(500) };
+    const pages = [{ file: 'a.html', html: '<script type="module" src="/b/_astro/a.js"></script>' }];
+    const [w] = await jsWeights(pages, async (p) => files[p] ?? null);
+    expect(w.unresolved).toEqual(['/b/_astro/c.js']);
+  });
+});

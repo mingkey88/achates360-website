@@ -1,0 +1,5 @@
+# Process steps on /services (spec §4.4). All placeholder.
+- { id: brief, step: 1, title: Brief, body: "[Draft] What happens at this step.", placeholder: true }
+- { id: concept, step: 2, title: Concept, body: "[Draft] What happens at this step.", placeholder: true }
+- { id: design, step: 3, title: Design, body: "[Draft] What happens at this step.", placeholder: true }
+- { id: deliver, step: 4, title: Deliver, body: "[Draft] What happens at this step.", placeholder: true }

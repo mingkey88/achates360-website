@@ -1,0 +1,5 @@
+# Stats (spec §6.3). Only facts the site already states may be placeholder: false.
+- { id: founded, order: 1, value: 2001, label: Founded, placeholder: false }
+- { id: projects, order: 2, value: listed-projects, label: Featured projects, placeholder: false }
+- { id: awards, order: 3, value: 10, suffix: "+", label: "[Draft] Awards", placeholder: true }
+- { id: clients, order: 4, value: 100, suffix: "+", label: "[Draft] Clients served", placeholder: true }

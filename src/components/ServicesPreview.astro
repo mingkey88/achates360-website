@@ -1,0 +1,32 @@
+---
+import Eyebrow from './ui/Eyebrow.astro';
+import Chip from './ui/Chip.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import DraftTag from './ui/DraftTag.astro';
+import type { UiString } from '../lib/strings';
+interface Service { id: string; title: string; tags: string[]; placeholder: boolean }
+interface Props { services: Service[]; eyebrow: UiString; cta: UiString }
+const { services, eyebrow, cta } = Astro.props;
+---
+<section class="services-preview section" aria-labelledby="sp-title">
+  <div class="wrap">
+    <Eyebrow as="h2" id="sp-title"><T s={eyebrow} /></Eyebrow>
+    <ul class="rows">
+      {services.map((s) => (
+        <li class="row" data-placeholder={s.placeholder ? '' : undefined} data-reveal>
+          <h3 class="display h2" data-split>{s.title}<DraftTag when={s.placeholder} /></h3>
+          <ul class="tags">{s.tags.map((t) => <li><Chip>{t}</Chip></li>)}</ul>
+        </li>
+      ))}
+    </ul>
+    <Pill href="/services"><T s={cta} /></Pill>
+  </div>
+</section>
+<style>
+  .services-preview { background: var(--peach); }
+  .rows { list-style: none; margin: 0 0 var(--s-7); padding: 0; }
+  .row { display: grid; gap: var(--s-4); padding-block: var(--s-6); border-top: 1px solid var(--line); }
+  .tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  @media (min-width: 1024px) { .row { grid-template-columns: 1.3fr 1fr; align-items: end; } }
+</style>

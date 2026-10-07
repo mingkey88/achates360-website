@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "export": "node scripts/export-wix/index.mjs",
     "render": "node scripts/export-wix/render.mjs",
-    "verify": "node scripts/verify-dist.mjs"
+    "verify": "node scripts/verify-dist.mjs",
+    "check:overflow": "node scripts/check-overflow.mjs"
   },
   "keywords": [],
   "author": "",
@@ -20,8 +21,10 @@
   "type": "module",
   "private": "true",
   "dependencies": {
-    "@fontsource/nunito-sans": "^5.3.0",
+    "@fontsource/bebas-neue": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
     "astro": "^7.3.5",
+    "gsap": "^3.15.0",
     "marked": "^18.1.0"
   },
   "devDependencies": {

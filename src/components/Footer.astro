@@ -1,103 +1,61 @@
 ---
-import { Image } from 'astro:assets';
-import Blocks from './Blocks.astro';
+import { renderMd } from '../lib/markdown';
 import { withBase, linkAttrs } from '../lib/paths';
-interface Props { blocks: any[] }
-const { blocks } = Astro.props;
-
-// The site footer is a row of columns; each "###### Label" text block (Contact, Social) opens a
-// new column. The first column holds the intro heading, then the legal lines (which Wix's mobile
-// layout moves to the end of the footer).
+import type { UiString } from '../lib/strings';
+interface Props { blocks: any[]; wordmark: UiString }
+const { blocks, wordmark } = Astro.props;
+// site.md footer blocks, verbatim: the intro line, then the legal lines; each "###### Label" text
+// block (Contact, Social) opens a column. Social icons become text links named by their alt text.
 const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
 const columns: any[][] = [[]];
 for (const b of blocks) {
   if (isLabel(b)) columns.push([]);
   columns.at(-1)!.push(b);
 }
-const [first, ...rest] = columns;
-const intro = first.slice(0, 1);
-const legal = first.slice(1);
+const [[intro, ...legal], ...rest] = columns;
+// The export's footer copy uses ##### / ###### for styling, which skips heading levels on every
+// page. Keep the words, render those two as styled paragraphs (the copy itself is unchanged).
+const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/?)h([56])\b([^>]*)>/g, (_m, close, n, attrs) => close ? '</p>' : `<p class="fh${n}"${attrs}>`);
 ---
-<footer id="footer" class="site-footer">
-  <div class="grid">
-    <div class="intro"><Blocks blocks={intro} /></div>
-    {rest.map((col) => {
-      const icons = col.filter((b) => b.type === 'image');
-      const others = col.filter((b) => b.type !== 'image');
-      return (
-        <div class="col">
-          <Blocks blocks={others} />
-          {icons.length > 0 && (
-            <ul class="social">
-              {icons.map((b) => {
-                const img = <Image src={b.src} alt={b.alt} width={39} height={39} densities={[1, 2]} />;
-                return (
-                  <li>
-                    {b.href
-                      ? <a href={withBase(b.href)} aria-label={b.alt} {...linkAttrs(b.href)}>{img}</a>
-                      : img}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-      );
-    })}
-    {legal.length > 0 && <div class="legal"><Blocks blocks={legal} /></div>}
+<footer class="site-footer">
+  <div class="wrap grid">
+    {intro && <div class="intro" set:html={md(intro.md)} />}
+    {rest.map((col) => (
+      <div class="col">
+        {col.filter((b) => b.type === 'text').map((b) => <div class="md" set:html={md(b.md)} />)}
+        {col.some((b) => b.type === 'image') && (
+          <ul class="social">
+            {col.filter((b) => b.type === 'image').map((b) => (
+              <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{b.alt}</a> : <span>{b.alt}</span>}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ))}
+    <div class="legal">{legal.map((b) => <div class="md" set:html={md(b.md)} />)}</div>
   </div>
+  <p class="mega-mark" aria-hidden="true">{wordmark.text}</p>
 </footer>
 <style>
-  /*
-   * Geometry measured on the live site (notter, home; footer box 1440x334 desktop, 320x595 mobile):
-   * desktop: columns start x=48 / 494 / 982 at 1440 (358 / 709 at 1024 — proportional), labels at
-   *   y=43, intro heading and contact heading at y=77, icons at y=82 (39px, 49px step),
-   *   legal lines at y=217.
-   * mobile (Wix 320 layout, lengths scaled by --m per Ruling 21): 20px inset, single column: intro y=38, Contact 144, details 174,
-   *   Social 351, icons 381 (35px, 50px step), legal 426.
-   */
-  .site-footer {
-    background: var(--color-footer-bg);
-    color: var(--color-footer-text);
-    font-size: var(--size-footer);
-    line-height: var(--leading-footer);
+  .site-footer { background: var(--black); color: #e9e4e1; padding-top: var(--section-y); overflow: hidden; }
+  .site-footer :focus-visible { outline-color: var(--peach); }
+  .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
+  .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); max-width: 18ch; text-wrap: balance; }
+  .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
+  .md :global(.fh6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: rgb(233 228 225 / .7); }
+  .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
+  .md :global(p) { margin: 0; }
+  .md :global(a), .social a { display: inline-block; padding-block: 6px; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  .social { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); text-transform: uppercase; letter-spacing: .08em; }
+  .legal { font-size: var(--fs-label); color: rgb(233 228 225 / .7); }
+  .mega-mark {
+    margin: var(--s-8) 0 0; padding-inline: var(--gutter); white-space: nowrap;
+    font: 400 var(--fs-mega)/.78 var(--font-display);
+    background: linear-gradient(180deg, #fff 10%, rgb(255 255 255 / 0) 95%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .site-footer :global(a) { color: inherit; text-decoration: none; }
-  .site-footer :global(:is(h5, h6, p)) { margin: 0; color: inherit; }
-  .site-footer :global(h5) { font-size: var(--size-footer-heading); line-height: var(--leading-footer-heading); }
-  .site-footer :global(h6) { font-size: var(--size-footer); line-height: var(--leading-footer); color: var(--color-footer-label); }
-  /* Wix holds the contact block in one multi-line h5; the export splits it into h5 + paragraphs
-     (the empty line becomes a paragraph break). Render the trailing lines at h5 size. */
-  .site-footer :global(h5 ~ p) { font-size: var(--size-footer-heading); line-height: var(--leading-footer-heading); }
-  .site-footer :global(h5 ~ p + p) { margin-top: var(--leading-footer-heading); }
-
-  .grid {
-    display: grid;
-    grid-template-columns: 446fr 488fr 410fr;
-    padding: 43px 48px 75px;
-  }
-  .intro { grid-column: 1; grid-row: 1; margin-top: 34px; max-width: 360px; }
-  .legal { grid-column: 1; grid-row: 2; margin-top: 54px; }
-  .col { grid-row: 1 / span 2; }
-  .col > :global(.block-text + .block-text) { margin-top: 13px; }
-  .social { list-style: none; display: flex; gap: 10px; margin: 18px 0 0; padding: 0; }
-  .social li { line-height: 0; }
-  .social a { display: block; }
-  .social :global(img) { width: 39px; height: 39px; }
-
-  @media (max-width: 767px) {
-    .site-footer { font-size: var(--size-footer-m); line-height: var(--leading-footer-m); }
-    .site-footer :global(h5),
-    .site-footer :global(h5 ~ p) { font-size: var(--size-footer-heading-m); line-height: var(--leading-footer-heading-m); }
-    .site-footer :global(h5 ~ p + p) { margin-top: var(--leading-footer-heading-m); }
-    .site-footer :global(h6) { font-size: var(--size-footer-m); line-height: var(--leading-footer-m); }
-    .grid { display: block; padding: calc(38 * var(--m)) calc(20 * var(--m)) calc(130 * var(--m)); }
-    .intro { margin: 0; max-width: none; }
-    .col { margin-top: calc(36 * var(--m)); }
-    .col + .col { margin-top: calc(37 * var(--m)); }
-    .col > :global(.block-text + .block-text) { margin-top: calc(10 * var(--m)); }
-    .social { gap: calc(15 * var(--m)); margin-top: calc(10 * var(--m)); }
-    .social :global(img) { width: calc(35 * var(--m)); height: calc(35 * var(--m)); }
-    .legal { margin-top: calc(10 * var(--m)); }
+  @media (min-width: 768px) {
+    .grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(160px, 1fr)); }
+    .legal { grid-column: 1 / -1; }
   }
 </style>

@@ -4,33 +4,43 @@ import { getImage } from 'astro:assets';
 import { SITE_ENV } from 'astro:env/server';
 import { robotsMeta, canonicalUrl } from '../lib/seo';
 import { pagePath } from '../lib/paths';
-import Logo from '../components/Logo.astro';
+import { loadExtras } from '../lib/extras';
+import { withServices } from '../lib/menu';
+import type { PageKind } from '../lib/page-kind';
+import Header from '../components/Header.astro';
+import Menu from '../components/Menu.astro';
 import Footer from '../components/Footer.astro';
-import SiteMenu from '../components/SiteMenu.astro';
-import MobileMenu from '../components/MobileMenu.astro';
-import BackToTop from '../components/BackToTop.astro';
+import bebasLatin from '@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2?url';
+import dmSansLatin from '@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2?url';
+import '@fontsource/bebas-neue/400.css';
+import '@fontsource/dm-sans/300.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/400-italic.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/type.css';
 
-// background: the page's Wix background colour, when it is not the default white (exported as
-// pageBackground).
-interface Props { title: string; description?: string; ogImage?: ImageMetadata; bodyClass?: string; background?: string }
-const { title, description, ogImage, bodyClass, background } = Astro.props;
+// overHero: the page opens with a full-bleed hero, so the header starts transparent over it.
+interface Props { title: string; description?: string; ogImage?: ImageMetadata; page: PageKind; overHero?: boolean }
+const { title, description, ogImage, page, overHero = false } = Astro.props;
 const site = (await getEntry('site', 'site'))!.data;
+const { text } = await loadExtras();
 const robots = robotsMeta(SITE_ENV);
 const og = ogImage ? new URL((await getImage({ src: ogImage, width: 1200, format: 'jpg' })).src, Astro.site).href : undefined;
-// build.format 'file' reports /x.html and /index.html; the live URLs are /x and / (see canonicalUrl).
 const canonical = canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL);
 const path = pagePath(Astro.url.pathname);
-// Wix's icon sizes: 32 (favicon), 192 (icon) and 180 (apple-touch-icon), all from one PNG.
 const icon = async (w: number) => site.favicon && (await getImage({ src: site.favicon.src, width: w, height: w, format: 'png' })).src;
 const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(180)]);
+const menu = withServices(site.menu ?? [], text('menu-services').text);
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={bebasLatin} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={dmSansLatin} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {robots && <meta name="robots" content={robots} />}
@@ -43,13 +53,16 @@ const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(
     {og && <meta property="og:image" content={og} />}
     <meta property="og:site_name" content="Achates 360" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#f6f1ee" />
+    {/* `js` gates hidden-until-revealed styles; motion-ready lifts them. If the motion bundle never
+        arrives, the timeout lifts them after 3s so nothing stays invisible (Review Focus 1). */}
+    <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>
   </head>
-  <body class={bodyClass} style={background ? `background: ${background}` : undefined}>
-    <Logo logo={site.logo} />
-    {site.menu && <SiteMenu menu={site.menu} social={site.menuSocial} path={path} />}
-    {site.mobileMenu && <MobileMenu menu={site.mobileMenu} path={path} />}
-    <main id="top"><slot /></main>
-    <Footer blocks={site.footer} />
-    <BackToTop />
+  <body data-page={page} data-over-hero={overHero ? '' : undefined}>
+    <a class="skip-link" href="#main" data-placeholder={text('skip-link').placeholder ? '' : undefined}>{text('skip-link').text}</a>
+    <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} />
+    <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
+    <main id="main"><slot /></main>
+    <Footer blocks={site.footer} wordmark={text('wordmark')} />
   </body>
 </html>

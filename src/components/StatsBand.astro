@@ -1,0 +1,48 @@
+---
+import Eyebrow from './ui/Eyebrow.astro';
+import Marquee from './ui/Marquee.astro';
+import StatCounter from './ui/StatCounter.astro';
+import T from './ui/T.astro';
+import DraftTag from './ui/DraftTag.astro';
+import { statValue } from '../lib/meta';
+import type { UiString } from '../lib/strings';
+interface Stat { id: string; value: number | 'listed-projects'; suffix?: string; label: string; placeholder: boolean }
+interface Props {
+  stats: Stat[]; listedCount: number; clients: { id: string; name: string; placeholder: boolean }[];
+  quote?: { quote: string; name: string; role: string; placeholder: boolean }; eyebrow: UiString;
+}
+const { stats, listedCount, clients, quote, eyebrow } = Astro.props;
+const anyClientDraft = clients.some((c) => c.placeholder);
+---
+<section class="stats-band section" aria-labelledby="sb-title">
+  <div class="wrap grid">
+    {stats.map((s) => <StatCounter value={statValue(s, listedCount)} suffix={s.suffix} label={s.label} placeholder={s.placeholder} />)}
+  </div>
+  <div class="wrap clients" data-placeholder={anyClientDraft ? '' : undefined}>
+    <Eyebrow as="h2" id="sb-title"><T s={eyebrow} /></Eyebrow>
+  </div>
+  <Marquee class="client-mq" speed={50}>
+    {clients.map((c) => <span class="client">{c.name}</span>)}
+  </Marquee>
+  {quote && (
+    <figure class="wrap quote" data-placeholder={quote.placeholder ? '' : undefined} data-reveal>
+      <blockquote>{quote.quote}</blockquote>
+      <figcaption><strong>{quote.name}</strong> · {quote.role}<DraftTag when={quote.placeholder} /></figcaption>
+    </figure>
+  )}
+</section>
+<style>
+  .stats-band {
+    background-color: var(--black); color: #e9e4e1;
+    background-image: linear-gradient(rgb(255 255 255 / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .06) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .stats-band :focus-visible { outline-color: var(--peach); }
+  .grid { display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+  .clients { margin-top: var(--s-9); }
+  .client-mq { --mq-gap: 3.5rem; }
+  .client { font: 400 clamp(2rem, 1.5rem + 2vw, 3.5rem)/1 var(--font-display); white-space: nowrap; }
+  .quote { margin-top: var(--s-9); max-width: 44ch; margin-inline: auto; }
+  .quote blockquote { margin: 0; font-size: var(--fs-lead); line-height: 1.35; font-weight: 300; }
+  .quote figcaption { margin-top: var(--s-4); font-size: var(--fs-small); }
+</style>

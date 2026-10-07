@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BgVideo from './BgVideo.astro';
+import Chip from './ui/Chip.astro';
+import DraftTag from './ui/DraftTag.astro';
+import { loadExtras } from '../lib/extras';
+import { BLANK_IMAGE } from '../lib/paths';
+type Hero = NonNullable<CollectionEntry<'projects'>['data']['hero']>;
+interface Props { services: { id: string; title: string; body: string; tags: string[]; placeholder: boolean; hero: Hero }[] }
+const { services } = Astro.props;
+const { text } = await loadExtras();
+const draft = text('video-pause').placeholder || text('video-play').placeholder;
+---
+<ol class="service-rows wrap">
+  {services.map((s) => (
+    <li class="svc" data-placeholder={s.placeholder ? '' : undefined}>
+      <div class="svc-text">
+        <h2 class="display h2" data-split>{s.title}<DraftTag when={s.placeholder} /></h2>
+        <p>{s.body}</p>
+        <ul class="tags">{s.tags.map((t) => <li><Chip>{t}</Chip></li>)}</ul>
+      </div>
+      <div class="svc-media" data-reveal data-bgvideo-viewport>
+        {s.hero.type === 'video'
+          ? (<>
+              <BgVideo src={s.hero.src} poster={s.hero.poster} desktopOnly class="svc-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={draft} />
+              <picture class="svc-pic">
+                <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
+                <Image class="svc-still" src={s.hero.poster} alt="" widths={[480, 960]} sizes="100vw" loading="lazy" />
+              </picture>
+            </>)
+          : <Image src={s.hero.src} alt={s.hero.alt} widths={[480, 960, 1440]} sizes="(max-width: 1023px) 100vw, 45vw" />}
+      </div>
+    </li>
+  ))}
+</ol>
+<style>
+  .service-rows { list-style: none; margin: 0 auto; padding: 0 0 var(--section-y); }
+  .svc { display: grid; gap: var(--s-6); padding-block: var(--s-8); border-top: 1px solid var(--line); }
+  .svc-text p { max-width: 44ch; margin: var(--s-4) 0; }
+  .tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .svc-media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-card); overflow: hidden; background: var(--charcoal); }
+  .svc-media :global(img), .svc-media :global(.svc-video) { width: 100%; height: 100%; object-fit: cover; }
+  .svc-pic { display: contents; }
+  @media (min-width: 768px) { .svc-media :global(.svc-still) { display: none; } }
+  @media (max-width: 767px) { .svc-media :global(.svc-video) { display: none; } }
+  @media (min-width: 1024px) { .svc { grid-template-columns: 1fr 1fr; align-items: center; } }
+</style>

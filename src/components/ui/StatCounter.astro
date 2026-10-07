@@ -1,0 +1,15 @@
+---
+import DraftTag from './DraftTag.astro';
+// The final number is in the HTML; motion (Task 11) counts up to it. Years and other values of
+// 1000 or more are shown as they are, without counting.
+interface Props { value: number; suffix?: string; label: string; placeholder: boolean }
+const { value, suffix, label, placeholder } = Astro.props;
+---
+<div class="stat" data-placeholder={placeholder ? '' : undefined}>
+  <p class="stat-num"><span data-count={Number.isInteger(value) && value < 1000 ? value : undefined}>{value}</span>{suffix}</p>
+  <p class="stat-label">{label}<DraftTag when={placeholder} /></p>
+</div>
+<style>
+  .stat-num { margin: 0; font: 400 clamp(3.5rem, 2.5rem + 4vw, 6.5rem)/.9 var(--font-display); color: var(--stat-color, var(--accent)); font-variant-numeric: tabular-nums; }
+  .stat-label { margin: var(--s-2) 0 0; font-size: var(--fs-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+</style>

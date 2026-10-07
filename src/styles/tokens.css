@@ -1,77 +1,38 @@
-/*
- * Design tokens, sampled from the live Wix site.
- * Sources: docs/reference/styles.json (computed styles; "desktop:" / "mobile:" page keys),
- * pixels sampled from docs/reference/<slug>/*.png, and live computed styles where styles.json
- * has no entry. Each token names its source.
- *
- * Fonts (Ruling 7): Wix renders body copy, titles, footer and gallery titles in its licensed
- * `helvetica-w01-light` (Helvetica Light) and small UI text (back link, VIEW PROJECT, form inputs,
- * submit label) in `avenir-lt-w01_35-light` (Avenir Light). Neither exists off Wix, so:
- *   Helvetica Light -> 'Helvetica Neue', Helvetica, Arial at weight 300 (--font-heading, --font-body)
- *   Avenir Light    -> Nunito Sans 300, self-hosted via @fontsource (--font-ui)
- * Wix reports font-weight 400 because the light cut is a separate family; the stand-in reaches the
- * light cut with weight 300, so weight tokens below are 300 where Wix's face is "light".
- *
- * Mobile (-m) values (Ruling 21): Wix lays mobile out at a fixed 320 CSS px and zooms it to the
- * device width (viewport meta "width=320"). The clone keeps width=device-width and instead scales
- * every mobile length by --m, so each -m token is calc(<measured Wix px> * var(--m)).
- */
+/* Design tokens (spec §3). Light only: the site has no dark theme. */
 :root {
-  --m: calc(100vw / 320);   /* 1 Wix mobile px: Wix's 320px mobile layout zoomed to the device width (390px phone -> 1.21875px) */
+  --ink: #151414;
+  --charcoal: #2f2e2e;
+  --peach: #ebd2c5;
+  --paper: #f6f1ee;
+  --white: #ffffff;
+  --black: #0d0d0d;
+  --accent: #ff4b1f;
+  --muted: #8f8888;
+  --accent-deep: #e03c10; /* accent for large text on light grounds; ~3.9:1 on paper */
+  --line: rgb(21 20 20 / .12);
 
-  --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Helvetica Light stand-in, use with weight 300 */
-  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;    /* Helvetica Light stand-in, use with weight 300 */
-  --font-ui: 'Nunito Sans', 'Avenir Next', Avenir, Helvetica, Arial, sans-serif; /* Avenir Light stand-in (Nunito Sans 300) */
-  --weight-light: 300;       /* weight that selects the light cut in both stand-ins */
+  --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
+  --font-text: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-mega: min(19.5vw, 24rem);
+  --fs-h1: clamp(3rem, 1.5rem + 8vw, 10rem);
+  --fs-h2: clamp(2.75rem, 1.5rem + 5vw, 6rem);
+  --fs-h3: clamp(1.75rem, 1.25rem + 2vw, 3rem);
+  --fs-lead: clamp(1.125rem, 1rem + .6vw, 1.625rem);
+  --fs-body: clamp(1rem, .95rem + .2vw, 1.125rem);
+  --fs-small: clamp(.75rem, .7rem + .2vw, .875rem);
+  --fs-label: .6875rem;
+  --lh-display: .88;
+  --lh-body: 1.55;
 
-  --color-page: #ffffff;     /* styles.json pageBackground is transparent; pixel (10,2000) of notter/desktop.png and (10,h-800) of home/desktop.png = rgb(255,255,255) */
-  --color-text: #605e5e;     /* live computed <p> colour of case-study body copy on notter, dbs-discretionary-portfolio-management, dxv, bumitama-annual-report: rgb(96, 94, 94). (styles.json projectBody sampled the client span, which is --color-muted.) */
-  --color-heading: #2f2e2e;  /* desktop:notter.projectTitle.color rgb(47, 46, 46) */
-  --color-muted: #adadac;    /* desktop:notter.projectClient.color rgb(173, 173, 172) */
-  --color-link: #2f2e2e;     /* desktop:notter.backLink.color rgb(47, 46, 46) */
-  --color-footer-bg: #e6e6e6;    /* pixel in footer of notter/desktop.png, home/desktop.png and notter/mobile.png = rgb(230,230,230) */
-  --color-footer-text: #605e5e;  /* desktop:home.footerText.color rgb(96, 94, 94) */
-  --color-footer-label: #adadac; /* live computed colour of footer h6 "Contact"/"Social" rgb(173, 173, 172) */
-  --color-header: #2f2e2e;   /* live #SITE_HEADER background rgb(47, 46, 46); pixel (5,5) of notter/mobile.png */
-  --color-page-alt: #f2f2f2; /* page background of home, joinus and copy-of-projects: pixels (30,500) and (1400,800) of their desktop.png = rgb(242,242,242); also the current item in the phone menu */
-  --color-page-grey: #adadac;    /* /projects page background: live pageBackground_ layer rgb(173,173,172); pixel (100,500) of projects/desktop.png */
-  --color-page-column: #fafafa;  /* /projects content column (Wix column strip, 980 wide) and mobile page: live rgb(250,250,250); pixel (700,1000) of projects/desktop.png */
-  --color-card-bg: #ebd2c5;  /* business-card page background: Wix data-page-bg rgb(235, 210, 197) on all six cards */
-  --color-on-dark: #ebd2c5;  /* live computed about body text rgb(235, 210, 197) (desktop:about.projectBody.color) */
-  --color-button: #282626;   /* live "Read Annual Report" button background rgb(40, 38, 38) (bumitama-annual-report) */
-  --color-orange: #f7702a;   /* live joinus job heading colour rgb(247, 112, 42) */
-  --color-orange-dark: #c74300;  /* live joinus "Apply Now" border and label rgb(199, 67, 0) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;
+  --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px; --s-11: 192px;
+  --gutter: clamp(16px, 4vw, 60px);
+  --section-y: clamp(64px, 10vw, 160px);
+  --max: 1440px;
+  --header-h: 64px;
 
-  --size-title: 28px;        /* desktop:notter.projectTitle.fontSize */
-  --size-title-m: calc(23 * var(--m));      /* mobile:notter.projectTitle.fontSize */
-  --size-small-heading: 22px;    /* no desktop smallHeading in styles.json; live computed h5 on /dbs-discretionary-portfolio-management, = desktop:home.footerHeading */
-  --size-small-heading-m: calc(19 * var(--m));  /* mobile:projects.smallHeading.fontSize */
-  --size-body: 15px;         /* desktop:notter.projectBody.fontSize */
-  --size-body-m: calc(14 * var(--m));       /* mobile:notter.projectBody.fontSize */
-  --size-footer: 15px;       /* desktop:home.footerText.fontSize */
-  --size-footer-m: calc(14 * var(--m));     /* mobile:home.footerText.fontSize */
-  --size-footer-heading: 22px;   /* desktop:home.footerHeading.fontSize */
-  --size-footer-heading-m: calc(18 * var(--m)); /* mobile:home.footerHeading.fontSize */
-  --size-gallery-title: 22px;    /* desktop:projects.galleryTitle.fontSize */
-  --leading-body: 21px;      /* desktop:notter.projectBody.lineHeight */
-  --leading-body-m: calc(19.6 * var(--m));  /* mobile:notter.projectBody.lineHeight */
-  --leading-footer: 21px;    /* desktop:home.footerText.lineHeight */
-  --leading-footer-m: calc(19.6 * var(--m));        /* mobile:home.footerText.lineHeight */
-  --leading-footer-heading: 28.6px;  /* desktop:home.footerHeading.lineHeight */
-  --leading-footer-heading-m: calc(23.4 * var(--m));/* mobile:home.footerHeading.lineHeight */
-  --leading-copy: 19px;      /* case-study body copy: Wix line-height "normal" of Helvetica Light 15px; live <p> boxes are 19px per line (notter, dxv, the-v-edit-e-zine) */
-  --leading-copy-m: calc(18 * var(--m));    /* mobile: live <p> boxes 18px per line at 14px (notter, dbs-discretionary-portfolio-management) */
-  --size-ui: 14px;           /* desktop:notter.backLink.fontSize (Avenir Light) */
-  --size-ui-m: calc(13.6 * var(--m));       /* mobile:notter.backLink.fontSize 13.6054px */
-  --leading-ui: 19.6px;      /* desktop:notter.backLink.lineHeight */
-  --leading-ui-m: calc(19 * var(--m));      /* mobile:notter.backLink.lineHeight 19.0476px */
-  --gallery-gap: 27px;       /* live /projects gallery: columns 301px wide on a 328px step, rows 258.75px tall on a 285.75px step */
-  --gallery-title-leading: 27px; /* desktop:projects.galleryTitle.lineHeight */
-  --weight-title: 300;       /* desktop:notter.projectTitle.fontWeight is 400 of the Light face -> 300 in the stand-in (see header) */
-
-  --button-radius: 0px;      /* desktop:home.formSubmit.borderRadius */
-  --page-max: 940px;         /* notter/desktop.png content column: images and text run x=238..1178 at 1440 (Wix grid is 980). Same number as PAGE_WIDTH in src/lib/layout.ts (scripts/layout.test.mjs checks) */
-  --column-shift: 10px;      /* Wix's case-study column sits ~10px left of centre (x=238..250 at 1440). = COLUMN_SHIFT in src/lib/layout.ts */
-  --color-video-bg: #000000; /* letterbox behind embeds and players before they load (Wix's player and embed backgrounds are black) */
-  --gutter: 20px;            /* Wix mobile side margin (footer and logo inset, mobile layout) */
+  --r-card: 16px;
+  --r-block: 32px;
+  --r-pill: 999px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
 }

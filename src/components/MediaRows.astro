@@ -1,0 +1,72 @@
+---
+import Block from './Block.astro';
+import { toSegments } from '../lib/segments';
+// The case-study body (spec §4.2): Wix's rows as single blocks, media grids or text+media splits.
+// The first text block reads as the lead paragraph.
+interface Props { blocks: any[]; pageTitle?: string }
+const { blocks, pageTitle } = Astro.props;
+const segments = toSegments(blocks);
+const firstText = blocks.find((b) => b.type === 'text');
+const isText = (b: any) => b.type === 'text' || b.type === 'link';
+// Case-study copy uses ##### / ###### for styling, which jumps from the page's h1 to h5/h6. Shift
+// every text block by the same amount so the shallowest heading becomes h2 (tags only; the words
+// are untouched).
+const depths = blocks.filter((b) => b.type === 'text').flatMap((b) => [...b.md.matchAll(/^\s*(#{1,6})\s/gm)].map((m) => m[1].length));
+const demote = depths.length ? 2 - Math.min(...depths) : 0;
+---
+<div class="media-rows">
+  {segments.map((s) => {
+    if (s.kind === 'single') {
+      return <div class:list={['seg', isText(s.block) ? 'seg-text' : 'seg-media']}><Block block={s.block} pageTitle={pageTitle} lead={s.block === firstText} demote={demote} /></div>;
+    }
+    if (s.kind === 'grid') {
+      return (
+        <div class="seg seg-grid" style={`--cols: ${s.cols}`}>
+          {s.blocks.map((b) => <Block block={b} pageTitle={pageTitle} demote={demote} sizes={`(max-width: 767px) 100vw, ${Math.round(92 / s.cols)}vw`} />)}
+        </div>
+      );
+    }
+    if (s.kind === 'stage') {
+      return (
+        <div class="seg seg-stage" style={`--cols: ${Math.min(s.items.length, 3)}`}>
+          {s.items.map((it) => (
+            <div class="stage" style={it.block.box ? `aspect-ratio: ${it.block.box.w} / ${it.block.box.h}` : undefined}>
+              <Block block={it.block} pageTitle={pageTitle} demote={demote} />
+              {it.overlays.map((o) => (
+                <div class="overlay" style={`left: ${o.left}%; top: ${o.top}%; width: ${o.width}%`}><Block block={o.block} pageTitle={pageTitle} demote={demote} sizes="(max-width: 767px) 50vw, 25vw" /></div>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div class="seg seg-split">
+        {s.blocks.map((b) => <div class={isText(b) ? 'cell-text' : 'cell-media'}><Block block={b} pageTitle={pageTitle} lead={b === firstText} demote={demote} sizes="(max-width: 767px) 100vw, 46vw" /></div>)}
+      </div>
+    );
+  })}
+</div>
+<style>
+  .media-rows { display: grid; gap: var(--s-4); }
+  .seg-text { padding-block: var(--s-6); }
+  .seg-text + .seg-text { padding-top: 0; }
+  .media-rows :global(.lead) { font-size: var(--fs-lead); line-height: 1.35; font-weight: 300; max-width: 40ch; }
+  .seg-grid, .seg-split, .seg-stage { display: grid; gap: var(--s-4); grid-template-columns: minmax(0, 1fr); }
+  .seg-split { gap: var(--s-6); align-items: start; }
+  .media-rows :global(:is(.block-image, .bgvideo)) { display: block; border-radius: var(--r-card); overflow: hidden; }
+  .media-rows :global(.block-img) { width: 100%; height: auto; }
+  .media-rows :global(.block-gallery) { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .media-rows :global(.block-link) { margin: 0; }
+  .stage { position: relative; border-radius: var(--r-card); overflow: hidden; }
+  .stage > :global(.block-image) { height: 100%; }
+  .stage > :global(.block-image .block-img) { width: 100%; height: 100%; object-fit: cover; }
+  .overlay { position: absolute; }
+  .overlay :global(.block-image) { border-radius: 0; }
+  .overlay :global(.block-img) { width: 100%; height: auto; }
+  @media (min-width: 768px) {
+    .seg-grid { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: start; }
+    .seg-stage { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+    .seg-split { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  }
+</style>

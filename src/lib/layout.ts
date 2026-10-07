@@ -1,10 +1,6 @@
 /**
- * Page geometry, one source (Task 11b fix 1). The CSS side is tokens.css `--page-max` and
- * `--column-shift`; scripts/layout.test.mjs fails if they drift from these numbers.
- *
- * Desktop content column at the 1440 render: Wix's images, galleries and players run x=238..1178
- * (notter) and 240..1188 (dxv). The clone's column is PAGE_WIDTH wide and sits COLUMN_SHIFT px
- * left of centre (Project.astro: calc(50% - var(--page-max) / 2 - var(--column-shift))).
+ * Wix page geometry at the 1440 render, used by src/lib/rows.ts to read the exported layout boxes
+ * (which blocks sat side by side). The redesign's CSS no longer mirrors these numbers.
  */
 export const VIEWPORT = 1440;
 export const PAGE_WIDTH = 940;

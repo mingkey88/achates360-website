@@ -1,0 +1,9 @@
+---
+interface Props { as?: 'p' | 'h2'; id?: string }
+const { as: Tag = 'p', id } = Astro.props;
+---
+<Tag class="eyebrow" id={id}><span class="dot" aria-hidden="true"></span><slot /></Tag>
+<style>
+  .eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 0 var(--s-4); font: 500 var(--fs-small)/1.2 var(--font-text); letter-spacing: .02em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex: none; }
+</style>

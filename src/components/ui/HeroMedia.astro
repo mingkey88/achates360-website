@@ -1,0 +1,36 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BgVideo from '../BgVideo.astro';
+import { BLANK_IMAGE } from '../../lib/paths';
+import { loadExtras } from '../../lib/extras';
+// A full-bleed hero (spec §4.1/§4.2). Video loads at >=768px; phones get its poster still, as in
+// the clone. The <picture> hands desktop a blank source so the still is never fetched there.
+// Images load eagerly as the LCP candidate.
+type Media = { type: 'image'; src: ImageMetadata; alt: string } | { type: 'video'; src: string; poster: ImageMetadata };
+interface Props { media: Media; class?: string; eager?: boolean }
+const { media, class: cls, eager = true } = Astro.props;
+const { text } = await loadExtras();
+const stillUrl = media.type === 'video' ? (await getImage({ src: media.poster, width: 1440, format: 'webp' })).src : undefined;
+const load = eager ? 'eager' : 'lazy';
+---
+<div class:list={['hero-media', cls]} data-bgvideo-viewport>
+  {media.type === 'video' ? (
+    <>
+      <BgVideo src={media.src} poster={media.poster} desktopOnly class="hm-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />
+      <picture class="hm-pic">
+        <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
+        <Image class="hm-still" src={media.poster} alt="" widths={[480, 960, 1440]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
+      </picture>
+      <noscript><img class="hm-still" src={stillUrl} alt="" /></noscript>
+    </>
+  ) : (
+    <Image class="hm-image" src={media.src} alt={media.alt} widths={[480, 960, 1440, 1920, 2560]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
+  )}
+</div>
+<style>
+  .hero-media { position: absolute; inset: 0; overflow: hidden; background: var(--charcoal); }
+  .hero-media :global(:is(.hm-video, .hm-still, .hm-image)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hm-pic { display: contents; }
+  @media (min-width: 768px) { .hero-media :global(.hm-still) { display: none; } }
+  @media (max-width: 767px) { .hero-media :global(.hm-video) { display: none; } }
+</style>

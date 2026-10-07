@@ -1,0 +1,23 @@
+---
+import { withBase } from '../lib/paths';
+import type { UiString } from '../lib/strings';
+import T from './ui/T.astro';
+interface Props { href: string; title: string | UiString; label: UiString }
+const { href, title, label } = Astro.props;
+---
+<section class="next-project">
+  <a class="np wrap" href={withBase(href)}>
+    <span class="label"><T s={label} /></span>
+    <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />}</span>
+    <span class="np-arrow" aria-hidden="true">→</span>
+  </a>
+</section>
+<style>
+  .next-project { background: var(--charcoal); color: var(--peach); }
+  .next-project :focus-visible { outline-color: var(--peach); }
+  .np { display: grid; gap: var(--s-3); padding-block: var(--section-y); text-decoration: none; }
+  .np-title { font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); color: var(--white); overflow-wrap: anywhere; text-wrap: balance; }
+  .np-arrow { font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent); transition: transform .3s var(--ease-out); }
+  .np:hover .np-arrow { transform: translateX(12px); }
+  @media (prefers-reduced-motion: reduce) { .np-arrow { transition: none; } }
+</style>

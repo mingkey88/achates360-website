@@ -1,0 +1,7 @@
+---
+import DraftTag from './DraftTag.astro';
+import type { UiString } from '../../lib/strings';
+interface Props { s: UiString }
+const { s } = Astro.props;
+---
+<span data-placeholder={s.placeholder ? '' : undefined}>{s.text}<DraftTag when={s.placeholder} /></span>

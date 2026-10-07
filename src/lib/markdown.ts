@@ -1,11 +1,14 @@
 import { Marked, Renderer } from 'marked';
 import { withBase, isExternal } from './paths';
 
-export function renderMd(md: string, base?: string): string {
+export function renderMd(md: string, base?: string, opts: { demote?: number } = {}): string {
   const marked = new Marked({
     gfm: true,
     walkTokens(token) {
       if (token.type === 'link') token.href = withBase(token.href, base);
+      // demote: shift heading levels (e.g. a homepage slide's "# …" inside a card) so each page
+      // keeps a single h1. The words are untouched.
+      if (token.type === 'heading' && opts.demote) token.depth = Math.max(1, Math.min(6, token.depth + opts.demote)) as typeof token.depth;
     },
     renderer: {
       // Wix opens every external http(s) link in a new tab (see linkAttrs in ./paths).

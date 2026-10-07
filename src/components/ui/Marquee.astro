@@ -1,0 +1,35 @@
+---
+import MarqueeToggle from './MarqueeToggle.astro';
+// CSS-only infinite marquee (spec §5): pauses on hover or focus, and has a visible pause/play
+// button (WCAG 2.2.2); under reduced motion it stops and the row can be scrolled sideways instead.
+// The second copy is hidden from assistive tech. controls={false}: the parent supplies one
+// <MarqueeToggle /> inside its own [data-mq-scope] that pauses several marquees together.
+interface Props { reverse?: boolean; speed?: number; class?: string; controls?: boolean }
+const { reverse = false, speed = 40, class: cls, controls = true } = Astro.props;
+const html = await Astro.slots.render('default');
+---
+<div class="mq-shell" data-mq-scope={controls ? '' : undefined}>
+  <div class:list={['marquee', cls]} style={`--speed: ${speed}s`} data-reverse={reverse ? '' : undefined}>
+    <div class="mq-track">
+      <div class="mq-group"><Fragment set:html={html} /></div>
+      <div class="mq-group" aria-hidden="true"><Fragment set:html={html} /></div>
+    </div>
+  </div>
+  {controls && <MarqueeToggle />}
+</div>
+<style is:global>
+  .mq-shell { position: relative; }
+  .marquee { overflow: hidden; }
+  .mq-track { display: flex; width: max-content; animation: mq var(--speed) linear infinite; }
+  .marquee[data-reverse] .mq-track { animation-direction: reverse; }
+  .mq-group { display: flex; flex-shrink: 0; align-items: center; gap: var(--mq-gap, 3rem); padding-right: var(--mq-gap, 3rem); }
+  /* Hover or focus pauses; the toggle itself is excluded so pressing Play always wins. */
+  [data-mq-scope]:is(:hover, :focus-within):not(:has(.mq-toggle:is(:hover, :focus))) .mq-track,
+  [data-mq-scope][data-paused] .mq-track { animation-play-state: paused; }
+  @keyframes mq { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { overflow-x: auto; }
+    .mq-track { animation: none; }
+    .mq-group[aria-hidden] { display: none; }
+  }
+</style>

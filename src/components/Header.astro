@@ -1,0 +1,64 @@
+---
+import { withBase, menuCurrent } from '../lib/paths';
+import type { UiString } from '../lib/strings';
+interface Link { label: string; href: string }
+interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString }
+const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
+---
+<header class="site-header" data-over-hero={overHero ? '' : undefined}>
+  <div class="bar">
+    <a class="wordmark" href={withBase('/')}><span aria-hidden="true">//&nbsp;</span>{wordmark.text}</a>
+    <nav class="primary" aria-label={navLabel.text}>
+      <ul>
+        {menu.map((it) => {
+          const current = menuCurrent(it, path);
+          return (
+            <li><a href={withBase(it.href)} aria-current={current === 'page' ? 'page' : undefined} data-current={current ?? undefined}>{it.label}</a></li>
+          );
+        })}
+      </ul>
+    </nav>
+    <button class="menu-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu">
+      <span class="sr-only">{menuLabel.text}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 16h18" /></svg>
+    </button>
+  </div>
+</header>
+<script>
+  // Solid after 80px of scroll (or always, without a hero); hides while scrolling down, returns on
+  // scroll up or when anything in it takes keyboard focus.
+  const header = document.querySelector<HTMLElement>('.site-header');
+  if (header) {
+    let last = window.scrollY;
+    const update = () => {
+      const y = window.scrollY;
+      header.classList.toggle('is-solid', y > 80 || !header.hasAttribute('data-over-hero'));
+      header.classList.toggle('is-hidden', y > last && y > 240 && !header.contains(document.activeElement));
+      last = y;
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
+    update();
+  }
+</script>
+<style>
+  .site-header {
+    position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px);
+    color: var(--ink); transition: transform .35s var(--ease-out), background-color .25s, color .25s;
+  }
+  .site-header[data-over-hero]:not(.is-solid) { color: var(--white); }
+  .site-header.is-solid { background: var(--paper); box-shadow: 0 1px 0 var(--line); }
+  .site-header.is-hidden { transform: translateY(-100%); }
+  .bar { display: flex; align-items: center; gap: var(--s-5); height: var(--header-h); padding-inline: var(--gutter); }
+  .wordmark { margin-right: auto; font: 400 1.625rem/1 var(--font-display); letter-spacing: .02em; text-decoration: none; white-space: nowrap; }
+  .primary ul { display: none; list-style: none; margin: 0; padding: 0; gap: var(--s-5); }
+  .primary a { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-small); font-weight: 500; letter-spacing: .08em; text-decoration: none; }
+  .primary a::before { content: ''; width: 7px; height: 7px; border: 1.5px solid currentColor; border-radius: 50%; }
+  .primary a[data-current]::before { background: currentColor; }
+  .primary a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .menu-open { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: inherit; cursor: pointer; }
+  .menu-open svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  .site-header[data-over-hero]:not(.is-solid) :focus-visible { outline-color: var(--white); }
+  @media (min-width: 1024px) { .primary ul { display: flex; } }
+  @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
+</style>

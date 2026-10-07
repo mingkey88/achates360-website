@@ -1,59 +1,57 @@
 ---
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import AnchorMenu from '../components/AnchorMenu.astro';
-import Gallery from '../components/Gallery.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import { loadExtras } from '../lib/extras';
 const d = (await getEntry('projectsIndex', 'projects'))!.data;
-// Wix's mobile layout lists the categories as links above the galleries; the footer item is
-// desktop-menu only.
-const mobileItems = d.menu.filter((i) => i.target !== 'footer');
+const site = (await getEntry('site', 'site'))!.data;
+const { text } = await loadExtras();
+// The page heading is the site menu's own PROJECTS label, verbatim.
+const heading = site.menu?.find((m) => m.href === '/projects')?.label ?? d.sections[0].heading;
+const ids = new Set(d.sections.map((s) => s.id));
+const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i.label, id: ids.has(i.target) ? i.target : d.sections[0].id }));
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="page-projects">
-  <AnchorMenu items={d.menu} variant="dots" />
-  <div class="index">
-    <AnchorMenu items={mobileItems} variant="list" />
-    {d.sections.map((s) => (
-      <section id={s.id} class="category">
-        <h2>{s.heading}</h2>
-        <Gallery items={s.items} layout="grid" />
-      </section>
-    ))}
-  </div>
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="projects">
+  <header class="wrap pi-head"><h1 class="display h1" data-split>{heading}</h1></header>
+  <nav class="chips-bar" aria-label={text('sections-label').text}>
+    <ul class="wrap">{chips.map((c) => <li><a href={`#${c.id}`} data-chip={c.id}>{c.label}</a></li>)}</ul>
+  </nav>
+  {d.sections.map((s) => (
+    <section id={s.id} class="pi-section wrap" aria-labelledby={`${s.id}-h`}>
+      <h2 id={`${s.id}-h`} class="display h2" data-split>{s.heading}</h2>
+      <ProjectGrid items={s.items} />
+    </section>
+  ))}
 </Base>
-<style>
-  /*
-   * Measured on the live /projects at 1440x900: grey page (#adadac) with a 980px #fafafa column
-   * centred from the 4px header strip down to the footer; headings and galleries start 13px into
-   * it (x=243), galleries 956 wide. First heading top at y=81; each 28px h2 (34px box) sits 25px
-   * above its 3-column gallery; Wix places sections 23-66px apart (45 here); the footer follows
-   * the last gallery after 10px.
-   * Mobile (Wix 320px layout, lengths x --m): #fafafa page; the category links at x=53 from
-   * y~115; first gallery 28 below them. Each heading runs vertically (writing-mode vertical-rl,
-   * 25px) in a 300px-tall box at x~17, level with its gallery's top; galleries are one column at
-   * x=53, 256.84 wide; sections 15-64 apart (42 here); the footer follows the last gallery.
-   * scroll-margin-top lands a section's heading where the first one sits at the top of the page.
-   */
-  :global(body.page-projects) { background: var(--color-page-grey); }
-  .index {
-    width: min(980px, 100%); margin-inline: auto; padding: 77px 11px 10px 13px;
-    background: var(--color-page-column);
-  }
-  .category + .category { margin-top: 45px; }
-  .category { scroll-margin-top: 81px; }
-  .category h2 { margin: 0; }
-  .category :global(.gallery) { margin-top: 25px; }
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  import { tilt } from '../scripts/motion/tilt';
+  run(reveal, tilt);
 
-  @media (max-width: 767px) {
-    :global(body.page-projects) { background: var(--color-page-column); }
-    .index { width: auto; padding: calc(21 * var(--m)) 0 0; }
-    .index > :global(.list) { margin-left: calc(53 * var(--m)); }
-    .category { position: relative; scroll-margin-top: calc(14 * var(--m)); }
-    .index > :global(.list) + .category { margin-top: calc(28 * var(--m)); }
-    .category + .category { margin-top: calc(42 * var(--m)); }
-    .category h2 {
-      position: absolute; left: calc(17 * var(--m)); top: 0; height: calc(300 * var(--m));
-      writing-mode: vertical-rl; font-size: calc(25 * var(--m));
+  // The chip for the section in view gets aria-current; the row scrolls to keep it visible.
+  const chips = new Map([...document.querySelectorAll<HTMLAnchorElement>('[data-chip]')].map((a) => [a.dataset.chip!, a]));
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      chips.forEach((a) => a.removeAttribute('aria-current'));
+      const a = chips.get(e.target.id);
+      if (!a) continue;
+      a.setAttribute('aria-current', 'true');
+      a.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
-    .category :global(.gallery) { width: calc(256.84 * var(--m)); margin: 0 0 0 calc(53 * var(--m)); }
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('.pi-section').forEach((s) => io.observe(s));
+</script>
+<style>
+  .pi-head { padding-block: var(--s-8) var(--s-6); }
+  .chips-bar { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 10; background: var(--paper); border-block: 1px solid var(--line); }
+  .chips-bar ul { list-style: none; margin-inline: auto; padding: var(--s-3) 4px; scroll-padding-inline: 4px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .chips-bar a {
+    display: inline-block; white-space: nowrap; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
+    font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
   }
+  .chips-bar a[aria-current] { background: var(--ink); color: var(--paper); }
+  .pi-section { padding-block: var(--s-8); scroll-margin-top: calc(var(--header-h) + 64px); }
+  .pi-section h2 { margin-bottom: var(--s-7); }
 </style>
