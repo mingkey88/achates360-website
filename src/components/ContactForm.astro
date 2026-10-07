@@ -138,6 +138,8 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     width: 100%; min-height: 48px; padding: 12px 18px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
     background: rgb(246 241 238 / .9); color: var(--ink); font: 400 var(--fs-body)/1.4 var(--font-text);
   }
+  .tried :is(input:not([type='checkbox']), textarea):invalid { border-style: dashed; border-width: 2.5px; }
+  .enquiry ::placeholder { color: #5c5757; opacity: 1; }
   textarea { min-height: 140px; border-radius: var(--r-card); resize: vertical; }
   .groups { display: grid; gap: var(--s-4); }
   .group { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }

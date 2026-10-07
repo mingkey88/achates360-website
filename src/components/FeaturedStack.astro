@@ -72,6 +72,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   .sc-md :global(:is(h2, h3, h4, h5, h6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); }
   .sc-badges { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--s-2); }
   .sc-badges :global(img) { width: 64px; height: 64px; object-fit: contain; }
+  .stack-card:focus-within { z-index: 1; }
   .stack-card :focus-visible { outline-color: var(--white); }
   @media (min-width: 768px) {
     .sc-media :global(.sc-still) { display: none; }

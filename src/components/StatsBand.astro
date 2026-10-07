@@ -19,7 +19,7 @@ const anyClientDraft = clients.some((c) => c.placeholder);
     {stats.map((s) => <StatCounter value={statValue(s, listedCount)} suffix={s.suffix} label={s.label} placeholder={s.placeholder} />)}
   </div>
   <div class="wrap clients" data-placeholder={anyClientDraft ? '' : undefined}>
-    <Eyebrow as="h2" id="sb-title"><T s={eyebrow} /><DraftTag when={anyClientDraft} /></Eyebrow>
+    <Eyebrow as="h2" id="sb-title"><T s={eyebrow} /></Eyebrow>
   </div>
   <Marquee class="client-mq" speed={50}>
     {clients.map((c) => <span class="client">{c.name}</span>)}
