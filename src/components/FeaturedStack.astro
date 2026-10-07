@@ -59,7 +59,9 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   </ol>
 </section>
 <style>
-  .stack { list-style: none; padding: 0; margin-top: var(--s-5); display: grid; gap: var(--s-6); }
+  /* Straight on from the hero: no full section gap above, just room for the label. */
+  .featured { padding-top: var(--s-6); }
+  .stack { list-style: none; padding: 0; margin-top: var(--s-4); display: grid; gap: var(--s-6); }
   /* Full bleed: the cards run edge to edge; their text keeps the page gutter. */
   .stack { --card-h: min(82svh, 860px); }
   .stack-card {

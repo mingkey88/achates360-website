@@ -78,5 +78,6 @@ export function hero(): void {
   })
     .to(stage, { scale: 1.6, opacity: 0, ease: 'none' }, 0)
     .to(q('.hh-center'), { yPercent: -60, opacity: 0, ease: 'none' }, 0)
-    .to(q('.hh-bars i'), { scaleY: 0, ease: 'none' }, 0);
+    // The bars leave within the first quarter, so no black band sits between the hero and Selected work.
+    .to(q('.hh-bars i'), { scaleY: 0, ease: 'none', duration: .25 }, 0);
 }
