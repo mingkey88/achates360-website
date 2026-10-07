@@ -47,8 +47,8 @@ const lines = tagline.text.split(/\s*•\s*/);
 </section>
 <style>
   .h-hero {
-    --rx: min(40vw, 620px); --rz: min(34vw, 460px); --tilt: min(21svh, 190px); --w: clamp(140px, 15vw, 270px);
-    --mark-y: 57%;
+    --rx: min(33vw, 520px); --rz: min(30vw, 420px); --tilt: min(15svh, 140px); --w: clamp(120px, 11vw, 200px);
+    --mark-y: 55%;
     position: relative; min-height: max(100svh, 640px); overflow: hidden; isolation: isolate;
     color: var(--white); background: radial-gradient(120% 90% at 50% 55%, #1f5258 0%, var(--teal-ink) 40%, #0a1c1f 100%);
   }
@@ -72,22 +72,22 @@ const lines = tagline.text.split(/\s*•\s*/);
   }
   .hh-item :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-  .hh-figures { position: absolute; left: 50%; top: var(--mark-y); z-index: 1; width: clamp(150px, 19vw, 300px); translate: -50% -50%; pointer-events: none; }
+  .hh-figures { position: absolute; left: 50%; top: var(--mark-y); z-index: 1; width: clamp(120px, 12vw, 200px); translate: -50% -50%; pointer-events: none; }
   .hh-figures :global(.hh-mark) { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 10px 40px rgb(0 0 0 / .45)); }
 
   /* The conventional hero: title across the top, statement bottom-left, description bottom-right. */
   .hh-layout {
     /* Above the vignette (z 3) so the type stays pure white; the grain (z 4, later in the DOM) still covers it. */
     position: relative; z-index: 4; min-height: inherit; display: grid; grid-template-rows: auto 1fr; pointer-events: none;
-    padding: calc(var(--header-h) + var(--s-4)) var(--gutter) calc(6svh + var(--s-7));
+    padding: calc(var(--header-h) + var(--s-7)) var(--gutter) calc(6svh + var(--s-8));
   }
   .hh-title {
-    margin: 0; font: 400 22.8vw/.8 var(--font-display); letter-spacing: -.005em; white-space: nowrap; text-align: center;
+    margin: 0; font: 400 clamp(4.5rem, 13vw, 15rem)/.8 var(--font-display); letter-spacing: -.005em; white-space: nowrap; text-align: center;
     text-shadow: 0 6px 40px rgb(0 0 0 / .35);
   }
   .hh-foot { align-self: end; display: grid; gap: var(--s-5); }
-  .hh-statement { margin: 0; display: grid; font: 400 clamp(2.75rem, 1.5rem + 4.6vw, 6.5rem)/.86 var(--font-display); text-transform: uppercase; text-shadow: 0 4px 30px rgb(0 0 0 / .5); }
-  .hh-blurb { margin: 0; max-width: 40ch; font: 500 clamp(.8125rem, .75rem + .3vw, 1.0625rem)/1.45 var(--font-text); letter-spacing: .02em; text-transform: uppercase; text-shadow: 0 2px 18px rgb(0 0 0 / .7); }
+  .hh-statement { margin: 0; display: grid; font: 400 clamp(2rem, 1.25rem + 2.4vw, 4rem)/.9 var(--font-display); letter-spacing: .01em; text-transform: uppercase; text-shadow: 0 4px 30px rgb(0 0 0 / .5); }
+  .hh-blurb { margin: 0; max-width: 36ch; font: 500 clamp(.75rem, .7rem + .2vw, .875rem)/1.6 var(--font-text); letter-spacing: .06em; color: var(--on-dark); text-transform: uppercase; text-shadow: 0 2px 18px rgb(0 0 0 / .7); }
   @media (min-width: 768px) {
     .hh-foot { grid-template-columns: 1fr auto; align-items: end; }
     .hh-blurb { margin-right: calc(44px + var(--s-5)); }
@@ -110,10 +110,10 @@ const lines = tagline.text.split(/\s*•\s*/);
   .h-hero :global(.mq-toggle) { top: auto; bottom: calc(6svh + var(--s-7)); translate: none; z-index: 6; }
 
   @media (max-width: 767px) {
-    .h-hero { --rx: 40vw; --rz: 46vw; --tilt: 15svh; --w: 104px; --mark-y: 44%; }
+    .h-hero { --rx: 36vw; --rz: 40vw; --tilt: 11svh; --w: 88px; --mark-y: 45%; }
     .hh-item { border-radius: 8px; }
-    .hh-figures { width: 128px; }
-    .hh-title { font-size: 22.6vw; }
+    .hh-figures { width: 104px; }
+    .hh-title { font-size: 18vw; }
     .h-hero :global(.mq-toggle) { bottom: calc(6svh + var(--s-4)); }
   }
   @media (prefers-reduced-motion: reduce) { .hh-grain { animation: none; } }
