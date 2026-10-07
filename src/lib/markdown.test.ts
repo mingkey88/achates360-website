@@ -40,3 +40,15 @@ describe('renderMd and no-break spaces', () => {
     expect(renderMd('a\u00a0b', B)).toBe('<p>a&nbsp;b</p>\n');
   });
 });
+
+describe('renderMd demote', () => {
+  it('shifts heading levels so page structure keeps one h1', () => {
+    expect(renderMd('# Red Packets', '/', { demote: 2 })).toContain('<h3');
+  });
+  it('never goes past h6', () => {
+    expect(renderMd('##### Contact', '/', { demote: 3 })).toContain('<h6');
+  });
+  it('leaves headings alone by default', () => {
+    expect(renderMd('# Join us', '/')).toContain('<h1');
+  });
+});
