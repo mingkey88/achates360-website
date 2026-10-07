@@ -102,3 +102,13 @@ describe('sizeProblems', () => {
     expect(r).toEqual({ total: 12 * MB, tooBig: ['a'], overTotal: true });
   });
 });
+
+describe('extra required paths', () => {
+  it('requires new redesign pages alongside the sitemap and permanent lists', () => {
+    expect(requiredPaths(['/'], ['/', '/angeline'], ['/services'])).toEqual(['/', '/angeline', '/services']);
+  });
+  it('the committed new-pages list holds /services', () => {
+    const extra = JSON.parse(readFileSync(new URL('./new-pages.json', import.meta.url), 'utf8'));
+    expect(extra).toEqual(['/services']);
+  });
+});

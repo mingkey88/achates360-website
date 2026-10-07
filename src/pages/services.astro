@@ -1,0 +1,35 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Sticker from '../components/ui/Sticker.astro';
+import T from '../components/ui/T.astro';
+import ServiceRows from '../components/ServiceRows.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import Reel from '../components/Reel.astro';
+import LetsConnect from '../components/LetsConnect.astro';
+import { loadExtras } from '../lib/extras';
+const x = await loadExtras();
+const { text } = x;
+const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
+const services = x.services.map((s: any) => {
+  const hero = projects.get(s.project)?.hero;
+  if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
+  return { ...s, hero };
+});
+const reel = (await getEntry('home', 'home'))!.data.slides[0].media;
+if (reel.type !== 'video') throw new Error('Reel: homepage slide-1 is no longer a video');
+const heading = text('services-heading');
+---
+<Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} page="services">
+  <header class="wrap sv-head" data-placeholder={heading.placeholder ? '' : undefined}>
+    <Sticker><T s={text('services-sticker')} /></Sticker>
+    <h1 class="display mega" data-split><T s={heading} /></h1>
+  </header>
+  <ServiceRows services={services} />
+  <ProcessSteps steps={x.process} heading={text('process-heading')} stepLabel={text('process-step')} />
+  <Reel src={reel.src} poster={reel.poster} left={text('reel-left')} right={text('reel-right')} label={`${text('reel-left').text} ${text('reel-right').text}`} />
+  <LetsConnect line={text('connect-line')} cta={text('connect-cta')} href="/#contact" />
+</Base>
+<style>
+  .sv-head { padding-block: var(--s-8) var(--s-7); display: grid; justify-items: start; gap: var(--s-4); }
+</style>

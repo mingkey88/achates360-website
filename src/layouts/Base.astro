@@ -5,6 +5,7 @@ import { SITE_ENV } from 'astro:env/server';
 import { robotsMeta, canonicalUrl } from '../lib/seo';
 import { pagePath } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
+import { withServices } from '../lib/menu';
 import type { PageKind } from '../lib/page-kind';
 import Header from '../components/Header.astro';
 import Menu from '../components/Menu.astro';
@@ -29,7 +30,7 @@ const canonical = canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.
 const path = pagePath(Astro.url.pathname);
 const icon = async (w: number) => site.favicon && (await getImage({ src: site.favicon.src, width: w, height: w, format: 'png' })).src;
 const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(180)]);
-const menu = site.menu ?? [];
+const menu = withServices(site.menu ?? [], text('menu-services').text);
 ---
 <!doctype html>
 <html lang="en">

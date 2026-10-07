@@ -1,0 +1,35 @@
+---
+import T from './ui/T.astro';
+import DraftTag from './ui/DraftTag.astro';
+import type { UiString } from '../lib/strings';
+interface Props { steps: { id: string; step: number; title: string; body: string; placeholder: boolean }[]; heading: UiString; stepLabel: UiString }
+const { steps, heading, stepLabel } = Astro.props;
+---
+<section class="process wrap" aria-labelledby="process-title">
+  <h2 id="process-title" class="display h2" data-split><T s={heading} /></h2>
+  <ol class="steps">
+    {steps.map((s) => (
+      <li class="step" data-placeholder={s.placeholder ? '' : undefined} data-reveal>
+        <details>
+          <summary>
+            <span class="label">{stepLabel.text} {String(s.step).padStart(2, '0')}</span>
+            <span class="display step-title">{s.title}<DraftTag when={s.placeholder} /></span>
+          </summary>
+          <p>{s.body}</p>
+        </details>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .process { padding: var(--s-8) var(--s-6); border-radius: var(--r-block); background: #ece6e2; text-align: center; }
+  .steps { list-style: none; margin: var(--s-7) 0 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); position: relative; }
+  .step { position: relative; }
+  .step::before { content: ''; display: block; width: 14px; height: 14px; margin: 0 auto var(--s-4); background: var(--ink); clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
+  details { padding: var(--s-5); border-radius: var(--r-card); background: var(--white); }
+  summary { display: grid; gap: var(--s-2); cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  .step-title { font-size: var(--fs-h3); }
+  details p { margin: var(--s-4) 0 0; font-size: var(--fs-small); }
+  @media (min-width: 1024px) { .steps::before { content: ''; position: absolute; top: 6px; left: 12%; right: 12%; border-top: 2px dotted var(--muted); } }
+</style>

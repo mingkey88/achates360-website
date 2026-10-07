@@ -12,8 +12,8 @@ const fileFor = (path) => (path === '/' ? 'index.html' : `${path.slice(1)}.html`
  * committed permanent list (every snapshot URL, including the six business-card slugs on printed
  * QR codes), so a live export that drops a page can never pass verification.
  */
-export function requiredPaths(sitemap, permanent) {
-  return [...new Set([...sitemap, ...permanent])].sort();
+export function requiredPaths(sitemap, permanent, extra = []) {
+  return [...new Set([...sitemap, ...permanent, ...extra])].sort();
 }
 
 export function missingPages(paths, distFiles) {
@@ -85,7 +85,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const distFiles = await listFiles('dist');
   const sitemap = JSON.parse(await readFile('scripts/export-wix/sitemap-urls.json', 'utf8'));
   const permanent = JSON.parse(await readFile('scripts/export-wix/permanent-urls.json', 'utf8'));
-  const paths = requiredPaths(sitemap, permanent);
+  const extra = JSON.parse(await readFile('scripts/new-pages.json', 'utf8'));
+  const paths = requiredPaths(sitemap, permanent, extra);
   const known = JSON.parse(await readFile('scripts/export-wix/known-missing.json', 'utf8'));
   const missing = missingPages(paths, distFiles);
   const pages = await Promise.all(distFiles.filter((f) => f.endsWith('.html')).map(async (f) => ({ file: f, html: await readFile(join('dist', f), 'utf8') })));
@@ -93,7 +94,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const broken = brokenLinks(pages, distFiles, base, known, knownHits);
   const sizes = await Promise.all(distFiles.map(async (f) => ({ file: f, size: (await stat(join('dist', f))).size })));
   const { total, tooBig, overTotal } = sizeProblems(sizes);
-  console.log(`pages: ${paths.length - missing.length}/${paths.length} required URLs built (sitemap ${sitemap.length}, permanent ${permanent.length})`);
+  console.log(`pages: ${paths.length - missing.length}/${paths.length} required URLs built (sitemap ${sitemap.length}, permanent ${permanent.length}, new ${extra.length})`);
   console.log(`dist size: ${(total / MB).toFixed(1)} MB (limit ${LIMITS.totalMax / MB} MB)`);
   missing.forEach((p) => console.error(`MISSING  ${p}`));
   broken.forEach((l) => console.error(`BROKEN   ${l.file} -> ${l.href}`));

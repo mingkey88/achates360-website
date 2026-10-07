@@ -1,4 +1,4 @@
-export const RESERVED = ['index', 'projects', 'robots.txt'];
+export const RESERVED = ['index', 'projects', 'services', 'robots.txt'];
 
 export function assertUniqueSlugs(groups: Record<string, string[]>): void {
   const seen = new Map<string, string>(RESERVED.map((r) => [r, 'reserved']));

@@ -1,0 +1,18 @@
+---
+import Player from './Player.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+interface Props { src: string; poster: ImageMetadata; left: UiString; right: UiString; label: string }
+const { src, poster, left, right, label } = Astro.props;
+---
+<section class="reel section" aria-label={label}>
+  <span class="side display" aria-hidden="true"><T s={left} /></span>
+  <div class="reel-video" data-reveal><Player src={src} poster={poster} label={label} /></div>
+  <span class="side display" aria-hidden="true"><T s={right} /></span>
+</section>
+<style>
+  .reel { display: grid; grid-template-columns: 1fr; justify-items: center; gap: var(--s-4); padding-inline: var(--gutter); }
+  .side { font-size: var(--fs-h2); color: #c9c2be; }
+  .reel-video { width: min(100%, 860px); }
+  @media (min-width: 1024px) { .reel { grid-template-columns: 1fr minmax(0, 860px) 1fr; align-items: center; } .side:last-child { justify-self: end; } }
+</style>
