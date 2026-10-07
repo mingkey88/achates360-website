@@ -13,3 +13,8 @@ const hasH1 = d.blocks.some((b: any) => b.type === 'text' && /^#\s/m.test(b.md))
   {!hasH1 && <h1 class="sr-only">{titleFromSeo(d.seo.title)}</h1>}
   <div class="wrap section"><MediaRows blocks={d.blocks} pageTitle={d.seo.title} /></div>
 </Base>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  run(reveal);
+</script>

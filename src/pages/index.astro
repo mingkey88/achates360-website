@@ -76,3 +76,12 @@ const hero = d.slides[0];
   .h-all-heading :global(a:hover) { text-decoration: underline; text-decoration-color: var(--accent); }
   #all-projects { scroll-margin-top: var(--header-h); }
 </style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  import { hero } from '../scripts/motion/hero';
+  import { stack } from '../scripts/motion/stack';
+  import { counters } from '../scripts/motion/counters';
+  import { tilt } from '../scripts/motion/tilt';
+  run(hero, reveal, stack, counters, tilt);
+</script>

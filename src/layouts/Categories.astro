@@ -24,3 +24,9 @@ const d = Astro.props.entry.data;
   .cat-body { padding-bottom: var(--s-9); }
   .cat-heading :global(h2) { margin: var(--s-9) 0 var(--s-6); font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); }
 </style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  import { tilt } from '../scripts/motion/tilt';
+  run(reveal, tilt);
+</script>

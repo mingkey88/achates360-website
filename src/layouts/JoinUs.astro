@@ -63,3 +63,8 @@ if (others.length) throw new Error(`/joinus: ${others.length} block(s) not place
   .role-body :global(.role-img) { width: 100%; height: auto; border-radius: var(--r-card); }
   @media (min-width: 1024px) { .role-body { grid-template-columns: 2fr 3fr; align-items: start; } }
 </style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  run(reveal);
+</script>

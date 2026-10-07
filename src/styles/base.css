@@ -19,3 +19,9 @@ button { font: inherit; }
 .on-dark { background: var(--charcoal); color: var(--peach); }
 /* Pages without a hero start below the fixed header. */
 body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); }
+
+/* Hidden until motion takes over: only with JS on, motion allowed, and before motion-ready (set by
+   run(), or by Base's 3s fallback if the bundle never arrives). */
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.motion-ready) :is([data-split], [data-reveal], [data-hero-title], [data-hero-sticker]) { opacity: 0; }
+}

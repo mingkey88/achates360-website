@@ -44,3 +44,8 @@ const labels = { client: text('meta-client'), year: text('meta-year'), services:
   .p-back { margin-block: 0; padding-bottom: var(--s-8); }
   @media (min-width: 768px) { .p-hero { min-height: 85svh; } }
 </style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  run(reveal);
+</script>

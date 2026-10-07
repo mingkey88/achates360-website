@@ -24,6 +24,11 @@ const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i
   ))}
 </Base>
 <script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  import { tilt } from '../scripts/motion/tilt';
+  run(reveal, tilt);
+
   // The chip for the section in view gets aria-current; the row scrolls to keep it visible.
   const chips = new Map([...document.querySelectorAll<HTMLAnchorElement>('[data-chip]')].map((a) => [a.dataset.chip!, a]));
   const io = new IntersectionObserver((entries) => {

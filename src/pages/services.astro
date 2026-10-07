@@ -33,3 +33,9 @@ const heading = text('services-heading');
 <style>
   .sv-head { padding-block: var(--s-8) var(--s-7); display: grid; justify-items: start; gap: var(--s-4); }
 </style>
+<script>
+  import { run } from '../scripts/motion/index';
+  import { reveal } from '../scripts/motion/reveal';
+  import { tilt } from '../scripts/motion/tilt';
+  run(reveal, tilt);
+</script>
