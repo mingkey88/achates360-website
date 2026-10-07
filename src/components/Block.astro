@@ -21,7 +21,7 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
   : <div class="block-image" data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></div>)}
 {b.type === 'gallery' && (
   <ul class="block-gallery">
-    {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) 100vw, 45vw" /></li>)}
+    {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} title={it.href ? it.title : undefined} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) 100vw, 45vw" /></li>)}
   </ul>
 )}
 {b.type === 'video' && (b.controls

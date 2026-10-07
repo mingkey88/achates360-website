@@ -15,7 +15,7 @@ const load = eager ? 'eager' : 'lazy';
 <div class:list={['hero-media', cls]} data-bgvideo-viewport>
   {media.type === 'video' ? (
     <>
-      <BgVideo src={media.src} poster={media.poster} desktopOnly class="hm-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} />
+      <BgVideo src={media.src} poster={media.poster} desktopOnly class="hm-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />
       <picture class="hm-pic">
         <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
         <Image class="hm-still" src={media.poster} alt="" widths={[480, 960, 1440]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />

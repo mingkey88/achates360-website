@@ -2,13 +2,13 @@
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
-interface Props { href: string; title: string; label: UiString }
+interface Props { href: string; title: string | UiString; label: UiString }
 const { href, title, label } = Astro.props;
 ---
 <section class="next-project">
   <a class="np wrap" href={withBase(href)}>
     <span class="label"><T s={label} /></span>
-    <span class="np-title" data-split>{title}</span>
+    <span class="np-title" data-split>{typeof title === 'string' ? title : <T s={title} />}</span>
     <span class="np-arrow" aria-hidden="true">→</span>
   </a>
 </section>

@@ -17,7 +17,7 @@ const home = (await getEntry('home', 'home'))!.data;
 const built = new Set((await getCollection('projects')).map((e) => e.id));
 const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null);
 const next = nextProject(id, order, (s) => built.has(s));
-const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback').text;
+const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback');
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="project" overHero={!!d.hero}>
@@ -41,6 +41,6 @@ const labels = { client: text('meta-client'), year: text('meta-year'), services:
   .p-hero-plain { min-height: 0; background: var(--charcoal); color: var(--peach); }
   .p-hero-plain::after { display: none; }
   .p-body { padding-block: var(--s-7) var(--s-8); }
-  .p-back { margin: 0; padding-bottom: var(--s-8); }
+  .p-back { margin-block: 0; padding-bottom: var(--s-8); }
   @media (min-width: 768px) { .p-hero { min-height: 85svh; } }
 </style>
