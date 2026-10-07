@@ -14,8 +14,8 @@ const classes = ['pill', `pill-${variant}`, cls];
     font: 400 1.125rem/1 var(--font-display); letter-spacing: .04em; text-decoration: none; cursor: pointer;
     transition: background-color .2s, color .2s, border-color .2s;
   }
-  .dash { width: 14px; height: 1.5px; background: currentColor; transition: width .25s var(--ease-out); }
-  .pill:is(:hover, :focus-visible) .dash { width: 26px; }
+  .dash { width: 26px; height: 1.5px; background: currentColor; transform: scaleX(.54); transform-origin: left center; transition: transform .25s var(--ease-out); }
+  .pill:is(:hover, :focus-visible) .dash { transform: scaleX(1); }
   .pill-outline:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
   .pill-fill { background: var(--accent); border-color: var(--accent); color: var(--ink); }
   .pill-fill:hover { background: var(--ink); border-color: var(--ink); color: var(--accent); }

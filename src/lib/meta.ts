@@ -14,3 +14,8 @@ export function metaColumns(d: { client?: string; copyright?: string; categories
 export function firstYear(copyright?: string): string | null {
   return copyright?.match(/\d{4}/)?.[0] ?? null;
 }
+
+/** A stat's number: `listed-projects` is counted at build time (spec §6.3). */
+export function statValue(s: { value: number | 'listed-projects' }, listedCount: number): number {
+  return s.value === 'listed-projects' ? listedCount : s.value;
+}

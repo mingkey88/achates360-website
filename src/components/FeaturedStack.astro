@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BgVideo from './BgVideo.astro';
+import Sticker from './ui/Sticker.astro';
+import Pill from './ui/Pill.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+import T from './ui/T.astro';
+import { renderMd } from '../lib/markdown';
+import { withBase, linkAttrs, BLANK_IMAGE } from '../lib/paths';
+import { loadExtras } from '../lib/extras';
+import type { UiString } from '../lib/strings';
+type Slide = CollectionEntry<'home'>['data']['slides'][number];
+type Project = CollectionEntry<'projects'>['data'];
+// The six homepage slides as sticky stacking cards (spec §4.1); motion adds the scale-back.
+interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString }
+const { items, eyebrow } = Astro.props;
+const { text } = await loadExtras();
+const videoDraft = text('video-pause').placeholder || text('video-play').placeholder;
+---
+<section class="featured section" aria-labelledby="featured-title">
+  <div class="wrap"><Eyebrow as="h2" id="featured-title"><T s={eyebrow} /></Eyebrow></div>
+  <ol class="stack wrap" data-stack>
+    {items.map(({ slide, project }, i) => (
+      <li class="stack-card" style={`--i: ${i}`}>
+        <div class="sc-media" data-bgvideo-viewport>
+          {slide.media.type === 'video' ? (
+            <>
+              <BgVideo src={slide.media.src} poster={slide.media.poster} desktopOnly class="sc-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={videoDraft} />
+              <picture class="sc-pic">
+                <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
+                <Image class="sc-still" src={slide.media.poster} alt="" widths={[480, 960]} sizes="100vw" />
+              </picture>
+            </>
+          ) : (
+            <Image class="sc-image" src={slide.media.src} alt={slide.media.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 1440px) 92vw, 1320px" />
+          )}
+        </div>
+        <div class="sc-text">
+          {project?.categories[0] && <Sticker>{project.categories[0]}</Sticker>}
+          {project && <h3 class="display h3">{project.title}</h3>}
+          {project?.client && <p class="sc-client">{project.client}</p>}
+          {slide.md && <div class="sc-md" set:html={renderMd(slide.md, undefined, { demote: 3 })} />}
+          {slide.badges.length > 0 && (
+            <ul class="sc-badges">
+              {slide.badges.map((b) => {
+                const img = <Image src={b.src} alt={b.alt} widths={[80, 160]} sizes="80px" />;
+                return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
+              })}
+            </ul>
+          )}
+          {slide.cta && <Pill href={slide.cta.href} variant="light">{slide.cta.label}</Pill>}
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .stack { list-style: none; padding: 0; margin-top: var(--s-5); display: grid; gap: var(--s-6); }
+  .stack-card {
+    position: sticky; top: calc(var(--header-h) + var(--s-3) + var(--i) * 10px);
+    height: min(76svh, 760px); border-radius: var(--r-block); overflow: hidden; color: var(--white);
+    transform-origin: 50% 0;
+  }
+  .sc-media { position: absolute; inset: 0; background: var(--charcoal); }
+  .sc-media :global(:is(.sc-video, .sc-still, .sc-image)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .sc-pic { display: contents; }
+  .stack-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0) 40%, rgb(0 0 0 / .65)); pointer-events: none; }
+  .sc-text { position: absolute; inset: auto 0 0; z-index: 1; display: grid; justify-items: start; gap: var(--s-3); padding: var(--s-6); }
+  .sc-text h3 { max-width: 16ch; }
+  .sc-client { margin: 0; font-size: var(--fs-small); letter-spacing: .06em; text-transform: uppercase; }
+  .sc-md :global(:is(h2, h3, h4, h5, h6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); }
+  .sc-badges { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--s-2); }
+  .sc-badges :global(img) { width: 64px; height: 64px; object-fit: contain; }
+  .stack-card :focus-visible { outline-color: var(--white); }
+  @media (min-width: 768px) {
+    .sc-media :global(.sc-still) { display: none; }
+    .sc-text { padding: var(--s-8); }
+  }
+  @media (max-width: 767px) { .sc-media :global(.sc-video) { display: none; } }
+</style>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { metaColumns, firstYear } from './meta';
+import { metaColumns, firstYear, statValue } from './meta';
 
 describe('metaColumns', () => {
   it('lists every filled column in order', () => {
@@ -22,4 +22,9 @@ describe('firstYear', () => {
     expect(firstYear(undefined)).toBeNull();
     expect(firstYear('©')).toBeNull();
   });
+});
+
+describe('statValue', () => {
+  it('passes numbers through', () => expect(statValue({ value: 2001 }, 49)).toBe(2001));
+  it('resolves listed-projects to the build-time count', () => expect(statValue({ value: 'listed-projects' }, 49)).toBe(49));
 });

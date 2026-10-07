@@ -1,0 +1,26 @@
+---
+// CSS-only infinite marquee (spec §5): pauses on hover; under reduced motion it stops and the row
+// can be scrolled sideways instead. The second copy is hidden from assistive tech.
+interface Props { reverse?: boolean; speed?: number; class?: string }
+const { reverse = false, speed = 40, class: cls } = Astro.props;
+const html = await Astro.slots.render('default');
+---
+<div class:list={['marquee', cls]} style={`--speed: ${speed}s`} data-reverse={reverse ? '' : undefined}>
+  <div class="mq-track">
+    <div class="mq-group"><Fragment set:html={html} /></div>
+    <div class="mq-group" aria-hidden="true"><Fragment set:html={html} /></div>
+  </div>
+</div>
+<style>
+  .marquee { overflow: hidden; }
+  .mq-track { display: flex; width: max-content; animation: mq var(--speed) linear infinite; }
+  .marquee[data-reverse] .mq-track { animation-direction: reverse; }
+  .mq-group { display: flex; flex-shrink: 0; align-items: center; gap: var(--mq-gap, 3rem); padding-right: var(--mq-gap, 3rem); }
+  .marquee:hover .mq-track { animation-play-state: paused; }
+  @keyframes mq { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { overflow-x: auto; }
+    .mq-track { animation: none; }
+    .mq-group[aria-hidden] { display: none; }
+  }
+</style>
