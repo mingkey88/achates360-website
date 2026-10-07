@@ -13,8 +13,7 @@ import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
 // The six homepage slides (spec §4.1). Without motion they are sticky stacking cards; stack.ts
-// turns them into one pinned deck whose waiting cards peek out in brand colours (.sc-tone).
-const TONES = ['var(--accent)', 'var(--turquoise)', 'var(--lime)'];
+// turns them into one pinned deck whose waiting cards peek out below the front one.
 interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString }
 const { items, eyebrow } = Astro.props;
 const { text } = await loadExtras();
@@ -25,7 +24,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   <div class="wrap"><Eyebrow as="h2" id="featured-title"><T s={eyebrow} /></Eyebrow></div>
   <ol class="stack wrap" data-stack>
     {items.map(({ slide, project }, i) => (
-      <li class="stack-card" style={`--i: ${i}; --tone: ${TONES[i % TONES.length]}`}>
+      <li class="stack-card" style={`--i: ${i}`}>
         <div class="sc-media" data-bgvideo-viewport>
           {slide.media.type === 'video' ? (
             <>
@@ -55,7 +54,6 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
           )}
           {slide.cta && <Pill href={slide.cta.href} variant="light">{slide.cta.label}</Pill>}
         </div>
-        <div class="sc-tone" aria-hidden="true"></div>
       </li>
     ))}
   </ol>
@@ -70,7 +68,8 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   /* Pinned deck (stack.ts): every card in one place; the waiting ones peek out 18px each below. */
   .stack.is-stacked { display: block; position: relative; height: calc(var(--card-h) + 3 * 18px); perspective: 1800px; }
   .stack.is-stacked .stack-card { position: absolute; inset: 0 0 auto; will-change: transform; }
-  .sc-tone { position: absolute; inset: 0; z-index: 2; background: var(--tone); opacity: 0; pointer-events: none; }
+  /* A waiting card's pause button would peek out of its strip; it returns when the card comes forward. */
+  .stack.is-stacked [data-bgvideo-hold] :global(.bv-toggle) { visibility: hidden; }
   .sc-media { position: absolute; inset: 0; background: var(--teal-ink); }
   .sc-media :global(:is(.sc-video, .sc-still, .sc-image)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .sc-pic { display: contents; }

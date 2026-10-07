@@ -7,7 +7,7 @@ const VISIBLE = 3;  // waiting cards that peek out; the rest wait hidden behind 
 
 /**
  * Featured cards as one pinned deck (spec §4.1, after ariyana-studio): the waiting cards peek out
- * below the front one in brand colours. Scrolling tilts the front card back and lifts it off the top
+ * below the front one, showing their own media. Scrolling tilts the front card back and lifts it off the top
  * while the rest move up a place. Its video keeps playing until it has fully left the screen.
  */
 export function stack(): void {
@@ -18,15 +18,12 @@ export function stack(): void {
   list.classList.add('is-stacked');
 
   const place = (d: number) => ({ y: Math.min(d, VISIBLE) * PEEK, scale: 1 - Math.min(d, VISIBLE) * SHRINK });
-  const tones = cards.map((c) => c.querySelector('.sc-tone'));
   cards.forEach((c, i) => gsap.set(c, { zIndex: n - i, transformOrigin: '50% 100%', ...place(i) }));
-  tones.forEach((t, i) => t && gsap.set(t, { opacity: i ? 1 : 0 }));
 
   const tl = gsap.timeline({ defaults: { ease: 'none', duration: 1 } });
   for (let i = 0; i < n - 1; i++) {
     tl.to(cards[i], { yPercent: -130, rotateX: 40 }, i);
     for (let j = i + 1; j < n; j++) tl.to(cards[j], place(j - i - 1), i);
-    if (tones[i + 1]) tl.to(tones[i + 1], { opacity: 0, duration: .6 }, i);
   }
 
   // Only the cards in play run their videos; BgVideo honours data-bgvideo-hold.
