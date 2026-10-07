@@ -160,5 +160,12 @@ describe('JS budget', () => {
     const [w] = await jsWeights(pages, async (p) => files[p] ?? null);
     expect(w.bytes).toBe(gzipSync(files['/b/_astro/a.js']).length + gzipSync(files['/b/_astro/c.js']).length);
     expect(JS_BUDGET).toBe(81920);
+    expect(w.unresolved).toEqual([]);
+  });
+  it('reports scripts it cannot read instead of counting them as 0 bytes', async () => {
+    const files = { '/b/_astro/a.js': 'import"./c.js";' + 'a'.repeat(500) };
+    const pages = [{ file: 'a.html', html: '<script type="module" src="/b/_astro/a.js"></script>' }];
+    const [w] = await jsWeights(pages, async (p) => files[p] ?? null);
+    expect(w.unresolved).toEqual(['/b/_astro/c.js']);
   });
 });

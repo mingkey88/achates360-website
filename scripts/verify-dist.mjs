@@ -111,13 +111,14 @@ export async function jsWeights(pages, readJs) {
   const size = async (p) => {
     if (!cache.has(p)) {
       const js = await readJs(p);
-      cache.set(p, js === null ? { bytes: 0, deps: [] } : { bytes: gzipSync(js).length, deps: importsOf(js).map((d) => posix.join(posix.dirname(p), d)) });
+      cache.set(p, js === null ? { bytes: 0, deps: [], missing: true } : { bytes: gzipSync(js).length, deps: importsOf(js).map((d) => posix.join(posix.dirname(p), d)) });
     }
     return cache.get(p);
   };
   const out = [];
   for (const { file, html } of pages) {
     const seen = new Set();
+    const unresolved = [];
     const queue = scriptFiles(html);
     let bytes = [...html.matchAll(/<script\b[^>]*type="module"[^>]*>([\s\S]*?)<\/script>/g)]
       .filter((m) => !/\bsrc=/.test(m[0]) && m[1].trim())
@@ -127,10 +128,11 @@ export async function jsWeights(pages, readJs) {
       if (seen.has(p)) continue;
       seen.add(p);
       const s = await size(p);
+      if (s.missing) unresolved.push(p);
       bytes += s.bytes;
       queue.push(...s.deps);
     }
-    out.push({ file, bytes });
+    out.push({ file, bytes, unresolved });
   }
   return out;
 }
@@ -165,6 +167,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   };
   const weights = await jsWeights(pages, readJs);
   const heavy = weights.filter((w) => w.bytes > JS_BUDGET);
+  const unresolved = weights.flatMap((w) => w.unresolved.map((path) => ({ file: w.file, path })));
   const top = weights.reduce((a, w) => (w.bytes > a.bytes ? w : a), { file: '-', bytes: 0 });
   const sizes = await Promise.all(distFiles.map(async (f) => ({ file: f, size: (await stat(join('dist', f))).size })));
   const { total, tooBig, overTotal } = sizeProblems(sizes);
@@ -178,8 +181,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   checks.forEach((c) => console.error(`PAGE     ${c.file}: ${c.problem}`));
   heavy.forEach((w) => console.error(`JS       ${w.file}: ${(w.bytes / 1024).toFixed(1)} KB gzip > ${JS_BUDGET / 1024} KB`));
+  unresolved.forEach((u) => console.error(`JS       ${u.file}: unresolved script ${u.path}`));
   console.log(`js: heaviest page ${top.file} ${(top.bytes / 1024).toFixed(1)} KB gzip (budget ${JS_BUDGET / 1024} KB)`);
   tooBig.forEach((f) => console.error(`TOO BIG  ${f} (>${LIMITS.fileMax / MB} MB)`));
   if (overTotal) console.error(`TOO BIG  dist/ total ${(total / MB).toFixed(1)} MB (>${LIMITS.totalMax / MB} MB)`);
-  process.exit(missing.length || broken.length || checks.length || heavy.length || tooBig.length || overTotal ? 1 : 0);
+  process.exit(missing.length || broken.length || checks.length || heavy.length || unresolved.length || tooBig.length || overTotal ? 1 : 0);
 }
