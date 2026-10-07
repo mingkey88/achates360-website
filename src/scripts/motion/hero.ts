@@ -1,4 +1,4 @@
-import { gsap } from './index';
+import { gsap, SplitText } from './index';
 
 // Each figure arrives in a corporate colour, then all turn white as they join hands.
 const ARRIVAL = ['#ff9015', '#99d9d9', '#cbe880', '#99d9d9', '#ff9015'];
@@ -6,9 +6,10 @@ const CRUISE = 7;   // degrees per second once the ring has settled
 const LAUNCH = 90;  // degrees per second as the ring whooshes in
 
 /**
- * Homepage hero as a short film (spec §4.1, ruling R29): the letterbox opens, the five logo figures
- * fly in and gather into their circle, the wordmark tracks in, then a ring of project images whooshes
- * up and settles into a slow orbit the visitor can drag. Scrolling pulls the camera back through it.
+ * Homepage hero as a short film (spec §4.1, rulings R29–R30): the letterbox opens, the five logo
+ * figures fly in and gather into their circle, the full-width title rises letter by letter, a ring of
+ * project images whooshes up and settles into a slow orbit the visitor can drag, and the bottom corners
+ * fill in. Scrolling pulls the camera back through it.
  */
 export function hero(): void {
   const root = document.querySelector<HTMLElement>('[data-hero]');
@@ -20,7 +21,7 @@ export function hero(): void {
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
   tl.from(q('.hh-bars i'), { height: '50.5%', duration: 1.8, ease: 'expo.inOut' }, 0)
     .from(q('.hh-glow'), { opacity: 0, scale: .3, duration: 2.6 }, .5)
-    .from(q('.hh-logo'), { scale: 1.3, duration: 4.2, ease: 'power2.out' }, .4);
+    .from(q('.hh-figures'), { scale: 1.5, duration: 4.2, ease: 'power2.out' }, .4);
   figs.forEach((g, i) => {
     const a = (i / figs.length) * Math.PI * 2 + .6;
     tl.from(g, {
@@ -29,8 +30,11 @@ export function hero(): void {
     }, .8 + i * .13);
     tl.fromTo(g, { fill: ARRIVAL[i % ARRIVAL.length] }, { fill: '#ffffff', duration: 1.2, ease: 'power1.inOut' }, 2.2);
   });
-  tl.from(q('.lg-ch'), { opacity: 0, x: (i) => (i - 4.5) * 16, duration: 1.5, stagger: .045 }, 2.1)
-    .from(q('.hh-tagline'), { opacity: 0, y: 14, letterSpacing: '.9em', duration: 1.8 }, 2.6)
+  const title = q('.hh-title')[0] as HTMLElement;
+  const chars = SplitText.create(title, { type: 'chars', mask: 'chars' }).chars;
+  tl.from(chars, { yPercent: 105, duration: 1.4, stagger: { each: .05, from: 'center' } }, 2.0)
+    .from(q('.hh-statement span'), { yPercent: 60, opacity: 0, duration: 1.4, stagger: .12 }, 2.9)
+    .from(q('.hh-blurb'), { y: 20, opacity: 0, duration: 1.4 }, 3.1)
     // Fade through --fade, never the ring's own opacity (that flattens its 3D until the fade ends).
     .from(q('.hh-ring'), { '--fade': 0, scale: .5, duration: 2.8 }, 2.3);
 
@@ -77,7 +81,9 @@ export function hero(): void {
     },
   })
     .to(stage, { scale: 1.6, opacity: 0, ease: 'none' }, 0)
-    .to(q('.hh-center'), { yPercent: -60, opacity: 0, ease: 'none' }, 0)
+    .to(title, { yPercent: -40, opacity: 0, ease: 'none' }, 0)
+    .to(q('.hh-figures'), { scale: 1.4, opacity: 0, ease: 'none' }, 0)
+    .to(q('.hh-foot'), { y: -60, opacity: 0, ease: 'none', duration: .6 }, 0)
     // The bars leave within the first quarter, so no black band sits between the hero and Selected work.
     .to(q('.hh-bars i'), { scaleY: 0, ease: 'none', duration: .25 }, 0);
 }

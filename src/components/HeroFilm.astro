@@ -1,21 +1,26 @@
 ---
 import { Image } from 'astro:assets';
 import MarqueeToggle from './ui/MarqueeToggle.astro';
-import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
 import logo from '../assets/logo-stacked-parts.svg?raw';
-// Homepage hero as a short film (spec §4.1, ruling R29). The stacked logo is split into five figures
-// and ten letters (src/assets/logo-stacked-parts.svg) so hero.ts can gather the figures into their
-// circle; behind it a ring of project images orbits. Without motion everything renders composed:
-// the ring sits at its starting angles, computed here.
+// Homepage hero (spec §4.1, rulings R29–R30): a short film that settles into a conventional,
+// ariyana-style hero. The five logo figures gather into their circle at the centre with a ring of
+// project images orbiting them; the full-width title rises across the top; the tagline (corporate
+// sheet) and the site description (Wix SEO text) take the bottom corners, both verbatim.
+// Without motion everything renders composed: the ring sits at its starting angles, computed here.
 interface Item { thumb: ImageMetadata; alt: string }
-interface Props { items: Item[]; name: UiString; tagline: UiString }
-const { items, name, tagline } = Astro.props;
+interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
+const { items, name, tagline, blurb } = Astro.props;
 const ring = items.map((it, i) => {
   const a = (i / items.length) * Math.PI * 2;
   return { ...it, s: Math.sin(a).toFixed(4), c: Math.cos(a).toFixed(4) };
 });
-const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="${name.text.replace(/"/g, '&quot;')}" `);
+// Only the figures: the giant title replaces the logo's own lowercase wordmark here.
+const mark = logo
+  .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
+  .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
+  .replace('<svg ', '<svg class="hh-mark" aria-hidden="true" focusable="false" ');
+const lines = tagline.text.split(/\s*•\s*/);
 ---
 <section class="h-hero" data-hero data-mq-scope aria-labelledby="hero-title">
   <div class="hh-stage" aria-hidden="true">
@@ -28,9 +33,13 @@ const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="$
       ))}
     </ul>
   </div>
-  <div class="hh-center">
-    <h1 id="hero-title" class="hh-logo"><Fragment set:html={svg} /></h1>
-    <p class="hh-tagline"><T s={tagline} /></p>
+  <div class="hh-figures"><Fragment set:html={mark} /></div>
+  <div class="hh-layout">
+    <h1 id="hero-title" class="hh-title">{name.text}</h1>
+    <div class="hh-foot">
+      <p class="hh-statement" data-placeholder={tagline.placeholder ? '' : undefined}>{lines.map((l) => <span>{l}</span>)}</p>
+      <p class="hh-blurb">{blurb}</p>
+    </div>
   </div>
   <div class="hh-grain" aria-hidden="true"></div>
   <div class="hh-bars" aria-hidden="true"><i></i><i></i></div>
@@ -38,22 +47,23 @@ const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="$
 </section>
 <style>
   .h-hero {
-    --rx: min(44vw, 640px); --rz: min(34vw, 460px); --tilt: min(29svh, 260px); --w: clamp(150px, 17vw, 300px);
-    position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; isolation: isolate;
-    color: var(--white); background: radial-gradient(120% 90% at 50% 42%, #1f5258 0%, var(--teal-ink) 40%, #0a1c1f 100%);
+    --rx: min(40vw, 620px); --rz: min(34vw, 460px); --tilt: min(21svh, 190px); --w: clamp(140px, 15vw, 270px);
+    --mark-y: 57%;
+    position: relative; min-height: max(100svh, 640px); overflow: hidden; isolation: isolate;
+    color: var(--white); background: radial-gradient(120% 90% at 50% 55%, #1f5258 0%, var(--teal-ink) 40%, #0a1c1f 100%);
   }
   /* Vignette */
-  .h-hero::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(90% 75% at 50% 45%, transparent 55%, rgb(0 0 0 / .6)); }
+  .h-hero::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(90% 75% at 50% 55%, transparent 55%, rgb(0 0 0 / .6)); }
 
-  .hh-stage { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 35%; cursor: grab; touch-action: pan-y; user-select: none; }
+  .hh-stage { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 40%; cursor: grab; touch-action: pan-y; user-select: none; }
   .hh-stage:active { cursor: grabbing; }
   .hh-glow {
-    position: absolute; left: 50%; top: 44%; width: 70vmin; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
-    background: radial-gradient(circle, rgb(255 144 21 / .38), rgb(255 144 21 / .08) 45%, transparent 70%); filter: blur(10px);
+    position: absolute; left: 50%; top: var(--mark-y); width: 70vmin; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 144 21 / .4), rgb(255 144 21 / .08) 45%, transparent 70%); filter: blur(10px);
   }
   /* Never fade .hh-ring itself: opacity < 1 flattens preserve-3d, so the cards would jump into depth
      when the fade ends. hero.ts fades --fade instead, which each card multiplies into its own opacity. */
-  .hh-ring { --fade: 1; position: absolute; left: 50%; top: 50%; margin: 0; padding: 0; list-style: none; transform-style: preserve-3d; }
+  .hh-ring { --fade: 1; position: absolute; left: 50%; top: var(--mark-y); margin: 0; padding: 0; list-style: none; transform-style: preserve-3d; }
   .hh-item {
     position: absolute; width: var(--w); aspect-ratio: 16 / 9; left: calc(var(--w) / -2); top: calc(var(--w) * -9 / 32);
     border-radius: 12px; overflow: hidden; background: var(--teal-ink); box-shadow: 0 24px 60px rgb(0 0 0 / .5);
@@ -62,10 +72,26 @@ const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="$
   }
   .hh-item :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-  .hh-center { position: relative; z-index: 2; display: grid; justify-items: center; gap: var(--s-5); translate: 0 -7svh; text-align: center; pointer-events: none; }
-  .hh-logo { margin: 0; width: min(62vw, 400px); }
-  .hh-logo :global(.hh-mark) { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 10px 40px rgb(0 0 0 / .45)); }
-  .hh-tagline { margin: 0; font: 400 var(--fs-small)/1.4 var(--font-text); letter-spacing: .32em; text-transform: lowercase; color: var(--on-dark); text-shadow: 0 2px 18px rgb(0 0 0 / .7); }
+  .hh-figures { position: absolute; left: 50%; top: var(--mark-y); z-index: 1; width: clamp(150px, 19vw, 300px); translate: -50% -50%; pointer-events: none; }
+  .hh-figures :global(.hh-mark) { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 10px 40px rgb(0 0 0 / .45)); }
+
+  /* The conventional hero: title across the top, statement bottom-left, description bottom-right. */
+  .hh-layout {
+    /* Above the vignette (z 3) so the type stays pure white; the grain (z 4, later in the DOM) still covers it. */
+    position: relative; z-index: 4; min-height: inherit; display: grid; grid-template-rows: auto 1fr; pointer-events: none;
+    padding: calc(var(--header-h) + var(--s-4)) var(--gutter) calc(6svh + var(--s-7));
+  }
+  .hh-title {
+    margin: 0; font: 400 22.8vw/.8 var(--font-display); letter-spacing: -.005em; white-space: nowrap; text-align: center;
+    text-shadow: 0 6px 40px rgb(0 0 0 / .35);
+  }
+  .hh-foot { align-self: end; display: grid; gap: var(--s-5); }
+  .hh-statement { margin: 0; display: grid; font: 400 clamp(2.75rem, 1.5rem + 4.6vw, 6.5rem)/.86 var(--font-display); text-transform: uppercase; text-shadow: 0 4px 30px rgb(0 0 0 / .5); }
+  .hh-blurb { margin: 0; max-width: 40ch; font: 500 clamp(.8125rem, .75rem + .3vw, 1.0625rem)/1.45 var(--font-text); letter-spacing: .02em; text-transform: uppercase; text-shadow: 0 2px 18px rgb(0 0 0 / .7); }
+  @media (min-width: 768px) {
+    .hh-foot { grid-template-columns: 1fr auto; align-items: end; }
+    .hh-blurb { margin-right: calc(44px + var(--s-5)); }
+  }
 
   /* Film grain: a tiled noise texture that jitters a few times a second. */
   .hh-grain {
@@ -77,16 +103,18 @@ const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="$
 
   /* Letterbox bars: hero.ts opens them from a closed black frame. */
   .hh-bars { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
-  .hh-bars i { position: absolute; inset-inline: 0; z-index: 5; height: 6svh; background: #000; pointer-events: none; }
+  .hh-bars i { position: absolute; inset-inline: 0; height: 6svh; background: #000; }
   .hh-bars i:first-child { top: 0; transform-origin: 50% 0; }
   .hh-bars i:last-child { bottom: 0; transform-origin: 50% 100%; }
 
-  .h-hero :global(.mq-toggle) { top: auto; bottom: calc(6svh + var(--s-4)); translate: none; z-index: 6; }
+  .h-hero :global(.mq-toggle) { top: auto; bottom: calc(6svh + var(--s-7)); translate: none; z-index: 6; }
 
   @media (max-width: 767px) {
-    .h-hero { --rx: 40vw; --rz: 46vw; --tilt: 30svh; --w: 112px; }
-    .hh-tagline { letter-spacing: .18em; }
+    .h-hero { --rx: 40vw; --rz: 46vw; --tilt: 15svh; --w: 104px; --mark-y: 44%; }
     .hh-item { border-radius: 8px; }
+    .hh-figures { width: 128px; }
+    .hh-title { font-size: 22.6vw; }
+    .h-hero :global(.mq-toggle) { bottom: calc(6svh + var(--s-4)); }
   }
   @media (prefers-reduced-motion: reduce) { .hh-grain { animation: none; } }
 </style>
