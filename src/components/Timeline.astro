@@ -16,7 +16,7 @@ const { items, heading } = Astro.props;
     {items.map((it, i) => (
       <li class="tl-item" data-placeholder={it.placeholder ? '' : undefined}>
         <p class="tl-year display">{it.year}</p>
-        <Sticker tilt={i % 2 ? 4 : -5} tone={i % 2 ? 'peach' : 'accent'}>{it.label}</Sticker>
+        <Sticker tilt={i % 2 ? 4 : -5} tone={i % 2 ? 'turquoise' : 'accent'}>{it.label}</Sticker>
         <p class="tl-body">{it.body}<DraftTag when={it.placeholder} /></p>
         <Image class="tl-img" src={it.image} alt={it.alt} widths={[400, 800]} sizes="(max-width: 767px) 80vw, 380px" />
       </li>

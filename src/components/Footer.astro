@@ -1,9 +1,9 @@
 ---
 import { renderMd } from '../lib/markdown';
 import { withBase, linkAttrs } from '../lib/paths';
-import type { UiString } from '../lib/strings';
-interface Props { blocks: any[]; wordmark: UiString }
-const { blocks, wordmark } = Astro.props;
+import Logo from './ui/Logo.astro';
+interface Props { blocks: any[] }
+const { blocks } = Astro.props;
 // site.md footer blocks, verbatim: the intro line, then the legal lines; each "###### Label" text
 // block (Contact, Social) opens a column. Social icons become text links named by their alt text.
 const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
@@ -34,26 +34,25 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
     ))}
     <div class="legal">{legal.map((b) => <div class="md" set:html={md(b.md)} />)}</div>
   </div>
-  <p class="mega-mark" aria-hidden="true">{wordmark.text}</p>
+  <div class="mega-mark"><Logo /></div>
 </footer>
 <style>
-  .site-footer { background: var(--black); color: #e9e4e1; padding-top: var(--section-y); overflow: hidden; }
-  .site-footer :focus-visible { outline-color: var(--peach); }
+  .site-footer { background: var(--black); color: var(--on-dark); padding-top: var(--section-y); overflow: hidden; }
+  .site-footer :focus-visible { outline-color: var(--turquoise); }
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
   .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 400 var(--fs-h3)/.95 var(--font-display); max-width: 18ch; text-wrap: balance; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
-  .md :global(.fh6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: rgb(233 228 225 / .7); }
+  .md :global(.fh6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--on-dark-2); }
   .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
   .md :global(p) { margin: 0; }
   .md :global(a), .social a { display: inline-block; padding-block: 6px; text-decoration-color: var(--accent); text-underline-offset: 3px; }
   .social { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); text-transform: uppercase; letter-spacing: .08em; }
-  .legal { font-size: var(--fs-label); color: rgb(233 228 225 / .7); }
+  .legal { font-size: var(--fs-label); color: var(--on-dark-2); }
   .mega-mark {
-    margin: var(--s-8) 0 0; padding-inline: var(--gutter); white-space: nowrap;
-    font: 400 var(--fs-mega)/.78 var(--font-display);
-    background: linear-gradient(180deg, #fff 10%, rgb(255 255 255 / 0) 95%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: var(--s-8) 0 0; padding-inline: var(--gutter); color: #fff;
+    -webkit-mask-image: linear-gradient(180deg, #000 10%, transparent 95%); mask-image: linear-gradient(180deg, #000 10%, transparent 95%);
   }
+  .mega-mark :global(.logo) { display: block; width: 100%; height: auto; margin-bottom: -2%; }
   @media (min-width: 768px) {
     .grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(160px, 1fr)); }
     .legal { grid-column: 1 / -1; }

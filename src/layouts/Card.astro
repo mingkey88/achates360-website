@@ -47,11 +47,11 @@ const mailIcon = icon('mailto:');
   </section>
 </Base>
 <style>
-  :global(body[data-page='card']) { background: var(--charcoal); }
+  :global(body[data-page='card']) { background: var(--teal-ink); }
   .card-section { display: grid; place-items: center; padding: var(--s-6) var(--gutter) var(--s-9); }
   .card {
     width: min(100%, 440px); display: grid; justify-items: start; gap: var(--s-4);
-    padding: var(--s-7) var(--s-6); border-radius: var(--r-block); background: var(--peach); color: var(--ink);
+    padding: var(--s-7) var(--s-6); border-radius: var(--r-block); background: var(--turquoise); color: var(--ink);
   }
   .card :global(.photo) { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; }
   .name { margin: var(--s-2) 0 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); overflow-wrap: anywhere; }
@@ -64,7 +64,7 @@ const mailIcon = icon('mailto:');
     flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; padding: 8px 18px;
     border: 1.5px solid var(--ink); border-radius: var(--r-pill); text-decoration: none; overflow-wrap: anywhere;
   }
-  .contact .text:hover, .contact .icon:hover { background: var(--ink); color: var(--peach); }
+  .contact .text:hover, .contact .icon:hover { background: var(--ink); color: var(--turquoise); }
   .vcard {
     display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 10px 22px 7px;
     border-radius: var(--r-pill); background: var(--accent); color: var(--ink); text-decoration: none;
@@ -72,5 +72,5 @@ const mailIcon = icon('mailto:');
   }
   .vcard svg { width: 22px; height: 22px; fill: currentColor; }
   .card :global(.qr) { width: 148px; height: auto; margin-top: var(--s-4); border-radius: 8px; }
-  @media (max-width: 767px) { :global(body[data-page='card']) { background: var(--peach); } .card { padding-inline: var(--s-4); } }
+  @media (max-width: 767px) { :global(body[data-page='card']) { background: var(--turquoise); } .card { padding-inline: var(--s-4); } }
 </style>

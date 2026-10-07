@@ -22,7 +22,7 @@ const { steps, heading, stepLabel } = Astro.props;
   </ol>
 </section>
 <style>
-  .process { padding: var(--s-8) var(--s-6); border-radius: var(--r-block); background: #ece6e2; text-align: center; }
+  .process { padding: var(--s-8) var(--s-6); border-radius: var(--r-block); background: var(--panel); text-align: center; }
   .steps { list-style: none; margin: var(--s-7) 0 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); position: relative; }
   .step { position: relative; }
   .step::before { content: ''; display: block; width: 14px; height: 14px; margin: 0 auto var(--s-4); background: var(--ink); clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }

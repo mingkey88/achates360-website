@@ -53,7 +53,7 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     {og && <meta property="og:image" content={og} />}
     <meta property="og:site_name" content="Achates 360" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#f6f1ee" />
+    <meta name="theme-color" content="#f3f5f4" />
     {/* `js` gates hidden-until-revealed styles; motion-ready lifts them. If the motion bundle never
         arrives, the timeout lifts them after 3s so nothing stays invisible (Review Focus 1). */}
     <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>
@@ -63,6 +63,6 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} />
     <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
     <main id="main"><slot /></main>
-    <Footer blocks={site.footer} wordmark={text('wordmark')} />
+    <Footer blocks={site.footer} />
   </body>
 </html>

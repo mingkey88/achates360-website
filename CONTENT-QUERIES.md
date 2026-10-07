@@ -260,3 +260,10 @@ replaced. Existing copy from the Wix site is unchanged.
 14. **The /notter Vimeo film does not play on staging.** Vimeo answers "not allowed" (a 401 error), most likely because the video's privacy setting only permits embedding on achates360.com. Please add the staging address (mingkey88.github.io) to the video's allowed domains, or confirm it will play once the site is live on achates360.com. This was also an open point from the clone.
 15. **The contact form's second tick-box heading "Selection 2".** On Wix this text was white on a white background, so visitors never saw it. The redesign shows it. It is copied exactly from the Wix export. Please say what it should read, or whether to drop it.
 16. **Large videos on the homepage cards (7.7 MB and 11.6 MB).** They could be re-encoded smaller so the page loads faster on phones and slow connections. This is a decision about the studio's media files, not a copy change.
+
+**Found in the March 2026 portfolio deck** (sent 7 Oct 2026; nothing on the site has been changed)
+17. **Office phone number.** The deck's cover gives +65 8909 6062. The website footer and contact page give +65 9846 2443 (from the Wix site). Which number should the website show?
+18. **Postcode.** The deck gives "1 Irving Place, #05-02, The Commerze @ Irving, Singapore 369549". The website gives Singapore 369546. Which is correct?
+19. **Brand colours and type.** The site now uses the corporate colours from the logo sheet: orange `#ff9015` as the accent, turquoise `#99d9d9` for colour bands, deep turquoise `#163c41` for dark sections and lime green `#cbe880` sparingly. These replace the Wix-era peach, charcoal and the redesign's orange-red. Please confirm. The corporate typeface, Officina Sans, would need a web-font licence; until then the site uses Bebas Neue and DM Sans. Details are in `brand/BRAND-NOTES.md`.
+20. **Deck copy for draft sections.** The deck states the founding year (2001), the "faithful companion and trusted friend" philosophy, a 56-logo client wall and 12 awards. May the site use this wording in place of the DRAFT text on the homepage, About and Services?
+

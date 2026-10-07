@@ -95,39 +95,45 @@ Art Director / MD approve it (`CONTENT-QUERIES.md#redesign-stage-2--decisions-an
 
 ### Design tokens
 
-Defined in `src/styles/tokens.css`. Light only.
+Defined in `src/styles/tokens.css`. Light only. Brand colours come from the corporate sheet
+(`brand/BRAND-NOTES.md`); all three are light, so they are grounds for `--ink` text, never text on light.
 
 | Token | Value | Use |
 |---|---|---|
+| `--accent` | `#ff9015` | brand orange (Pantone 1495 U): pills, stickers, contact band, accents on dark grounds |
+| `--accent-deep` | `#b85c00` | orange for text and marks on light grounds (About stats, list markers) |
+| `--turquoise` | `#99d9d9` | brand turquoise (324 U): colour bands, cards, text on teal-ink |
+| `--lime` | `#cbe880` | brand lime green (373 U), sparingly: About clients band, text selection |
+| `--teal-ink` | `#163c41` | dark bands (stats, next project, menu, About intro) |
 | `--ink` | `#151414` | text |
-| `--charcoal` | `#2f2e2e` | dark blocks |
-| `--peach` | `#ebd2c5` | colour blocks, text on charcoal |
-| `--paper` | `#f6f1ee` | page background |
-| `--white` / `--black` | `#ffffff` / `#0d0d0d` | footer, stats band |
-| `--accent` | `#ff4b1f` | signal colour; text on it is always `--ink` |
-| `--accent-deep` | `#e03c10` | accent for large text on light grounds (About stats) |
-| `--muted` | `#8f8888` | only at 24px or larger |
+| `--paper` | `#f3f5f4` | page background |
+| `--panel` | `#e1eeec` | turquoise-tinted light panel (process steps) |
+| `--white` / `--black` | `#ffffff` / `#0d0d0d` | form fields / footer |
+| `--text-2` | `#5a6563` | secondary text on light grounds |
+| `--muted` | `#7b8785` | only at 24px or larger |
+| `--on-dark` / `--on-dark-2` | `#e6eeec` / 70% | footer text / labels |
 
 Fonts: Bebas Neue 400 (display) and DM Sans 300/400/500 + 400 italic (text), self-hosted via
 `@fontsource`; the two latin 400 files are preloaded in `Base.astro`. Radii 16 / 32 / 999 px.
 Breakpoints (mobile-first): 480 / 768 / 1024 / 1440.
 
-**Contrast** (WCAG 2.x relative luminance; computed 7 Oct 2026)
+**Contrast** (WCAG 2.x relative luminance; computed 7 Oct 2026 for the corporate palette, see `brand/BRAND-NOTES.md`)
 
 | Text | Background | Ratio | Minimum |
 |---|---|---|---|
-| ink `#151414` | paper `#f6f1ee` | 16.40 | 4.5 |
-| ink | peach `#ebd2c5` | 12.75 | 4.5 |
-| ink | accent `#ff4b1f` | 5.50 | 4.5 |
-| peach | charcoal `#2f2e2e` | 9.39 | 4.5 |
-| `#e9e4e1` (footer text) | black `#0d0d0d` | 15.41 | 4.5 |
-| accent (stat numbers, large) | black | 5.81 | 3 |
-| muted `#8f8888` (large) | paper | 3.10 | 3 |
-| `#5d5654` (subtitles) | paper | 6.41 | 4.5 |
-| accent (stat numbers) | paper | **2.98** (fails) | 3 |
-| accent-deep `#e03c10` (stat numbers) | paper | 3.88 | 3 |
-| accent `#ff4b1f` (menu hover/current, large text only) | charcoal `#2f2e2e` | 4.05 | 3 |
-| form placeholder `#5c5757` | form field (paper at 90% over accent, ≈ `#f7e0d9`) | 5.62 | 4.5 |
+| ink `#151414` | paper `#f3f5f4` | 16.79 | 4.5 |
+| ink | turquoise `#99d9d9` | 11.63 | 4.5 |
+| ink | lime `#cbe880` | 13.48 | 4.5 |
+| ink | accent `#ff9015` | 8.10 | 4.5 |
+| turquoise | teal-ink `#163c41` | 7.56 | 4.5 |
+| white (headings) | teal-ink | 11.95 | 4.5 |
+| accent (stat numbers, arrows, menu hover; large) | teal-ink | 5.27 | 3 |
+| on-dark `#e6eeec` (footer text) | black `#0d0d0d` | 16.48 | 4.5 |
+| on-dark-2 (footer labels, 70%) | black | 8.26 | 4.5 |
+| text-2 `#5a6563` (subtitles, placeholders) | paper | 5.52 | 4.5 |
+| muted `#7b8785` (large only) | paper | 3.40 | 3 |
+| accent (any text) | paper | **2.07** (fails: never text on light) | 3 |
+| accent-deep `#b85c00` (stat numbers, list markers) | paper | 4.20 | 3 |
 
 Accent on paper misses 3:1, so large numerals on light grounds use `--accent-deep`. Accent on
 black (homepage stats band) is fine.
