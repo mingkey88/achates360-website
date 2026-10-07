@@ -1,5 +1,5 @@
 .display {
-  margin: 0; font-family: var(--font-display); font-weight: 400; line-height: var(--lh-display);
+  margin-block: 0; font-family: var(--font-display); font-weight: 400; line-height: var(--lh-display);
   letter-spacing: .005em; text-wrap: balance; overflow-wrap: anywhere;
 }
 .mega { font-size: var(--fs-mega); line-height: .82; }
