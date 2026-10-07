@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import MarqueeToggle from './ui/MarqueeToggle.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+import logo from '../assets/logo-stacked-parts.svg?raw';
+// Homepage hero as a short film (spec §4.1, ruling R29). The stacked logo is split into five figures
+// and ten letters (src/assets/logo-stacked-parts.svg) so hero.ts can gather the figures into their
+// circle; behind it a ring of project images orbits. Without motion everything renders composed:
+// the ring sits at its starting angles, computed here.
+interface Item { thumb: ImageMetadata; alt: string }
+interface Props { items: Item[]; name: UiString; tagline: UiString }
+const { items, name, tagline } = Astro.props;
+const ring = items.map((it, i) => {
+  const a = (i / items.length) * Math.PI * 2;
+  return { ...it, s: Math.sin(a).toFixed(4), c: Math.cos(a).toFixed(4) };
+});
+const svg = logo.replace('<svg ', `<svg class="hh-mark" role="img" aria-label="${name.text.replace(/"/g, '&quot;')}" `);
+---
+<section class="h-hero" data-hero data-mq-scope aria-labelledby="hero-title">
+  <div class="hh-stage" aria-hidden="true">
+    <div class="hh-glow"></div>
+    <ul class="hh-ring" data-hero-ring>
+      {ring.map((it, i) => (
+        <li class="hh-item" style={`--s: ${it.s}; --c: ${it.c}`}>
+          <Image src={it.thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 160px, 300px" loading={i < 4 ? 'eager' : 'lazy'} draggable="false" />
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="hh-center">
+    <h1 id="hero-title" class="hh-logo"><Fragment set:html={svg} /></h1>
+    <p class="hh-tagline"><T s={tagline} /></p>
+  </div>
+  <div class="hh-grain" aria-hidden="true"></div>
+  <div class="hh-bars" aria-hidden="true"><i></i><i></i></div>
+  <MarqueeToggle />
+</section>
+<style>
+  .h-hero {
+    --rx: min(44vw, 640px); --rz: min(34vw, 460px); --tilt: min(29svh, 260px); --w: clamp(150px, 17vw, 300px);
+    position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; isolation: isolate;
+    color: var(--white); background: radial-gradient(120% 90% at 50% 42%, #1f5258 0%, var(--teal-ink) 40%, #0a1c1f 100%);
+  }
+  /* Vignette */
+  .h-hero::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(90% 75% at 50% 45%, transparent 55%, rgb(0 0 0 / .6)); }
+
+  .hh-stage { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 35%; cursor: grab; touch-action: pan-y; user-select: none; }
+  .hh-stage:active { cursor: grabbing; }
+  .hh-glow {
+    position: absolute; left: 50%; top: 44%; width: 70vmin; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 144 21 / .38), rgb(255 144 21 / .08) 45%, transparent 70%); filter: blur(10px);
+  }
+  .hh-ring { position: absolute; left: 50%; top: 50%; margin: 0; padding: 0; list-style: none; transform-style: preserve-3d; }
+  .hh-item {
+    position: absolute; width: var(--w); aspect-ratio: 16 / 9; left: calc(var(--w) / -2); top: calc(var(--w) * -9 / 32);
+    border-radius: 12px; overflow: hidden; background: var(--teal-ink); box-shadow: 0 24px 60px rgb(0 0 0 / .5);
+    transform: translate3d(calc(var(--s) * var(--rx)), calc(var(--c) * var(--tilt)), calc((var(--c) - 1) * var(--rz)));
+    opacity: calc(.22 + .78 * (var(--c) + 1) / 2);
+  }
+  .hh-item :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+
+  .hh-center { position: relative; z-index: 2; display: grid; justify-items: center; gap: var(--s-5); translate: 0 -7svh; text-align: center; pointer-events: none; }
+  .hh-logo { margin: 0; width: min(62vw, 400px); }
+  .hh-logo :global(.hh-mark) { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 10px 40px rgb(0 0 0 / .45)); }
+  .hh-tagline { margin: 0; font: 400 var(--fs-small)/1.4 var(--font-text); letter-spacing: .32em; text-transform: lowercase; color: var(--on-dark); text-shadow: 0 2px 18px rgb(0 0 0 / .7); }
+
+  /* Film grain: a tiled noise texture that jitters a few times a second. */
+  .hh-grain {
+    position: absolute; inset: -50%; z-index: 4; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: hh-grain 1s steps(6) infinite;
+  }
+  @keyframes hh-grain { 0% { translate: 0 0; } 20% { translate: -8% 4%; } 40% { translate: 6% -6%; } 60% { translate: -4% 8%; } 80% { translate: 8% 2%; } 100% { translate: 0 0; } }
+
+  /* Letterbox bars: hero.ts opens them from a closed black frame. */
+  .hh-bars { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+  .hh-bars i { position: absolute; inset-inline: 0; z-index: 5; height: 6svh; background: #000; pointer-events: none; }
+  .hh-bars i:first-child { top: 0; transform-origin: 50% 0; }
+  .hh-bars i:last-child { bottom: 0; transform-origin: 50% 100%; }
+
+  .h-hero :global(.mq-toggle) { top: auto; bottom: calc(6svh + var(--s-4)); translate: none; z-index: 6; }
+
+  @media (max-width: 767px) {
+    .h-hero { --rx: 40vw; --rz: 46vw; --tilt: 30svh; --w: 112px; }
+    .hh-tagline { letter-spacing: .18em; }
+    .hh-item { border-radius: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hh-grain { animation: none; } }
+</style>
