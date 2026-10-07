@@ -12,7 +12,7 @@ const { items, heading } = Astro.props;
 ---
 <section class="timeline" data-timeline aria-labelledby="tl-title">
   <h2 id="tl-title" class="display h2 wrap" data-split><T s={heading} /></h2>
-  <ol class="tl-track">
+  <ol class="tl-track" tabindex="0" aria-labelledby="tl-title">
     {items.map((it, i) => (
       <li class="tl-item" data-placeholder={it.placeholder ? '' : undefined}>
         <p class="tl-year display">{it.year}</p>
@@ -26,6 +26,7 @@ const { items, heading } = Astro.props;
 <style>
   .timeline { padding-block: var(--section-y); overflow: hidden; }
   .tl-track { list-style: none; margin: var(--s-7) 0 0; padding: 0 var(--gutter); display: flex; gap: var(--s-7); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .tl-track:focus-visible { outline-offset: -2px; }
   .tl-item { flex: 0 0 min(80vw, 380px); scroll-snap-align: start; display: grid; align-content: start; justify-items: start; gap: var(--s-4); }
   .tl-year { font-size: clamp(5rem, 3rem + 7vw, 10rem); line-height: .8; }
   .tl-body { margin: 0; padding-top: var(--s-4); border-top: 1px solid var(--line); font-size: var(--fs-small); }

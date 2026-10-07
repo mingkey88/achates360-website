@@ -23,7 +23,8 @@ const all = await getCollection('projects');
 const projects = new Map(all.map((e) => [e.id, e.data]));
 const listedCount = all.filter((e) => e.data.listed).length;
 const timeline = x.timeline.map((t: any) => {
-  const p = projects.get(t.project)!;
+  const p = projects.get(t.project);
+  if (!p) throw new Error(`timeline/${t.id}: unknown project "${t.project}"`);
   const year = firstYear(p.copyright);
   if (!year || !p.hero) throw new Error(`timeline/${t.id}: project "${t.project}" needs a copyright year and a hero`);
   const image = p.hero.type === 'image' ? p.hero.src : p.hero.poster;
