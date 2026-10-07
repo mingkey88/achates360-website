@@ -1,14 +1,21 @@
 /* Design tokens (spec §3). Light only: the site has no dark theme. */
 :root {
+  /* Corporate colours (brand/BRAND-NOTES.md): orange Pantone 1495 U, turquoise 324 U, lime green 373 U.
+     All three are light, so they are grounds for ink text; text in brand colour uses the -deep/-ink shades. */
+  --accent: #ff9015;      /* brand orange: fills, pills, stickers, accents on dark grounds */
+  --accent-deep: #b85c00; /* orange for text and marks on light grounds; 4.2:1 on paper */
+  --turquoise: #99d9d9;   /* brand turquoise: light bands, text on teal-ink */
+  --lime: #cbe880;        /* brand lime green: used sparingly (clients band, text selection) */
+  --teal-ink: #163c41;    /* deep turquoise for dark bands; turquoise text on it is 7.6:1 */
   --ink: #151414;
-  --charcoal: #2f2e2e;
-  --peach: #ebd2c5;
-  --paper: #f6f1ee;
+  --paper: #f3f5f4;
   --white: #ffffff;
   --black: #0d0d0d;
-  --accent: #ff4b1f;
-  --muted: #8f8888;
-  --accent-deep: #e03c10; /* accent for large text on light grounds; ~3.9:1 on paper */
+  --text-2: #5a6563;      /* secondary text on light grounds; 5.5:1 on paper */
+  --muted: #7b8785;       /* large text only (>= 24px); 3.4:1 on paper */
+  --on-dark: #e6eeec;     /* body text on black */
+  --on-dark-2: rgb(230 238 236 / .7);
+  --panel: #e1eeec;       /* turquoise-tinted light panel */
   --line: rgb(21 20 20 / .12);
 
   --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;

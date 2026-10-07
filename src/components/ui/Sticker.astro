@@ -1,6 +1,6 @@
 ---
 // data-* attributes pass through (e.g. data-hero-sticker for the hero motion).
-interface Props { tilt?: number; tone?: 'accent' | 'peach' | 'ink'; class?: string; [key: `data-${string}`]: string | boolean | undefined }
+interface Props { tilt?: number; tone?: 'accent' | 'turquoise' | 'lime' | 'ink'; class?: string; [key: `data-${string}`]: string | boolean | undefined }
 const { tilt = -5, tone = 'accent', class: cls, ...rest } = Astro.props;
 ---
 <span class:list={['sticker', `sticker-${tone}`, cls]} style={`--tilt: ${tilt}deg`} {...rest}><slot /></span>
@@ -10,6 +10,7 @@ const { tilt = -5, tone = 'accent', class: cls, ...rest } = Astro.props;
     font: 400 clamp(1rem, .9rem + .4vw, 1.375rem)/1.1 var(--font-display); letter-spacing: .03em;
   }
   .sticker-accent { background: var(--accent); color: var(--ink); }
-  .sticker-peach { background: var(--peach); color: var(--ink); }
-  .sticker-ink { background: var(--ink); color: var(--peach); }
+  .sticker-turquoise { background: var(--turquoise); color: var(--ink); }
+  .sticker-lime { background: var(--lime); color: var(--ink); }
+  .sticker-ink { background: var(--ink); color: var(--turquoise); }
 </style>

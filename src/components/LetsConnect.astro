@@ -18,7 +18,7 @@ const { line, cta, href } = Astro.props;
 <style>
   .connect { position: relative; padding-block: var(--section-y); overflow: hidden; --mq-gap: 2.5rem; }
   .solid, .outline { font: 400 clamp(4rem, 2rem + 9vw, 11rem)/.9 var(--font-display); white-space: nowrap; }
-  .solid { color: #8f8888; }
+  .solid { color: var(--muted); }
   .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
   /* The overlay spans the section but only the pill takes pointer events, so the marquees and the
      pause button underneath stay reachable. */

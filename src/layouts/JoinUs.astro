@@ -57,7 +57,7 @@ if (others.length) throw new Error(`/joinus: ${others.length} block(s) not place
   .role { border-radius: var(--r-card); background: var(--white); padding: var(--s-6); }
   summary { display: grid; justify-items: start; gap: var(--s-3); cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
-  summary h2::after { content: ' +' / ''; color: var(--accent); }
+  summary h2::after { content: ' +' / ''; color: var(--accent-deep); }
   .role[open] summary h2::after { content: ' –' / ''; }
   .role-body { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
   .apply { margin: var(--s-6) 0 0; }

@@ -48,9 +48,15 @@ teal for headings (about `#2e8a9a`), mid-grey title bars and yellow icon accents
 - Case studies in the deck: Mann+Hummel MH Innovates 2026, Safe Roads Singapore, Enabling Village,
   Frasers Heritage Wall, Samsung, Grab, Grohe, Kaplan MRT, DBS Private Bank AI imagery.
 
-## Where the redesign differs (decisions for the Art Director / MD)
+## How the site uses it (7 Oct 2026)
 
-- Accent: the redesign uses `#ff4b1f` (orange-red). The brand orange is `#ff9015`.
-- Palette: the redesign's peach `#ebd2c5` and charcoal come from the Wix site, not the corporate sheet.
-  Turquoise and lime green are not used on the site yet.
-- Type: the redesign uses Bebas Neue + DM Sans (free web fonts), not Officina.
+The site now follows the corporate palette (decided by the site builder; the Art Director / MD
+still to confirm, CONTENT-QUERIES item 19):
+
+- Orange `#ff9015` is the accent: buttons, stickers, the contact band, numbers on dark grounds.
+  Where orange must be text on a light ground it is the deeper `#b85c00`.
+- Turquoise `#99d9d9` replaces the Wix-era peach for colour bands and cards, and is the text colour
+  on dark bands.
+- Dark bands are a deep turquoise, `#163c41`, instead of charcoal.
+- Lime green `#cbe880` is used sparingly: the About clients band and text selection.
+- Type is still Bebas Neue + DM Sans: Officina needs a web licence.

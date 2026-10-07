@@ -13,5 +13,5 @@
 .prose > :last-child { margin-bottom: 0; }
 .prose :is(p, ul, ol) { margin: 0 0 1em; }
 .prose :is(h1, h2, h3, h4, h5, h6) { font: 400 var(--fs-h3) / .95 var(--font-display); margin: 1.2em 0 .4em; text-wrap: balance; }
-.prose a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
-.prose li::marker { color: var(--accent); }
+.prose a { text-decoration-color: var(--accent-deep); text-underline-offset: 3px; }
+.prose li::marker { color: var(--accent-deep); }
