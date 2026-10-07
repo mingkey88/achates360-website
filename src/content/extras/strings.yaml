@@ -6,8 +6,7 @@
 - { id: menu-services, text: SERVICES, placeholder: true }
 - { id: video-pause, text: Pause video, placeholder: true }
 - { id: video-play, text: Play video, placeholder: true }
-- { id: hero-sticker, text: Since 2001, placeholder: true }
-- { id: hero-tagline, text: Design is thinking made visual, placeholder: true }
+- { id: hero-tagline, text: faithful friend • thoughtful design, placeholder: false }
 - { id: featured-eyebrow, text: Selected work, placeholder: true }
 - { id: intro-eyebrow, text: Inside the studio, placeholder: true }
 - { id: intro-cta, text: Learn more, placeholder: true }

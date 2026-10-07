@@ -1,8 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import HeroMedia from '../components/ui/HeroMedia.astro';
-import Sticker from '../components/ui/Sticker.astro';
+import HeroFilm from '../components/HeroFilm.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
@@ -30,17 +29,9 @@ const [introDark, introMuted] = [words.slice(0, 5).join(' '), words.slice(5).joi
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
-const hero = d.slides[0];
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="home" overHero>
-  <section class="h-hero" data-hero>
-    <HeroMedia media={hero.media} />
-    <div class="h-hero-text">
-      <Sticker class="h-sticker" data-hero-sticker><T s={text('hero-sticker')} /></Sticker>
-      <h1 class="display mega" data-hero-title>{text('wordmark').text}</h1>
-      <p class="label h-tagline wrap"><T s={text('hero-tagline')} /></p>
-    </div>
-  </section>
+  <HeroFilm items={d.allProjects.items.slice(0, 8)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
 
   <FeaturedStack items={featured} eyebrow={text('featured-eyebrow')} />
 
@@ -63,12 +54,6 @@ const hero = d.slides[0];
   <ContactForm md={d.contact.md} form={d.contact.form} />
 </Base>
 <style>
-  .h-hero { position: relative; min-height: 100svh; display: flex; align-items: flex-end; color: var(--white); isolation: isolate; overflow: hidden; }
-  .h-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / .4), rgb(0 0 0 / .1) 40%, rgb(0 0 0 / .55)); pointer-events: none; }
-  .h-hero-text { position: relative; z-index: 1; width: 100%; padding-bottom: var(--s-7); display: grid; }
-  .h-hero-text :global(.h-sticker) { justify-self: start; margin: 0 0 var(--s-4) var(--gutter); }
-  .h-hero-text h1 { padding-inline: calc(var(--gutter) * .6); white-space: nowrap; }
-  .h-tagline { margin: var(--s-4) auto 0; }
   .two-tone { max-width: 22ch; margin-block: var(--s-4) var(--s-7); }
   .two-tone .muted { color: var(--muted); }
   .h-all-heading :global(h2) { margin: 0 0 var(--s-7); font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); }
