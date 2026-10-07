@@ -1,121 +1,46 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
-import Blocks from '../components/Blocks.astro';
-import BgVideo from '../components/BgVideo.astro';
-import { withBase, backLinkHref, BLANK_IMAGE, linkAttrs } from '../lib/paths';
+import HeroMedia from '../components/ui/HeroMedia.astro';
+import Sticker from '../components/ui/Sticker.astro';
+import Pill from '../components/ui/Pill.astro';
+import MetaStrip from '../components/MetaStrip.astro';
+import MediaRows from '../components/MediaRows.astro';
+import NextProject from '../components/NextProject.astro';
+import { loadExtras } from '../lib/extras';
+import { backLinkHref } from '../lib/paths';
+import { nextProject, slugOf } from '../lib/next-project';
 interface Props { entry: CollectionEntry<'projects'> }
-const d = Astro.props.entry.data;
+const { id, data: d } = Astro.props.entry;
+const { text } = await loadExtras();
+const home = (await getEntry('home', 'home'))!.data;
+const built = new Set((await getCollection('projects')).map((e) => e.id));
+const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null);
+const next = nextProject(id, order, (s) => built.has(s));
+const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback').text;
+const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} bodyClass="page-project" background={d.pageBackground}>
-  {d.hero && (
-    <div class="hero">
-      {d.hero.type === 'video'
-        ? <BgVideo src={d.hero.src} poster={d.hero.poster} class="hero-media" desktopOnly />
-        : (
-          <picture>
-            {/* Wix's mobile layout has no hero: an empty source keeps phones from fetching it. */}
-            <source media="(max-width: 767px)" srcset={BLANK_IMAGE} />
-            <Image class="hero-media" src={d.hero.src} alt={d.hero.alt} widths={[768, 1440, 1920, 2560]} sizes="100vw" loading="eager" fetchpriority="high" />
-          </picture>
-        )}
-      {d.badges.length > 0 && (
-        <div class="badges">
-          {d.badges.map((b) => {
-            // Wix's badge box (112x110 for most award badges) when the export recorded it.
-            const [w, h] = b.box ? [b.box.w, b.box.h] : [112, 110];
-            const img = <Image src={b.src} alt={b.alt} width={w} height={h} densities={[1, 2]} style={`width: ${w}px; height: ${h}px`} />;
-            return b.href
-              ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a>
-              : img;
-          })}
-        </div>
-      )}
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="project" overHero={!!d.hero}>
+  <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
+    {d.hero && <HeroMedia media={d.hero} />}
+    <div class="p-hero-text wrap">
+      {d.categories[0] && <Sticker>{d.categories[0]}</Sticker>}
+      <h1 class="display h1" data-split>{d.title}</h1>
     </div>
-  )}
-  {/* Wix's off-canvas hero caption (Ruling 19b): kept for screen readers, outside the hero so it
-      survives the hero being hidden on mobile. */}
+  </section>
   {d.heroCaption && <p class="sr-only">{d.heroCaption}</p>}
-  <article class="wrap project">
-    {d.backLink && <p class="back"><a href={withBase(backLinkHref(d.backLink.href))}>{d.backLink.label}</a></p>}
-    <h2 class="title">{d.title}</h2>
-    {d.client && <p class="client">{d.client}</p>}
-    <div class="blocks"><Blocks blocks={d.blocks} gallery="stack" pageTitle={d.title} /></div>
-    {d.copyright && <p class="copyright">{d.copyright}</p>}
-  </article>
+  <MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} />
+  <article class="wrap p-body"><MediaRows blocks={d.blocks} pageTitle={d.title} /></article>
+  {d.backLink && <p class="wrap p-back"><Pill href={backLinkHref(d.backLink.href)}>{d.backLink.label}</Pill></p>}
+  <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} />
 </Base>
 <style>
-  /*
-   * Geometry measured on the live site at 1440 (notter, dbs-discretionary-portfolio-management,
-   * dxv, the-v-edit-e-zine, bumitama-annual-report; Wix positions every element absolutely, so
-   * spacing between blocks varies a little per page — these are the common values):
-   *   hero: a 900px-tall cover box whose visible part ends at y=791 (top 7px and bottom ~102px
-   *     cropped); badges 112x110 at the content column's right edge, 13px above the hero bottom.
-   *   back link: right-aligned to the content column, top 24px below the hero.
-   *   title h2 top at 872, client at 913, first block at ~990; text boxes ~640px wide.
-   *   between images / galleries / players: 10px; around text: ~30px; copyright ~30px after the
-   *   last block; ~40px to the footer.
-   * Mobile (Wix 320px layout, lengths x --m per Ruling 21): no hero; title 30 below the header
-   * band, client 10 below it, first block ~40 below that, 10 between media, the copyright and then
-   * the back link (a 280x78 box, text centred) come last.
-   */
-  .hero { position: relative; height: 787px; overflow: hidden; }
-  .hero :global(.hero-media) { position: absolute; left: 0; top: -11px; width: 100%; height: 900px; max-width: none; object-fit: cover; }
-  .badges { position: absolute; right: max(var(--gutter), calc(50% - 462px)); bottom: 13px; display: flex; gap: 12px; }
-  .badges a { display: block; line-height: 0; }
-  .badges :global(img) { object-fit: cover; }
-
-  /* Wix's column sits ~10px left of centre (x=237..250 for text and images on a 1440 page). */
-  .project { padding-bottom: 40px; margin-left: max(var(--gutter), calc(50% - var(--page-max) / 2 - var(--column-shift))); }
-  .back { margin: 24px 0 0; text-align: right; font: var(--weight-light) var(--size-ui) / var(--leading-ui) var(--font-ui); }
-  .back a { color: var(--color-link); text-decoration: none; }
-  .back a:hover { text-decoration: underline; }
-  .title { margin: 37px 0 0; }
-  .client, .copyright { color: var(--color-muted); line-height: 21px; letter-spacing: 0.15px; }
-  .client { margin: 7px 0 0; }
-  .copyright { margin: 30px 0 0; }
-  /* Wix colours the © in the body grey and the year in the muted grey. */
-  .copyright::first-letter { color: var(--color-text); }
-
-  .blocks { margin-top: 56px; }
-  .blocks > :global(* + *) { margin-top: 30px; }
-  .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media]) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: 10px; }
-  .blocks :global(.block-image) { display: block; line-height: 0; }
-  .blocks :global(.block-text) { max-width: 640px; line-height: var(--leading-copy); }
-  /* A text with a Wix layout box takes the box's width (Blocks.astro). */
-  .blocks :global(.item .block-text) { max-width: none; }
-  .blocks :global(.block-text :is(p, ul, ol, h5)) { margin: 0 0 var(--leading-copy); }
-  .blocks :global(.block-text > :last-child) { margin-bottom: 0; }
-  .blocks :global(.block-text h5) { color: var(--color-text); line-height: normal; }
-  .blocks :global(.block-text :is(ul, ol)) { padding-left: 27px; }
-  .blocks :global(.block-text li p) { margin: 0; }
-  /* Wix renders content link blocks as its dark text button. */
-  .blocks :global(.block-link) { margin-bottom: 0; }
-  .blocks :global(.block-link a) {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 194px; height: 40px; padding: 0 20px; margin-left: -7px;
-    background: var(--color-button); color: #fff; text-decoration: none;
-    font: var(--weight-light) var(--size-body) / normal var(--font-ui); letter-spacing: 0.75px;
-  }
-
-  @media (max-width: 767px) {
-    .hero { display: none; }
-    .project { display: flex; flex-direction: column; width: calc(280 * var(--m)); margin-inline: auto; padding-bottom: 0; }
-    .back { order: 1; margin: calc(-3 * var(--m)) 0 0; height: calc(78 * var(--m)); display: flex; align-items: center; justify-content: center; font-size: var(--size-ui-m); line-height: var(--leading-ui-m); }
-    .title { margin-top: calc(30 * var(--m)); }
-    .client, .copyright { line-height: calc(19.6 * var(--m)); letter-spacing: calc(0.14 * var(--m)); }
-    .client { margin-top: calc(10 * var(--m)); }
-    .copyright { margin-top: calc(20 * var(--m)); }
-    .blocks { margin-top: calc(40 * var(--m)); }
-    .blocks > :global(* + *) { margin-top: calc(30 * var(--m)); }
-    .blocks > :global(:is(.block-text, .block-link, .block-row:not([data-media])) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
-    .blocks > :global(:is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media]) + :is(.block-image, .gallery, .embed, .bgvideo, .player, .block-row[data-media])) { margin-top: calc(10 * var(--m)); }
-    .blocks :global(.block-text) { max-width: none; line-height: var(--leading-copy-m); }
-    .blocks :global(.block-text :is(p, ul, ol, h5)) { margin-bottom: var(--leading-copy-m); }
-    .blocks :global(.block-text h5) { font-size: calc(21 * var(--m)); }
-    .blocks :global(.block-text :is(ul, ol)) { padding-left: calc(25 * var(--m)); }
-    .blocks :global(.block-link) { text-align: center; }
-    .blocks :global(.block-link a) { min-width: calc(200 * var(--m)); height: calc(42 * var(--m)); padding: 0 calc(20 * var(--m)); margin-left: 0; font-size: calc(15 * var(--m)); letter-spacing: calc(0.75 * var(--m)); }
-  }
+  .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
+  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .35), rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6)); pointer-events: none; }
+  .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
+  .p-hero-plain { min-height: 0; background: var(--charcoal); color: var(--peach); }
+  .p-hero-plain::after { display: none; }
+  .p-body { padding-block: var(--s-7) var(--s-8); }
+  .p-back { margin: 0; padding-bottom: var(--s-8); }
+  @media (min-width: 768px) { .p-hero { min-height: 85svh; } }
 </style>

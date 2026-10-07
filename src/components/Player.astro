@@ -11,5 +11,5 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
   <video src={/^https?:\/\//.test(src) ? src : mediaUrl(src)} poster={posterUrl} controls preload="metadata" playsinline aria-label={label}></video>
 </div>
 <style>
-  .player video { display: block; width: 100%; height: auto; background: var(--color-video-bg); }
+  .player video { display: block; width: 100%; height: auto; background: var(--ink); border-radius: var(--r-card); }
 </style>

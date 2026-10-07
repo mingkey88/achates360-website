@@ -1,41 +1,47 @@
 ---
 import { getImage } from 'astro:assets';
 import { mediaUrl } from '../lib/paths';
-// Background video (muted, looping, no controls). It plays only while on screen and never under
-// prefers-reduced-motion. "On screen" is the video's own box, or the nearest ancestor marked
-// data-bgvideo-viewport when the video sits in a larger layer than the part shown (the
-// homepage's sticky slide backgrounds).
-// desktopOnly: the video (and its poster) load only at >=768px, for media that Wix's mobile layout
-// hides, and only once the video comes within a screen of the viewport.
-interface Props { src: string; poster: ImageMetadata; class?: string; desktopOnly?: boolean }
-const { src, poster, class: cls, desktopOnly = false } = Astro.props;
+// Background video (muted, looping, no controls). It plays only while on screen, never under
+// reduced motion, and never again after the visitor pauses it (WCAG 2.2.2; src/lib/video-policy).
+// desktopOnly: loads only at >=768px once within a screen of the viewport. pauseLabel/playLabel:
+// render a pause/play button (required for any looping video a visitor sees for >5s).
+interface Props { src: string; poster: ImageMetadata; class?: string; desktopOnly?: boolean; pauseLabel?: string; playLabel?: string }
+const { src, poster, class: cls, desktopOnly = false, pauseLabel, playLabel } = Astro.props;
 const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
+const toggle = pauseLabel && playLabel;
 ---
 <div class:list={['bgvideo', cls]}>
   {desktopOnly
     ? <video data-src={mediaUrl(src)} data-poster={posterUrl} muted loop playsinline preload="none" aria-hidden="true"></video>
-    : <video src={mediaUrl(src)} poster={posterUrl} autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>}
+    : <video src={mediaUrl(src)} poster={posterUrl} muted loop playsinline preload="metadata" aria-hidden="true"></video>}
+  {toggle && (
+    <button class="bv-toggle" type="button" aria-pressed="false" data-pause={pauseLabel} data-play={playLabel}>
+      <span class="sr-only">{pauseLabel}</span>
+      <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>
+      <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg>
+    </button>
+  )}
 </div>
 <script>
+  import { shouldPlay } from '../lib/video-policy';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const desktop = window.matchMedia('(min-width: 768px)');
   const videos = [...document.querySelectorAll<HTMLVideoElement>('.bgvideo video')];
-  const near = new Set<Element>(); // within a screen of the viewport: may load
-  const seen = new Set<Element>(); // on screen: may play
+  const near = new Set<Element>();
+  const seen = new Set<Element>();
   const area = (v: HTMLVideoElement) => v.closest('[data-bgvideo-viewport]') ?? v;
+  const lazy = (v: HTMLVideoElement) => v.dataset.src !== undefined;
 
   const update = (v: HTMLVideoElement) => {
-    if (reduce.matches) v.removeAttribute('autoplay');
-    if (v.dataset.src !== undefined) {
-      if (!desktop.matches) { v.pause(); return; }
-      if (!v.getAttribute('src')) {
-        if (!near.has(area(v))) return;
-        if (v.dataset.poster) v.poster = v.dataset.poster;
-        v.preload = 'metadata';
-        v.src = v.dataset.src;
-      }
+    const allowedHere = !lazy(v) || desktop.matches;
+    if (lazy(v) && allowedHere && !v.getAttribute('src') && near.has(area(v))) {
+      if (v.dataset.poster) v.poster = v.dataset.poster;
+      v.preload = 'metadata';
+      v.src = v.dataset.src!;
     }
-    if (seen.has(area(v)) && !reduce.matches) v.play().catch(() => {});
+    const play = shouldPlay({ onScreen: seen.has(area(v)), reduced: reduce.matches, userPaused: v.dataset.userPaused === 'true', allowedHere })
+      && !!v.getAttribute('src');
+    if (play) v.play().catch(() => {});
     else v.pause();
   };
   const watch = (set: Set<Element>, rootMargin: string) => new IntersectionObserver((entries) => {
@@ -48,8 +54,36 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
   for (const v of videos) update(v);
   reduce.addEventListener('change', () => videos.forEach(update));
   desktop.addEventListener('change', () => videos.forEach(update));
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.bv-toggle')) {
+    const v = btn.parentElement!.querySelector('video')!;
+    const label = btn.querySelector('.sr-only')!;
+    const sync = () => {
+      const paused = v.dataset.userPaused === 'true';
+      btn.setAttribute('aria-pressed', String(paused));
+      label.textContent = paused ? btn.dataset.play! : btn.dataset.pause!;
+    };
+    // Reduced motion starts paused, so the button offers Play from the start.
+    if (reduce.matches) v.dataset.userPaused = 'true';
+    btn.addEventListener('click', () => {
+      v.dataset.userPaused = v.dataset.userPaused === 'true' ? 'false' : 'true';
+      sync();
+      update(v);
+      // An explicit Play under reduced motion is the visitor's choice: honour it.
+      if (v.dataset.userPaused === 'false' && reduce.matches && v.getAttribute('src')) v.play().catch(() => {});
+    });
+    sync();
+  }
 </script>
 <style>
   .bgvideo { position: relative; overflow: hidden; }
   .bgvideo video { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .bv-toggle {
+    position: absolute; right: var(--s-4); bottom: var(--s-4); z-index: 2; width: 44px; height: 44px;
+    display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%;
+    background: rgb(246 241 238 / .85); color: var(--ink); cursor: pointer;
+  }
+  .bv-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+  .bv-toggle .i-play, .bv-toggle[aria-pressed='true'] .i-pause { display: none; }
+  .bv-toggle[aria-pressed='true'] .i-play { display: block; }
 </style>

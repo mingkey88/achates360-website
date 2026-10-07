@@ -1,0 +1,25 @@
+---
+import { withBase, linkAttrs } from '../../lib/paths';
+interface Props { href?: string; variant?: 'outline' | 'fill' | 'light'; type?: 'button' | 'submit'; class?: string }
+const { href, variant = 'outline', type = 'button', class: cls } = Astro.props;
+const classes = ['pill', `pill-${variant}`, cls];
+---
+{href
+  ? <a class:list={classes} href={withBase(href)} {...linkAttrs(href)}><span class="dash" aria-hidden="true"></span><slot /></a>
+  : <button class:list={classes} type={type}><span class="dash" aria-hidden="true"></span><slot /></button>}
+<style>
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 9px 20px 7px;
+    border: 1.5px solid currentColor; border-radius: var(--r-pill); background: transparent; color: inherit;
+    font: 400 1.125rem/1 var(--font-display); letter-spacing: .04em; text-decoration: none; cursor: pointer;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .dash { width: 14px; height: 1.5px; background: currentColor; transition: width .25s var(--ease-out); }
+  .pill:is(:hover, :focus-visible) .dash { width: 26px; }
+  .pill-outline:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .pill-fill { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+  .pill-fill:hover { background: var(--ink); border-color: var(--ink); color: var(--accent); }
+  .pill-light { color: var(--white); }
+  .pill-light:hover { background: var(--white); border-color: var(--white); color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .pill, .dash { transition: none; } }
+</style>
