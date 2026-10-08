@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import MarqueeToggle from './ui/MarqueeToggle.astro';
+import type { UiString } from '../lib/strings';
+import logo from '../assets/logo-stacked-parts.svg?raw';
+// Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images drift across a
+// concave arc (edges nearer and turned toward the viewer), the five logo figures gather above a calm
+// title, and the tagline (corporate sheet) and site description (Wix SEO text) sit in the bottom
+// corners, both verbatim. hero.ts animates it; without motion it renders at its composed positions.
+interface Item { thumb: ImageMetadata; alt: string }
+interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
+const { items, name, tagline, blurb } = Astro.props;
+export const ARC_STEP = .34; // spacing between cards, in half-viewport widths (hero.ts reads data-step)
+const mid = (items.length - 1) / 2;
+const mark = logo
+  .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
+  .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
+  .replace('<svg ', '<svg class="ha-mark-svg" aria-hidden="true" focusable="false" ');
+const lines = tagline.text.split(/\s*•\s*/);
+---
+<section class="ha" data-hero data-mq-scope aria-labelledby="hero-title">
+  <div class="ha-arc" data-arc data-step={ARC_STEP} aria-hidden="true">
+    {items.map((it, i) => (
+      <div class="ha-card" style={`--u: ${((i - mid) * ARC_STEP).toFixed(3)}`}>
+        <Image src={it.thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 140px, 260px" loading={i < 6 ? 'eager' : 'lazy'} draggable="false" />
+      </div>
+    ))}
+  </div>
+  <div class="ha-copy">
+    <div class="ha-mark"><Fragment set:html={mark} /></div>
+    <h1 id="hero-title" class="ha-title">{name.text}</h1>
+  </div>
+  <div class="ha-foot">
+    <p class="ha-tagline" data-placeholder={tagline.placeholder ? '' : undefined}>{lines.map((l) => <span>{l}</span>)}</p>
+    <p class="ha-blurb">{blurb}</p>
+  </div>
+  <MarqueeToggle />
+</section>
+<style>
+  .ha {
+    --card: clamp(140px, min(14vw, 30svh), 260px);
+    /* The header is solid here (no overHero), so the hero fills the screen below it. */
+    position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
+    display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: var(--s-5) var(--gutter) var(--s-6);
+    background: var(--paper); color: var(--ink);
+  }
+  /* The arc: --u is a card's position in half-viewport widths (0 = centre). Cards further out come
+     nearer and turn toward the centre, like the inside of a cylinder. */
+  .ha-arc { position: relative; min-height: 0; perspective: 900px; perspective-origin: 50% 50%; cursor: grab; touch-action: pan-y; user-select: none; }
+  .ha-arc:active { cursor: grabbing; }
+  .ha-card {
+    position: absolute; left: 50%; top: 50%; width: var(--card); aspect-ratio: 4 / 5; margin: calc(var(--card) * -5 / 8) 0 0 calc(var(--card) / -2);
+    border-radius: 6px; overflow: hidden; background: var(--panel);
+    transform: translateX(calc(var(--u) * 50vw)) translateZ(calc(var(--u) * var(--u) * 190px)) rotateY(calc(var(--u) * 34deg));
+    /* --in: 0→1 entrance (hero.ts); edges fade out before the track wraps. */
+    opacity: calc(clamp(0, calc((1.25 - abs(var(--u))) * 4), 1) * var(--in, 1));
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
+  }
+  .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+
+  .ha-copy { display: grid; justify-items: center; gap: var(--s-4); padding-top: var(--s-4); text-align: center; }
+  .ha-mark { width: clamp(52px, 4.5vw, 72px); color: var(--ink); }
+  .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
+  .ha-title { margin: 0; font: 400 clamp(2rem, 1.3rem + 2.6vw, 3.75rem)/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; text-indent: .14em; }
+
+  .ha-foot { display: grid; gap: var(--s-4); padding-top: var(--s-6); font: 500 var(--fs-label)/1.6 var(--font-text); letter-spacing: .12em; text-transform: uppercase; }
+  .ha-foot p { margin: 0; }
+  .ha-tagline { display: grid; }
+  .ha-blurb { max-width: 44ch; color: var(--text-2); }
+  @media (min-width: 768px) {
+    .ha-foot { grid-template-columns: 1fr 1fr; align-items: end; }
+    .ha-blurb { justify-self: end; text-align: right; }
+  }
+  .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
+
+  @media (max-width: 767px) {
+    .ha { --card: 118px; }
+    .ha-card { transform: translateX(calc(var(--u) * 104vw)) translateZ(calc(var(--u) * var(--u) * 90px)) rotateY(calc(var(--u) * 26deg)); }
+  }
+</style>

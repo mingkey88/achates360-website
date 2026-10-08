@@ -22,7 +22,7 @@ button { font: inherit; }
 .skip-link:focus-visible { outline: 2px solid var(--turquoise); outline-offset: 2px; }
 .wrap { width: min(100% - 2 * var(--gutter), var(--max)); margin-inline: auto; }
 .section { padding-block: var(--section-y); }
-.on-dark { background: var(--teal-ink); color: var(--turquoise); }
+.on-dark { background: var(--teal-ink); color: var(--on-dark); }
 /* Pages without a hero start below the fixed header. */
 body:not([data-over-hero]) > main { padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); }
 

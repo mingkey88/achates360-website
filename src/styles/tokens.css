@@ -6,29 +6,29 @@
   --accent-deep: #b85c00; /* orange for text and marks on light grounds; 4.2:1 on paper */
   --turquoise: #99d9d9;   /* brand turquoise: light bands, text on teal-ink */
   --lime: #cbe880;        /* brand lime green: used sparingly (clients band, text selection) */
-  --teal-ink: #163c41;    /* deep turquoise for dark bands; turquoise text on it is 7.6:1 */
+  --teal-ink: #1b1d1d;    /* direction B: dark bands are near-black, Croma-style (A uses deep turquoise #163c41) */
   --ink: #151414;
-  --paper: #f3f5f4;
+  --paper: #ffffff;
   --white: #ffffff;
   --black: #0d0d0d;
   --text-2: #5a6563;      /* secondary text on light grounds; 5.5:1 on paper */
   --muted: #7b8785;       /* large text only (>= 24px); 3.4:1 on paper */
   --on-dark: #e6eeec;     /* body text on black */
   --on-dark-2: rgb(230 238 236 / .7);
-  --panel: #e1eeec;       /* turquoise-tinted light panel */
+  --panel: #f4f5f4;       /* direction B: quiet grey panel for alternate sections */
   --line: rgb(21 20 20 / .12);
 
-  --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
-  --font-text: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --fs-mega: min(19.5vw, 24rem);
-  --fs-h1: clamp(3rem, 1.5rem + 8vw, 10rem);
-  --fs-h2: clamp(2.75rem, 1.5rem + 5vw, 6rem);
-  --fs-h3: clamp(1.75rem, 1.25rem + 2vw, 3rem);
+  --font-display: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-text: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-mega: min(8vw, 8rem);
+  --fs-h1: clamp(2.25rem, 1.5rem + 3.4vw, 5rem);
+  --fs-h2: clamp(1.75rem, 1.3rem + 2vw, 3.25rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + .7vw, 1.75rem);
   --fs-lead: clamp(1.125rem, 1rem + .6vw, 1.625rem);
   --fs-body: clamp(1rem, .95rem + .2vw, 1.125rem);
   --fs-small: clamp(.75rem, .7rem + .2vw, .875rem);
   --fs-label: .6875rem;
-  --lh-display: .88;
+  --lh-display: 1.05;
   --lh-body: 1.55;
 
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;

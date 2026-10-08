@@ -13,10 +13,10 @@ const { href, title, label } = Astro.props;
   </a>
 </section>
 <style>
-  .next-project { background: var(--teal-ink); color: var(--turquoise); }
+  .next-project { background: var(--teal-ink); color: var(--on-dark); }
   .next-project :focus-visible { outline-color: var(--turquoise); }
   .np { display: grid; gap: var(--s-3); padding-block: var(--section-y); text-decoration: none; }
-  .np-title { font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); color: var(--white); overflow-wrap: anywhere; text-wrap: balance; }
+  .np-title { font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-transform: uppercase; color: var(--white); overflow-wrap: anywhere; text-wrap: balance; }
   .np-arrow { font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent); transition: transform .3s var(--ease-out); }
   .np:hover .np-arrow { transform: translateX(12px); }
   @media (prefers-reduced-motion: reduce) { .np-arrow { transition: none; } }

@@ -7,7 +7,7 @@ const { tilt = -5, tone = 'accent', class: cls, ...rest } = Astro.props;
 <style>
   .sticker {
     display: inline-block; padding: 4px 10px 1px; transform: rotate(var(--tilt));
-    font: 400 clamp(1rem, .9rem + .4vw, 1.375rem)/1.1 var(--font-display); letter-spacing: .03em;
+    font: 500 .75rem/1.2 var(--font-display); letter-spacing: .1em; text-transform: uppercase;
   }
   .sticker-accent { background: var(--accent); color: var(--ink); }
   .sticker-turquoise { background: var(--turquoise); color: var(--ink); }

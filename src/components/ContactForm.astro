@@ -113,9 +113,9 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
 </script>
 <style>
-  .contact { background: var(--accent); color: var(--ink); padding-block: var(--section-y); }
+  .contact { background: var(--panel); color: var(--ink); padding-block: var(--section-y); }
   .contact { display: grid; gap: var(--s-7); padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); }
-  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-wrap: balance; overflow-wrap: anywhere; }
+  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
   .enquiry { display: grid; gap: var(--s-4); }
   .field { display: grid; gap: 6px; }
   .label, legend { font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
@@ -136,11 +136,11 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   .req { color: inherit; }
   button[type='submit'] {
     justify-self: start; min-height: 52px; padding: 12px 32px 9px; border: 0; border-radius: var(--r-pill);
-    background: var(--ink); color: var(--accent); font: 400 1.5rem/1 var(--font-display); letter-spacing: .04em; cursor: pointer;
+    background: var(--accent); color: var(--ink); font: 500 .9375rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
   }
   button[type='submit'][aria-disabled='true'] { opacity: .6; }
   .status { margin: 0; min-height: 1.5em; font-weight: 500; }
-  .success :global(*) { margin: 0; font: 400 var(--fs-h3)/1 var(--font-display); }
+  .success :global(*) { margin: 0; font: 400 var(--fs-h3)/1.2 var(--font-display); }
   .contact :focus-visible { outline-color: var(--ink); }
   @media (min-width: 1024px) { .contact { grid-template-columns: 1fr 1.2fr; align-items: start; } }
 </style>
