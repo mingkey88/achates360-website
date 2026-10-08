@@ -5,12 +5,6 @@ const { tilt = -5, tone = 'accent', class: cls, ...rest } = Astro.props;
 ---
 <span class:list={['sticker', `sticker-${tone}`, cls]} style={`--tilt: ${tilt}deg`} {...rest}><slot /></span>
 <style>
-  .sticker {
-    display: inline-block; padding: 4px 10px 1px; transform: rotate(var(--tilt));
-    font: 500 .75rem/1.2 var(--font-display); letter-spacing: .1em; text-transform: uppercase;
-  }
-  .sticker-accent { background: var(--accent); color: var(--ink); }
-  .sticker-turquoise { background: var(--turquoise); color: var(--ink); }
-  .sticker-lime { background: var(--lime); color: var(--ink); }
-  .sticker-ink { background: var(--ink); color: var(--turquoise); }
+  /* Direction B: a quiet label (small tracked capitals, no colour block, no tilt). */
+  .sticker { display: inline-block; font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .2em; text-transform: uppercase; }
 </style>

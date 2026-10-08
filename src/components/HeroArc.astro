@@ -64,7 +64,7 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha-arc:active { cursor: grabbing; }
   .ha-card {
     position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
-    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 4px; overflow: hidden; background: var(--panel);
+    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; overflow: hidden; background: var(--panel);
     transform: translateZ(var(--P)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--P) * -1));
     opacity: calc(var(--o, 1) * var(--in, 1));
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
@@ -77,12 +77,12 @@ const lines = tagline.text.split(/\s*•\s*/);
     -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
   }
   .ha-lens::before {
-    left: 0; background: linear-gradient(90deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
+    left: 0; background: linear-gradient(90deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
     -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
     -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
   }
   .ha-lens::after {
-    right: 0; background: linear-gradient(270deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
+    right: 0; background: linear-gradient(270deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
     -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
     -webkit-mask-composite: source-in; mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
   }
@@ -91,11 +91,11 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha-copy { display: grid; justify-items: center; gap: var(--s-4); padding-top: var(--s-4); text-align: center; }
   .ha-mark { width: clamp(52px, 4.5vw, 72px); color: var(--ink); }
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
-  .ha-title { margin: 0; font: 400 clamp(2rem, 1.3rem + 2.6vw, 3.75rem)/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; text-indent: .14em; }
+  .ha-title { margin: 0; font: 400 clamp(2.25rem, 1.4rem + 3vw, 4.25rem)/1 var(--font-display); font-variant-numeric: lining-nums; letter-spacing: .16em; text-transform: uppercase; text-indent: .14em; }
 
   .ha-foot { display: grid; gap: var(--s-4); padding-top: var(--s-6); font: 500 var(--fs-label)/1.6 var(--font-text); letter-spacing: .12em; text-transform: uppercase; }
   .ha-foot p { margin: 0; }
-  .ha-tagline { display: grid; }
+  .ha-tagline { display: grid; font: italic 400 clamp(1.25rem, 1.1rem + .6vw, 1.75rem)/1.15 var(--font-display); letter-spacing: 0; text-transform: none; }
   .ha-blurb { max-width: 44ch; color: var(--text-2); }
   @media (min-width: 768px) {
     .ha-foot { grid-template-columns: 1fr 1fr; align-items: end; }

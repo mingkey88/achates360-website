@@ -3,27 +3,27 @@
   /* Corporate colours (brand/BRAND-NOTES.md): orange Pantone 1495 U, turquoise 324 U, lime green 373 U.
      All three are light, so they are grounds for ink text; text in brand colour uses the -deep/-ink shades. */
   --accent: #ff9015;      /* brand orange: fills, pills, stickers, accents on dark grounds */
-  --accent-deep: #b85c00; /* orange for text and marks on light grounds; 4.2:1 on paper */
+  --accent-deep: #a85400; /* orange for text and marks on light grounds; 4.2:1 on paper */
   --turquoise: #99d9d9;   /* brand turquoise: light bands, text on teal-ink */
   --lime: #cbe880;        /* brand lime green: used sparingly (clients band, text selection) */
-  --teal-ink: #1b1d1d;    /* direction B: dark bands are near-black, Croma-style (A uses deep turquoise #163c41) */
-  --ink: #151414;
-  --paper: #ffffff;
+  --teal-ink: #1c1916;    /* direction B: dark bands are warm near-black (A uses deep turquoise #163c41) */
+  --ink: #1a1714;
+  --paper: #f7f4ef;      /* direction B: warm ivory */
   --white: #ffffff;
   --black: #0d0d0d;
-  --text-2: #5a6563;      /* secondary text on light grounds; 5.5:1 on paper */
-  --muted: #7b8785;       /* large text only (>= 24px); 3.4:1 on paper */
-  --on-dark: #e6eeec;     /* body text on black */
-  --on-dark-2: rgb(230 238 236 / .7);
-  --panel: #f4f5f4;       /* direction B: quiet grey panel for alternate sections */
-  --line: rgb(21 20 20 / .12);
+  --text-2: #6a6259;      /* secondary text on light grounds; 5.5:1 on paper */
+  --muted: #8c8379;       /* large text only (>= 24px); 3.4:1 on paper */
+  --on-dark: #eee8df;     /* body text on black */
+  --on-dark-2: rgb(238 232 223 / .7);
+  --panel: #eee8df;       /* direction B: warm panel for alternate sections */
+  --line: rgb(26 23 20 / .14);
 
-  --font-display: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif;
   --font-text: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fs-mega: min(8vw, 8rem);
-  --fs-h1: clamp(2.25rem, 1.5rem + 3.4vw, 5rem);
-  --fs-h2: clamp(1.75rem, 1.3rem + 2vw, 3.25rem);
-  --fs-h3: clamp(1.25rem, 1.1rem + .7vw, 1.75rem);
+  --fs-h1: clamp(2.75rem, 1.8rem + 4vw, 6rem);
+  --fs-h2: clamp(2.1rem, 1.5rem + 2.4vw, 3.75rem);
+  --fs-h3: clamp(1.5rem, 1.3rem + .8vw, 2.1rem);
   --fs-lead: clamp(1.125rem, 1rem + .6vw, 1.625rem);
   --fs-body: clamp(1rem, .95rem + .2vw, 1.125rem);
   --fs-small: clamp(.75rem, .7rem + .2vw, .875rem);
@@ -38,8 +38,10 @@
   --max: 1440px;
   --header-h: 64px;
 
-  --r-card: 16px;
-  --r-block: 32px;
+  --r-card: 0px;
+  --r-block: 0px;
   --r-pill: 999px;
   --ease-out: cubic-bezier(.22, 1, .36, 1);
 }
+/* Direction B: the desktop header is two rows (logo, then menu). */
+@media (min-width: 1024px) { :root { --header-h: 112px; } }

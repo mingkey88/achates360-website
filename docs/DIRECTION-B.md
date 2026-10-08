@@ -7,17 +7,18 @@ template (https://kitpro-croma.webflow.io/): its feel only, no code or images ta
 
 | | Direction A (bold) | Direction B (quiet) |
 |---|---|---|
-| Typeface | Bebas Neue (condensed display) + DM Sans | Fira Sans throughout, headings in modest caps. Fira is Erik Spiekermann's free relative of ITC Officina, the corporate typeface |
-| Page ground | Pale grey-green | White |
-| Dark bands | Deep turquoise `#163c41` | Near-black `#1b1d1d` |
-| Colour | Orange, turquoise and lime in large fills | Orange as the one accent (buttons, labels, numbers); turquoise and lime only in small touches |
+| Typeface | Bebas Neue (condensed display) + DM Sans | Cormorant Garamond serif for headings (sentence case, italic accents) + Fira Sans for text and small tracked labels. Fira is Erik Spiekermann's free relative of ITC Officina, the corporate typeface |
+| Page ground | Pale grey-green | Warm ivory `#f7f4ef` |
+| Dark bands | Deep turquoise `#163c41` | Warm near-black `#1c1916` |
+| Colour | Orange, turquoise and lime in large fills | Almost none: ink on ivory; buttons are underlined small-caps links; orange survives only in small touches |
+| Header | Logo left, dotted menu right | Logo centred, menu centred beneath in small tracked capitals (Hermès-style) |
 | Hero | Dark teal "film": giant ACHATES 360, figures gather, 3D ring of work orbits | White stage: a wide-angle "lens" of project images (wide cards on desktop, tall on phones) drifts slowly, the side cards curving toward the viewer and blurring into white; figures gather above a letter-spaced ACHATES 360, tagline and description in small caps in the corners |
 | Type scale | Very large (titles up to 15rem) | Restrained (page titles up to 8rem, section headings up to 3.25rem) |
 
-Contrast (WCAG 2.x) for B's pairings: ink on white 18.39, text-2 `#5a6563` on white 6.04,
-muted `#7b8785` on white 3.72 (large only), accent-deep `#b85c00` on white 4.60, on-dark
-`#e6eeec` on `#1b1d1d` 14.36, orange on `#1b1d1d` 7.46, ink on panel `#f4f5f4` 16.82, ink on
-orange 8.10. All pass for their sizes.
+Contrast (WCAG 2.x) for B's pairings: ink `#1a1714` on ivory 16.27, text-2 `#6a6259` on ivory
+5.46 and on panel `#eee8df` 4.92, muted `#8c8379` on ivory 3.40 (large only), accent-deep
+`#a85400` on ivory 4.87, on-dark `#eee8df` on `#1c1916` 14.37 (70%: 7.76), orange on `#1c1916`
+7.71. All pass for their sizes.
 
 To view locally: `git checkout direction/croma && npx astro dev`, then
 http://localhost:4321/achates360-website. Switch back with `git checkout feature/hero-film`.

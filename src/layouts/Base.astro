@@ -10,10 +10,13 @@ import type { PageKind } from '../lib/page-kind';
 import Header from '../components/Header.astro';
 import Menu from '../components/Menu.astro';
 import Footer from '../components/Footer.astro';
-// Direction B (Croma): one family, Fira Sans, Erik Spiekermann's free relative of ITC Officina
-// (the corporate typeface, which has no web licence).
+// Direction B: Cormorant Garamond for headings (the luxe serif voice), Fira Sans for text and small
+// labels (Erik Spiekermann's free relative of ITC Officina, the corporate typeface).
+import cormorantLatin from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2?url';
 import firaLatin from '@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff2?url';
-import firaLatin500 from '@fontsource/fira-sans/files/fira-sans-latin-500-normal.woff2?url';
+import '@fontsource/cormorant-garamond/300.css';
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/400-italic.css';
 import '@fontsource/fira-sans/300.css';
 import '@fontsource/fira-sans/400.css';
 import '@fontsource/fira-sans/500.css';
@@ -41,7 +44,7 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={firaLatin} />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href={firaLatin500} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={cormorantLatin} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {robots && <meta name="robots" content={robots} />}
@@ -54,7 +57,7 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     {og && <meta property="og:image" content={og} />}
     <meta property="og:site_name" content="Achates 360" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#f7f4ef" />
     {/* `js` gates hidden-until-revealed styles; motion-ready lifts them. If the motion bundle never
         arrives, the timeout lifts them after 3s so nothing stays invisible (Review Focus 1). */}
     <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>

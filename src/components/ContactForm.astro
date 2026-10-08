@@ -115,28 +115,28 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
 <style>
   .contact { background: var(--panel); color: var(--ink); padding-block: var(--section-y); }
   .contact { display: grid; gap: var(--s-7); padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); }
-  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
+  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-wrap: balance; overflow-wrap: anywhere; }
   .enquiry { display: grid; gap: var(--s-4); }
   .field { display: grid; gap: 6px; }
   .label, legend { font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
   input:not([type='checkbox']), textarea {
-    width: 100%; min-height: 48px; padding: 12px 18px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
+    width: 100%; min-height: 48px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0;
     background: var(--white); color: var(--ink); font: 400 var(--fs-body)/1.4 var(--font-text);
   }
   .tried :is(input:not([type='checkbox']), textarea):invalid { border-style: dashed; border-width: 2.5px; }
   .enquiry ::placeholder { color: var(--text-2); opacity: 1; }
-  textarea { min-height: 140px; border-radius: var(--r-card); resize: vertical; }
+  textarea { min-height: 140px; border: 1px solid var(--ink); padding: 12px 14px; border-radius: 0; resize: vertical; }
   .groups { display: grid; gap: var(--s-4); }
   .group { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
   .group legend { margin-bottom: var(--s-2); }
-  .option { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--r-pill); cursor: pointer; }
+  .option { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 0; cursor: pointer; }
   .option input { width: 18px; height: 18px; accent-color: var(--ink); }
   .group.invalid .option { border-style: dashed; }
   .group-error { width: 100%; margin: 0; font-size: var(--fs-small); font-weight: 500; }
   .req { color: inherit; }
   button[type='submit'] {
-    justify-self: start; min-height: 52px; padding: 12px 32px 9px; border: 0; border-radius: var(--r-pill);
-    background: var(--accent); color: var(--ink); font: 500 .9375rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+    justify-self: start; min-height: 52px; padding: 12px 40px 10px; border: 0; border-radius: 0;
+    background: var(--ink); color: var(--paper); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .2em; text-transform: uppercase; cursor: pointer;
   }
   button[type='submit'][aria-disabled='true'] { opacity: .6; }
   .status { margin: 0; min-height: 1.5em; font-weight: 500; }

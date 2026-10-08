@@ -54,7 +54,7 @@ const mailIcon = icon('mailto:');
     padding: var(--s-7) var(--s-6); border-radius: var(--r-block); background: var(--turquoise); color: var(--ink);
   }
   .card :global(.photo) { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; }
-  .name { margin: var(--s-2) 0 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-transform: uppercase; overflow-wrap: anywhere; }
+  .name { margin: var(--s-2) 0 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); overflow-wrap: anywhere; }
   .role { margin: 0; font: 500 var(--fs-label)/1.3 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
   .blurb { margin: 0; font-size: var(--fs-small); }
   .contact { display: flex; align-items: center; gap: var(--s-2); width: 100%; }
@@ -68,7 +68,7 @@ const mailIcon = icon('mailto:');
   .vcard {
     display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 10px 22px 7px;
     border-radius: var(--r-pill); background: var(--accent); color: var(--ink); text-decoration: none;
-    font: 500 .9375rem/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase;
+    font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .2em; text-transform: uppercase;
   }
   .vcard svg { width: 22px; height: 22px; fill: currentColor; }
   .card :global(.qr) { width: 148px; height: auto; margin-top: var(--s-4); border-radius: 8px; }

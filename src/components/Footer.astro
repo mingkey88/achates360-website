@@ -40,7 +40,7 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .site-footer { background: var(--black); color: var(--on-dark); padding-top: var(--section-y); overflow: hidden; }
   .site-footer :focus-visible { outline-color: var(--turquoise); }
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
-  .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 300 var(--fs-h3)/1.2 var(--font-display); text-transform: uppercase; max-width: 18ch; text-wrap: balance; }
+  .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 300 var(--fs-h3)/1.2 var(--font-display); max-width: 18ch; text-wrap: balance; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
   .md :global(.fh6) { margin: 0 0 var(--s-2); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--on-dark-2); }
   .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
