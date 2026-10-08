@@ -97,7 +97,9 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha-copy { display: grid; justify-items: center; gap: var(--s-4); padding-top: var(--s-4); text-align: center; }
   .ha-mark { width: clamp(52px, 4.5vw, 72px); color: var(--ink); }
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
-  .ha-title { margin: 0; font: 400 clamp(2.5rem, 1.5rem + 3.4vw, 4.75rem)/1 var(--font-display); font-variant-numeric: lining-nums; letter-spacing: .16em; text-transform: uppercase; text-indent: .16em; color: var(--ink); }
+  /* One line at every width: the letter-spaced title is about 9.6 times its font size wide, so it is
+     capped at the space between the gutters divided by that. */
+  .ha-title { margin: 0; white-space: nowrap; font: 400 min(clamp(2.5rem, 1.5rem + 3.4vw, 4.75rem), calc((100vw - 2 * var(--gutter)) / 9.8))/1 var(--font-display); font-variant-numeric: lining-nums; letter-spacing: .16em; text-transform: uppercase; text-indent: .16em; color: var(--ink); }
 
   .ha-foot { display: grid; gap: var(--s-4); padding-top: var(--s-6); font: 500 var(--fs-label)/1.6 var(--font-text); letter-spacing: .12em; text-transform: uppercase; }
   .ha-foot p { margin: 0; }
