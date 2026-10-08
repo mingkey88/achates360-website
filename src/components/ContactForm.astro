@@ -135,7 +135,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
      whose underline draws across on focus; the service choices as text tags; the intro stays in view. */
   .contact {
     display: grid; gap: var(--s-8); padding-block: var(--section-y); border-top: 1px solid var(--line);
-    padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); background: var(--paper); color: var(--ink);
+    padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); background: var(--paper) var(--paper-tex); color: var(--ink);
   }
   .intro :global(h2) { margin: 0; max-width: 14ch; font: 400 clamp(2.5rem, 1.6rem + 3.2vw, 5rem)/1.02 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
   .enquiry { display: grid; gap: var(--s-8); }

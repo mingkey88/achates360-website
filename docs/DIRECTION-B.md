@@ -55,3 +55,5 @@ projects" links now go to /projects (the homepage no longer has the grid they sc
 Applied site-wide through the shared tokens and components: the projects index categories are a quiet
 underlined index, business cards are ivory with hairline details and an ink button, Join Us roles
 sit on hairlines instead of white panels.
+
+Texture and lens (B): the lens strip has depth of field (each card blurs and desaturates gradually with its distance from the centre, like a wide-open lens) instead of a flat edge blur; a faint still paper fibre sits on every ivory ground, and a light film grain over photographs. Deliberate imperfection, in keeping with a print studio.

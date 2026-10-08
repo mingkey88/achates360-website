@@ -45,7 +45,7 @@ const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i
 </script>
 <style>
   .pi-head { padding-block: var(--s-8) var(--s-6); }
-  .chips-bar { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 10; background: var(--paper); border-block: 1px solid var(--line); }
+  .chips-bar { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 10; background: var(--paper) var(--paper-tex); border-block: 1px solid var(--line); }
   /* Direction B: the categories as a quiet index of tracked small capitals; the one in view is
      underlined, the rest muted. */
   .chips-bar ul { list-style: none; margin-inline: auto; padding: 0 4px; scroll-padding-inline: 4px; display: flex; gap: var(--s-6); overflow-x: auto; scrollbar-width: none; }

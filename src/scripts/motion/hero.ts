@@ -49,6 +49,11 @@ export function hero(): void {
     c.style.setProperty('--u', u.toFixed(4));
     c.style.setProperty('--o', o.toFixed(3));
     c.style.visibility = o > 0 ? '' : 'hidden';
+    // Depth of field (same curve as the server render in HeroArc.astro), quantised so the blur is
+    // only re-rasterised when it visibly changes.
+    const d = Math.max(0, Math.abs(u) - .55);
+    c.style.setProperty('--blur', `${Math.round(Math.min(d * 3.2, 9) * 4) / 4}px`);
+    c.style.setProperty('--sat', (1 - Math.min(d * .22, .4)).toFixed(2));
   });
   let active = true;
   gsap.ticker.add((_t, dt) => {

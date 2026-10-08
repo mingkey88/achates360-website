@@ -16,7 +16,9 @@ const { items, name, tagline, blurb } = Astro.props;
 // differs by breakpoint. Static render: only the centre five are shown (on phones a wider step would
 // put the next ones near the camera plane); hero.ts takes over.
 const mid = Math.floor(items.length / 2);
-const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
+// Depth of field, as hero.ts computes it: sharp near the centre, softening and losing a little colour outward.
+const dof = (u: number) => { const d = Math.max(0, Math.abs(u) - .55); return `--blur: ${(Math.min(d * 3.2, 9)).toFixed(2)}px; --sat: ${(1 - Math.min(d * .22, .4)).toFixed(2)}`; };
+const pose = (u: number) => `--u: ${u}; ${dof(u)}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
 const mark = logo
   .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
   .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
@@ -48,7 +50,7 @@ const lines = tagline.text.split(/\s*•\s*/);
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
     position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
     display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: var(--s-5) var(--gutter) var(--s-6);
-    background: var(--paper); color: var(--ink);
+    background: var(--paper) var(--paper-tex); color: var(--ink);
   }
   /* The lens: a wide-angle camera standing on the axis of a cylinder, cards on its inside wall.
      translateZ(P) moves the axis to the camera, rotateY(-a) translateZ(-R) puts a card at angle a
@@ -69,14 +71,14 @@ const lines = tagline.text.split(/\s*•\s*/);
     transform: translateZ(var(--P)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--P) * -1));
     opacity: calc(var(--o, 1) * var(--in, 1));
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
+    /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
+    filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
   }
   /* Lens edges: the outer cards blur and fade into the white page. */
   /* Taller than the arc (the edge cards stretch past it) and feathered top and bottom, so the blur has no hard edge. */
   .ha-lens { position: absolute; inset: -30% calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
-  .ha-lens::before, .ha-lens::after {
-    content: ''; position: absolute; inset-block: 0; width: 30%;
-    -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
-  }
+  /* The edges now only fade into the paper; the softening itself is per card (depth of field). */
+  .ha-lens::before, .ha-lens::after { content: ''; position: absolute; inset-block: 0; width: 22%; }
   .ha-lens::before {
     left: 0; background: linear-gradient(90deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
     -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
@@ -89,8 +91,10 @@ const lines = tagline.text.split(/\s*•\s*/);
   }
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   /* After terrot: the project name and client written on the card, over a soft shade. */
+  /* Film grain over each photograph, under the caption. */
+  .ha-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--grain); opacity: .16; mix-blend-mode: overlay; pointer-events: none; }
   .ha-card::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .55)); pointer-events: none; }
-  .ha-cap { position: absolute; inset: auto 0 0; z-index: 1; display: grid; gap: 4px; padding: 6% 7%; color: var(--white); text-align: center; pointer-events: none; }
+  .ha-cap { position: absolute; inset: auto 0 0; z-index: 2; display: grid; gap: 4px; padding: 6% 7%; color: var(--white); text-align: center; pointer-events: none; }
   .ha-cap-t { font: 500 clamp(.875rem, .5rem + .9vw, 1.5rem)/1.05 var(--font-title); letter-spacing: -.02em; text-wrap: balance; }
   .ha-cap-d { font: 500 clamp(.5625rem, .5rem + .2vw, .6875rem)/1.2 var(--font-text); letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
 
@@ -114,6 +118,6 @@ const lines = tagline.text.split(/\s*•\s*/);
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
     .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --step: 33.7; }
-    .ha-lens::before, .ha-lens::after { width: 22%; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+    .ha-lens::before, .ha-lens::after { width: 16%; }
   }
 </style>
