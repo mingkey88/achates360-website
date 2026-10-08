@@ -13,9 +13,10 @@ interface Item { thumb: ImageMetadata; alt: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
 const { items, name, tagline, blurb } = Astro.props;
 // --u is a card's place in card steps from the centre; the step angle lives in CSS (--step) because it
-// differs by breakpoint. Static render: only the centre five (u = -2..2) are shown; hero.ts takes over.
+// differs by breakpoint. Static render: only the centre three are shown (a wider step would put the
+// next ones near the camera plane on phones); hero.ts takes over.
 const mid = Math.floor(items.length / 2);
-const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
+const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 1 ? 1 : 0}${Math.abs(u) <= 1 ? '' : '; visibility: hidden'}`;
 const mark = logo
   .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
   .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
@@ -53,7 +54,7 @@ const lines = tagline.text.split(/\s*•\s*/);
      facing it. With R = P the centre card is drawn at its own size; cards toward the edges stretch
      and their outer sides grow taller, which is the curved-lens look. --step is the angle that puts
      neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
-  .ha { --card-w: 21vw; --card-ratio: 4 / 3; --P: 62vw; --step: 20.5; }
+  .ha { --card-w: 21vw; --card-ratio: 4 / 3; --P: 36vw; --step: 35.5; }
   .ha-arc {
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;
@@ -67,18 +68,21 @@ const lines = tagline.text.split(/\s*•\s*/);
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
   }
   /* Lens edges: the outer cards blur and fade into the white page. */
-  .ha-lens { position: absolute; inset: 0 calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
+  /* Taller than the arc (the edge cards stretch past it) and feathered top and bottom, so the blur has no hard edge. */
+  .ha-lens { position: absolute; inset: -30% calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
   .ha-lens::before, .ha-lens::after {
     content: ''; position: absolute; inset-block: 0; width: 30%;
     -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
   }
   .ha-lens::before {
     left: 0; background: linear-gradient(90deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent); mask-image: linear-gradient(90deg, #000 30%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
   }
   .ha-lens::after {
     right: 0; background: linear-gradient(270deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent); mask-image: linear-gradient(270deg, #000 30%, transparent);
+    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
   }
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
@@ -99,7 +103,7 @@ const lines = tagline.text.split(/\s*•\s*/);
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
-    .ha { --card-w: 40vw; --card-ratio: 3 / 4; --P: 80vw; --step: 30.5; }
+    .ha { --card-w: 40vw; --card-ratio: 3 / 4; --P: 54vw; --step: 45.8; }
     .ha-lens::before, .ha-lens::after { width: 22%; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
   }
 </style>

@@ -19,7 +19,7 @@ export function hero(): void {
   const figs = q('.lg-fig');
   const n = cards.length;
   const mid = Math.floor(n / 2);
-  const HIDE = 62; // degrees: past this a card is off screen; hide it long before it wraps behind the camera
+  const HIDE = 78; // degrees: past this a card is off screen; hide it long before it wraps behind the camera
   let stepDeg = 20;
   const readStep = () => { stepDeg = parseFloat(getComputedStyle(arc).getPropertyValue('--step')) || 20; };
   readStep();
