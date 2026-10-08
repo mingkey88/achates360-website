@@ -3,15 +3,19 @@ import { Image } from 'astro:assets';
 import MarqueeToggle from './ui/MarqueeToggle.astro';
 import type { UiString } from '../lib/strings';
 import logo from '../assets/logo-stacked-parts.svg?raw';
-// Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images drift across a
-// concave arc (edges nearer and turned toward the viewer), the five logo figures gather above a calm
-// title, and the tagline (corporate sheet) and site description (Wix SEO text) sit in the bottom
-// corners, both verbatim. hero.ts animates it; without motion it renders at its composed positions.
+// Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
+// inside of a cylinder, a lens view: the centre card is furthest away, the side cards come nearer,
+// turn toward the viewer and blur into white at the edges. Wide cards on desktop, tall on phones.
+// The five logo figures gather above a calm title; the tagline (corporate sheet) and site
+// description (Wix SEO text) sit in the bottom corners, both verbatim. hero.ts drifts the cards;
+// without motion they render at the composed angles computed here.
 interface Item { thumb: ImageMetadata; alt: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
 const { items, name, tagline, blurb } = Astro.props;
-export const ARC_STEP = .34; // spacing between cards, in half-viewport widths (hero.ts reads data-step)
-const mid = (items.length - 1) / 2;
+// --u is a card's place in card steps from the centre; the step angle lives in CSS (--step) because it
+// differs by breakpoint. Static render: only the centre five (u = -2..2) are shown; hero.ts takes over.
+const mid = Math.floor(items.length / 2);
+const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
 const mark = logo
   .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
   .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
@@ -19,12 +23,13 @@ const mark = logo
 const lines = tagline.text.split(/\s*•\s*/);
 ---
 <section class="ha" data-hero data-mq-scope aria-labelledby="hero-title">
-  <div class="ha-arc" data-arc data-step={ARC_STEP} aria-hidden="true">
+  <div class="ha-arc" data-arc aria-hidden="true">
     {items.map((it, i) => (
-      <div class="ha-card" style={`--u: ${((i - mid) * ARC_STEP).toFixed(3)}`}>
-        <Image src={it.thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 140px, 260px" loading={i < 6 ? 'eager' : 'lazy'} draggable="false" />
+      <div class="ha-card" style={pose(i - mid)}>
+        <Image src={it.thumb} alt="" widths={[320, 640, 960]} sizes="(max-width: 767px) 200px, 420px" loading={Math.abs(i - mid) < 4 ? 'eager' : 'lazy'} draggable="false" />
       </div>
     ))}
+    <div class="ha-lens" aria-hidden="true"></div>
   </div>
   <div class="ha-copy">
     <div class="ha-mark"><Fragment set:html={mark} /></div>
@@ -38,23 +43,42 @@ const lines = tagline.text.split(/\s*•\s*/);
 </section>
 <style>
   .ha {
-    --card: clamp(140px, min(14vw, 30svh), 260px);
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
     position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
     display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: var(--s-5) var(--gutter) var(--s-6);
     background: var(--paper); color: var(--ink);
   }
-  /* The arc: --u is a card's position in half-viewport widths (0 = centre). Cards further out come
-     nearer and turn toward the centre, like the inside of a cylinder. */
-  .ha-arc { position: relative; min-height: 0; perspective: 900px; perspective-origin: 50% 50%; cursor: grab; touch-action: pan-y; user-select: none; }
+  /* The lens: a wide-angle camera standing on the axis of a cylinder, cards on its inside wall.
+     translateZ(P) moves the axis to the camera, rotateY(-a) translateZ(-R) puts a card at angle a
+     facing it. With R = P the centre card is drawn at its own size; cards toward the edges stretch
+     and their outer sides grow taller, which is the curved-lens look. --step is the angle that puts
+     neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
+  .ha { --card-w: 21vw; --card-ratio: 4 / 3; --P: 62vw; --step: 20.5; }
+  .ha-arc {
+    position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
+    cursor: grab; touch-action: pan-y; user-select: none;
+  }
   .ha-arc:active { cursor: grabbing; }
   .ha-card {
-    position: absolute; left: 50%; top: 50%; width: var(--card); aspect-ratio: 4 / 5; margin: calc(var(--card) * -5 / 8) 0 0 calc(var(--card) / -2);
-    border-radius: 6px; overflow: hidden; background: var(--panel);
-    transform: translateX(calc(var(--u) * 50vw)) translateZ(calc(var(--u) * var(--u) * 190px)) rotateY(calc(var(--u) * 34deg));
-    /* --in: 0→1 entrance (hero.ts); edges fade out before the track wraps. */
-    opacity: calc(clamp(0, calc((1.25 - abs(var(--u))) * 4), 1) * var(--in, 1));
+    position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
+    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 4px; overflow: hidden; background: var(--panel);
+    transform: translateZ(var(--P)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--P) * -1));
+    opacity: calc(var(--o, 1) * var(--in, 1));
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
+  }
+  /* Lens edges: the outer cards blur and fade into the white page. */
+  .ha-lens { position: absolute; inset: 0 calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
+  .ha-lens::before, .ha-lens::after {
+    content: ''; position: absolute; inset-block: 0; width: 30%;
+    -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
+  }
+  .ha-lens::before {
+    left: 0; background: linear-gradient(90deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent); mask-image: linear-gradient(90deg, #000 30%, transparent);
+  }
+  .ha-lens::after {
+    right: 0; background: linear-gradient(270deg, var(--paper), rgb(255 255 255 / .55) 35%, transparent);
+    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent); mask-image: linear-gradient(270deg, #000 30%, transparent);
   }
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
@@ -74,7 +98,8 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
 
   @media (max-width: 767px) {
-    .ha { --card: 118px; }
-    .ha-card { transform: translateX(calc(var(--u) * 104vw)) translateZ(calc(var(--u) * var(--u) * 90px)) rotateY(calc(var(--u) * 26deg)); }
+    /* Phones: tall cards, same lens. */
+    .ha { --card-w: 40vw; --card-ratio: 3 / 4; --P: 80vw; --step: 30.5; }
+    .ha-lens::before, .ha-lens::after { width: 22%; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
   }
 </style>

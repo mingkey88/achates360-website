@@ -11,7 +11,7 @@ template (https://kitpro-croma.webflow.io/): its feel only, no code or images ta
 | Page ground | Pale grey-green | White |
 | Dark bands | Deep turquoise `#163c41` | Near-black `#1b1d1d` |
 | Colour | Orange, turquoise and lime in large fills | Orange as the one accent (buttons, labels, numbers); turquoise and lime only in small touches |
-| Hero | Dark teal "film": giant ACHATES 360, figures gather, 3D ring of work orbits | White stage: a curved arc of 12 project images drifts slowly, figures gather above a letter-spaced ACHATES 360, tagline and description in small caps in the corners |
+| Hero | Dark teal "film": giant ACHATES 360, figures gather, 3D ring of work orbits | White stage: a wide-angle "lens" of project images (wide cards on desktop, tall on phones) drifts slowly, the side cards curving toward the viewer and blurring into white; figures gather above a letter-spaced ACHATES 360, tagline and description in small caps in the corners |
 | Type scale | Very large (titles up to 15rem) | Restrained (page titles up to 8rem, section headings up to 3.25rem) |
 
 Contrast (WCAG 2.x) for B's pairings: ink on white 18.39, text-2 `#5a6563` on white 6.04,
