@@ -29,7 +29,7 @@ const cards = items.map(({ slide, project }, i) => ({
     <ol class="sw-grid">
       {cards.map((c, i) => (
         <li class={`sw-item sw-${(i % 4) + 1}`}>
-          <MediaCard image={c.image} alt={c.alt} href={c.href} title={c.title} subtitle={c.meta} previewVideo={c.video} ratio={c.ratio} sizes="(max-width: 767px) calc(100vw - 32px), 55vw" widths={[640, 960, 1280, 1600]} />
+          <MediaCard image={c.image} alt={c.alt} href={c.href} title={c.title} subtitle={c.meta} previewVideo={c.video} ratio={c.ratio} sizes="(max-width: 767px) calc(100vw - 32px), 55vw" widths={[640, 960, 1280, 1600]} wipe />
         </li>
       ))}
     </ol>

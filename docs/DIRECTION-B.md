@@ -42,3 +42,15 @@ logo marquee, three testimonial cards and the "Let's connect" banner. Case-study
 projects" links now go to /projects (the homepage no longer has the grid they scrolled to).
 
 The hero title gradient runs #d56f0a to #a85400: 3.13 to 4.87 on ivory, above the 3:1 large-text minimum.
+
+## Contact form and motion (B)
+
+- Contact: an editorial form. Large single-line fields with floating labels and an underline that
+  draws across on focus; the service choices as text tags (checked = ink); steps numbered 01-03;
+  the intro statement stays in view on desktop; a large "Submit" with a circled arrow. Wording,
+  validation and posting are unchanged.
+- Motion: headings rise line by line out of a mask; project images in Selected work and the
+  projects grid are unveiled bottom-to-top while settling from a slight zoom; a soft circle with an
+  arrow follows the pointer over linked project images (fine pointers only, never under reduced
+  motion).
+

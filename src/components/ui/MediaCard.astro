@@ -2,18 +2,19 @@
 import { Image } from 'astro:assets';
 import { withBase, mediaUrl, linkAttrs } from '../../lib/paths';
 import Sticker from './Sticker.astro';
-// A rounded image card. previewVideo: a muted preview that plays on hover, only on hover-capable
-// pointers and without reduced motion (Review Focus 5).
+// An image card. previewVideo: a muted preview that plays on hover, only on hover-capable pointers and
+// without reduced motion (Review Focus 5). wipe: the image is unveiled on scroll (motion/reveal.ts).
+// Linked cards get a soft follow-the-pointer arrow on fine pointers (direction B).
 interface Props {
   image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string;
-  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean;
+  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false } = Astro.props;
 const Wrap = href ? 'a' : 'div';
 const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
 ---
 <Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal>
-  <div class="mc-media" style={`aspect-ratio: ${ratio}`}>
+  <div class="mc-media" style={`aspect-ratio: ${ratio}`} data-wipe={wipe ? '' : undefined}>
     <Image src={image} alt={alt} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
     {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
@@ -38,11 +39,38 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
     });
     card.addEventListener('pointerleave', () => { card.classList.remove('is-playing'); v.pause(); });
   }
+
+  // A circle with an arrow follows the pointer over linked cards, easing behind it.
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const links = document.querySelectorAll<HTMLElement>('a.media-card');
+  if (links.length && fine.matches && !reduce.matches) {
+    const dot = document.createElement('div');
+    dot.className = 'mc-cursor';
+    dot.setAttribute('aria-hidden', 'true');
+    dot.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>';
+    document.body.append(dot);
+    let x = 0, y = 0, tx = 0, ty = 0, raf = 0, idle = 0;
+    const tick = () => {
+      x += (tx - x) * .2; y += (ty - y) * .2;
+      dot.style.translate = `${x}px ${y}px`;
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > .3 ? requestAnimationFrame(tick) : 0;
+    };
+    const follow = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY; if (!raf) raf = requestAnimationFrame(tick); };
+    for (const a of links) {
+      a.addEventListener('pointerenter', (e) => {
+        clearTimeout(idle);
+        if (!dot.classList.contains('is-on')) { x = tx = e.clientX; y = ty = e.clientY; dot.style.translate = `${x}px ${y}px`; }
+        dot.classList.add('is-on');
+      });
+      a.addEventListener('pointermove', follow);
+      a.addEventListener('pointerleave', () => { idle = window.setTimeout(() => dot.classList.remove('is-on'), 40); });
+    }
+  }
 </script>
 <style>
   .media-card { display: block; color: inherit; text-decoration: none; }
   .mc-media { position: relative; overflow: hidden; border-radius: var(--r-card); background: var(--turquoise); }
-  .mc-media :global(img), .mc-preview { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease-out); }
+  .mc-media :global(img), .mc-preview { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
   .mc-preview { position: absolute; inset: 0; opacity: 0; transition: opacity .25s; }
   .is-playing .mc-preview { opacity: 1; }
   a.media-card:hover .mc-media :global(img) { transform: scale(1.04); }
@@ -50,5 +78,12 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
   .mc-text { padding-top: var(--s-3); }
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-display); overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
+  :global(.mc-cursor) {
+    position: fixed; left: 0; top: 0; z-index: 60; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--paper); color: var(--ink); pointer-events: none;
+    scale: 0; transition: scale .45s var(--ease-out); box-shadow: 0 10px 30px rgb(0 0 0 / .15);
+  }
+  :global(.mc-cursor.is-on) { scale: 1; }
+  :global(.mc-cursor svg) { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.4; }
   @media (prefers-reduced-motion: reduce) { .mc-media :global(img) { transition: none; } }
 </style>

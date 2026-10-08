@@ -1,8 +1,8 @@
 ---
 /*
  * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
- * submit label come verbatim from home.md; only the styling is the redesign's (a full-bleed accent
- * block, pill inputs, ink text).
+ * submit label come verbatim from home.md; only the styling is the redesign's (direction B: an
+ * editorial form with floating labels, text-tag options and a large submit with an arrow).
  *
  * Field names: the message box has no name in the export, so it posts as `message`; the checkbox
  * groups post as group-1 / group-2. Submit posts the FormData to PUBLIC_FORM_ENDPOINT (staging
@@ -29,32 +29,50 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     {intro.map((m) => <div set:html={renderMd(m)} />)}
   </div>
   <form class="enquiry" novalidate>
-    {lines.map((f) => (
-      <label class="field">
-        <span class="label">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
-        <input type={inputType(f)} name={fieldName(f)} required={f.required} placeholder={f.placeholder} autocomplete={autocomplete(f)} />
-      </label>
-    ))}
-    <div class="groups">
-      {form.groups.map((g, i) => (
-        <fieldset class="group" data-required={g.required ? 'true' : 'false'} aria-describedby={g.required ? `group-error-${i + 1}` : undefined}>
-          <legend>{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
-          {g.options.map((o) => (
-            <label class="option"><input type="checkbox" name={`group-${i + 1}`} value={o} /><span>{o}</span></label>
-          ))}
-          {/* An alert region, always rendered so screen readers announce the text when it is set. */}
-          {g.required && <p class="group-error" id={`group-error-${i + 1}`} role="alert" data-message="Please choose at least one."></p>}
-        </fieldset>
+    <div class="step">
+      <span class="step-no" aria-hidden="true">01</span>
+      <div class="lines">
+        {lines.map((f) => (
+          <label class:list={['field', { wide: f.type === 'email' }]}>
+            <input type={inputType(f)} name={fieldName(f)} required={f.required} placeholder=" " autocomplete={autocomplete(f)} />
+            <span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
+            <span class="rule" aria-hidden="true"></span>
+          </label>
+        ))}
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-no" aria-hidden="true">02</span>
+      <div class="groups">
+        {form.groups.map((g, i) => (
+          <fieldset class="group" data-required={g.required ? 'true' : 'false'} aria-describedby={g.required ? `group-error-${i + 1}` : undefined}>
+            <legend>{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
+            <div class="options">
+              {g.options.map((o) => (
+                <label class="option"><input type="checkbox" name={`group-${i + 1}`} value={o} /><span>{o}</span></label>
+              ))}
+            </div>
+            {/* An alert region, always rendered so screen readers announce the text when it is set. */}
+            {g.required && <p class="group-error" id={`group-error-${i + 1}`} role="alert" data-message="Please choose at least one."></p>}
+          </fieldset>
+        ))}
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-no" aria-hidden="true">03</span>
+      {boxes.map((f) => (
+        /* Wix's message box has no label: its placeholder text (verbatim) becomes the floating label. */
+        <label class="field box">
+          <textarea name={fieldName(f)} required={f.required} placeholder=" " rows="3"></textarea>
+          <span class="flabel">{f.label || f.placeholder}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
+          <span class="rule" aria-hidden="true"></span>
+        </label>
       ))}
     </div>
-    {boxes.map((f) => (
-      f.label
-        ? <label class="field box"><span class="label">{f.label}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder}></textarea></label>
-        /* Wix's message box has no label: its placeholder (verbatim) names it for screen readers. */
-        : <textarea class="box" name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined}></textarea>
-    ))}
-    <button type="submit">{form.submitLabel}</button>
-    <p class="status" role="status" aria-live="polite"></p>
+    <div class="send-row">
+      <button type="submit" class="send"><span class="send-label">{form.submitLabel}</span><span class="send-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" /></svg></span></button>
+      <p class="status" role="status" aria-live="polite"></p>
+    </div>
     {success && <div class="success" hidden set:html={renderMd(success)} />}
   </form>
 </section>
@@ -113,34 +131,74 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
 </script>
 <style>
-  .contact { background: var(--panel); color: var(--ink); padding-block: var(--section-y); }
-  .contact { display: grid; gap: var(--s-7); padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); }
-  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-wrap: balance; overflow-wrap: anywhere; }
-  .enquiry { display: grid; gap: var(--s-4); }
-  .field { display: grid; gap: 6px; }
-  .label, legend { font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
-  input:not([type='checkbox']), textarea {
-    width: 100%; min-height: 48px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0;
-    background: var(--white); color: var(--ink); font: 400 var(--fs-body)/1.4 var(--font-text);
+  /* Direction B: an editorial form. Large single-line fields whose labels float up as you type and
+     whose underline draws across on focus; the service choices as text tags; the intro stays in view. */
+  .contact {
+    display: grid; gap: var(--s-8); padding-block: var(--section-y); border-top: 1px solid var(--line);
+    padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); background: var(--paper); color: var(--ink);
   }
-  .tried :is(input:not([type='checkbox']), textarea):invalid { border-style: dashed; border-width: 2.5px; }
-  .enquiry ::placeholder { color: var(--text-2); opacity: 1; }
-  textarea { min-height: 140px; border: 1px solid var(--ink); padding: 12px 14px; border-radius: 0; resize: vertical; }
-  .groups { display: grid; gap: var(--s-4); }
-  .group { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .group legend { margin-bottom: var(--s-2); }
-  .option { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 0; cursor: pointer; }
-  .option input { width: 18px; height: 18px; accent-color: var(--ink); }
+  .intro :global(h2) { margin: 0; max-width: 14ch; font: 400 clamp(2.25rem, 1.5rem + 3vw, 4.5rem)/1.02 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
+  .enquiry { display: grid; gap: var(--s-8); }
+  .step { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: var(--s-4); align-items: start; }
+  .step-no { padding-top: 1.4rem; font: 400 var(--fs-label)/1 var(--font-text); letter-spacing: .12em; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .lines { display: grid; gap: var(--s-6) var(--s-6); }
+
+  .field { position: relative; display: block; padding-top: 1.4rem; }
+  .field input, .field textarea {
+    display: block; width: 100%; padding: 8px 0 10px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+    background: transparent; color: var(--ink); font: 400 clamp(1.25rem, 1.1rem + .6vw, 1.625rem)/1.3 var(--font-text); outline: none;
+  }
+  .field textarea { min-height: 3.2em; resize: vertical; field-sizing: content; }
+  /* .flabel, not .label: the global .label utility would force small caps at rest. */
+  .flabel {
+    position: absolute; left: 0; top: calc(1.4rem + 10px); color: var(--text-2); pointer-events: none; transform-origin: 0 0;
+    font: 400 clamp(1.25rem, 1.1rem + .6vw, 1.625rem)/1.3 var(--font-text);
+    transition: transform .45s var(--ease-out), color .3s;
+  }
+  .field :is(input, textarea):is(:focus, :not(:placeholder-shown)) + .flabel { transform: translateY(-1.9rem) scale(.5); color: var(--ink); letter-spacing: .12em; text-transform: uppercase; font-weight: 500; }
+  .rule { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--ease-out); }
+  .field :is(input, textarea):focus ~ .rule { transform: scaleX(1); }
+  .tried .field :is(input, textarea):invalid { border-bottom: 2px dashed var(--accent-deep); }
+  .field :is(input, textarea):focus-visible ~ .rule { height: 2px; }
+
+  .groups { display: grid; gap: var(--s-6); padding-top: 1.1rem; }
+  .group { margin: 0; padding: 0; border: 0; min-width: 0; }
+  legend { margin-bottom: var(--s-4); padding: 0; font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+  .options { display: flex; flex-wrap: wrap; gap: 10px; }
+  .option {
+    position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line);
+    font: 400 var(--fs-body)/1 var(--font-text); cursor: pointer; transition: background-color .3s, color .3s, border-color .3s;
+  }
+  .option input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+  .option:hover { border-color: var(--ink); }
+  .option:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .option:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 3px; }
   .group.invalid .option { border-style: dashed; }
-  .group-error { width: 100%; margin: 0; font-size: var(--fs-small); font-weight: 500; }
+  .group-error { margin: var(--s-3) 0 0; font-size: var(--fs-small); font-weight: 500; color: var(--accent-deep); }
+  .group-error:empty { display: none; }
   .req { color: inherit; }
-  button[type='submit'] {
-    justify-self: start; min-height: 52px; padding: 12px 40px 10px; border: 0; border-radius: 0;
-    background: var(--ink); color: var(--paper); font: 500 var(--fs-label)/1 var(--font-text); letter-spacing: .2em; text-transform: uppercase; cursor: pointer;
+
+  .send-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-5); padding-left: calc(2.5rem + var(--s-4)); }
+  .send {
+    display: inline-flex; align-items: center; gap: var(--s-4); min-height: 64px; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer;
+    font: 400 clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem)/1 var(--font-display); letter-spacing: -.02em;
   }
-  button[type='submit'][aria-disabled='true'] { opacity: .6; }
-  .status { margin: 0; min-height: 1.5em; font-weight: 500; }
+  .send-arrow { display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid var(--ink); border-radius: 50%; overflow: hidden; transition: background-color .35s, color .35s; }
+  .send-arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform .45s var(--ease-out); }
+  .send:is(:hover, :focus-visible) .send-arrow { background: var(--ink); color: var(--paper); }
+  .send:is(:hover, :focus-visible) .send-arrow svg { transform: translateX(4px); }
+  .send[aria-disabled='true'] { opacity: .5; }
+  .status { margin: 0; min-height: 1.5em; font-size: var(--fs-small); font-weight: 500; }
   .success :global(*) { margin: 0; font: 400 var(--fs-h3)/1.2 var(--font-display); }
   .contact :focus-visible { outline-color: var(--ink); }
-  @media (min-width: 1024px) { .contact { grid-template-columns: 1fr 1.2fr; align-items: start; } }
+
+  @media (min-width: 768px) {
+    .lines { grid-template-columns: 1fr 1fr; }
+    .field.wide { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1024px) {
+    .contact { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+    .intro { position: sticky; top: calc(var(--header-h) + var(--s-7)); }
+  }
+  @media (prefers-reduced-motion: reduce) { .flabel, .rule, .send-arrow svg, .option { transition: none; } }
 </style>
