@@ -25,12 +25,11 @@ export function mediaUrl(path: string, base?: string): string {
 }
 
 /**
- * Wix's "← BACK TO PROJECTS" links point at the home page with a data-anchor: on desktop Wix
- * scrolls the home page to its "All Projects" section (id `all-projects` in the clone).
+ * Wix's "← BACK TO PROJECTS" links point at the home page, where Wix scrolled to its "All Projects"
+ * grid. Direction B's homepage no longer lists every project, so they go to /projects instead.
  */
-export const HOME_PROJECTS_ANCHOR = '#all-projects';
 export function backLinkHref(href: string): string {
-  return href === '/' ? '/' + HOME_PROJECTS_ANCHOR : href;
+  return href === '/' ? '/projects' : href;
 }
 
 /**

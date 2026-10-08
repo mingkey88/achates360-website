@@ -21,3 +21,22 @@ orange 8.10. All pass for their sizes.
 
 To view locally: `git checkout direction/croma && npx astro dev`, then
 http://localhost:4321/achates360-website. Switch back with `git checkout feature/hero-film`.
+
+## Homepage structure (B only)
+
+The clone's homepage carried about 79 portfolio items (15 in the hero, a 6-card deck, the full
+58-item grid). B's homepage is a short editorial sequence; the full list stays on /projects.
+
+1. Hero: the lens strip (10 projects).
+2. Point of view: the About sentence "The name Achates 360 reflects…", link to About.
+3. Selected work: 4 projects in an asymmetric two-column grid, client · discipline · year under
+   each, video on hover, "View all projects (49)".
+4. What we do: the four service groups as a numbered index, image on hover, link to Services.
+5. Credentials: stats, client names as one line of text, an awards line from the March 2026 deck.
+6. One testimonial, set large.
+7. Contact form.
+
+Removed from the homepage: the stacked card deck, the 58-project grid, the dark stats band and
+logo marquee, three testimonial cards and the "Let's connect" banner. Case-study "Back to
+projects" links now go to /projects (the homepage no longer has the grid they scrolled to).
+

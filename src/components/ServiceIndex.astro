@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import Eyebrow from './ui/Eyebrow.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import DraftTag from './ui/DraftTag.astro';
+import { withBase } from '../lib/paths';
+import type { UiString } from '../lib/strings';
+// Direction B homepage: the service groups as a numbered typographic index. On hover-capable
+// screens the row's project image fades in at the right; on touch it never shows (no layout shift).
+interface Service { id: string; title: string; tags: string[]; placeholder: boolean; image: ImageMetadata }
+interface Props { services: Service[]; eyebrow: UiString; cta: UiString }
+const { services, eyebrow, cta } = Astro.props;
+---
+<section class="si section" aria-labelledby="si-title">
+  <div class="wrap">
+    <Eyebrow as="h2" id="si-title"><T s={eyebrow} /></Eyebrow>
+    <ol class="si-list">
+      {services.map((s, i) => (
+        <li class="si-row" data-placeholder={s.placeholder ? '' : undefined}>
+          <a class="si-link" href={withBase('/services')}>
+            <span class="si-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="si-title">{s.title}<DraftTag when={s.placeholder} /></span>
+            <span class="si-tags">{s.tags.join(' · ')}</span>
+            <span class="si-img" aria-hidden="true"><Image src={s.image} alt="" widths={[480, 800]} sizes="26vw" /></span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <Pill href="/services"><T s={cta} /></Pill>
+  </div>
+</section>
+<style>
+  .si-list { list-style: none; margin: var(--s-6) 0 var(--s-8); padding: 0; border-bottom: 1px solid var(--line); }
+  .si-row { border-top: 1px solid var(--line); }
+  .si-link { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-2) var(--s-5); align-items: baseline; padding-block: var(--s-6); color: inherit; text-decoration: none; }
+  .si-num { font: 400 var(--fs-small)/1 var(--font-text); color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .si-title { font: 300 clamp(1.75rem, 1.2rem + 2.4vw, 3.5rem)/1.05 var(--font-display); text-transform: uppercase; letter-spacing: .01em; transition: transform .5s var(--ease-out), color .3s; }
+  .si-tags { grid-column: 2; font-size: var(--fs-label); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+  .si-img { display: none; }
+  @media (min-width: 1024px) {
+    .si-link { grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 18rem); align-items: center; }
+    .si-tags { grid-column: 3; text-align: right; }
+  }
+  @media (hover: hover) and (min-width: 1024px) {
+    .si-img {
+      display: block; position: absolute; right: 22rem; top: 50%; z-index: 1; width: clamp(200px, 20vw, 320px); aspect-ratio: 4 / 3;
+      border-radius: 4px; overflow: hidden; pointer-events: none; opacity: 0; translate: 0 -40%; rotate: -3deg;
+      transition: opacity .35s, translate .5s var(--ease-out);
+    }
+    .si-img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+    .si-link:hover .si-img, .si-link:focus-visible .si-img { opacity: 1; translate: 0 -50%; }
+    .si-link:hover .si-title { transform: translateX(var(--s-4)); color: var(--accent-deep); }
+  }
+  @media (prefers-reduced-motion: reduce) { .si-title, .si-img { transition: none; } }
+</style>

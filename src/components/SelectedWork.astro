@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import MediaCard from './ui/MediaCard.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import { firstYear } from '../lib/meta';
+import type { UiString } from '../lib/strings';
+type Slide = CollectionEntry<'home'>['data']['slides'][number];
+type Project = CollectionEntry<'projects'>['data'];
+// Direction B homepage: four projects in an asymmetric, magazine-style grid (large beside small, then
+// flipped), each with client · discipline · year beneath. Videos play on hover (MediaCard).
+interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number }
+const { items, eyebrow, cta, total } = Astro.props;
+const RATIOS = ['4 / 3', '4 / 5', '4 / 5', '4 / 3'];
+const cards = items.map(({ slide, project }, i) => ({
+  image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
+  alt: slide.media.type === 'image' ? slide.media.alt : '',
+  video: slide.media.type === 'video' ? slide.media.src : undefined,
+  href: slide.cta?.href,
+  title: project?.title,
+  meta: [project?.client, project?.categories[0], firstYear(project?.copyright)].filter(Boolean).join(' · '),
+  ratio: RATIOS[i % RATIOS.length],
+}));
+---
+<section class="sw section" aria-labelledby="sw-title">
+  <div class="wrap">
+    <Eyebrow as="h2" id="sw-title"><T s={eyebrow} /></Eyebrow>
+    <ol class="sw-grid">
+      {cards.map((c, i) => (
+        <li class={`sw-item sw-${(i % 4) + 1}`}>
+          <MediaCard image={c.image} alt={c.alt} href={c.href} title={c.title} subtitle={c.meta} previewVideo={c.video} ratio={c.ratio} sizes="(max-width: 767px) calc(100vw - 32px), 55vw" widths={[640, 960, 1280, 1600]} />
+        </li>
+      ))}
+    </ol>
+    <div class="sw-foot"><Pill href="/projects"><T s={cta} /> <span class="sw-count">({total})</span></Pill></div>
+  </div>
+</section>
+<style>
+  .sw-grid { list-style: none; margin: var(--s-6) 0 0; padding: 0; display: grid; gap: var(--s-8) var(--s-6); }
+  .sw :global(.mc-media) { border-radius: 4px; }
+  .sw :global(.mc-text) { padding-top: var(--s-4); }
+  .sw :global(.mc-title) { font-weight: 400; font-size: clamp(1.125rem, 1rem + .5vw, 1.5rem); }
+  .sw :global(.mc-sub) { margin-top: 6px; font-size: var(--fs-label); letter-spacing: .12em; text-transform: uppercase; }
+  .sw-foot { display: flex; justify-content: center; margin-top: var(--s-9); }
+  .sw-count { font-variant-numeric: tabular-nums; }
+  @media (min-width: 768px) {
+    .sw-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); row-gap: var(--s-9); }
+    .sw-1 { grid-column: 1 / 8; }
+    .sw-2 { grid-column: 9 / 13; align-self: end; }
+    .sw-3 { grid-column: 2 / 6; }
+    .sw-4 { grid-column: 7 / 13; margin-top: var(--s-10); }
+  }
+</style>

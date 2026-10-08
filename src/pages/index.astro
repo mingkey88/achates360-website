@@ -5,15 +5,12 @@ import HeroArc from '../components/HeroArc.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
-import FeaturedStack from '../components/FeaturedStack.astro';
-import ServicesPreview from '../components/ServicesPreview.astro';
-import StatsBand from '../components/StatsBand.astro';
-import ProjectGrid from '../components/ProjectGrid.astro';
-import Testimonials from '../components/Testimonials.astro';
-import LetsConnect from '../components/LetsConnect.astro';
+import SelectedWork from '../components/SelectedWork.astro';
+import ServiceIndex from '../components/ServiceIndex.astro';
+import Credentials from '../components/Credentials.astro';
+import DraftTag from '../components/ui/DraftTag.astro';
 import ContactForm from '../components/ContactForm.astro';
 import { loadExtras } from '../lib/extras';
-import { renderMd } from '../lib/markdown';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
 
@@ -29,44 +26,53 @@ const [introDark, introMuted] = [words.slice(0, 5).join(' '), words.slice(5).joi
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
+// Direction B homepage (docs/DIRECTION-B.md): hero, point of view, four selected projects, the
+// service index, one proof band, one testimonial, contact. The full project list lives on /projects.
+const selected = featured.slice(0, 4);
+const services = x.services.map((s: any) => {
+  const hero = projects.get(s.project)?.hero;
+  if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
+  return { ...s, image: hero.type === 'video' ? hero.poster : hero.src };
+});
+const quote = x.testimonials[0];
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="home">
-  <HeroArc items={d.allProjects.items.slice(0, 15)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
-
-  <FeaturedStack items={featured} eyebrow={text('featured-eyebrow')} />
+  <HeroArc items={d.allProjects.items.slice(0, 10)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
     <Eyebrow><T s={text('intro-eyebrow')} /></Eyebrow>
-    <h2 id="intro-title" class="display h2 two-tone" data-split>{introDark} <span class="muted">{introMuted}</span></h2>
-    <Pill href="/about" variant="fill"><T s={text('intro-cta')} /></Pill>
+    <h2 id="intro-title" class="display two-tone" data-split>{introDark} <span class="muted">{introMuted}</span></h2>
+    <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
-  <ServicesPreview services={x.services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
-  <StatsBand stats={x.stats} listedCount={listedCount} clients={x.clients} quote={x.testimonials[0]} eyebrow={text('clients-eyebrow')} />
+  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
+  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} />
 
-  <section id="all-projects" class="h-all wrap section">
-    <div class="h-all-heading" set:html={renderMd(d.allProjects.md)} />
-    <ProjectGrid items={d.allProjects.items} />
+  <section class="h-quote wrap section" aria-labelledby="quote-title">
+    <h2 id="quote-title" class="sr-only"><T s={text('testimonials-eyebrow')} /></h2>
+    <figure data-placeholder={quote.placeholder ? '' : undefined}>
+      <blockquote><p>{quote.quote}</p></blockquote>
+      <figcaption>{quote.name} · {quote.role}<DraftTag when={quote.placeholder} /></figcaption>
+    </figure>
   </section>
 
-  <Testimonials items={x.testimonials} eyebrow={text('testimonials-eyebrow')} />
-  <LetsConnect line={text('connect-line')} />
   <ContactForm md={d.contact.md} form={d.contact.form} />
 </Base>
 <style>
-  .two-tone { max-width: 22ch; margin-block: var(--s-4) var(--s-7); }
+  .h-intro { padding-block: calc(var(--section-y) * 1.2); }
+  .two-tone { max-width: 26ch; margin-block: var(--s-5) var(--s-7); font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3.5rem); line-height: 1.15; font-weight: 300; text-transform: none; letter-spacing: 0; }
   .two-tone .muted { color: var(--muted); }
-  .h-all-heading :global(h2) { margin: 0 0 var(--s-7); font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-transform: uppercase; }
-  .h-all-heading :global(a) { text-decoration: none; }
-  .h-all-heading :global(a:hover) { text-decoration: underline; text-decoration-color: var(--accent-deep); }
-  #all-projects { scroll-margin-top: var(--header-h); }
+  .h-quote { border-top: 1px solid var(--line); }
+  .h-quote figure { margin: 0 auto; max-width: 40ch; text-align: center; }
+  .h-quote blockquote { margin: 0; }
+  .h-quote blockquote p { margin: 0; font: 300 clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem)/1.3 var(--font-display); text-wrap: balance; }
+  .h-quote figcaption { margin-top: var(--s-6); font-size: var(--fs-label); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
 </style>
 <script>
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { hero } from '../scripts/motion/hero';
-  import { stack } from '../scripts/motion/stack';
   import { counters } from '../scripts/motion/counters';
-  import { tilt } from '../scripts/motion/tilt';
-  run(hero, reveal, stack, counters, tilt);
+  run(hero, reveal, counters);
 </script>
