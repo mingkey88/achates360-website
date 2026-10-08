@@ -13,10 +13,10 @@ interface Item { thumb: ImageMetadata; alt: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
 const { items, name, tagline, blurb } = Astro.props;
 // --u is a card's place in card steps from the centre; the step angle lives in CSS (--step) because it
-// differs by breakpoint. Static render: only the centre three are shown (a wider step would put the
-// next ones near the camera plane on phones); hero.ts takes over.
+// differs by breakpoint. Static render: only the centre five are shown (on phones a wider step would
+// put the next ones near the camera plane); hero.ts takes over.
 const mid = Math.floor(items.length / 2);
-const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 1 ? 1 : 0}${Math.abs(u) <= 1 ? '' : '; visibility: hidden'}`;
+const pose = (u: number) => `--u: ${u}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
 const mark = logo
   .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
   .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
@@ -27,7 +27,7 @@ const lines = tagline.text.split(/\s*•\s*/);
   <div class="ha-arc" data-arc aria-hidden="true">
     {items.map((it, i) => (
       <div class="ha-card" style={pose(i - mid)}>
-        <Image src={it.thumb} alt="" widths={[320, 640, 960]} sizes="(max-width: 767px) 200px, 420px" loading={Math.abs(i - mid) < 4 ? 'eager' : 'lazy'} draggable="false" />
+        <Image src={it.thumb} alt="" widths={[320, 640, 960]} sizes="(max-width: 767px) 160px, 320px" loading={Math.abs(i - mid) < 5 ? 'eager' : 'lazy'} draggable="false" />
       </div>
     ))}
     <div class="ha-lens" aria-hidden="true"></div>
@@ -54,7 +54,7 @@ const lines = tagline.text.split(/\s*•\s*/);
      facing it. With R = P the centre card is drawn at its own size; cards toward the edges stretch
      and their outer sides grow taller, which is the curved-lens look. --step is the angle that puts
      neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
-  .ha { --card-w: 21vw; --card-ratio: 4 / 3; --P: 36vw; --step: 35.5; }
+  .ha { --card-w: 10vw; --card-ratio: 4 / 3; --P: 38vw; --step: 16.2; }
   .ha-arc {
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;
@@ -103,7 +103,7 @@ const lines = tagline.text.split(/\s*•\s*/);
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
-    .ha { --card-w: 40vw; --card-ratio: 3 / 4; --P: 54vw; --step: 45.8; }
+    .ha { --card-w: 24vw; --card-ratio: 3 / 4; --P: 44vw; --step: 34.3; }
     .ha-lens::before, .ha-lens::after { width: 22%; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
   }
 </style>
