@@ -1,6 +1,6 @@
 .display {
   margin-block: 0; font-family: var(--font-display); font-weight: 400; line-height: var(--lh-display);
-  letter-spacing: -.005em; text-wrap: balance; overflow-wrap: anywhere;
+  font-weight: 500; letter-spacing: -.025em; text-wrap: balance; overflow-wrap: anywhere;
 }
 .mega { font-size: var(--fs-mega); line-height: .82; }
 .h1 { font-size: var(--fs-h1); }
@@ -12,9 +12,8 @@
 .prose > :first-child { margin-top: 0; }
 .prose > :last-child { margin-bottom: 0; }
 .prose :is(p, ul, ol) { margin: 0 0 1em; }
-.prose :is(h1, h2, h3, h4, h5, h6) { font: 400 var(--fs-h3) / 1.15 var(--font-display); margin: 1.2em 0 .4em; text-wrap: balance; }
+.prose :is(h1, h2, h3, h4, h5, h6) { font: 500 var(--fs-h3) / 1.15 var(--font-display); letter-spacing: -.02em; margin: 1.2em 0 .4em; text-wrap: balance; }
 .prose a { text-decoration-color: var(--accent-deep); text-underline-offset: 3px; }
 .prose li::marker { color: var(--accent-deep); }
-/* Direction B: Cormorant's default old-style figures dip below the line; headings use lining figures.
-   A component rule that sets the `font` shorthand resets this, so those rules repeat it. */
-.display, :is(h1, h2, h3) { font-variant-numeric: lining-nums; }
+/* Direction B: the serif italic is an accent voice for single phrases inside modern headings. */
+.accent { font-family: var(--font-accent); font-style: italic; font-weight: 400; letter-spacing: 0; }

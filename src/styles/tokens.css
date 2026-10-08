@@ -18,7 +18,8 @@
   --panel: #eee8df;       /* direction B: warm panel for alternate sections */
   --line: rgb(26 23 20 / .14);
 
-  --font-display: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif;
+  --font-display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  --font-accent: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif; /* italic accent words only */
   --font-text: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fs-mega: min(8vw, 8rem);
   --fs-h1: clamp(2.75rem, 1.8rem + 4vw, 6rem);

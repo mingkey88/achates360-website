@@ -7,12 +7,12 @@ template (https://kitpro-croma.webflow.io/): its feel only, no code or images ta
 
 | | Direction A (bold) | Direction B (quiet) |
 |---|---|---|
-| Typeface | Bebas Neue (condensed display) + DM Sans | Cormorant Garamond serif for headings (sentence case, italic accents) + Fira Sans for text and small tracked labels. Fira is Erik Spiekermann's free relative of ITC Officina, the corporate typeface |
+| Typeface | Bebas Neue (condensed display) + DM Sans | Modern + luxe mix: Inter Tight (tight grotesk) for headings, Cormorant Garamond italic for accent phrases, Fira Sans for text and small tracked labels. Fira is Erik Spiekermann's free relative of ITC Officina, the corporate typeface. Modern cues after terrot.webflow.io |
 | Page ground | Pale grey-green | Warm ivory `#f7f4ef` |
 | Dark bands | Deep turquoise `#163c41` | Warm near-black `#1c1916` |
 | Colour | Orange, turquoise and lime in large fills | Almost none: ink on ivory; buttons are underlined small-caps links; orange survives only in small touches |
 | Header | Logo left, dotted menu right | Logo centred, menu centred beneath in small tracked capitals (Hermès-style) |
-| Hero | Dark teal "film": giant ACHATES 360, figures gather, 3D ring of work orbits | White stage: a wide-angle "lens" of project images (wide cards on desktop, tall on phones) drifts slowly, the side cards curving toward the viewer and blurring into white; figures gather above a letter-spaced ACHATES 360, tagline and description in small caps in the corners |
+| Hero | Dark teal "film": giant ACHATES 360, figures gather, 3D ring of work orbits | White stage: a wide-angle "lens" of project images (wide cards on desktop, tall on phones) drifts slowly, the side cards curving toward the viewer and blurring into white; cards carry the project name and client; the figures gather above a large lowercase "achates 360" in a brand-orange gradient; italic serif tagline and small-caps description in the corners |
 | Type scale | Very large (titles up to 15rem) | Restrained (page titles up to 8rem, section headings up to 3.25rem) |
 
 Contrast (WCAG 2.x) for B's pairings: ink `#1a1714` on ivory 16.27, text-2 `#6a6259` on ivory
@@ -41,3 +41,4 @@ Removed from the homepage: the stacked card deck, the 58-project grid, the dark 
 logo marquee, three testimonial cards and the "Let's connect" banner. Case-study "Back to
 projects" links now go to /projects (the homepage no longer has the grid they scrolled to).
 
+The hero title gradient runs #d56f0a to #a85400: 3.13 to 4.87 on ivory, above the 3:1 large-text minimum.
