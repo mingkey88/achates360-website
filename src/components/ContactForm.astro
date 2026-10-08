@@ -137,7 +137,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
     display: grid; gap: var(--s-8); padding-block: var(--section-y); border-top: 1px solid var(--line);
     padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); background: var(--paper); color: var(--ink);
   }
-  .intro :global(h2) { margin: 0; max-width: 14ch; font: 400 clamp(2.25rem, 1.5rem + 3vw, 4.5rem)/1.02 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
+  .intro :global(h2) { margin: 0; max-width: 14ch; font: 400 clamp(2.5rem, 1.6rem + 3.2vw, 5rem)/1.02 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
   .enquiry { display: grid; gap: var(--s-8); }
   .step { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: var(--s-4); align-items: start; }
   .step-no { padding-top: 1.4rem; font: 400 var(--fs-label)/1 var(--font-text); letter-spacing: .12em; color: var(--text-2); font-variant-numeric: tabular-nums; }
@@ -181,7 +181,7 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   .send-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-5); padding-left: calc(2.5rem + var(--s-4)); }
   .send {
     display: inline-flex; align-items: center; gap: var(--s-4); min-height: 64px; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer;
-    font: 400 clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem)/1 var(--font-display); letter-spacing: -.02em;
+    font: italic 400 clamp(2rem, 1.5rem + 1.8vw, 3.25rem)/1 var(--font-display);
   }
   .send-arrow { display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid var(--ink); border-radius: 50%; overflow: hidden; transition: background-color .35s, color .35s; }
   .send-arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform .45s var(--ease-out); }

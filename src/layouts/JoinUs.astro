@@ -54,7 +54,7 @@ if (others.length) throw new Error(`/joinus: ${others.length} block(s) not place
   .ju-head { padding-block: var(--s-8) var(--s-6); }
   .ju-head :global(h1) { margin: 0; font: 400 var(--fs-h1)/var(--lh-display) var(--font-display); }
   .roles { display: grid; gap: var(--s-5); padding-bottom: var(--s-9); }
-  .role { border-radius: var(--r-card); background: var(--white); padding: var(--s-6); }
+  .role { border-radius: 0; background: transparent; border-top: 1px solid var(--line); padding: var(--s-7) 0; }
   summary { display: grid; justify-items: start; gap: var(--s-3); cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
   summary h2::after { content: ' +' / ''; color: var(--accent-deep); }

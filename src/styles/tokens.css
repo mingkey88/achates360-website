@@ -18,8 +18,9 @@
   --panel: #eee8df;       /* direction B: warm panel for alternate sections */
   --line: rgb(26 23 20 / .14);
 
-  --font-display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
-  --font-accent: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif; /* italic accent words only */
+  --font-display: 'Cormorant Garamond', 'Cormorant', Garamond, 'Times New Roman', serif; /* headlines */
+  --font-accent: var(--font-display); /* italic accent phrases */
+  --font-title: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; /* practical titles: projects, services, captions */
   --font-text: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --fs-mega: min(8vw, 8rem);
   --fs-h1: clamp(2.75rem, 1.8rem + 4vw, 6rem);

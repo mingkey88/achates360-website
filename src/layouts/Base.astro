@@ -10,9 +10,12 @@ import type { PageKind } from '../lib/page-kind';
 import Header from '../components/Header.astro';
 import Menu from '../components/Menu.astro';
 import Footer from '../components/Footer.astro';
-// Direction B: Inter Tight for headings (modern), Cormorant Garamond italic for accent words (luxe),
-// Fira Sans for text and small labels (Spiekermann's free relative of ITC Officina, the corporate face).
-import interTightLatin from '@fontsource/inter-tight/files/inter-tight-latin-500-normal.woff2?url';
+// Direction B type system: Cormorant Garamond for headlines (the posh voice), Inter Tight for practical
+// titles (project names, services, captions: the modern voice), Fira Sans for text and small labels
+// (Spiekermann's free relative of ITC Officina, the corporate typeface).
+import cormorantLatin from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-400-normal.woff2?url';
+import '@fontsource/cormorant-garamond/300.css';
+import '@fontsource/cormorant-garamond/400.css';
 import '@fontsource/inter-tight/400.css';
 import '@fontsource/inter-tight/500.css';
 import firaLatin from '@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff2?url';
@@ -44,7 +47,7 @@ const menu = withServices(site.menu ?? [], text('menu-services').text);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={firaLatin} />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href={interTightLatin} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={cormorantLatin} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {robots && <meta name="robots" content={robots} />}

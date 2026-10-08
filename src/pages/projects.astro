@@ -46,12 +46,16 @@ const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i
 <style>
   .pi-head { padding-block: var(--s-8) var(--s-6); }
   .chips-bar { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 10; background: var(--paper); border-block: 1px solid var(--line); }
-  .chips-bar ul { list-style: none; margin-inline: auto; padding: var(--s-3) 4px; scroll-padding-inline: 4px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  /* Direction B: the categories as a quiet index of tracked small capitals; the one in view is
+     underlined, the rest muted. */
+  .chips-bar ul { list-style: none; margin-inline: auto; padding: 0 4px; scroll-padding-inline: 4px; display: flex; gap: var(--s-6); overflow-x: auto; scrollbar-width: none; }
   .chips-bar a {
-    display: inline-block; white-space: nowrap; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
-    font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .08em; text-transform: uppercase; text-decoration: none;
+    display: inline-flex; align-items: center; min-height: 52px; white-space: nowrap; color: var(--text-2);
+    font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .16em; text-transform: uppercase; text-decoration: none;
+    transition: color .3s;
   }
-  .chips-bar a[aria-current] { background: var(--ink); color: var(--paper); }
+  .chips-bar a:hover { color: var(--ink); }
+  .chips-bar a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 8px; }
   .pi-section { padding-block: var(--s-8); scroll-margin-top: calc(var(--header-h) + 64px); }
   .pi-section h2 { margin-bottom: var(--s-7); }
 </style>

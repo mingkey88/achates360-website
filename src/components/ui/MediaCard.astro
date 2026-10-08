@@ -76,7 +76,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href) } : {};
   a.media-card:hover .mc-media :global(img) { transform: scale(1.04); }
   .mc-media :global(.mc-sticker) { position: absolute; top: var(--s-3); right: var(--s-3); }
   .mc-text { padding-top: var(--s-3); }
-  .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-display); overflow-wrap: anywhere; }
+  .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
   :global(.mc-cursor) {
     position: fixed; left: 0; top: 0; z-index: 60; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%;

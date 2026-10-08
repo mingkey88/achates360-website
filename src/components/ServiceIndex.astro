@@ -35,7 +35,7 @@ const { services, eyebrow, cta } = Astro.props;
   .si-row { border-top: 1px solid var(--line); }
   .si-link { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-2) var(--s-5); align-items: baseline; padding-block: var(--s-6); color: inherit; text-decoration: none; }
   .si-num { font: 400 var(--fs-small)/1 var(--font-text); color: var(--text-2); font-variant-numeric: tabular-nums; }
-  .si-title { font: 500 clamp(1.875rem, 1.2rem + 2.6vw, 3.75rem)/1.05 var(--font-display); letter-spacing: -.03em; transition: transform .5s var(--ease-out), color .3s; }
+  .si-title { font: 500 clamp(1.875rem, 1.2rem + 2.6vw, 3.75rem)/1.05 var(--font-title); letter-spacing: -.03em; transition: transform .5s var(--ease-out), color .3s; }
   /* After terrot: a small brand-orange dot before each service. */
   .si-title::before { content: ''; display: inline-block; width: .16em; height: .16em; margin-right: .35em; border-radius: 50%; background: var(--accent); vertical-align: .32em; }
   .si-tags { grid-column: 2; font-size: var(--fs-label); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
