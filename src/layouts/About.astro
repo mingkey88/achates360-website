@@ -36,7 +36,7 @@ const anyClientDraft = x.clients.some((c: any) => c.placeholder);
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="about">
   <section class="ab-intro on-dark">
     <div class="wrap ab-grid">
-      <h1 class="display h1" data-split>{heading}</h1>
+      <h1 class="display h1 sc" data-split>{heading}</h1>
       <div class="ab-blocks">{d.blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>
     </div>
   </section>

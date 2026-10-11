@@ -6,7 +6,7 @@
 .h1 { font-size: var(--fs-h1); }
 .h2 { font-size: var(--fs-h2); }
 .h3 { font-size: var(--fs-h3); line-height: 1.15; }
-.label { font-size: var(--fs-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+.label { font-size: var(--fs-label); letter-spacing: 0; font-weight: 500; }
 .lead { font-size: var(--fs-lead); line-height: 1.35; font-weight: 300; }
 .prose { max-width: 68ch; overflow-wrap: anywhere; }
 .prose > :first-child { margin-top: 0; }
@@ -20,3 +20,8 @@
 .display, :is(h1, h2, h3) { font-variant-numeric: lining-nums; }
 /* The serif italic as an accent voice for single phrases. */
 .accent { font-family: var(--font-accent); font-style: italic; font-weight: 400; letter-spacing: 0; }
+/* Direction B (after Aesop): labels the export supplies in capitals (menu names, "VIEW PROJECT") display in
+   sentence case. Display only: the copy is unchanged. Needs a block or inline-block box for ::first-letter. */
+.sc { text-transform: lowercase; }
+.sc::first-letter { text-transform: uppercase; }
+:where(span, a).sc { display: inline-block; }

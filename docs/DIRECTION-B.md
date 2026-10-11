@@ -57,3 +57,20 @@ underlined index, business cards are ivory with hairline details and an ink butt
 sit on hairlines instead of white panels.
 
 Texture and lens (B): the lens strip has depth of field (each card blurs and desaturates gradually with its distance from the centre, like a wide-open lens) instead of a flat edge blur; a faint still paper fibre sits on every ivory ground, and a light film grain over photographs. Deliberate imperfection, in keeping with a print studio.
+
+## Aesop pass (12 Oct 2026, replaces the serif/sans mix above)
+
+After aesop.com.sg: one quiet grotesk throughout (Hanken Grotesk, a free relative of Aesop's Suisse),
+everything in sentence case with no tracked capitals (labels the export supplies in capitals, such as
+the menu, "VIEW PROJECT" and "← BACK TO PROJECTS", display in sentence case via the `.sc` utility; the
+copy itself is unchanged); small, calm headings (page titles up to 2.75rem, hierarchy by space); warm
+cream `#fffef2` with earthy section tints (stone `#f6f3e8`, blush `#f7ecdd`, sage `#dbdecf`), charcoal
+`#252525` footer with hairline-ruled column headings; rectangular buttons with an arrow; Selected work
+as split image/tinted-panel compositions; the hero settles into a centred stack (full stacked logo,
+tagline, description, one button); the testimonial is set alone in an upright serif (Cormorant), as
+Aesop sets its quotations. Lens depth of field, paper texture and film grain kept.
+
+Contrast: ink `#333333` on cream 12.46 (sage 9.24); text-2 `#5f5f5a` 6.33 on cream, 4.70 on sage;
+accent-deep `#9c4f00` 5.86 on cream, 4.35 on sage (large/links only there); cream on charcoal 15.12;
+footer labels `#bdbcb2` on charcoal 8.03. Muted `#8a8a84` only on cream/stone at large sizes.
+

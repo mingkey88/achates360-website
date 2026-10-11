@@ -1,4 +1,4 @@
-import { gsap, SplitText } from './index';
+import { gsap } from './index';
 
 // Each figure arrives in a corporate colour, then all settle to ink as they join hands.
 const ARRIVAL = ['#ff9015', '#99d9d9', '#cbe880', '#99d9d9', '#ff9015'];
@@ -7,7 +7,7 @@ const DRIFT = .14; // cards per second
 /**
  * Direction B homepage hero (after kitpro-croma): the lens of project images rises in from the centre
  * outward and drifts slowly round the cylinder (drag to scrub, pause button stops it); the five logo figures
- * gather above the title, which letter-spaces in; the bottom corners fade up. Scrolling away lifts
+ * gather above the logo's wordmark, and the centred copy fades up (after Aesop). Scrolling away lifts
  * the arc and fades the copy.
  */
 export function hero(): void {
@@ -33,12 +33,11 @@ export function hero(): void {
   figs.forEach((g, i) => {
     const a = (i / figs.length) * Math.PI * 2 + .6;
     tl.from(g, { x: Math.cos(a) * 120, y: Math.sin(a) * 80, rotation: (i % 2 ? 1 : -1) * (90 + i * 25), scale: .3, opacity: 0, transformOrigin: '50% 50%', duration: 1.6 }, .5 + i * .1);
-    tl.fromTo(g, { fill: ARRIVAL[i % ARRIVAL.length] }, { fill: '#151414', duration: 1, ease: 'power1.inOut' }, 1.7);
+    tl.fromTo(g, { fill: ARRIVAL[i % ARRIVAL.length] }, { fill: '#333333', duration: 1, ease: 'power1.inOut' }, 1.7);
   });
-  const title = q('.ha-title')[0] as HTMLElement;
-  const chars = SplitText.create(title, { type: 'chars' }).chars;
-  tl.from(chars, { opacity: 0, x: (i) => (i - (chars.length - 1) / 2) * -14, duration: 1.6, stagger: .03 }, 1.1)
-    .from(q('.ha-foot p'), { opacity: 0, y: 16, duration: 1.4, stagger: .12 }, 1.6);
+  // The logo's lowercase wordmark letters settle in under the figures, then the copy fades up.
+  tl.from(q('.lg-ch'), { opacity: 0, y: 6, duration: 1.2, stagger: .04 }, 1.2)
+    .from(q('.ha-tagline, .ha-blurb, .ha-copy > .pill'), { opacity: 0, y: 14, duration: 1.4, stagger: .12 }, 1.6);
 
   // Drift: every card moves round the cylinder on a track that wraps after n cards. Cards past HIDE
   // are off screen, so they are hidden well before they wrap round behind the camera.
@@ -84,5 +83,5 @@ export function hero(): void {
     },
   })
     .to(arc, { yPercent: -18, ease: 'none' }, 0)
-    .to(q('.ha-copy, .ha-foot'), { opacity: 0, y: -40, ease: 'none', duration: .6 }, 0);
+    .to(q('.ha-copy'), { opacity: 0, y: -40, ease: 'none', duration: .6 }, 0);
 }

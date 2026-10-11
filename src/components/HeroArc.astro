@@ -1,6 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import MarqueeToggle from './ui/MarqueeToggle.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
 import logo from '../assets/logo-stacked-parts.svg?raw';
 // Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
@@ -10,8 +12,8 @@ import logo from '../assets/logo-stacked-parts.svg?raw';
 // description (Wix SEO text) sit in the bottom corners, both verbatim. hero.ts drifts the cards;
 // without motion they render at the composed angles computed here.
 interface Item { thumb: ImageMetadata; alt: string; title: string; description: string }
-interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
-const { items, name, tagline, blurb } = Astro.props;
+interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string; cta: UiString }
+const { items, name, tagline, blurb, cta } = Astro.props;
 // --u is a card's place in card steps from the centre; the step angle lives in CSS (--step) because it
 // differs by breakpoint. Static render: only the centre five are shown (on phones a wider step would
 // put the next ones near the camera plane); hero.ts takes over.
@@ -19,11 +21,8 @@ const mid = Math.floor(items.length / 2);
 // Depth of field, as hero.ts computes it: sharp near the centre, softening and losing a little colour outward.
 const dof = (u: number) => { const d = Math.max(0, Math.abs(u) - .55); return `--blur: ${(Math.min(d * 3.2, 9)).toFixed(2)}px; --sat: ${(1 - Math.min(d * .22, .4)).toFixed(2)}`; };
 const pose = (u: number) => `--u: ${u}; ${dof(u)}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
-const mark = logo
-  .replace(/viewBox="[^"]*"/, 'viewBox="52.4 -.3 88.7 97.3"')
-  .replace(/<g class="lg-word">.*?<\/g><\/svg>/, '</svg>')
-  .replace('<svg ', '<svg class="ha-mark-svg" aria-hidden="true" focusable="false" ');
-const lines = tagline.text.split(/\s*•\s*/);
+// The full stacked logo (figures over the lowercase wordmark) is the page's h1, named by the wordmark.
+const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-label="${name.text.replace(/"/g, '&quot;')}" `);
 ---
 <section class="ha" data-hero data-mq-scope aria-labelledby="hero-title">
   <div class="ha-arc" data-arc aria-hidden="true">
@@ -36,12 +35,10 @@ const lines = tagline.text.split(/\s*•\s*/);
     <div class="ha-lens" aria-hidden="true"></div>
   </div>
   <div class="ha-copy">
-    <div class="ha-mark"><Fragment set:html={mark} /></div>
-    <h1 id="hero-title" class="ha-title">{name.text}</h1>
-  </div>
-  <div class="ha-foot">
-    <p class="ha-tagline" data-placeholder={tagline.placeholder ? '' : undefined}>{lines.map((l) => <span>{l}</span>)}</p>
+    <h1 id="hero-title" class="ha-mark"><Fragment set:html={mark} /></h1>
+    <p class="ha-tagline" data-placeholder={tagline.placeholder ? '' : undefined}>{tagline.text}</p>
     <p class="ha-blurb">{blurb}</p>
+    <Pill href="/projects"><T s={cta} /></Pill>
   </div>
   <MarqueeToggle />
 </section>
@@ -49,7 +46,7 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha {
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
     position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
-    display: grid; grid-template-rows: minmax(0, 1fr) auto auto; padding: var(--s-5) var(--gutter) var(--s-6);
+    display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: var(--s-5) var(--gutter) var(--s-6);
     background: var(--paper) var(--paper-tex); color: var(--ink);
   }
   /* The lens: a wide-angle camera standing on the axis of a cylinder, cards on its inside wall.
@@ -96,23 +93,14 @@ const lines = tagline.text.split(/\s*•\s*/);
   .ha-card::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .55)); pointer-events: none; }
   .ha-cap { position: absolute; inset: auto 0 0; z-index: 2; display: grid; gap: 4px; padding: 6% 7%; color: var(--white); text-align: center; pointer-events: none; }
   .ha-cap-t { font: 500 clamp(.875rem, .5rem + .9vw, 1.5rem)/1.05 var(--font-title); letter-spacing: -.02em; text-wrap: balance; }
-  .ha-cap-d { font: 500 clamp(.5625rem, .5rem + .2vw, .6875rem)/1.2 var(--font-text); letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+  .ha-cap-d { font: 500 clamp(.5625rem, .5rem + .2vw, .6875rem)/1.2 var(--font-text); letter-spacing: 0; opacity: .85; }
 
-  .ha-copy { display: grid; justify-items: center; gap: var(--s-4); padding-top: var(--s-4); text-align: center; }
-  .ha-mark { width: clamp(52px, 4.5vw, 72px); color: var(--ink); }
+  /* After Aesop: one centred stack (logo, tagline, a short paragraph, one button). */
+  .ha-copy { display: grid; justify-items: center; gap: var(--s-3); padding-top: var(--s-5); text-align: center; }
+  .ha-mark { margin: 0 0 var(--s-2); width: clamp(120px, 11vw, 168px); color: var(--ink); }
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
-  /* One line at every width: the letter-spaced title is about 9.6 times its font size wide, so it is
-     capped at the space between the gutters divided by that. */
-  .ha-title { margin: 0; white-space: nowrap; font: 400 min(clamp(2.5rem, 1.5rem + 3.4vw, 4.75rem), calc((100vw - 2 * var(--gutter)) / 9.8))/1 var(--font-display); font-variant-numeric: lining-nums; letter-spacing: .16em; text-transform: uppercase; text-indent: .16em; color: var(--ink); }
-
-  .ha-foot { display: grid; gap: var(--s-4); padding-top: var(--s-6); font: 500 var(--fs-label)/1.6 var(--font-text); letter-spacing: .12em; text-transform: uppercase; }
-  .ha-foot p { margin: 0; }
-  .ha-tagline { display: grid; font: italic 400 clamp(1.25rem, 1.1rem + .6vw, 1.75rem)/1.15 var(--font-accent); letter-spacing: 0; text-transform: none; }
-  .ha-blurb { max-width: 44ch; color: var(--text-2); }
-  @media (min-width: 768px) {
-    .ha-foot { grid-template-columns: 1fr 1fr; align-items: end; }
-    .ha-blurb { justify-self: end; text-align: right; }
-  }
+  .ha-tagline { margin: 0; font: 400 var(--fs-lead)/1.4 var(--font-text); }
+  .ha-blurb { margin: 0 0 var(--s-4); max-width: 52ch; font: 400 var(--fs-small)/1.6 var(--font-text); color: var(--text-2); }
   .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
 
   @media (max-width: 767px) {

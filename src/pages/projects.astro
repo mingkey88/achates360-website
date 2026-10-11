@@ -12,7 +12,7 @@ const ids = new Set(d.sections.map((s) => s.id));
 const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i.label, id: ids.has(i.target) ? i.target : d.sections[0].id }));
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="projects">
-  <header class="wrap pi-head"><h1 class="display h1" data-split>{heading}</h1></header>
+  <header class="wrap pi-head"><h1 class="display h1 sc" data-split>{heading}</h1></header>
   <nav class="chips-bar" aria-label={text('sections-label').text}>
     <ul class="wrap">{chips.map((c) => <li><a href={`#${c.id}`} data-chip={c.id}>{c.label}</a></li>)}</ul>
   </nav>
@@ -51,7 +51,7 @@ const chips = d.menu.filter((i) => i.target !== 'footer').map((i) => ({ label: i
   .chips-bar ul { list-style: none; margin-inline: auto; padding: 0 4px; scroll-padding-inline: 4px; display: flex; gap: var(--s-6); overflow-x: auto; scrollbar-width: none; }
   .chips-bar a {
     display: inline-flex; align-items: center; min-height: 52px; white-space: nowrap; color: var(--text-2);
-    font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .16em; text-transform: uppercase; text-decoration: none;
+    font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: 0; text-decoration: none;
     transition: color .3s;
   }
   .chips-bar a:hover { color: var(--ink); }
