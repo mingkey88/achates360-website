@@ -1,0 +1,10 @@
+---
+import { siInstagram, siFacebook, siVimeo } from 'simple-icons';
+// Social network marks for the footer (direction B, after nationalgallery.sg). Paths from Simple Icons
+// (CC0); LinkedIn is not in Simple Icons, so a plain "in" mark is drawn here. Unknown names render nothing.
+interface Props { name: string }
+const LINKEDIN = 'M3.5 9h4v12h-4zM5.5 2.5a2.25 2.25 0 1 1 0 4.5 2.25 2.25 0 0 1 0-4.5zM10 9h3.8v1.7c.6-1 1.9-2 3.9-2 4 0 4.8 2.6 4.8 6V21h-4v-5.5c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H10z';
+const paths: Record<string, string> = { instagram: siInstagram.path, facebook: siFacebook.path, vimeo: siVimeo.path, linkedin: LINKEDIN };
+const d = paths[Astro.props.name.trim().toLowerCase()];
+---
+{d && <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={d} /></svg>}

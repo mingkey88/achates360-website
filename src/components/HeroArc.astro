@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import MarqueeToggle from './ui/MarqueeToggle.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+import logo from '../assets/logo-stacked-parts.svg?raw';
+// Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
+// inside of a cylinder, a lens view: the centre card is furthest away, the side cards come nearer,
+// turn toward the viewer and blur into white at the edges. Wide cards on desktop, tall on phones.
+// The five logo figures gather above a calm title; the tagline (corporate sheet) and site
+// description (Wix SEO text) sit in the bottom corners, both verbatim. hero.ts drifts the cards;
+// without motion they render at the composed angles computed here.
+interface Item { thumb: ImageMetadata; alt: string; title: string; description: string }
+interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string; cta: UiString }
+const { items, name, tagline, blurb, cta } = Astro.props;
+// --u is a card's place in card steps from the centre; the step angle lives in CSS (--step) because it
+// differs by breakpoint. Static render: only the centre five are shown (on phones a wider step would
+// put the next ones near the camera plane); hero.ts takes over.
+const mid = Math.floor(items.length / 2);
+// Depth of field, as hero.ts computes it: sharp near the centre, softening and losing a little colour outward.
+const dof = (u: number) => { const d = Math.max(0, Math.abs(u) - .55); return `--blur: ${(Math.min(d * 3.2, 9)).toFixed(2)}px; --sat: ${(1 - Math.min(d * .22, .4)).toFixed(2)}`; };
+const pose = (u: number) => `--u: ${u}; ${dof(u)}; --o: ${Math.abs(u) <= 2 ? 1 : 0}${Math.abs(u) <= 2 ? '' : '; visibility: hidden'}`;
+// The full stacked logo (figures over the lowercase wordmark) is the page's h1, named by the wordmark.
+const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-label="${name.text.replace(/"/g, '&quot;')}" `);
+---
+<section class="ha" data-hero data-mq-scope aria-labelledby="hero-title">
+  <div class="ha-arc" data-arc aria-hidden="true">
+    {items.map((it, i) => (
+      <div class="ha-card" style={pose(i - mid)}>
+        <Image src={it.thumb} alt="" widths={[320, 640, 960]} sizes="(max-width: 767px) 240px, 560px" loading={Math.abs(i - mid) < 5 ? 'eager' : 'lazy'} draggable="false" />
+        <span class="ha-cap"><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
+      </div>
+    ))}
+    <div class="ha-lens" aria-hidden="true"></div>
+  </div>
+  <div class="ha-copy">
+    <h1 id="hero-title" class="ha-mark"><Fragment set:html={mark} /></h1>
+    <p class="ha-tagline" data-placeholder={tagline.placeholder ? '' : undefined}>{tagline.text}</p>
+    <p class="ha-blurb">{blurb}</p>
+    <Pill href="/projects"><T s={cta} /></Pill>
+  </div>
+  <MarqueeToggle />
+</section>
+<style>
+  .ha {
+    /* The header is solid here (no overHero), so the hero fills the screen below it. */
+    position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
+    display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: var(--s-5) var(--gutter) var(--s-6);
+    background: var(--paper) var(--paper-tex); color: var(--ink);
+  }
+  /* The lens: a wide-angle camera standing on the axis of a cylinder, cards on its inside wall.
+     translateZ(P) moves the axis to the camera, rotateY(-a) translateZ(-R) puts a card at angle a
+     facing it. With R = P the centre card is drawn at its own size; cards toward the edges stretch
+     and their outer sides grow taller, which is the curved-lens look. --step is the angle that puts
+     neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
+  /* Croma's lens (perspective 42.4% of the width, cards 14.1%, 20.2deg apart) scaled up 1.35x:
+     card and perspective grow together, so the angles and the shape of the curve stay the same. */
+  .ha { --card-w: 19vw; --card-ratio: 4 / 3; --P: 57.2vw; --step: 19.37; } /* gap ~0.25vw */
+  .ha-arc {
+    position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
+    cursor: grab; touch-action: pan-y; user-select: none;
+  }
+  .ha-arc:active { cursor: grabbing; }
+  .ha-card {
+    position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
+    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; overflow: hidden; background: var(--panel);
+    transform: translateZ(var(--P)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--P) * -1));
+    opacity: calc(var(--o, 1) * var(--in, 1));
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
+    /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
+    filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
+  }
+  /* Lens edges: the outer cards blur and fade into the white page. */
+  /* Taller than the arc (the edge cards stretch past it) and feathered top and bottom, so the blur has no hard edge. */
+  .ha-lens { position: absolute; inset: -30% calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
+  /* The edges now only fade into the paper; the softening itself is per card (depth of field). */
+  .ha-lens::before, .ha-lens::after { content: ''; position: absolute; inset-block: 0; width: 22%; }
+  .ha-lens::before {
+    left: 0; background: linear-gradient(90deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
+  }
+  .ha-lens::after {
+    right: 0; background: linear-gradient(270deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
+    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+    -webkit-mask-composite: source-in; mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
+  }
+  .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  /* After terrot: the project name and client written on the card, over a soft shade. */
+  /* Film grain over each photograph, under the caption. */
+  .ha-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--grain); opacity: .16; mix-blend-mode: overlay; pointer-events: none; }
+  .ha-card::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .55)); pointer-events: none; }
+  .ha-cap { position: absolute; inset: auto 0 0; z-index: 2; display: grid; gap: 4px; padding: 6% 7%; color: var(--white); text-align: center; pointer-events: none; }
+  .ha-cap-t { font: 500 clamp(.875rem, .5rem + .9vw, 1.5rem)/1.05 var(--font-title); letter-spacing: -.02em; text-wrap: balance; }
+  .ha-cap-d { font: 500 clamp(.5625rem, .5rem + .2vw, .6875rem)/1.2 var(--font-text); letter-spacing: 0; opacity: .85; }
+
+  /* After Aesop: one centred stack (logo, tagline, a short paragraph, one button). */
+  .ha-copy { display: grid; justify-items: center; gap: var(--s-3); padding-top: var(--s-5); text-align: center; }
+  .ha-mark { margin: 0 0 var(--s-2); width: clamp(120px, 11vw, 168px); color: var(--ink); }
+  .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
+  .ha-tagline { margin: 0; font: 400 var(--fs-lead)/1.4 var(--font-text); }
+  .ha-blurb { margin: 0 0 var(--s-4); max-width: 52ch; font: 400 var(--fs-small)/1.6 var(--font-text); color: var(--text-2); }
+  .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
+
+  @media (max-width: 767px) {
+    /* Phones: tall cards, same lens. */
+    .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --step: 32.47; } /* gap ~0.8vw */
+    .ha-lens::before, .ha-lens::after { width: 16%; }
+  }
+</style>

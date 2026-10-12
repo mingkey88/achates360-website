@@ -8,7 +8,8 @@ import { readdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const BASE = process.env.SITE_ENV === 'production' ? '' : '/achates360-website';
-const pages = (await readdir('dist')).filter((f) => f.endsWith('.html') && f !== '404.html');
+// Every built page, sub-folders included (/projects/<category>).
+const pages = (await readdir('dist', { recursive: true })).filter((f) => f.endsWith('.html') && f !== '404.html' && !f.startsWith('_'));
 
 // A fresh port every run: a stale server on a fixed port could serve an old dist/.
 const PORT = await new Promise((res, rej) => {

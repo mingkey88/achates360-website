@@ -6,7 +6,6 @@ import BgVideo from './BgVideo.astro';
 import Embed from './Embed.astro';
 import Player from './Player.astro';
 import MediaCard from './ui/MediaCard.astro';
-import Pill from './ui/Pill.astro';
 import { loadExtras } from '../lib/extras';
 // One exported content block in the new design. Copy is rendered verbatim; the clone's per-block
 // colours (b.color) belonged to Wix's layout and are not used.
@@ -16,7 +15,7 @@ const { text } = await loadExtras();
 const label = pageTitle ? `${pageTitle} video` : undefined;
 ---
 {b.type === 'text' && <div class:list={['block-text', 'prose', { lead }]} data-reveal set:html={renderMd(b.md, undefined, { demote })} />}
-{b.type === 'link' && <p class="block-link"><Pill href={backLinkHref(b.href)}>{b.label}</Pill></p>}
+{b.type === 'link' && (() => { const m = String(b.label).match(/^(←\s*)?(.*)$/)!; return <p class="block-link"><a class="back-link" href={withBase(backLinkHref(b.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
 {b.type === 'image' && (b.href
   ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)} data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></a>
   : <div class="block-image" data-reveal><Image class="block-img" src={b.src} alt={b.alt} widths={[480, 960, 1440, 1920]} sizes={sizes} /></div>)}
@@ -29,3 +28,6 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
   ? <Player src={b.src} poster={b.poster} label={label} />
   : <BgVideo src={b.src} poster={b.poster} class="block-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />)}
 {b.type === 'embed' && <Embed provider={b.provider} id={b.id} title={label} />}
+<style>
+  .back-link { display: inline-flex; align-items: center; gap: .4em; min-height: 44px; font-size: var(--fs-small); color: inherit; text-underline-offset: 4px; }
+</style>

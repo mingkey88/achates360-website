@@ -1,0 +1,40 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import CategoryPicker from '../../components/CategoryPicker.astro';
+import { loadExtras } from '../../lib/extras';
+import { projectCategories } from '../../lib/categories';
+// One page per project category (direction B): the supplied section heading and its gallery, verbatim,
+// with the category dropdown to move between them.
+export async function getStaticPaths() {
+  const d = (await getEntry('projectsIndex', 'projects'))!.data;
+  return projectCategories(d.sections).map((c) => ({ params: { category: c.slug } }));
+}
+const d = (await getEntry('projectsIndex', 'projects'))!.data;
+const { text } = await loadExtras();
+const cats = projectCategories(d.sections);
+const cat = cats.find((c) => c.slug === Astro.params.category)!;
+const picker = cats.map((c) => ({ heading: c.heading, href: c.href, count: c.items.length }));
+---
+<Base title={`${cat.heading} | ${d.seo.title}`} description={d.seo.description} ogImage={d.seo.ogImage} page="projects">
+  <header class="wrap cat-head">
+    <h1 class="display h1" data-split>{cat.heading}</h1>
+    <CategoryPicker label={text('category-label')} current={cat.heading} all={{ label: text('next-fallback'), href: '/projects' }} categories={picker} path={cat.href} />
+  </header>
+  <section class="wrap cat-grid" aria-labelledby="cat-title">
+    <h2 id="cat-title" class="sr-only">{cat.heading}</h2>
+    <ProjectGrid items={cat.items} />
+  </section>
+</Base>
+<style>
+  .cat-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s-6); padding-block: var(--s-8) var(--s-7); border-bottom: 1px solid var(--line); }
+  .cat-head h1 { margin: 0; }
+  .cat-grid { padding-block: var(--s-7) var(--section-y); }
+</style>
+<script>
+  import { run } from '../../scripts/motion/index';
+  import { reveal } from '../../scripts/motion/reveal';
+  import { tilt } from '../../scripts/motion/tilt';
+  run(reveal, tilt);
+</script>

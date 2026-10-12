@@ -40,8 +40,8 @@ describe('withBase with a home fragment', () => {
 });
 
 describe('backLinkHref', () => {
-  it('sends the home back link to the All Projects section', () => {
-    expect(backLinkHref('/')).toBe('/#all-projects');
+  it('sends the home back link to the projects page', () => {
+    expect(backLinkHref('/')).toBe('/projects');
   });
   it('leaves other targets alone', () => {
     expect(backLinkHref('/projects')).toBe('/projects');

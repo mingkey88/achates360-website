@@ -3,12 +3,11 @@ import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
 import HeroMedia from '../components/ui/HeroMedia.astro';
 import Sticker from '../components/ui/Sticker.astro';
-import Pill from '../components/ui/Pill.astro';
 import MetaStrip from '../components/MetaStrip.astro';
 import MediaRows from '../components/MediaRows.astro';
 import NextProject from '../components/NextProject.astro';
 import { loadExtras } from '../lib/extras';
-import { backLinkHref } from '../lib/paths';
+import { backLinkHref, withBase } from '../lib/paths';
 import { nextProject, slugOf } from '../lib/next-project';
 interface Props { entry: CollectionEntry<'projects'> }
 const { id, data: d } = Astro.props.entry;
@@ -31,18 +30,20 @@ const labels = { client: text('meta-client'), year: text('meta-year'), services:
   {d.heroCaption && <p class="sr-only">{d.heroCaption}</p>}
   <MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} />
   <article class="wrap p-body"><MediaRows blocks={d.blocks} pageTitle={d.title} /></article>
-  {d.backLink && <p class="wrap p-back"><Pill href={backLinkHref(d.backLink.href)}>{d.backLink.label}</Pill></p>}
+  {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} />
 </Base>
 <style>
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
   .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .35), rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6)); pointer-events: none; }
   .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
-  .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--turquoise); }
+  .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--on-dark); }
   .p-hero-plain::after { display: none; }
   .p-body { padding-block: var(--s-7) var(--s-8); }
   .p-back { margin-block: 0; padding-bottom: var(--s-8); }
   @media (min-width: 768px) { .p-hero { min-height: 85svh; } }
+  /* The supplied label is capitals (verbatim); shown in sentence case, after Aesop. */
+  .p-back-link { display: inline-flex; align-items: center; gap: .4em; min-height: 44px; font-size: var(--fs-small); color: inherit; text-underline-offset: 4px; }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

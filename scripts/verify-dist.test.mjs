@@ -107,9 +107,12 @@ describe('extra required paths', () => {
   it('requires new redesign pages alongside the sitemap and permanent lists', () => {
     expect(requiredPaths(['/'], ['/', '/angeline'], ['/services'])).toEqual(['/', '/angeline', '/services']);
   });
-  it('the committed new-pages list holds /services', () => {
+  it('the committed new-pages list holds /services and one page per project category', () => {
     const extra = JSON.parse(readFileSync(new URL('./new-pages.json', import.meta.url), 'utf8'));
-    expect(extra).toEqual(['/services']);
+    const index = readFileSync(new URL('../src/content/projectsIndex/projects.md', import.meta.url), 'utf8');
+    const sections = [...index.matchAll(/^    heading: /gm)].length;
+    expect(extra[0]).toBe('/services');
+    expect(extra.filter((p) => /^\/projects\/[a-z0-9-]+$/.test(p))).toHaveLength(sections);
   });
 });
 

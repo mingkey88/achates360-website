@@ -1,8 +1,8 @@
 ---
 /*
  * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
- * submit label come verbatim from home.md; only the styling is the redesign's (a full-bleed accent
- * block, pill inputs, ink text).
+ * submit label come verbatim from home.md; only the styling is the redesign's (direction B: an
+ * form after Aesop: boxed fields with labels above, a grid of square checkboxes, one solid submit).
  *
  * Field names: the message box has no name in the export, so it posts as `message`; the checkbox
  * groups post as group-1 / group-2. Submit posts the FormData to PUBLIC_FORM_ENDPOINT (staging
@@ -10,10 +10,15 @@
  * per group and a dashed outline once a submit has been tried.
  */
 import { renderMd } from '../lib/markdown';
+import T from './ui/T.astro';
+import LogoSketch from './LogoSketch.astro';
+import type { UiString } from '../lib/strings';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }
 interface Group { name: string; label: string; required: boolean; options: string[] }
-interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string } }
-const { md, form } = Astro.props;
+// heading: a draft replacement for the supplied intro ("Drop us a message…"), pending approval
+// (CONTENT-QUERIES 23); the supplied text stays in home.md.
+interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString }
+const { md, form, heading } = Astro.props;
 const success = md.find((m) => m.startsWith('Thanks for submitting'));
 const intro = md.filter((m) => m !== success);
 // Wix lays the single-line fields out first, then the checkbox groups, then the message box.
@@ -25,38 +30,45 @@ const autocomplete = (f: Field) => ({ name: 'name', company: 'organization', ema
 const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : 'field');
 ---
 <section id="contact" class="contact">
-  <div class="intro">
-    {intro.map((m) => <div set:html={renderMd(m)} />)}
-  </div>
-  <form class="enquiry" novalidate>
-    {lines.map((f) => (
-      <label class="field">
-        <span class="label">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
-        <input type={inputType(f)} name={fieldName(f)} required={f.required} placeholder={f.placeholder} autocomplete={autocomplete(f)} />
-      </label>
-    ))}
-    <div class="groups">
+  <LogoSketch id="contact-sketch" class="c-sketch" />
+  <div class="inner">
+    <div class="intro">
+      {heading ? <h2><T s={heading} /></h2> : intro.map((m) => <div set:html={renderMd(m)} />)}
+    </div>
+    <form class="enquiry" novalidate>
+      <div class="lines">
+        {lines.map((f) => (
+          <label class:list={['field', { wide: f.type === 'email' }]}>
+            <span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
+            <input type={inputType(f)} name={fieldName(f)} required={f.required} autocomplete={autocomplete(f)} />
+          </label>
+        ))}
+      </div>
       {form.groups.map((g, i) => (
         <fieldset class="group" data-required={g.required ? 'true' : 'false'} aria-describedby={g.required ? `group-error-${i + 1}` : undefined}>
-          <legend>{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
-          {g.options.map((o) => (
-            <label class="option"><input type="checkbox" name={`group-${i + 1}`} value={o} /><span>{o}</span></label>
-          ))}
+          <legend class="flabel">{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
+          <div class="options">
+            {g.options.map((o) => (
+              <label class="option"><input type="checkbox" name={`group-${i + 1}`} value={o} /><span class="box" aria-hidden="true"></span><span>{o}</span></label>
+            ))}
+          </div>
           {/* An alert region, always rendered so screen readers announce the text when it is set. */}
           {g.required && <p class="group-error" id={`group-error-${i + 1}`} role="alert" data-message="Please choose at least one."></p>}
         </fieldset>
       ))}
-    </div>
-    {boxes.map((f) => (
-      f.label
-        ? <label class="field box"><span class="label">{f.label}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder}></textarea></label>
-        /* Wix's message box has no label: its placeholder (verbatim) names it for screen readers. */
-        : <textarea class="box" name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined}></textarea>
-    ))}
-    <button type="submit">{form.submitLabel}</button>
-    <p class="status" role="status" aria-live="polite"></p>
-    {success && <div class="success" hidden set:html={renderMd(success)} />}
-  </form>
+      {boxes.map((f) => (
+        f.label
+          ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6"></textarea></label>
+          /* Wix's message box has no label: its placeholder (verbatim) shows in the box and names it for screen readers. */
+          : <div class="field"><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined} rows="6"></textarea></div>
+      ))}
+      <div class="send-row">
+        <button type="submit" class="send">{form.submitLabel}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+      {success && <div class="success" hidden set:html={renderMd(success)} />}
+    </form>
+  </div>
 </section>
 <script>
   import { PUBLIC_FORM_ENDPOINT } from 'astro:env/client';
@@ -113,34 +125,62 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   }
 </script>
 <style>
-  .contact { background: var(--accent); color: var(--ink); padding-block: var(--section-y); }
-  .contact { display: grid; gap: var(--s-7); padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); }
-  .intro :global(h2) { margin: 0; font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); text-wrap: balance; overflow-wrap: anywhere; }
-  .enquiry { display: grid; gap: var(--s-4); }
-  .field { display: grid; gap: 6px; }
-  .label, legend { font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: .1em; text-transform: uppercase; }
-  input:not([type='checkbox']), textarea {
-    width: 100%; min-height: 48px; padding: 12px 18px; border: 1.5px solid var(--ink); border-radius: var(--r-pill);
-    background: var(--white); color: var(--ink); font: 400 var(--fs-body)/1.4 var(--font-text);
+  /* Direction B (after Aesop): one centred column. Boxed fields with small labels above, the service
+     choices as an even grid of square checkboxes, a proper message box and one solid button. */
+  .contact { position: relative; isolation: isolate; overflow: hidden; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
+  .contact > :global(.c-sketch) { position: absolute; z-index: -1; left: -6vw; bottom: -4vw; width: clamp(220px, 30vw, 460px); color: rgb(51 51 51 / .12); }
+  .inner { max-width: 760px; margin-inline: auto; display: grid; gap: var(--s-7); }
+  .intro { text-align: center; }
+  .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }
+  .enquiry { display: grid; gap: var(--s-6); }
+  .lines { display: grid; gap: var(--s-5); }
+  .field { display: grid; gap: var(--s-2); }
+  .flabel { padding: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--ink); }
+  .req { color: var(--text-2); }
+  .field input, .field textarea {
+    width: 100%; min-height: 52px; padding: 14px 16px; border: 1px solid rgb(51 51 51 / .45); border-radius: 0;
+    background: var(--paper); color: var(--ink); font: 400 var(--fs-body)/1.4 var(--font-text); transition: border-color .2s;
   }
-  .tried :is(input:not([type='checkbox']), textarea):invalid { border-style: dashed; border-width: 2.5px; }
-  .enquiry ::placeholder { color: var(--text-2); opacity: 1; }
-  textarea { min-height: 140px; border-radius: var(--r-card); resize: vertical; }
-  .groups { display: grid; gap: var(--s-4); }
-  .group { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .group legend { margin-bottom: var(--s-2); }
-  .option { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--r-pill); cursor: pointer; }
-  .option input { width: 18px; height: 18px; accent-color: var(--ink); }
-  .group.invalid .option { border-style: dashed; }
-  .group-error { width: 100%; margin: 0; font-size: var(--fs-small); font-weight: 500; }
-  .req { color: inherit; }
-  button[type='submit'] {
-    justify-self: start; min-height: 52px; padding: 12px 32px 9px; border: 0; border-radius: var(--r-pill);
-    background: var(--ink); color: var(--accent); font: 400 1.5rem/1 var(--font-display); letter-spacing: .04em; cursor: pointer;
+  .field textarea { min-height: 168px; resize: vertical; }
+  .field :is(input, textarea):hover { border-color: var(--ink); }
+  .field :is(input, textarea):focus { outline: 2px solid var(--ink); outline-offset: 0; border-color: var(--ink); }
+  .field textarea::placeholder { color: var(--text-2); opacity: 1; }
+  .tried .field :is(input, textarea):invalid { border-color: var(--accent-deep); box-shadow: inset 0 0 0 1px var(--accent-deep); }
+
+  .group { margin: 0; padding: 0; border: 0; min-width: 0; }
+  .group legend { margin-bottom: var(--s-3); }
+  .options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid rgb(51 51 51 / .18); }
+  .option { position: relative; display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border-bottom: 1px solid rgb(51 51 51 / .18); font-size: var(--fs-small); cursor: pointer; }
+  .option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .box { flex: none; position: relative; width: 18px; height: 18px; border: 1px solid var(--ink); background: var(--paper); transition: background-color .2s; }
+  .box::after { content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid var(--paper); border-width: 0 1.5px 1.5px 0; rotate: 45deg; opacity: 0; }
+  .option input:checked + .box { background: var(--ink); }
+  .option input:checked + .box::after { opacity: 1; }
+  .option input:focus-visible + .box { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .group.invalid .box { border-color: var(--accent-deep); }
+  .group-error { margin: var(--s-3) 0 0; font-size: var(--fs-small); color: var(--accent-deep); }
+  .group-error:empty { display: none; }
+
+  .send-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
+  .send {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 40px;
+    border: 1px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--paper); cursor: pointer;
+    font: 400 var(--fs-body)/1 var(--font-text); transition: background-color .3s, color .3s;
   }
-  button[type='submit'][aria-disabled='true'] { opacity: .6; }
-  .status { margin: 0; min-height: 1.5em; font-weight: 500; }
-  .success :global(*) { margin: 0; font: 400 var(--fs-h3)/1 var(--font-display); }
+  .send svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: transform .4s var(--ease-out); }
+  .send:is(:hover, :focus-visible) { background: transparent; color: var(--ink); }
+  .send:is(:hover, :focus-visible) svg { transform: translateX(4px); }
+  .send[aria-disabled='true'] { opacity: .5; }
+  .status { margin: 0; min-height: 1.5em; font-size: var(--fs-small); }
+  .success { padding: var(--s-6); background: var(--paper); text-align: center; }
+  .success :global(*) { margin: 0; font: 400 var(--fs-h3)/1.3 var(--font-display); }
   .contact :focus-visible { outline-color: var(--ink); }
-  @media (min-width: 1024px) { .contact { grid-template-columns: 1fr 1.2fr; align-items: start; } }
+
+  @media (min-width: 640px) {
+    .lines { grid-template-columns: 1fr 1fr; }
+    .field.wide { grid-column: 1 / -1; }
+    .options { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--s-5); }
+  }
+  @media (max-width: 479px) { .send { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .send, .send svg, .box, .field :is(input, textarea) { transition: none; } }
 </style>

@@ -1,0 +1,73 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import MediaCard from './ui/MediaCard.astro';
+import SelectedCover from './SelectedCover.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import { withBase } from '../lib/paths';
+import { firstYear } from '../lib/meta';
+import type { UiString } from '../lib/strings';
+type Slide = CollectionEntry<'home'>['data']['slides'][number];
+type Project = CollectionEntry<'projects'>['data'];
+// Direction B homepage (after Aesop): each selected project as a split composition, the image on one
+// half and a tinted panel with its name, client · discipline · year and a link on the other,
+// alternating sides. Videos play on hover (MediaCard).
+// The first item is the cover (SelectedCover: paper-cut heading over its film); the rest follow as rows.
+interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number }
+const { items, eyebrow, cta, total } = Astro.props;
+const TINTS = ['var(--stone)', 'var(--blush)', 'var(--sage)', 'var(--stone)'];
+const all = items.map(({ slide, project }, i) => ({
+  image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
+  alt: slide.media.type === 'image' ? slide.media.alt : '',
+  video: slide.media.type === 'video' ? slide.media.src : undefined,
+  href: slide.cta?.href,
+  label: slide.cta?.label,
+  title: project?.title,
+  meta: [project?.client, project?.categories[0], firstYear(project?.copyright)].filter(Boolean).join(' · '),
+  media: slide.media,
+  tint: TINTS[i % TINTS.length],
+}));
+const [cover, ...rows] = all;
+---
+<section class="sw" aria-labelledby="sw-title">
+  {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} />}
+  <ol class="sw-list">
+    {rows.map((r, i) => (
+      <li class:list={['sw-row', { flip: i % 2 === 1 }]} style={`--tint: ${r.tint}`}>
+        <div class="sw-media">
+          <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="5 / 4" sizes="(max-width: 767px) 100vw, 50vw" widths={[640, 960, 1280, 1600]} wipe />
+        </div>
+        <div class="sw-text">
+          {r.meta && <p class="sw-meta">{r.meta}</p>}
+          {r.title && <h3 class="sw-title">{r.href ? <a href={withBase(r.href)}>{r.title}</a> : r.title}</h3>}
+          {r.href && r.label && <Pill href={r.href}><span class="sc">{r.label}</span></Pill>}
+        </div>
+      </li>
+    ))}
+  </ol>
+  <div class="sw-foot"><Pill href="/projects" variant="fill"><T s={cta} /> <span class="sw-count">({total})</span></Pill></div>
+</section>
+<style>
+  /* No overflow clipping here: it would stop the cover's sticky film. */
+  .sw { padding-bottom: var(--section-y); }
+  .sw-list { list-style: none; margin: var(--section-y) 0 0; padding: 0; display: grid; gap: var(--s-8); }
+  .sw-row { position: relative; display: grid; }
+  .sw :global(.mc-media) { border-radius: 0; }
+  .sw-text { position: relative; z-index: 1; display: grid; align-content: center; justify-items: start; gap: var(--s-4); padding: var(--s-7) var(--gutter); background: var(--tint); }
+  .sw-meta { margin: 0; font-size: var(--fs-small); color: var(--text-2); }
+  .sw-title { margin: 0; max-width: 20ch; font: 400 var(--fs-h2)/1.2 var(--font-display); text-wrap: balance; }
+  .sw-title a { color: inherit; text-decoration: none; }
+  .sw-title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+  .sw-text :global(.pill) { margin-top: var(--s-3); }
+  .sw-foot { display: flex; justify-content: center; margin-top: var(--s-9); }
+  .sw-count { font-variant-numeric: tabular-nums; }
+  /* Desktop: the tinted card overlaps the picture's edge and drops below it (after nationalgallery.sg). */
+  @media (min-width: 900px) {
+    .sw-row { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+    .sw-media { grid-column: 1 / 9; grid-row: 1; }
+    .sw-text { grid-column: 8 / 13; grid-row: 1; margin-bottom: calc(var(--s-8) * -1); padding: var(--s-8) clamp(var(--s-6), 4vw, var(--s-9)); box-shadow: 0 30px 60px -40px rgb(0 0 0 / .35); }
+    .sw-row.flip .sw-media { grid-column: 5 / 13; }
+    .sw-row.flip .sw-text { grid-column: 1 / 6; }
+    .sw-list { gap: calc(var(--s-10) + var(--s-6)); padding-bottom: var(--s-8); }
+  }
+</style>

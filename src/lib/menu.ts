@@ -7,3 +7,13 @@ export function withServices(menu: NavLink[], label: string, href = '/services')
   const at = menu.findIndex((m) => m.href === '/projects');
   return at === -1 ? [...menu, item] : [...menu.slice(0, at + 1), item, ...menu.slice(at + 1)];
 }
+
+/** The site menu with the project categories hung under PROJECTS (direction B); site.md is never edited. */
+export function withCategories(menu: NavLink[], categories: NavLink[], href = '/projects'): NavLink[] {
+  return menu.map((m) => (m.href === href ? { ...m, items: categories } : m));
+}
+
+/** The menu's CONTACT item ("/#contact", the old home-page form) points at the contact page (direction B). */
+export function withContactPage(menu: NavLink[], from = '/#contact', to = '/contact'): NavLink[] {
+  return menu.map((m) => (m.href === from ? { ...m, href: to } : m));
+}
