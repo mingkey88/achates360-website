@@ -95,8 +95,6 @@ menu:
         href: /dbs-sustainable-investing-video
       - label: DBS Discretionary Portfolio Management
         href: /dbs-discretionary-portfolio-management
-      - label: DBS Private Bank Video Wall
-        href: /dbs-pb-video-wall
       - label: Bank Julius Baer
         href: /bank-julius-baer
       - label: Grab Brand App Campaign
@@ -151,14 +149,16 @@ menu:
         href: /redpacket
       - label: Nokia Spy Case
         href: /nokia
-      - label: Corporate Powerpoint Presentations
-        href: /corporate-powerpoint-presentations
       - label: St Regis TeaRoom & Patisserie
         href: /st-regis-tearoom-patisserie
       - label: Mann Hummel
         href: /mannhummel
-      - label: Affluent Segment AI Assets
-        href: /dbs-affluent-segment-ai-assets
+      - label: Alstom Asia Pacific
+        href: /alstom-r151-last-train-handover
+      - label: Singapore General Hospital
+        href: /sgh-patient-safety-appreciation-night
+      - label: Singapore Urban Mobility Week 2026
+        href: /alstom-singapore-urban-mobility-week-2026
   - label: CONTACT
     href: /#contact
   - label: ABOUT
@@ -219,8 +219,6 @@ mobileMenu:
         href: /dbs-sustainable-investing-video
       - label: DBS Discretionary Portfolio Management
         href: /dbs-discretionary-portfolio-management
-      - label: DBS Private Bank Video Wall
-        href: /dbs-pb-video-wall
       - label: Bank Julius Baer
         href: /bank-julius-baer
       - label: Grab Brand App Campaign
@@ -275,14 +273,16 @@ mobileMenu:
         href: /redpacket
       - label: Nokia Spy Case
         href: /nokia
-      - label: Corporate Powerpoint Presentations
-        href: /corporate-powerpoint-presentations
       - label: St Regis TeaRoom & Patisserie
         href: /st-regis-tearoom-patisserie
       - label: Mann Hummel
         href: /mannhummel
-      - label: Affluent Segment AI Assets
-        href: /dbs-affluent-segment-ai-assets
+      - label: Alstom Asia Pacific
+        href: /alstom-r151-last-train-handover
+      - label: Singapore General Hospital
+        href: /sgh-patient-safety-appreciation-night
+      - label: Singapore Urban Mobility Week 2026
+        href: /alstom-singapore-urban-mobility-week-2026
   - label: ABOUT
     href: /about
   - label: JOIN US
