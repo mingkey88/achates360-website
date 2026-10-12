@@ -10,6 +10,7 @@ import ServiceIndex from '../components/ServiceIndex.astro';
 import Credentials from '../components/Credentials.astro';
 import DraftTag from '../components/ui/DraftTag.astro';
 import ContactForm from '../components/ContactForm.astro';
+import LogoSketch from '../components/LogoSketch.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
@@ -28,9 +29,10 @@ const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.sl
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
-// Direction B homepage (docs/DIRECTION-B.md): hero, point of view, four selected projects, the
+// Direction B homepage (docs/DIRECTION-B.md): hero, point of view, five selected projects (the first as a paper-cut cover), the
 // service index, one proof band, one testimonial, contact. The full project list lives on /projects.
-const selected = featured.slice(0, 4);
+// Star Wars Luzerne (homepage slide 5) leads as the cover, then the first four slides.
+const selected = [featured[4], ...featured.slice(0, 4)].filter(Boolean);
 const services = x.services.map((s: any) => {
   const hero = projects.get(s.project)?.hero;
   if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
@@ -42,12 +44,13 @@ const quote = x.testimonials[0];
   <HeroArc items={d.allProjects.items.slice(0, 10)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} cta={text('selected-cta')} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
+    <LogoSketch id="intro-sketch" class="h-sketch" />
     <Eyebrow><T s={text('intro-eyebrow')} /></Eyebrow>
     <h2 id="intro-title" class="display two-tone" data-split>{introBefore}{introKey && <span class="key">{introKey}</span>}{introAfter}</h2>
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
-  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} cut={d.slides[4]?.media} />
+  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
   <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} />
 
@@ -62,10 +65,12 @@ const quote = x.testimonials[0];
   <ContactForm md={d.contact.md} form={d.contact.form} heading={text('contact-heading')} />
 </Base>
 <style>
-  .h-intro { padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
+  .h-intro { position: relative; padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
   .h-intro :global(.eyebrow) { justify-content: center; }
   .two-tone { max-width: 30ch; margin-block: var(--s-3) var(--s-6); font-size: clamp(1.5rem, 1.25rem + 1.1vw, 2.25rem); line-height: 1.3; }
   .two-tone .key { color: var(--accent-deep); }
+  /* The hand-drawn logo motif, large and faint behind the statement. */
+  .h-intro > :global(.h-sketch) { position: absolute; z-index: -1; left: 50%; top: 50%; width: min(78vw, 560px); translate: -50% -46%; color: rgb(51 51 51 / .13); }
   .h-quote { padding-block: var(--section-y); }
   .h-quote figure { margin: 0 auto; max-width: 40ch; text-align: center; }
   .h-quote blockquote { margin: 0; }

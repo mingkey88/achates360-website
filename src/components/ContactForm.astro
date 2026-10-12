@@ -11,6 +11,7 @@
  */
 import { renderMd } from '../lib/markdown';
 import T from './ui/T.astro';
+import LogoSketch from './LogoSketch.astro';
 import type { UiString } from '../lib/strings';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }
 interface Group { name: string; label: string; required: boolean; options: string[] }
@@ -29,6 +30,7 @@ const autocomplete = (f: Field) => ({ name: 'name', company: 'organization', ema
 const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : 'field');
 ---
 <section id="contact" class="contact">
+  <LogoSketch id="contact-sketch" class="c-sketch" />
   <div class="inner">
     <div class="intro">
       {heading ? <h2><T s={heading} /></h2> : intro.map((m) => <div set:html={renderMd(m)} />)}
@@ -125,7 +127,8 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
 <style>
   /* Direction B (after Aesop): one centred column. Boxed fields with small labels above, the service
      choices as an even grid of square checkboxes, a proper message box and one solid button. */
-  .contact { background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
+  .contact { position: relative; isolation: isolate; overflow: hidden; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
+  .contact > :global(.c-sketch) { position: absolute; z-index: -1; left: -6vw; bottom: -4vw; width: clamp(220px, 30vw, 460px); color: rgb(51 51 51 / .12); }
   .inner { max-width: 760px; margin-inline: auto; display: grid; gap: var(--s-7); }
   .intro { text-align: center; }
   .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }

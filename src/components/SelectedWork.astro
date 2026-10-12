@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import MediaCard from './ui/MediaCard.astro';
-import PaperCut from './PaperCut.astro';
+import SelectedCover from './SelectedCover.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import { withBase } from '../lib/paths';
@@ -12,11 +12,11 @@ type Project = CollectionEntry<'projects'>['data'];
 // Direction B homepage (after Aesop): each selected project as a split composition, the image on one
 // half and a tinted panel with its name, client · discipline · year and a link on the other,
 // alternating sides. Videos play on hover (MediaCard).
-// cut: the media seen through the paper-cut heading (a slide not among the selected four).
-interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number; cut?: Slide['media'] }
-const { items, eyebrow, cta, total, cut } = Astro.props;
+// The first item is the cover (SelectedCover: paper-cut heading over its film); the rest follow as rows.
+interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number }
+const { items, eyebrow, cta, total } = Astro.props;
 const TINTS = ['var(--stone)', 'var(--blush)', 'var(--sage)', 'var(--stone)'];
-const rows = items.map(({ slide, project }, i) => ({
+const all = items.map(({ slide, project }, i) => ({
   image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
   alt: slide.media.type === 'image' ? slide.media.alt : '',
   video: slide.media.type === 'video' ? slide.media.src : undefined,
@@ -24,13 +24,13 @@ const rows = items.map(({ slide, project }, i) => ({
   label: slide.cta?.label,
   title: project?.title,
   meta: [project?.client, project?.categories[0], firstYear(project?.copyright)].filter(Boolean).join(' · '),
+  media: slide.media,
   tint: TINTS[i % TINTS.length],
 }));
+const [cover, ...rows] = all;
 ---
 <section class="sw" aria-labelledby="sw-title">
-  <div class="sw-head">
-    {cut ? <PaperCut id="sw-title" text={eyebrow} media={cut} /> : <h2 id="sw-title" class="wrap">{eyebrow.text}</h2>}
-  </div>
+  {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} />}
   <ol class="sw-list">
     {rows.map((r, i) => (
       <li class:list={['sw-row', { flip: i % 2 === 1 }]} style={`--tint: ${r.tint}`}>
@@ -48,9 +48,9 @@ const rows = items.map(({ slide, project }, i) => ({
   <div class="sw-foot"><Pill href="/projects" variant="fill"><T s={cta} /> <span class="sw-count">({total})</span></Pill></div>
 </section>
 <style>
-  .sw { padding-block: var(--section-y); overflow: hidden; }
-  .sw-head { margin-bottom: var(--s-6); }
-  .sw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-8); }
+  /* No overflow clipping here: it would stop the cover's sticky film. */
+  .sw { padding-bottom: var(--section-y); }
+  .sw-list { list-style: none; margin: var(--section-y) 0 0; padding: 0; display: grid; gap: var(--s-8); }
   .sw-row { position: relative; display: grid; }
   .sw :global(.mc-media) { border-radius: 0; }
   .sw-text { position: relative; z-index: 1; display: grid; align-content: center; justify-items: start; gap: var(--s-4); padding: var(--s-7) var(--gutter); background: var(--tint); }
