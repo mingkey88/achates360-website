@@ -47,7 +47,7 @@ const quote = x.testimonials[0];
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
-  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
+  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} cut={d.slides[4]?.media} />
   <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} />
 

@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BgVideo from './BgVideo.astro';
+import DraftTag from './ui/DraftTag.astro';
+import { loadExtras } from '../lib/extras';
+import type { UiString } from '../lib/strings';
+type Media = CollectionEntry<'home'>['data']['slides'][number]['media'];
+// A paper-cut heading (after nationalgallery.sg): a sheet of the page's cream paper lies over a playing
+// video, with the heading's letters cut out of it, so the footage shows through the letter-shaped holes.
+// The paper casts a soft shadow into the holes, which gives it thickness. The real heading is a visually
+// hidden h2; the SVG is decorative and the video keeps its pause button. One line on wide screens, two on phones.
+interface Props { text: UiString; media: Media; id: string }
+const { text, media, id } = Astro.props;
+const { text: t } = await loadExtras();
+const words = text.text.split(' ');
+const lines2 = words.length > 1 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [text.text];
+const poster = media.type === 'video' ? media.poster : media.src;
+const sheet = (k: string, vb: string, lines: string[], size: number, gap: number) => {
+  const [, , w, h] = vb.split(' ').map(Number);
+  const top = (h - (lines.length - 1) * gap) / 2;
+  return { k, vb, w, h, rows: lines.map((l, i) => ({ l, y: top + i * gap })), size };
+};
+const wide = sheet('w', '0 0 1600 300', [text.text], 250, 0);
+const narrow = sheet('n', '0 0 800 520', lines2, 205, 200);
+---
+<div class="pc" data-placeholder={text.placeholder ? '' : undefined}>
+  <h2 id={id} class="sr-only">{text.text}</h2>
+  <div class="pc-stage" data-bgvideo-viewport>
+    {media.type === 'video'
+      ? (<>
+          <Image class="pc-media" src={poster} alt="" widths={[640, 1280, 1920]} sizes="100vw" />
+          <BgVideo src={media.src} poster={media.poster} desktopOnly class="pc-media" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
+        </>)
+      : <Image class="pc-media" src={poster} alt="" widths={[640, 1280, 1920]} sizes="100vw" />}
+    {[wide, narrow].map((s) => (
+      <svg class={`pc-sheet pc-${s.k}`} viewBox={s.vb} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <defs>
+          <mask id={`${id}-${s.k}-m`} maskUnits="userSpaceOnUse" x={-100} y={-100} width={s.w + 200} height={s.h + 200}>
+            <rect x={-100} y={-100} width={s.w + 200} height={s.h + 200} fill="#fff" />
+            {s.rows.map((r) => <text x={s.w / 2} y={r.y} text-anchor="middle" dominant-baseline="central" font-size={s.size}>{r.l}</text>)}
+          </mask>
+          <filter id={`${id}-${s.k}-f`} filterUnits="userSpaceOnUse" x={-100} y={-100} width={s.w + 200} height={s.h + 200}>
+            <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity=".5" />
+          </filter>
+        </defs>
+        <rect class="pc-paper" x={-100} y={-100} width={s.w + 200} height={s.h + 200} mask={`url(#${id}-${s.k}-m)`} filter={`url(#${id}-${s.k}-f)`} />
+      </svg>
+    ))}
+    <span class="pc-grain" aria-hidden="true"></span>
+  </div>
+  <DraftTag when={text.placeholder} />
+</div>
+<style>
+  .pc { position: relative; margin: 0; }
+  .pc-stage { position: relative; overflow: hidden; aspect-ratio: 1600 / 300; background: var(--ink); }
+  .pc-stage :global(.pc-media) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .pc-stage :global(.bgvideo video) { width: 100%; height: 100%; object-fit: cover; }
+  .pc-sheet { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pc-sheet text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.04em; }
+  .pc-paper { fill: var(--paper); }
+  /* The page's paper fibre over the sheet, so it reads as the same paper, not a separate panel. */
+  .pc-grain { position: absolute; inset: 0; background: var(--paper-tex); pointer-events: none; }
+  .pc-n { display: none; }
+  .pc :global(.bv-toggle) { z-index: 2; }
+  .pc > :global(.draft-tag) { position: absolute; right: var(--gutter); top: var(--s-2); }
+  @media (max-width: 767px) {
+    .pc-stage { aspect-ratio: 800 / 520; }
+    .pc-w { display: none; }
+    .pc-n { display: block; }
+  }
+</style>
