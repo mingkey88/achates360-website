@@ -3,18 +3,32 @@ import { withBase, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import Logo from './ui/Logo.astro';
 interface Link { label: string; href: string }
-interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString }
-const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
+interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString; subLabel: UiString }
+const { menu, path, overHero, wordmark, menuLabel, navLabel, subLabel } = Astro.props;
 ---
 <header class="site-header" data-over-hero={overHero ? '' : undefined}>
   <div class="bar">
     <a class="wordmark" href={withBase('/')}><Logo label={wordmark.text} /></a>
     <nav class="primary" aria-label={navLabel.text}>
       <ul>
-        {menu.map((it) => {
+        {menu.map((it, i) => {
           const current = menuCurrent(it, path);
+          const sub = it.items && it.items.length > 0;
           return (
-            <li><a href={withBase(it.href)} aria-current={current === 'page' ? 'page' : undefined} data-current={current ?? undefined}>{it.label}</a></li>
+            <li class:list={{ 'has-sub': sub }}>
+              <a href={withBase(it.href)} aria-current={current === 'page' ? 'page' : undefined} data-current={current ?? undefined}>{it.label}</a>
+              {sub && (
+                <>
+                  {/* A disclosure, not an ARIA menu: the button opens a plain list of links. Hover opens it too. */}
+                  <button class="sub-toggle" type="button" aria-expanded="false" aria-controls={`nav-sub-${i}`} aria-label={`${subLabel.text}: ${it.label}`} data-placeholder={subLabel.placeholder ? '' : undefined}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+                  <ul class="sub" id={`nav-sub-${i}`}>
+                    {it.items!.map((s) => <li><a href={withBase(s.href)} aria-current={s.href === path ? 'page' : undefined}>{s.label}</a></li>)}
+                  </ul>
+                </>
+              )}
+            </li>
           );
         })}
       </ul>
@@ -40,6 +54,16 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
     window.addEventListener('scroll', update, { passive: true });
     header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
     update();
+  }
+
+  // Category dropdowns: the toggle opens/closes; Escape or a click elsewhere closes.
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.sub-toggle')) {
+    const li = btn.closest('li')!;
+    const set = (open: boolean) => { btn.setAttribute('aria-expanded', String(open)); li.classList.toggle('is-open', open); };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+    li.addEventListener('keydown', (e) => { if (e.key === 'Escape' && li.classList.contains('is-open')) { set(false); btn.focus(); } });
+    document.addEventListener('click', (e) => { if (!li.contains(e.target as Node)) set(false); });
+    li.addEventListener('focusout', (e) => { if (!li.contains(e.relatedTarget as Node)) set(false); });
   }
 </script>
 <style>
@@ -68,7 +92,21 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
     .wordmark { grid-column: 2; grid-row: 1; margin: 0; justify-self: center; }
     .menu-open { grid-column: 3; grid-row: 1; justify-self: end; }
     .primary { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
-    .primary ul { display: flex; gap: var(--s-6); }
+    .primary > ul { display: flex; gap: var(--s-6); }
+    .primary .sub { display: block; }
   }
-  @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
+  .has-sub { position: relative; display: flex; align-items: center; gap: 2px; }
+  .sub-toggle { display: grid; place-items: center; width: 28px; height: 32px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+  .sub-toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: rotate .3s var(--ease-out); }
+  .is-open .sub-toggle svg, .has-sub:hover .sub-toggle svg { rotate: 180deg; }
+  .sub {
+    position: absolute; left: 50%; top: 100%; z-index: 2; min-width: 260px; margin: 0; padding: var(--s-3) 0; list-style: none;
+    background: var(--paper); border: 1px solid var(--line); box-shadow: 0 18px 40px -18px rgb(0 0 0 / .25); color: var(--ink);
+    opacity: 0; visibility: hidden; translate: -50% 6px; transition: opacity .25s, translate .3s var(--ease-out), visibility 0s .25s;
+  }
+  .has-sub:hover .sub, .has-sub.is-open .sub { opacity: 1; visibility: visible; translate: -50% 0; transition-delay: 0s; }
+  .sub a { display: block; padding: 10px var(--s-5); font-size: var(--fs-small); text-decoration: none; text-transform: none; white-space: nowrap; }
+  .sub a::first-letter { text-transform: none; }
+  .sub a:is(:hover, [aria-current]) { background: var(--stone); text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) { .site-header, .sub, .sub-toggle svg { transition: none; } }
 </style>

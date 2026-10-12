@@ -12,6 +12,8 @@
 - { id: intro-cta, text: Learn more, placeholder: true }
 - { id: services-eyebrow, text: What we do, placeholder: true }
 - { id: contact-heading, text: Write to us., placeholder: true }
+- { id: nav-categories, text: Categories, placeholder: true }
+- { id: category-label, text: Category, placeholder: true }
 - { id: selected-cta, text: View all projects, placeholder: true }
 - { id: awards-line, text: "GDUSA American Graphic Design Award 2016 · A' Design Award 2017 Bronze · Singapore Book Awards 2017 · HOW International Design Awards · The Paperweight Awards 2014", placeholder: true }
 - { id: services-cta, text: All services, placeholder: true }

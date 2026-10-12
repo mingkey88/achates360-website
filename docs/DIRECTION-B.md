@@ -74,3 +74,5 @@ Contrast: ink `#333333` on cream 12.46 (sage 9.24); text-2 `#5f5f5a` 6.33 on cre
 accent-deep `#9c4f00` 5.86 on cream, 4.35 on sage (large/links only there); cream on charcoal 15.12;
 footer labels `#bdbcb2` on charcoal 8.03. Muted `#8a8a84` only on cream/stone at large sizes.
 
+Projects (B): /projects is an overview of the nine categories as image tiles with counts; each category has its own page at /projects/<slug> (slug from the supplied heading, src/lib/categories.ts). A "Category" dropdown on these pages and a dropdown under Projects in the header move between them; the phone menu lists them under Projects. Old /projects#<section> links forward to the category page.
+
