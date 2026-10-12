@@ -50,13 +50,15 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     background: var(--paper) var(--paper-tex); color: var(--ink);
   }
   /* The lens: a wide-angle camera standing on the axis of a cylinder, cards on its inside wall.
-     translateZ(P) moves the axis to the camera, rotateY(-a) translateZ(-R) puts a card at angle a
-     facing it. With R = P the centre card is drawn at its own size; cards toward the edges stretch
-     and their outer sides grow taller, which is the curved-lens look. --step is the angle that puts
+     translateZ(R) moves the axis forward, rotateY(-a) translateZ(-R) puts a card at angle a on the
+     wall facing it; the centre card stays at its own size. Cards toward the edges stretch and their
+     outer sides grow taller, which is the curved-lens look. --step is the angle that puts
      neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
-  /* Croma's lens (perspective 42.4% of the width, cards 14.1%, 20.2deg apart) scaled up 1.35x:
-     card and perspective grow together, so the angles and the shape of the curve stay the same. */
-  .ha { --card-w: 19vw; --card-ratio: 4 / 3; --P: 57.2vw; --step: 19.37; } /* gap ~0.25vw */
+  /* Croma's lens (perspective 42.4% of the width, cards 14.1%) scaled up 1.35x. The cylinder's radius
+     --R is smaller than the camera distance --P (0.68x), so the camera stands behind the axis: the
+     side cards come nearer than the centre one and grow taller, a deeper concave curve (12 Oct 2026).
+     --step = 2 asin((W + gap) / 2R) in degrees, so neighbours stay one card plus a gap apart. */
+  .ha { --card-w: 19vw; --card-ratio: 4 / 3; --P: 57.2vw; --R: 38.9vw; --step: 28.65; } /* gap ~0.25vw */
   .ha-arc {
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;
@@ -65,7 +67,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   .ha-card {
     position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
     translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; overflow: hidden; background: var(--panel);
-    transform: translateZ(var(--P)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--P) * -1));
+    transform: translateZ(var(--R)) rotateY(calc(var(--u) * var(--step) * -1deg)) translateZ(calc(var(--R) * -1));
     opacity: calc(var(--o, 1) * var(--in, 1));
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
     /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
@@ -105,7 +107,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
-    .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --step: 32.47; } /* gap ~0.8vw */
+    .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --R: 50.6vw; --step: 48.55; } /* gap ~0.8vw */
     .ha-lens::before, .ha-lens::after { width: 16%; }
   }
 </style>

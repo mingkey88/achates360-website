@@ -4,30 +4,41 @@ import type { CollectionEntry } from 'astro:content';
 import BgVideo from './BgVideo.astro';
 import Pill from './ui/Pill.astro';
 import DraftTag from './ui/DraftTag.astro';
-import LogoSketch from './LogoSketch.astro';
+import logo from '../assets/logo-stacked-parts.svg?raw';
 import { loadExtras } from '../lib/extras';
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 type Media = CollectionEntry<'home'>['data']['slides'][number]['media'];
-// The first selected project as a cover (after nationalgallery.sg). Its video fills the screen and stays
-// put (sticky) while a sheet of the page's own paper, with the heading's letters cut out of it, slides up
-// and away as you scroll, uncovering the whole film; the project's card overlaps its lower corner.
-// Pure CSS scrolling (no script), so it also works under reduced motion. The heading is a visually hidden
-// h2; the paper SVG is decorative; the video keeps its pause button.
+// The first selected project as a cover, after nationalgallery.sg's home ("EXPERIENCE ART YOUR WAY"):
+// the top of the screen is a sheet of the page's paper, its heading cut out in heavy capitals and the
+// logo's five figures cut out beside them like an alpha mask, so the project's film shows through the
+// letters; below the sheet's stepped edge the film runs plain. The film stays put (sticky) while the
+// sheet scrolls up and away, uncovering it whole; the project's card overlaps its lower corner.
+// Pure CSS scrolling (no script), so it also works under reduced motion. The heading is a visually
+// hidden h2 (the capitals are display only); the paper SVG is decorative; the video keeps its pause button.
 interface Props {
   id: string; heading: UiString; media: Media;
   project: { title?: string; meta?: string; href?: string; label?: string };
 }
 const { id, heading, media, project } = Astro.props;
 const { text: t } = await loadExtras();
-const words = heading.text.split(' ');
-const half = Math.ceil(words.length / 2);
+const words = heading.text.toUpperCase().split(' ');
 const poster = media.type === 'video' ? media.poster : media.src;
-// The paper is drawn far larger than the view ("meet" scales the letters to fit; the extra paper covers
-// any letterbox), so only the letter holes ever show the film.
-const sheet = (k: string, w: number, h: number, lines: string[], size: number, gap: number) =>
-  ({ k, w, h, size, rows: lines.map((l, i) => ({ l, y: h / 2 + (i - (lines.length - 1) / 2) * gap })) });
-const sheets = [sheet('w', 1600, 900, [heading.text], 235, 0), sheet('n', 800, 1300, words.length > 1 ? [words.slice(0, half).join(' '), words.slice(half).join(' ')] : [heading.text], 210, 200)];
+// The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), cut out of the sheet.
+const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
+const FIG = { x: 50, y: -3, w: 94, h: 103 };
+// Two compositions, drawn far larger than the view ("meet" fits them; the extra paper covers any
+// letterbox): wide screens set the words on two lines, the second right-aligned with the figures
+// before it; phones stack them. Coordinates are the sheet's own units.
+interface Sheet { k: string; w: number; h: number; size: number; lines: { t: string; x: number; y: number; anchor: 'start' | 'end' }[]; fig: { x: number; y: number; h: number } }
+const first = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+const second = words.slice(Math.ceil(words.length / 2)).join(' ');
+// Both lines are set tight and right-aligned on one edge (as the gallery sets its three), the figures
+// in the space before the shorter second line.
+const sheets: Sheet[] = [
+  { k: 'w', w: 1600, h: 600, size: 300, lines: [{ t: first, x: 1540, y: 262, anchor: 'end' }, { t: second, x: 1540, y: 556, anchor: 'end' }], fig: { x: 250, y: 318, h: 250 } },
+  { k: 'n', w: 800, h: 330, size: 158, lines: [{ t: first, x: 770, y: 140, anchor: 'end' }, { t: second, x: 770, y: 305, anchor: 'end' }], fig: { x: 60, y: 180, h: 130 } },
+];
 const B = 4000;
 ---
 <div class="cover" data-placeholder={heading.placeholder ? '' : undefined}>
@@ -42,43 +53,54 @@ const B = 4000;
     </div>
   </div>
   <div class="cover-paper">
-    {sheets.map((s) => (
-      <svg class={`paper paper-${s.k}`} viewBox={`0 0 ${s.w} ${s.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-        <defs>
-          <mask id={`${id}-${s.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
-            <rect x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} fill="#fff" />
-            {s.rows.map((r) => <text x={s.w / 2} y={r.y} text-anchor="middle" dominant-baseline="central" font-size={s.size}>{r.l}</text>)}
-          </mask>
-          <filter id={`${id}-${s.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
-            <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".5" />
-          </filter>
-        </defs>
-        <rect class="paper-sheet" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} mask={`url(#${id}-${s.k}-m)`} filter={`url(#${id}-${s.k}-f)`} />
-      </svg>
-    ))}
-    <span class="paper-grain" aria-hidden="true"></span>
-    <LogoSketch id={`${id}-sketch`} class="paper-sketch" />
+    <div class="paper-cut">
+      {sheets.map((s) => (
+        <svg class={`paper paper-${s.k}`} viewBox={`0 0 ${s.w} ${s.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+          <defs>
+            <mask id={`${id}-${s.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
+              <rect x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} fill="#fff" />
+              {s.lines.map((l) => <text x={l.x} y={l.y} text-anchor={l.anchor} font-size={s.size}>{l.t}</text>)}
+              <g transform={`translate(${s.fig.x} ${s.fig.y}) scale(${s.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
+            </mask>
+            <filter id={`${id}-${s.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
+              <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".5" />
+            </filter>
+          </defs>
+          <rect class="paper-sheet" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} mask={`url(#${id}-${s.k}-m)`} filter={`url(#${id}-${s.k}-f)`} />
+        </svg>
+      ))}
+      <span class="paper-grain" aria-hidden="true"></span>
+    </div>
     <DraftTag when={heading.placeholder} />
   </div>
   <div class="cover-run" aria-hidden="true"></div>
 </div>
 <style>
-  /* Flow: film (100svh, sticky) → paper (100svh, pulled up over the film) → run-out (130svh). The film
-     stays stuck for the whole run-out: the paper takes 100svh to scroll off it, then the uncovered
-     film lingers for another 30svh before moving on. */
-  .cover { --v: 100svh; position: relative; }
+  /* Flow: film (100svh, sticky) → paper (--ph tall, pulled up over the film's top) → run-out. The film
+     stays stuck while the paper scrolls off it, then lingers 30svh uncovered before moving on. */
+  .cover { --v: 100svh; --ph: 64svh; --step-h: 7svh; --step-w: 40%; position: relative; }
   .cover-film { position: sticky; top: 0; height: var(--v); overflow: hidden; background: var(--ink); }
   .cover-film :global(.cover-media) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cover-film :global(.bgvideo video) { width: 100%; height: 100%; object-fit: cover; }
-  .cover-paper { position: relative; z-index: 1; height: var(--v); margin-top: calc(var(--v) * -1); pointer-events: none; }
+  /* The sheet's lower edge steps up on the left (as nationalgallery.sg's white page does over its
+     film); the drop shadow follows the stepped edge because it is drawn after the clip. */
+  .cover-paper { position: relative; z-index: 1; height: var(--ph); margin-bottom: calc(var(--v) - var(--ph)); margin-top: calc(var(--v) * -1); pointer-events: none; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .28)); }
+  .paper-cut {
+    position: absolute; inset: 0; overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, var(--step-w) 100%, var(--step-w) calc(100% - var(--step-h)), 0 calc(100% - var(--step-h)));
+  }
   .cover-paper :global(.draft-tag) { position: absolute; right: var(--gutter); top: calc(var(--header-h) + var(--s-4)); }
-  .cover-run { height: calc(var(--v) * 1.3); }
-  .paper { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .paper text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.045em; }
+  .cover-run { height: calc(var(--ph) + var(--v) * .3); }
+  /* The letters sit clear of the stepped edge. (The header hides while scrolling down, so the sheet
+     needs only a margin at the top, not the header's height.) */
+  .paper { position: absolute; left: var(--gutter); right: var(--gutter); top: var(--s-7); height: calc(100% - var(--s-7) - var(--step-h) - var(--s-5)); width: calc(100% - 2 * var(--gutter)); }
+  .paper text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
   .paper-sheet { fill: var(--paper); }
+  /* The sheet beyond the lettering's box: plain paper above (under the header) and below. */
+  /* The paper rect is far larger than the lettering's box; the sheet's clip-path trims it. */
+  .paper { overflow: visible; }
   .paper-n { display: none; }
   .paper-grain { position: absolute; inset: 0; background: var(--paper-tex); }
-  .cover-paper :global(.paper-sketch) { position: absolute; right: 6vw; bottom: 8svh; width: clamp(120px, 14vw, 220px); color: rgb(51 51 51 / .45); }
   /* The project's card overlaps the film's lower-left corner, as nationalgallery.sg's visit bar does. */
   .cover-card {
     position: absolute; left: 0; bottom: 0; z-index: 1; display: grid; justify-items: start; gap: var(--s-3);
@@ -89,10 +111,11 @@ const B = 4000;
   .cc-title a { color: inherit; text-decoration: none; }
   .cc-title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
   .cover-card :global(.pill) { margin-top: var(--s-2); }
-  .cover :global(.bv-toggle) { z-index: 2; top: calc(var(--header-h) + var(--s-4)); bottom: auto; }
+  .cover :global(.bv-toggle) { z-index: 2; top: auto; bottom: var(--s-5); right: var(--gutter); }
   @media (max-width: 767px) {
+    .cover { --ph: 38svh; --step-h: 4svh; --step-w: 46%; }
+    .cover-paper :global(.draft-tag) { top: var(--s-4); }
     .paper-w { display: none; }
     .paper-n { display: block; }
-    .cover-paper :global(.paper-sketch) { right: 50%; translate: 50% 0; bottom: 6svh; width: 110px; }
   }
 </style>
