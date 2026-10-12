@@ -79,8 +79,12 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel, subLabel } = Astro.
   .site-header.is-hidden { transform: translateY(-100%); }
   .bar { display: flex; align-items: center; gap: var(--s-5); height: var(--header-h); padding-inline: var(--gutter); }
   .wordmark { flex: none; margin-right: auto; display: flex; padding-block: 4px; }
-  .wordmark :global(.logo) { display: block; height: 40px; width: auto; }
-  @media (min-width: 768px) { .wordmark :global(.logo) { height: 46px; } }
+  /* The wordmark's letters are fine strokes: at 46px they were ~9px tall and anti-aliased soft on
+     standard screens. Larger, in the deeper ink, they stay crisp. */
+  .wordmark :global(.logo) { display: block; height: 44px; width: auto; shape-rendering: geometricPrecision; }
+  .site-header:is(:not([data-over-hero]), .is-solid) .wordmark { color: var(--teal-ink); }
+  @media (min-width: 768px) { .wordmark :global(.logo) { height: 48px; } }
+  @media (min-width: 1024px) { .wordmark :global(.logo) { height: 56px; } }
   .primary ul { display: none; list-style: none; margin: 0; padding: 0; gap: var(--s-5); }
   /* site.md's labels are capitals (verbatim); Aesop sets navigation in sentence case, so they display as such. */
   .primary a { display: inline-block; padding-block: 6px; font-size: .9375rem; font-weight: 400; text-decoration: none; text-transform: lowercase; }

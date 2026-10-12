@@ -2,17 +2,15 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
 import Block from '../components/Block.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
-import Marquee from '../components/ui/Marquee.astro';
-import StatCounter from '../components/ui/StatCounter.astro';
-import T from '../components/ui/T.astro';
-import DraftTag from '../components/ui/DraftTag.astro';
 import Timeline from '../components/Timeline.astro';
-import Testimonials from '../components/Testimonials.astro';
-import LetsConnect from '../components/LetsConnect.astro';
+import Credentials from '../components/Credentials.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
-import { firstYear, statValue } from '../lib/meta';
-// /about (spec §4.5): the existing About blocks verbatim on deep teal, then the new sections.
+import { firstYear } from '../lib/meta';
+// /about in direction B: the existing About blocks verbatim in an editorial column on the paper, then
+// the homepage's own pieces: the numbers, clients and awards band, the story, one quotation, and the
+// quiet close to the contact page.
 interface Props { entry: CollectionEntry<'basic'> }
 const d = Astro.props.entry.data;
 const x = await loadExtras();
@@ -31,40 +29,36 @@ const timeline = x.timeline.map((t: any) => {
   const alt = p.hero.type === 'image' ? p.hero.alt : '';
   return { id: t.id, year, label: p.title, body: t.body, image, alt, placeholder: t.placeholder };
 });
-const anyClientDraft = x.clients.some((c: any) => c.placeholder);
+// The Wix About page carried a "Back to projects" link (a leftover of its page template); it leads
+// nowhere useful from About, so it is not shown here (the record keeps it).
+const blocks = d.blocks.filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
+// A different quotation from the homepage's, where there is one.
+const quote = x.testimonials[1] ?? x.testimonials[0];
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="about">
-  <section class="ab-intro on-dark">
-    <div class="wrap ab-grid">
-      <h1 class="display h1 sc" data-split>{heading}</h1>
-      <div class="ab-blocks">{d.blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>
-    </div>
+  <section class="wrap ab-intro">
+    <h1 class="display h1 sc" data-split>{heading}</h1>
+    <div class="ab-blocks">{blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>
   </section>
-  <section class="wrap section ab-stats" aria-labelledby="ab-stats-t">
-    <Eyebrow as="h2" id="ab-stats-t"><T s={text('about-stats-eyebrow')} /></Eyebrow>
-    <div class="ab-stat-grid">{x.stats.map((s: any) => <StatCounter value={statValue(s, listedCount)} suffix={s.suffix} label={s.label} placeholder={s.placeholder} />)}</div>
-  </section>
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} />
   <Timeline items={timeline} heading={text('timeline-heading')} />
-  <section class="ab-clients section" aria-labelledby="ab-clients-t" data-placeholder={anyClientDraft ? '' : undefined}>
-    <div class="wrap"><Eyebrow as="h2" id="ab-clients-t"><T s={text('clients-eyebrow')} /><DraftTag when={anyClientDraft} /></Eyebrow></div>
-    <Marquee speed={55}>{x.clients.map((c: any) => <span class="client">{c.name}</span>)}</Marquee>
-  </section>
-  <Testimonials items={x.testimonials} eyebrow={text('testimonials-eyebrow')} />
-  <LetsConnect line={text('connect-line')} cta={text('connect-cta')} href="/contact" />
+  {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
+  <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  .ab-intro { padding-block: var(--s-8) var(--section-y); }
-  .ab-grid { display: grid; gap: var(--s-7); }
-  .ab-blocks { display: grid; gap: var(--s-6); max-width: 62ch; }
-  .ab-blocks :global(.block-text) { font-size: var(--fs-lead); line-height: 1.4; font-weight: 300; }
-  .ab-blocks :global(.block-image) { border-radius: var(--r-card); overflow: hidden; }
+  /* Editorial: the page title in the left columns, the studio's own words in a reading column. */
+  .ab-intro { display: grid; gap: var(--s-7); padding-block: var(--s-8) var(--section-y); border-bottom: 1px solid var(--line); }
+  .ab-intro h1 { margin: 0; }
+  .ab-blocks { display: grid; gap: var(--s-6); max-width: 60ch; }
+  .ab-blocks :global(.block-text) { font-size: var(--fs-lead); line-height: 1.55; }
+  .ab-blocks :global(.block-text p:first-child) { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem); line-height: 1.35; }
+  .ab-blocks :global(.block-image) { overflow: hidden; }
   .ab-blocks :global(.block-img) { width: 100%; height: auto; }
-  .ab-blocks :global(.pill) { color: var(--on-dark); }
-  .ab-stats { --stat-color: var(--accent-deep); }
-  .ab-stat-grid { display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
-  .ab-clients { background: var(--panel); --mq-gap: 3.5rem; }
-  .client { font: 300 clamp(1.25rem, 1rem + 1vw, 2rem)/1 var(--font-display); letter-spacing: .04em; white-space: nowrap; }
-  @media (min-width: 1024px) { .ab-grid { grid-template-columns: 1fr 1.4fr; align-items: start; } }
+  @media (min-width: 1024px) {
+    .ab-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: start; }
+    .ab-intro h1 { grid-column: 1 / 5; position: sticky; top: calc(var(--header-h) + var(--s-6)); }
+    .ab-blocks { grid-column: 6 / 12; }
+  }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

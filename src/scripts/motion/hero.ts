@@ -1,4 +1,5 @@
 import { gsap, isLate } from './index';
+import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../../lib/lens';
 
 // Each figure arrives in a corporate colour, then all settle to ink as they join hands.
 const ARRIVAL = ['#ff9015', '#99d9d9', '#cbe880', '#99d9d9', '#ff9015'];
@@ -19,11 +20,9 @@ export function hero(): void {
   const figs = q('.lg-fig');
   const n = cards.length;
   const mid = Math.floor(n / 2);
-  const HIDE = 78; // degrees: past this a card is off screen; hide it long before it wraps behind the camera
-  let stepDeg = 20;
-  const readStep = () => { stepDeg = parseFloat(getComputedStyle(arc).getPropertyValue('--step')) || 20; };
-  readStep();
-  window.addEventListener('resize', readStep);
+  // The lens curve for the current breakpoint (the same as HeroArc.astro's media query).
+  const phone = window.matchMedia('(max-width: 767px)');
+  const lens = () => (phone.matches ? LENS_PHONE : LENS_DESKTOP);
 
   // Cards rise in from the centre outward. Only CSS variables are tweened: a GSAP transform would
   // overwrite the lens transform, and fading the arc itself would flatten its 3D.
@@ -42,8 +41,8 @@ export function hero(): void {
   // (from() states apply at once, so it must not sit at its start) and keep only the drift.
   if (isLate()) tl.progress(1);
 
-  // Drift: every card moves round the cylinder on a track that wraps after n cards. Cards past HIDE
-  // are off screen, so they are hidden well before they wrap round behind the camera.
+  // Drift: every card moves along the curve on a track that wraps after n cards. Cards fade out as
+  // they turn edge-on at the sides, long before they wrap round to the other end.
   const state = { offset: 0, boost: 0 };
   // Last value written per card and property: a style write (and the blur re-raster it causes) only
   // happens when the value actually changes.
@@ -55,15 +54,19 @@ export function hero(): void {
   };
   const place = () => cards.forEach((_c, i) => {
     const u = ((((i - mid + state.offset + n / 2) % n) + n) % n) - n / 2;
-    const o = gsap.utils.clamp(0, 1, (HIDE - Math.abs(u * stepDeg)) / 10);
-    set(i, '--u', u.toFixed(4));
-    set(i, '--o', o.toFixed(3));
+    const L = lens();
+    const p = lensPose(u, L);
+    const o = lensOpacity(p, L);
+    set(i, '--cx', p.x.toFixed(3));
+    set(i, '--cz', p.z.toFixed(3));
+    set(i, '--cry', p.ry.toFixed(3));
+    set(i, '--co', o.toFixed(3));
     set(i, 'visibility', o > 0 ? '' : 'hidden');
     // Depth of field (same curve as the server render in HeroArc.astro), quantised so the blur is
     // only re-rasterised when it visibly changes.
     const d = Math.max(0, Math.abs(u) - .55);
-    set(i, '--blur', `${Math.round(Math.min(d * 3.2, 9) * 4) / 4}px`);
-    set(i, '--sat', (1 - Math.min(d * .22, .4)).toFixed(2));
+    set(i, '--blur', `${Math.round(Math.min(d * 1.6, 5) * 4) / 4}px`);
+    set(i, '--sat', (1 - Math.min(d * .18, .35)).toFixed(2));
   });
   // The drift runs only while the hero is on screen (also right after a reload that restores the
   // scroll position further down, where no scroll event would have switched it on or off).

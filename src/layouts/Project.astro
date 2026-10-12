@@ -40,18 +40,32 @@ const jsonLd = [
     </div>
   </section>
   {d.heroCaption && <p class="sr-only">{d.heroCaption}</p>}
-  <MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} />
-  <article class="wrap p-body"><MediaRows blocks={d.blocks} pageTitle={d.title} /></article>
+  {/* Editorial layout (after Aesop and nationalgallery.sg articles): on wide screens the project's
+      facts sit in a narrow column that stays in view, the story and pictures fill the rest. */}
+  <div class="wrap p-layout">
+    <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} /></aside>
+    <article class="p-body"><MediaRows blocks={d.blocks} pageTitle={d.title} /></article>
+  </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} />
 </Base>
 <style>
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
-  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .35), rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6)); pointer-events: none; }
+  /* A darker shade at the top keeps the white header legible over light photographs. */
+  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .55), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / .6)); pointer-events: none; }
   .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
   .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--on-dark); }
   .p-hero-plain::after { display: none; }
-  .p-body { padding-block: var(--s-7) var(--s-8); }
+  .p-layout { display: grid; gap: 0; }
+  /* The strip is its own .wrap elsewhere; inside the layout's wrap it must not add the margins again. */
+  .p-meta :global(.meta.wrap) { width: 100%; }
+  .p-body { padding-block: var(--s-7) var(--s-8); min-width: 0; }
+  @media (min-width: 1024px) {
+    .p-layout { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); column-gap: var(--s-8); align-items: start; }
+    .p-meta { position: sticky; top: calc(var(--header-h) + var(--s-6)); padding-block: var(--s-7); }
+    .p-meta :global(.meta) { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); padding-block: 0; border-bottom: 0; }
+    .p-meta :global(.meta-col) { padding-top: var(--s-4); border-top: 1px solid var(--line); }
+  }
   .p-back { margin-block: 0; padding-bottom: var(--s-8); }
   @media (min-width: 768px) { .p-hero { min-height: 85svh; } }
   /* The supplied label is capitals (verbatim); shown in sentence case, after Aesop. */

@@ -1,0 +1,23 @@
+---
+import T from './ui/T.astro';
+import DraftTag from './ui/DraftTag.astro';
+import type { UiString } from '../lib/strings';
+// One client quotation set alone in the serif (direction B, after Aesop), between hairlines of space.
+// Used on the homepage and About; the eyebrow names it for screen readers only.
+interface Props { id: string; eyebrow: UiString; quote: { quote: string; name: string; role: string; placeholder: boolean } }
+const { id, eyebrow, quote } = Astro.props;
+---
+<section class="qb wrap section" aria-labelledby={id}>
+  <h2 id={id} class="sr-only"><T s={eyebrow} /></h2>
+  <figure data-placeholder={quote.placeholder ? '' : undefined}>
+    <blockquote><p>‘{quote.quote}’</p></blockquote>
+    <figcaption>{quote.name} · {quote.role}<DraftTag when={quote.placeholder} /></figcaption>
+  </figure>
+</section>
+<style>
+  .qb { padding-block: var(--section-y); }
+  .qb figure { margin: 0 auto; max-width: 40ch; text-align: center; }
+  .qb blockquote { margin: 0; }
+  .qb blockquote p { margin: 0; font: 400 clamp(1.5rem, 1.2rem + 1.3vw, 2.375rem)/1.3 var(--font-quote); font-variant-numeric: lining-nums; text-wrap: balance; }
+  .qb figcaption { margin-top: var(--s-5); font-size: var(--fs-small); color: var(--text-2); }
+</style>

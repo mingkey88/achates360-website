@@ -3,8 +3,10 @@ import { renderMd } from '../lib/markdown';
 import { withBase, linkAttrs } from '../lib/paths';
 import Logo from './ui/Logo.astro';
 import SocialIcon from './ui/SocialIcon.astro';
-interface Props { blocks: any[]; hideIntro?: boolean }
-const { blocks, hideIntro = false } = Astro.props;
+// signoff: shown in the intro's place where the page has already said the intro line (the homepage
+// closes with it): the studio's tagline, large, and the main pages as a row of links (menu labels).
+interface Props { blocks: any[]; hideIntro?: boolean; signoff?: { line: string; links: { label: string; href: string }[] } }
+const { blocks, hideIntro = false, signoff } = Astro.props;
 // site.md footer blocks, verbatim: the intro line, then the legal lines; each "###### Label" text
 // block (Contact, Social) opens a column. Social icons become text links named by their alt text.
 const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
@@ -21,7 +23,15 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
 <footer class="site-footer">
   <div class="wrap grid">
     {/* Hidden intro keeps its (empty) grid cell so the columns stay where they are. */}
-    {intro && <div class="intro" set:html={hideIntro ? '' : md(intro.md)} />}
+    {intro && !hideIntro && <div class="intro" set:html={md(intro.md)} />}
+    {intro && hideIntro && (
+      <div class="intro signoff">
+        {signoff && <p class="so-line">{signoff.line}</p>}
+        {signoff && signoff.links.length > 0 && (
+          <ul class="so-links">{signoff.links.map((l) => <li><a href={withBase(l.href)}><span class="sc">{l.label}</span></a></li>)}</ul>
+        )}
+      </div>
+    )}
     {rest.map((col) => (
       <div class="col">
         {col.filter((b) => b.type === 'text').map((b) => <div class="md" set:html={md(b.md)} />)}
@@ -43,6 +53,11 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .site-footer :focus-visible { outline-color: var(--turquoise); }
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
   .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 400 var(--fs-lead)/1.5 var(--font-display); max-width: 30ch; }
+  .signoff { display: grid; align-content: start; gap: var(--s-6); }
+  .so-line { margin: 0; max-width: 16ch; font: 400 clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem)/1.1 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
+  .so-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-5); font-size: var(--fs-small); }
+  .so-links a { display: inline-block; padding-block: 10px; color: var(--on-dark); text-decoration: none; }
+  .so-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
   .md :global(.fh6) { margin: 0 0 var(--s-3); padding-bottom: var(--s-3); border-bottom: 1px solid rgb(255 254 242 / .35); font: 400 var(--fs-small)/1 var(--font-text); color: var(--on-dark); }
   .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }

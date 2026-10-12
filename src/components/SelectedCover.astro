@@ -24,6 +24,10 @@ const { id, heading, media, project } = Astro.props;
 const { text: t } = await loadExtras();
 const words = heading.text.toUpperCase().split(' ');
 const poster = media.type === 'video' ? media.poster : media.src;
+// Phones get a portrait cut of the cover film when one has been made next to it ("<name>-phone.mp4",
+// 540x960, no sound): about a third of the desktop file, so the film plays on phones as well.
+const PHONE_CUTS = new Set(['media/video/9766c0_dc0766bd21f24857af77b62c8b872cab.mp4']);
+const phoneVideo = (src: string) => (PHONE_CUTS.has(src) ? src.replace(/\.mp4$/, '-phone.mp4') : undefined);
 // The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), cut out of the sheet.
 const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
 const FIG = { x: 50, y: -3, w: 94, h: 103 };
@@ -45,7 +49,7 @@ const B = 4000;
   <h2 id={id} class="sr-only">{heading.text}</h2>
   <div class="cover-film" data-bgvideo-viewport>
     <Pic class="cover-media" src={poster} alt="" widths={[640, 1280, 1920, 2560]} sizes="100vw" mobileCrop={9 / 16} mobileWidths={[360, 480, 640, 768]} mobileSizes="100vw" />
-    {media.type === 'video' && <BgVideo src={media.src} poster={media.poster} desktopOnly class="cover-media" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />}
+    {media.type === 'video' && <BgVideo src={media.src} poster={media.poster} desktopOnly phoneSrc={phoneVideo(media.src)} class="cover-media" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />}
     <div class="cover-card">
       {project.meta && <p class="cc-meta">{project.meta}</p>}
       {project.title && <h3 class="cc-title">{project.href ? <a href={withBase(project.href)}>{project.title}</a> : project.title}</h3>}

@@ -1,18 +1,14 @@
 ---
 import Player from './Player.astro';
-import T from './ui/T.astro';
-import type { UiString } from '../lib/strings';
-interface Props { src: string; poster: ImageMetadata; left: UiString; right: UiString; label: string }
-const { src, poster, left, right, label } = Astro.props;
+// The showreel (direction B): full width like the homepage's cover film, no words beside it. It keeps
+// its player controls (a reel with sound, started by the visitor).
+interface Props { src: string; poster: ImageMetadata; label: string }
+const { src, poster, label } = Astro.props;
 ---
-<section class="reel section" aria-label={label}>
-  <span class="side display" aria-hidden="true"><T s={left} /></span>
+<section class="reel" aria-label={label}>
   <div class="reel-video" data-reveal><Player src={src} poster={poster} label={label} /></div>
-  <span class="side display" aria-hidden="true"><T s={right} /></span>
 </section>
 <style>
-  .reel { display: grid; grid-template-columns: 1fr; justify-items: center; gap: var(--s-4); padding-inline: var(--gutter); }
-  .side { font-size: var(--fs-h2); color: var(--muted); } /* 3.4:1 on paper: passes for large text (was 1.78:1) */
-  .reel-video { width: min(100%, 860px); }
-  @media (min-width: 1024px) { .reel { grid-template-columns: 1fr minmax(0, 860px) 1fr; align-items: center; } .side:last-child { justify-self: end; } }
+  .reel { padding-block: var(--section-y); }
+  .reel-video :global(:is(video, img)) { display: block; width: 100%; height: auto; border-radius: 0; }
 </style>
