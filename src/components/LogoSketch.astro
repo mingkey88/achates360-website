@@ -1,22 +1,16 @@
 ---
 import logo from '../assets/logo-stacked-parts.svg?raw';
-// A thin, hand-drawn version of the logo's five figures, used as a quiet background motif (after the
-// line drawings on nationalgallery.sg). The outlines are the real logo shapes; a turbulence displacement
-// gives the line a slight wobble, as if traced by hand. Always decorative.
-interface Props { class?: string; id: string }
-const { class: cls, id } = Astro.props;
+// A thin line drawing of the logo's five figures, used as a quiet background motif (after the line
+// drawings on nationalgallery.sg). The outlines are the real logo shapes, drawn as one clean, even inked
+// line with round joins. Always decorative.
+interface Props { class?: string; id?: string }
+const { class: cls } = Astro.props;
 const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
 ---
 <svg class:list={['sketch', cls]} viewBox="50 -3 94 103" aria-hidden="true" focusable="false">
-  <defs>
-    <filter id={`${id}-f`} x="-10%" y="-10%" width="120%" height="120%">
-      <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="7" />
-      <feDisplacementMap in="SourceGraphic" scale="1.6" />
-    </filter>
-  </defs>
-  <g filter={`url(#${id}-f)`} set:html={figures} />
+  <g set:html={figures} />
 </svg>
 <style>
   .sketch { display: block; overflow: visible; pointer-events: none; }
-  .sketch :global(path) { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .sketch :global(path) { fill: none; stroke: currentColor; vector-effect: non-scaling-stroke; stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; shape-rendering: geometricPrecision; }
 </style>
