@@ -60,8 +60,10 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
   .big::first-letter { text-transform: uppercase; }
   .big:hover, .big[aria-current] { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 8px; }
   .sub { columns: 2 220px; column-gap: var(--s-6); margin: var(--s-4) 0 var(--s-5); font-size: var(--fs-small); }
-  .sub li { break-inside: avoid; padding-block: 3px; }
-  .sub a { text-decoration: none; opacity: .85; }
+  .sub li { break-inside: avoid; }
+  /* 44px touch targets (the links were 18px tall). */
+  .sub a { display: block; padding-block: 12px; text-decoration: none; opacity: .85; }
   .sub a:hover, .sub a[aria-current] { opacity: 1; text-decoration: underline; }
-  .social { display: flex; flex-wrap: wrap; gap: var(--s-5); font-size: var(--fs-small); letter-spacing: 0; }
+  .social { display: flex; flex-wrap: wrap; column-gap: var(--s-5); font-size: var(--fs-small); letter-spacing: 0; }
+  .social a { display: inline-block; padding-block: 12px; }
 </style>
