@@ -40,3 +40,5 @@
 - { id: marquee-pause, text: Pause animation, placeholder: true }
 - { id: marquee-play, text: Play animation, placeholder: true }
 - { id: skip-link, text: Skip to content, placeholder: true }
+- { id: notfound-title, text: Page not found, placeholder: true }
+- { id: notfound-body, text: "The page you were looking for has moved or no longer exists. These may help:", placeholder: true }

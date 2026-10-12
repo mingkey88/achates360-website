@@ -14,6 +14,9 @@ import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
 import { withBase } from '../lib/paths';
+import { getImage } from 'astro:assets';
+import { organizationLd } from '../lib/seo';
+import ogDefault from '../assets/og-default.jpg';
 
 const d = (await getEntry('home', 'home'))!.data;
 const about = (await getEntry('basic', 'about'))!.data;
@@ -42,8 +45,15 @@ const quote = x.testimonials[0];
 // The closing call to action's line is the footer's own intro sentence (site.md), verbatim.
 const site = (await getEntry('site', 'site'))!.data;
 const footerIntro = String((site.footer as any[]).find((b) => b.type === 'text')?.md ?? '').replace(/^#+\s*/, '');
+// Structured data: the studio, from the footer's own links (email, social profiles).
+const footerMd = site.footer.filter((b: any) => b.type === 'text').map((b: any) => b.md).join('\n');
+const email = footerMd.match(/mailto:([^)\s]+)/)?.[1];
+const sameAs = site.footer.filter((b: any) => b.type === 'image' && /^https?:/.test(b.href ?? '')).map((b: any) => b.href);
+const homeUrl = new URL(import.meta.env.BASE_URL.replace(/\/?$/, '/'), Astro.site).href;
+const logoUrl = new URL((await getImage({ src: ogDefault, width: 1200, format: 'jpg' })).src, Astro.site).href;
+const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs })];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="home">
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home">
   <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);

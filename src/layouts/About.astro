@@ -50,7 +50,7 @@ const anyClientDraft = x.clients.some((c: any) => c.placeholder);
     <Marquee speed={55}>{x.clients.map((c: any) => <span class="client">{c.name}</span>)}</Marquee>
   </section>
   <Testimonials items={x.testimonials} eyebrow={text('testimonials-eyebrow')} />
-  <LetsConnect line={text('connect-line')} cta={text('connect-cta')} href="/#contact" />
+  <LetsConnect line={text('connect-line')} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
   .ab-intro { padding-block: var(--s-8) var(--section-y); }

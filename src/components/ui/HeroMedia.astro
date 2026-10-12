@@ -3,12 +3,14 @@ import { Image, getImage } from 'astro:assets';
 import BgVideo from '../BgVideo.astro';
 import { BLANK_IMAGE } from '../../lib/paths';
 import { loadExtras } from '../../lib/extras';
+import { altOr } from '../../lib/seo';
 // A full-bleed hero (spec §4.1/§4.2). Video loads at >=768px; phones get its poster still, as in
 // the clone. The <picture> hands desktop a blank source so the still is never fetched there.
 // Images load eagerly as the LCP candidate.
 type Media = { type: 'image'; src: ImageMetadata; alt: string } | { type: 'video'; src: string; poster: ImageMetadata };
-interface Props { media: Media; class?: string; eager?: boolean }
-const { media, class: cls, eager = true } = Astro.props;
+// fallbackAlt: used when the export's description is empty or just the upload's file name.
+interface Props { media: Media; class?: string; eager?: boolean; fallbackAlt?: string }
+const { media, class: cls, eager = true, fallbackAlt = '' } = Astro.props;
 const { text } = await loadExtras();
 const stillUrl = media.type === 'video' ? (await getImage({ src: media.poster, width: 1440, format: 'webp' })).src : undefined;
 const load = eager ? 'eager' : 'lazy';
@@ -24,7 +26,7 @@ const load = eager ? 'eager' : 'lazy';
       <noscript><img class="hm-still" src={stillUrl} alt="" /></noscript>
     </>
   ) : (
-    <Image class="hm-image" src={media.src} alt={media.alt} widths={[480, 960, 1440, 1920, 2560]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
+    <Image class="hm-image" src={media.src} alt={altOr(media.alt, fallbackAlt)} widths={[480, 960, 1440, 1920, 2560]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
   )}
 </div>
 <style>
