@@ -279,3 +279,93 @@ replaced. Existing copy from the Wix site is unchanged.
     - (d) The pictures' descriptions are file names (for example "SMRT_290926_ED-169.jpg", "1.jpeg"). See item 13.
     - (e) The same import dropped three menu links to pages that are still password-protected on Wix and are not on the new site (DBS Private Bank Video Wall, Corporate Powerpoint Presentations, Affluent Segment AI Assets). They would have led nowhere. Say if any of these should be published too.
 27. **Search and sharing (12 Oct 2026).** Links shared on WhatsApp, LinkedIn and Facebook showed a black square, because the shared logo is a transparent PNG. Each project now shares its own hero picture, and other pages share a new card: the stacked logo on the paper colour (`src/assets/og-default.jpg`). The site now has /sitemap.xml (the same address Wix uses) and a "Page not found" page with two draft lines, "Page not found" and "The page you were looking for has moved or no longer exists. These may help:". Please approve them. Search engines are also told that /copy-of-projects and /copy-of-grohe-quarterly-campaigns are copies of /projects and /grohe-quarterly-campaigns; say if those two Wix copies should be retired instead. The structured data for Google lists the studio's email and social profiles; the phone number and address will be added once items 17 and 18 are answered.
+
+**Found in the copy review (12 Oct 2026).** Nothing below has been changed on the site. Each item needs a yes, a no or other wording.
+
+28. **Founding year.** /joinus says "Founded in 2006". The homepage, About and the March 2026 deck say 2001. The Journal of Aviation Management page says the studio worked on the journal "since its launch in 2000". Which year is right? The homepage's "Founded 2001" figure depends on it.
+29. **The artist's name.** "Tan Ping Chang" appears in the project title, the client field, two /projects cards and a homepage card. The body text, menu and search title say "Tan Ping Chiang". Suggested: "The Art of Tan Ping Chiang" everywhere.
+30. **Hidden text on the Road Safety page.** /singaporeroadsafetycampaign carries the same white-on-white Nötter awards text as /notter (item 7): "Nötter Nuts has won the following awards: 1. Singapore Packaging Awards 2. NY DRIVENxDESIGN". Visitors cannot see it, but screen readers read it out. Remove it?
+31. **A third phone number, and stockist numbers.** /building-memories-artbook and /the-brooks-clown give the studio as "Tel: 6292 0492". /the-brooks-clown also gives The Farm Store and Huggs-Epigram that same number; Building Memories gives The Farm Store as 6336 0609. Abby's card shows "+65 8909 606", which looks like the deck's +65 8909 6062 missing its last digit. The building is spelt "The Commerze@Irving" on the site and "The Commerze @ Irving" in the deck. See also item 17.
+32. **Dated copy.**
+    - Ambrosia: "#HawkerCentreFood support movement till 15 February 2022", plus the free Nasi Lemak and otah offers.
+    - The Brook's Clown: "will be launched", "from now until 30 Nov '19", "S$44.90 (incl. GST)".
+    - Building Memories: the stockist list dates from 2015–17.
+    - Red packets: "this coming Chinese New Year", "starting at just $2.88".
+    - A homepage slide reads "Create Your Custom Red Packets for 2025" (not shown in the current design).
+
+    Options: put them in the past tense, remove the offers, or refresh the red packet page for CNY 2027.
+33. **About 45 typos and grammar slips**, for example:
+    - "an bespoke"
+    - "Donates would help build"
+    - "Singapore Chinese Orchestral (SCO)"
+    - "National Trade Union Congress" (should be "Trades")
+    - "making it more edgier"
+    - "has helped solved"
+    - "aspired entrepreneurs"
+    - "the primarily logo"
+    - "Guests of Honours"
+    - "a one of-its-kind"
+    - "retails stores"
+    - "for their clients' to have"
+
+    The full list, page by page with a suggested fix for each, is in `docs/copy-review-2026-10-12.md`. Approve all, or mark any to keep.
+34. **Client names spelt several ways.** Please confirm one form of each:
+    - "The Ritz-Carlton, Millenia Singapore" / "The Ritz Carlton"
+    - "The St. Regis Singapore" / "St Regis", and "TeaRoom" / "The Tea Room"
+    - "MANN+HUMMEL" / "Mann+Hummel" / "Mann Hummel"
+    - "Nötter" / "Notter"
+    - "StarWars x Luzerne" / "Star Wars × Luzerne"
+    - "Whatsapp" / "WhatsApp"
+    - "Achates360" / "Achates 360"
+    - "AAS" / "Automobile Association of Singapore"
+
+    Also check the Samsung, Konica Minolta and Singapore Conference Hall 50/50 client entities.
+35. **One project, several titles.** Many projects carry a different title on the homepage, /projects, the menu and Google. For example, /samsung-micro-led has five. /charles-monat-cny's page title, "Festive Collaterals and Packaging", is identical to /bank-julius-baer's. Proposal: each page's own title is the one used everywhere. Five homepage titles also carry an "[Award Winning]" suffix; suggest showing the award in the Recognition field instead.
+36. **Dates.** Ranges are written "2013 – 2016", "2018 - 2020" and "12-27 January 2013". Suggested: "2018–2020" and "25 October 2019". /kaplan, /the-skyline and /idm-venture-capital have no year, so their Year field is empty; please supply them. /the-ritz-kids-programme-guide says © 2001, which looks early for the programme it describes.
+37. **US spellings** among UK-spelt copy: /changi-airport-group ("organization", "colors", "Customized"), /the-ritz-carlton-superbrunch ("colors"), /ambrosia… ("organization") and /redpacket ("customized"). Convert to UK spelling?
+38. **Award names that conflict.**
+    - /building-memories-artbook: "Singapore Book Awards 2017" in the heading, but "The Singapore Art Book Awards 2017 panel" in the text.
+    - /national-theatre-pop-up-kit: "Hong Kong Design Awards 2018", but the deck lists "Gov, Hong Kong and New York Design Awards 2016 Gold".
+    - /notter: "Singapore Packaging Awards", but the logo reads "SPSA 2021".
+
+    The homepage awards line (item 22b) depends on these.
+39. **Contact form wording** (copied from Wix): "Services you are looking at?", "Type Your Message here...", "Others ( Pls specify in message)", and "Thanks for submitting!". The options "Publication" and "Digital Marketing" also differ from the category names "Publications" and "Digital Communications". Suggested: "What can we help with?", "Your message", "Other (please tell us in your message)", "Thank you. We'll be in touch shortly." Or keep them as they are. Item 15's "Selection 2" no longer shows: its options now join the services list.
+40. **Fields that read oddly once shown.**
+    - /redpacket's Client field is the tagline "keep your budget in the Green!".
+    - /ambrosia…'s client is "Publisher Achates 360".
+    - The buttons "VIEW PROJECT" and "Apply Now" are in capitals or title case.
+41. **Google descriptions with factual errors.**
+    - /little-thoughts… calls the client a "cafe".
+    - /the-skyline is "in Singapore" (it is in Phnom Penh).
+    - /uel-annual-report is "for academic publishing".
+    - /konicaminolta is "corporate branding" (it is WhatsApp stickers).
+    - Others: /national-theatre-pop-up-kit, /the-art-of-tan-ping-chiang, /samsung-micro-led, /samsung-tablets…, /dbs-wealth-feed, /dbs-cio-podcasts, /grohe-quarterly-campaigns.
+    - Typos: "Achates360,Singapore's", "MosaicMagazine", "Heart felt", "in the Green!Swift".
+
+    Item 26b adds R151.
+42. **Repeated paragraphs.** The Charles Monat introduction is identical on two pages; the VP Bank and Bank of Singapore greetings text is near-identical; all six business-card blurbs repeat About's first paragraph. "high net-worth" is hyphenated three ways. These are low priority.
+43. **Claims to check before launch.**
+    - DBS: "keep your investments safe" and "without sacrificing returns" read as financial promises. The traffic and client-acquisition results on /dbs-wealth-feed need DBS's agreement.
+    - "Singapore's leading creative agency" (in about 12 Google descriptions) is unsupported. Suggest "award-winning creative agency".
+    - Grab: "reaching millions of users" and "the fastest booking service".
+    - Red packets: the $2.88 price and a delivery "guarantee".
+    - Samsung: sapphire as "the second strongest material on earth".
+44. **/joinus job posting.** One posting covers two levels ("Client Account Executive / Manager") and refers to the account manager inside the account manager's posting. "Has 2 – 5 / 5 – 10 years' working experience" is unclear. It is undated and repeats the 2006 founding year. Is the role still open? Split it, or replace it with a general invitation to write in.
+
+**Draft wording we suggest for our own labels** (all still marked DRAFT; approve or replace):
+- "Get in touch" → "Make an enquiry": it sits right under the footer's "Get in touch with us…".
+- "View all projects" / "All projects" / "All Projects" / "BACK TO PROJECTS" → "All projects" everywhere.
+- "Let's connect and let's work together" → "Have a project in mind? Write to us."
+- "Learn more" → "About the studio".
+- "All services" → "Our services".
+- "Trusted by" → "Selected clients".
+- "Client feedback" → "In their words".
+- "We're hiring" → "Open position".
+- Meta label "Services" → "Discipline": it shows the category names.
+- "Back to site" → "Close menu".
+- Screen-reader label "Site" → "Main".
+- Homepage figures: "10+ Awards" → "12 Awards" (the deck's count). "100+ Clients served" has no source: remove it or supply the figure.
+- Service names: use the deck's own five, "Strategic Branding · Advertising & Marketing · Publications · Digital Communications · Graphic Design".
+- Client line: brand names, not company names. For example "Singapore Chinese Orchestra", "VP Bank", "Konica Minolta", "DBS".
+
+**Pictures (12 Oct 2026).** Wix holds no larger versions of the site's pictures than the ones already used. Sharper pictures need the studio's own master files (PSD, AI or full-size exports). These matter most: /redpacket (30 of 31 images are 1341 px wide), /the-star-performing-arts-centre-marketing, /grab-brand-app-campaign, /uel-annual-report, /international-green-building-conference, /national-theatre-pop-up-kit, /dbs-wealth-feed, /wedding-invitation-wedding-favours, /mosaic-magazine, /samsung-connected-home, and the hero pictures of /the-ritz-carlton-superbrunch and /the-art-of-tan-ping-chiang. A higher-resolution still from the Star Wars × Luzerne video would also sharpen the homepage cover on phones.
