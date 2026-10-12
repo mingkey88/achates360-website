@@ -9,21 +9,26 @@ import { firstYear } from '../lib/meta';
 import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
-// Direction B homepage: after the cover, each selected project gets its own composition, like the
-// spreads of a printed portfolio (Batch 2, step 4). The four layouts, in order:
-//   lead   - a large picture with a tinted panel overlapping its corner (after nationalgallery.sg)
+// Direction B homepage: after the cover, the selected projects are set like the spreads of a printed
+// portfolio (Batch 2, step 4). Two layouts:
+//   lead   - a large picture with a tinted panel overlapping its corner (after nationalgallery.sg),
+//            the picture on the left, or on the right when flipped
 //   spread - the picture across the page, client · discipline · year and the title on one caption line under it
-//   type   - a tall picture to one side, the title set large across the rest, no panel
-//   quiet  - a smaller picture off-centre in open paper, the details in a narrow column beside it
+// The client chose spread for the second row only (12 Oct 2026); the rest keep the original lead rows.
 // More rows than layouts repeat the sequence. Videos play on hover (MediaCard).
 // The first item is the cover (SelectedCover: paper-cut heading over its film); the rest follow as rows.
 interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number }
 const { items, eyebrow, cta, total } = Astro.props;
-const LAYOUTS = [
-  { name: 'lead', ratio: '5 / 4', sizes: '(max-width: 899px) 100vw, 67vw', widths: [640, 960, 1280, 1600, 1900] },
-  { name: 'spread', ratio: '16 / 7', sizes: '100vw', widths: [640, 960, 1280, 1600, 1920, 2400] },
-  { name: 'type', ratio: '4 / 5', sizes: '(max-width: 899px) calc(100vw - 64px), 38vw', widths: [480, 720, 960, 1280] },
-  { name: 'quiet', ratio: '3 / 2', sizes: '(max-width: 899px) 80vw, 42vw', widths: [480, 720, 960, 1280] },
+const LAYOUTS = {
+  lead: { ratio: '5 / 4', sizes: '(max-width: 899px) 100vw, 67vw', widths: [640, 960, 1280, 1600, 1900] },
+  spread: { ratio: '16 / 7', sizes: '100vw', widths: [640, 960, 1280, 1600, 1920, 2400] },
+} as const;
+// Stone is too close to the paper now the panels have no shadow, so the lead panels use blush and sage.
+const ROWS = [
+  { layout: 'lead', flip: false, tint: 'var(--blush)' },
+  { layout: 'spread', flip: false, tint: 'none' },
+  { layout: 'lead', flip: false, tint: 'var(--sage)' },
+  { layout: 'lead', flip: true, tint: 'var(--blush)' },
 ] as const;
 const all = items.map(({ slide, project }) => ({
   image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
@@ -41,9 +46,9 @@ const [cover, ...rows] = all;
   {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} />}
   <ol class="sw-list">
     {rows.map((r, i) => {
-      const l = LAYOUTS[i % LAYOUTS.length];
+      const row = ROWS[i % ROWS.length], l = LAYOUTS[row.layout];
       return (
-        <li class={`sw-row sw-${l.name}`}>
+        <li class:list={['sw-row', `sw-${row.layout}`, { flip: row.flip }]} style={`--tint: ${row.tint}`}>
           <div class="sw-media crop">
             <span class="sw-folio" aria-hidden="true">{String(i + 2).padStart(2, '0')}</span>
             <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio={l.ratio} sizes={l.sizes} widths={[...l.widths]} wipe duplicateLink={!!r.title} />
@@ -79,17 +84,12 @@ const [cover, ...rows] = all;
     font: 500 var(--fs-small)/1 var(--font-text); font-variant-numeric: tabular-nums; letter-spacing: .08em; color: var(--text-2);
   }
 
-  /* Phones and narrow tablets: every layout stacks picture then details. Full-width pictures have no
-     corners to mark; the inset ones (type, quiet) keep their crop marks. */
+  /* Phones and narrow tablets: both layouts stack picture then details; the pictures run full width,
+     so there are no corners to mark. */
   @media (max-width: 899px) {
-    .sw-lead .sw-media.crop::before, .sw-spread .sw-media.crop::before { display: none; }
+    .sw-media.crop::before { display: none; }
     .sw-folio { right: var(--gutter); }
-    .sw-lead .sw-text { padding-block: var(--s-7); background: var(--blush); }
-    .sw-type .sw-media, .sw-quiet .sw-media { margin-inline: var(--s-6); }
-    .sw-type .sw-folio, .sw-quiet .sw-folio { right: 0; }
-    .sw-quiet .sw-media { margin-right: 20vw; }
-    .sw-type .sw-text { order: -1; padding: 0 var(--gutter) var(--s-8); }
-    .sw-type .sw-title { font-size: var(--fs-mega); line-height: 1.05; }
+    .sw-lead .sw-text { padding-block: var(--s-7); background: var(--tint); }
   }
 
   @media (min-width: 900px) {
@@ -100,8 +100,11 @@ const [cover, ...rows] = all;
     /* lead: the tinted card overlaps the picture's edge and drops below it (after nationalgallery.sg). */
     .sw-lead { align-items: end; column-gap: 0; padding-bottom: var(--s-8); }
     .sw-lead .sw-media { grid-column: 1 / 9; }
-    .sw-lead .sw-text { grid-column: 8 / 13; margin-bottom: calc(var(--s-8) * -1); padding: var(--s-8) clamp(var(--s-6), 4vw, var(--s-9)); background: var(--blush); }
+    .sw-lead .sw-text { grid-column: 8 / 13; margin-bottom: calc(var(--s-8) * -1); padding: var(--s-8) clamp(var(--s-6), 4vw, var(--s-9)); background: var(--tint); }
     .sw-lead .sw-folio { bottom: auto; right: auto; top: 0; left: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); translate: 0 -50%; margin: 0; }
+    .sw-lead.flip .sw-media { grid-column: 5 / 13; }
+    .sw-lead.flip .sw-text { grid-column: 1 / 6; }
+    .sw-lead.flip .sw-folio { left: auto; right: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); }
 
     /* spread: the picture across the page inside the margins, one caption line under it. */
     .sw-spread { padding-inline: var(--gutter); row-gap: var(--s-6); }
@@ -111,19 +114,6 @@ const [cover, ...rows] = all;
     .sw-spread .sw-title { grid-column: 4 / 10; max-width: none; }
     .sw-spread .sw-text :global(.pill) { grid-column: 10 / 13; justify-self: end; margin: 0; }
 
-    /* type: a tall picture on the right, the title large across the left, no panel. */
-    .sw-type { padding-inline: var(--gutter); align-items: end; }
-    .sw-type .sw-media { grid-column: 8 / 13; }
-    .sw-type .sw-text { grid-column: 1 / 8; align-content: end; padding-right: var(--s-7); }
-    .sw-type .sw-title { max-width: 14ch; font-size: clamp(2.5rem, 1.2rem + 3.6vw, 5rem); line-height: 1.02; letter-spacing: -.01em; }
-    .sw-type .sw-folio { right: auto; left: 0; }
-
-    /* quiet: a smaller picture off-centre in open paper, details in a narrow column beside it. */
-    .sw-quiet { padding-inline: var(--gutter); align-items: end; }
-    .sw-quiet .sw-media { grid-column: 3 / 8; }
-    .sw-quiet .sw-text { grid-column: 9 / 12; align-content: end; gap: var(--s-3); }
-    .sw-quiet .sw-title { font-size: var(--fs-h3); }
-    .sw-quiet .sw-folio { right: auto; left: 0; }
     .sw-list { gap: calc(var(--s-10) + var(--s-6)); }
   }
 </style>
