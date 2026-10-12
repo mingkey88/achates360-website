@@ -3,11 +3,13 @@ import Pic from './ui/Pic.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
+import { withBase } from '../lib/paths';
 // The homepage's closing section (after kitpro-croma): project pictures start as one stacked pile in
 // the middle and spread out to the edges as you scroll, revealing the call to action in the space they
 // leave. Motion: scripts/motion/scatter.ts (scrubbed to scroll inside a sticky stage). Without motion
 // the pictures simply sit in their spread-out places with the message visible.
-interface Item { thumb: ImageMetadata }
+// Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts).
+interface Item { thumb: ImageMetadata; title: string; href?: string }
 interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
 const { items, heading, blurb, cta, href } = Astro.props;
 // Spread-out places: x / y = centre in % of the stage, w = width in vw (desktop); m* the same for phones,
@@ -29,10 +31,17 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
 ---
 <section class="scta" aria-labelledby="scta-title" data-scatter>
   <div class="scta-stage">
-    <ul class="scta-pics" aria-hidden="true">
-      {pics.map(({ thumb, p }, i) => (
-        <li class:list={['pic crop', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
-          <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 28vw, 14vw" />
+    <ul class="scta-pics">
+      {pics.map(({ thumb, title, href: to, p }, i) => (
+        <li class:list={['pic crop', { 'desk-only': p.mx === undefined, 'cap-end': p.x > 60 }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
+          {to ? (
+            <a class="pic-link" href={withBase(to)} draggable="false">
+              <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 28vw, 14vw" draggable="false" />
+              <span class="pic-cap">{title} <span aria-hidden="true">&rarr;</span></span>
+            </a>
+          ) : (
+            <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 28vw, 14vw" />
+          )}
         </li>
       ))}
     </ul>
@@ -52,20 +61,38 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; }
   .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
   .pic {
-    position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1vw);
+    position: absolute; left: calc(var(--x) * 1% + var(--dx, 0px)); top: calc(var(--y) * 1% + var(--dy, 0px)); width: calc(var(--w) * 1vw);
     translate: -50% -50%; z-index: var(--z); background: var(--stone); --cm-len: 9px; --cm-gap: 5px;
   }
-  .pic :global(img) { display: block; width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; }
-  .pic::after { content: ''; position: absolute; inset: 0; background: var(--grain); opacity: .14; mix-blend-mode: overlay; }
-  .scta-msg {
-    position: absolute; left: 50%; top: 50%; z-index: 20; translate: -50% -50%; width: min(86vw, 560px);
-    display: grid; justify-items: center; gap: var(--s-6); text-align: center;
+  .pic:is(:hover, :focus-within) { z-index: 30; }
+  .pic-link { display: block; color: inherit; text-decoration: none; cursor: grab; user-select: none; -webkit-user-drag: none; }
+  .pic.is-dragging .pic-link { cursor: grabbing; }
+  /* The project's name under the picture, below the crop marks, on hover or keyboard focus. */
+  .pic-cap {
+    position: absolute; top: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); left: 0; width: max-content; max-width: 22ch;
+    font: 500 var(--fs-small)/1.35 var(--font-text); color: var(--ink); opacity: 0; translate: 0 -4px; transition: opacity .25s, translate .25s var(--ease-out);
   }
+  .cap-end .pic-cap { left: auto; right: 0; text-align: right; }
+  .pic-link:is(:hover, :focus-visible) .pic-cap, .pic.is-dragging .pic-cap { opacity: 1; translate: none; }
+  @media (hover: none) { .pic-cap { display: none; } }
+  .pic :global(img) { display: block; width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; }
+  .pic::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--grain); opacity: .14; mix-blend-mode: overlay; }
+  /* The message stays above every picture, even one dragged over it, so the button is always reachable;
+     only its text and button take the pointer, so pictures underneath can still be picked up. */
+  .scta-msg {
+    position: absolute; left: 50%; top: 50%; z-index: 10000; translate: -50% -50%; width: min(86vw, 560px);
+    display: grid; justify-items: center; gap: var(--s-6); text-align: center; pointer-events: none;
+  }
+  .scta-msg > * { pointer-events: auto; }
   .scta-msg h2 { margin: 0; font: 400 var(--fs-h1)/1.15 var(--font-display); }
   .scta-msg p { margin: 0 0 var(--s-4); max-width: 44ch; font-size: var(--fs-lead); line-height: 1.6; color: var(--text-2); text-wrap: balance; }
   @media (max-width: 767px) {
     :global(html.motion-live) .scta { height: 170svh; }
-    .pic { left: calc(var(--mx) * 1%); top: calc(var(--my) * 1%); width: calc(var(--mw) * 1vw); }
+    .pic { left: calc(var(--mx) * 1% + var(--dx, 0px)); top: calc(var(--my) * 1% + var(--dy, 0px)); width: calc(var(--mw) * 1vw); }
     .pic.desk-only { display: none; }
   }
 </style>
+<script>
+  import { pile } from '../scripts/pile';
+  pile();
+</script>
