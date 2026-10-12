@@ -5,7 +5,7 @@ import { SITE_ENV } from 'astro:env/server';
 import { robotsMeta, canonicalUrl } from '../lib/seo';
 import { pagePath } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
-import { withServices, withCategories } from '../lib/menu';
+import { withServices, withCategories, withContactPage } from '../lib/menu';
 import { projectCategories } from '../lib/categories';
 import type { PageKind } from '../lib/page-kind';
 import Header from '../components/Header.astro';
@@ -35,7 +35,7 @@ const icon = async (w: number) => site.favicon && (await getImage({ src: site.fa
 const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(180)]);
 const projectsIndex = (await getEntry('projectsIndex', 'projects'))!.data;
 const categories = projectCategories(projectsIndex.sections).map((c) => ({ label: c.heading, href: c.href }));
-const menu = withCategories(withServices(site.menu ?? [], text('menu-services').text), categories);
+const menu = withContactPage(withCategories(withServices(site.menu ?? [], text('menu-services').text), categories));
 ---
 <!doctype html>
 <html lang="en">

@@ -9,10 +9,11 @@ import SelectedWork from '../components/SelectedWork.astro';
 import ServiceIndex from '../components/ServiceIndex.astro';
 import Credentials from '../components/Credentials.astro';
 import DraftTag from '../components/ui/DraftTag.astro';
-import ContactForm from '../components/ContactForm.astro';
+import ScatterCTA from '../components/ScatterCTA.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
+import { withBase } from '../lib/paths';
 
 const d = (await getEntry('home', 'home'))!.data;
 const about = (await getEntry('basic', 'about'))!.data;
@@ -38,8 +39,15 @@ const services = x.services.map((s: any) => {
   return { ...s, image: hero.type === 'video' ? hero.poster : hero.src };
 });
 const quote = x.testimonials[0];
+// The closing call to action's line is the footer's own intro sentence (site.md), verbatim.
+const site = (await getEntry('site', 'site'))!.data;
+const footerIntro = String((site.footer as any[]).find((b) => b.type === 'text')?.md ?? '').replace(/^#+\s*/, '');
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="home">
+  <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
+    // Old links to the homepage form (/#contact) go to the contact page.
+    if (location.hash === '#contact') location.replace(contactPage);
+  </script>
   <HeroArc items={d.allProjects.items.slice(0, 10)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} cta={text('selected-cta')} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
@@ -60,7 +68,7 @@ const quote = x.testimonials[0];
     </figure>
   </section>
 
-  <ContactForm md={d.contact.md} form={d.contact.form} heading={text('contact-heading')} />
+  <ScatterCTA items={d.allProjects.items.slice(10, 19)} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
   .h-intro { position: relative; padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
@@ -78,5 +86,6 @@ const quote = x.testimonials[0];
   import { reveal } from '../scripts/motion/reveal';
   import { hero } from '../scripts/motion/hero';
   import { counters } from '../scripts/motion/counters';
-  run(hero, reveal, counters);
+  import { scatter } from '../scripts/motion/scatter';
+  run(hero, reveal, counters, scatter);
 </script>

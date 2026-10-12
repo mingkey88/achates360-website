@@ -12,3 +12,8 @@ export function withServices(menu: NavLink[], label: string, href = '/services')
 export function withCategories(menu: NavLink[], categories: NavLink[], href = '/projects'): NavLink[] {
   return menu.map((m) => (m.href === href ? { ...m, items: categories } : m));
 }
+
+/** The menu's CONTACT item ("/#contact", the old home-page form) points at the contact page (direction B). */
+export function withContactPage(menu: NavLink[], from = '/#contact', to = '/contact'): NavLink[] {
+  return menu.map((m) => (m.href === from ? { ...m, href: to } : m));
+}

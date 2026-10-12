@@ -1,0 +1,19 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { loadExtras } from '../lib/extras';
+// The contact page (direction B): the enquiry form that used to close the homepage, on its own page.
+// Title: the site menu's own CONTACT label, verbatim (shown in sentence case). Form copy from home.md.
+const d = (await getEntry('home', 'home'))!.data;
+const site = (await getEntry('site', 'site'))!.data;
+const { text } = await loadExtras();
+const heading = site.menu?.find((m) => m.href === '/#contact' || m.href === '/contact')?.label ?? 'Contact';
+---
+<Base title={`${heading.charAt(0)}${heading.slice(1).toLowerCase()} | Achates 360`} description={d.seo.description} ogImage={d.seo.ogImage} page="page">
+  <header class="wrap ct-head"><h1 class="display h1 sc">{heading}</h1></header>
+  <ContactForm md={d.contact.md} form={d.contact.form} heading={text('contact-heading')} />
+</Base>
+<style>
+  .ct-head { padding-block: var(--s-8) var(--s-6); }
+</style>

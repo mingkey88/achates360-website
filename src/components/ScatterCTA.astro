@@ -1,0 +1,66 @@
+---
+import { Image } from 'astro:assets';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+// The homepage's closing section (after kitpro-croma): project pictures start as one stacked pile in
+// the middle and spread out to the edges as you scroll, revealing the call to action in the space they
+// leave. Motion: scripts/motion/scatter.ts (scrubbed to scroll inside a sticky stage). Without motion
+// the pictures simply sit in their spread-out places with the message visible.
+interface Item { thumb: ImageMetadata }
+interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
+const { items, heading, blurb, cta, href } = Astro.props;
+// Spread-out places: x / y = centre in % of the stage, w = width in vw (desktop); m* the same for phones,
+// where only the first six are used, above and below the message.
+const PLACES = [
+  { x: 20, y: 32, w: 12, mx: 22, my: 14, mw: 30 },
+  { x: 33, y: 15, w: 10, mx: 70, my: 11, mw: 26 },
+  { x: 52, y: 17, w: 17, mx: 50, my: 24, mw: 32 },
+  { x: 84, y: 16, w: 12, mx: 20, my: 82, mw: 30 },
+  { x: 81, y: 47, w: 12, mx: 72, my: 86, mw: 34 },
+  { x: 16, y: 80, w: 19, mx: 48, my: 76, mw: 24 },
+  { x: 39, y: 77, w: 16 },
+  { x: 59, y: 82, w: 12 },
+  { x: 86, y: 80, w: 20 },
+];
+const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i] }));
+---
+<section class="scta" aria-labelledby="scta-title" data-scatter>
+  <div class="scta-stage">
+    <ul class="scta-pics" aria-hidden="true">
+      {pics.map(({ thumb, p }, i) => (
+        <li class:list={['pic', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
+          <Image src={thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 34vw, 20vw" loading="lazy" />
+        </li>
+      ))}
+    </ul>
+    <div class="scta-msg" data-scatter-msg>
+      <h2 id="scta-title"><T s={heading} /></h2>
+      <p>{blurb}</p>
+      <Pill href={href} variant="fill"><T s={cta} /></Pill>
+    </div>
+  </div>
+</section>
+<style>
+  /* Scroll room: the stage stays stuck for the section's extra height while the pile spreads. */
+  .scta { position: relative; height: 240svh; }
+  .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; }
+  .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
+  .pic {
+    position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1vw);
+    translate: -50% -50%; z-index: var(--z); overflow: hidden; background: var(--stone); box-shadow: 0 20px 40px -24px rgb(0 0 0 / .35);
+  }
+  .pic :global(img) { display: block; width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; }
+  .pic::after { content: ''; position: absolute; inset: 0; background: var(--grain); opacity: .14; mix-blend-mode: overlay; }
+  .scta-msg {
+    position: absolute; left: 50%; top: 50%; z-index: 20; translate: -50% -50%; width: min(90vw, 620px);
+    display: grid; justify-items: center; gap: var(--s-4); text-align: center;
+  }
+  .scta-msg h2 { margin: 0; font: 400 var(--fs-h1)/1.15 var(--font-display); }
+  .scta-msg p { margin: 0 0 var(--s-3); max-width: 46ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); }
+  @media (max-width: 767px) {
+    .scta { height: 200svh; }
+    .pic { left: calc(var(--mx) * 1%); top: calc(var(--my) * 1%); width: calc(var(--mw) * 1vw); }
+    .pic.desk-only { display: none; }
+  }
+</style>

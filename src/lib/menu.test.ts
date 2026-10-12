@@ -19,3 +19,15 @@ describe('withServices', () => {
     expect(withServices([{ label: 'HOME', href: '/' }], 'SERVICES').at(-1)).toEqual({ label: 'SERVICES', href: '/services' });
   });
 });
+
+import { withContactPage } from './menu';
+describe('withContactPage', () => {
+  it('points the old home-page contact anchor at the contact page', () => {
+    const out = withContactPage(menu);
+    expect(out[2]).toEqual({ label: 'CONTACT', href: '/contact' });
+    expect(out[0]).toBe(menu[0]);
+  });
+  it('leaves other links alone', () => {
+    expect(withContactPage([{ label: 'HOME', href: '/' }])).toEqual([{ label: 'HOME', href: '/' }]);
+  });
+});
