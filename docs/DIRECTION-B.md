@@ -76,3 +76,5 @@ footer labels `#bdbcb2` on charcoal 8.03. Muted `#8a8a84` only on cream/stone at
 
 Projects (B): /projects is an overview of the nine categories as image tiles with counts; each category has its own page at /projects/<slug> (slug from the supplied heading, src/lib/categories.ts). A "Category" dropdown on these pages and a dropdown under Projects in the header move between them; the phone menu lists them under Projects. Old /projects#<section> links forward to the category page.
 
+After nationalgallery.sg (12 Oct 2026): lens cards closer (gap ~0.25vw desktop, ~0.8vw phones); the intro sentence in ink with its key phrase "faithful companion and trusted friend" in brand orange (display only); "Selected work" as heavy cut-out lettering filled with a project photograph, just touching the first picture; Selected work's tinted text cards overlap their picture's edge on desktop; the founding year drawn as a large outlined numeral behind the credentials; footer social links with square outlined network marks (Simple Icons, CC0; LinkedIn drawn by hand).
+

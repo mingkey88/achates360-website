@@ -56,7 +56,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
      neighbours one card-plus-gap apart: 2 asin((W + gap) / 2R). */
   /* Croma's lens (perspective 42.4% of the width, cards 14.1%, 20.2deg apart) scaled up 1.35x:
      card and perspective grow together, so the angles and the shape of the curve stay the same. */
-  .ha { --card-w: 19vw; --card-ratio: 4 / 3; --P: 57.2vw; --step: 20.2; }
+  .ha { --card-w: 19vw; --card-ratio: 4 / 3; --P: 57.2vw; --step: 19.37; } /* gap ~0.25vw */
   .ha-arc {
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;
@@ -105,7 +105,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
-    .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --step: 33.7; }
+    .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; --step: 32.47; } /* gap ~0.8vw */
     .ha-lens::before, .ha-lens::after { width: 16%; }
   }
 </style>

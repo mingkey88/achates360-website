@@ -21,8 +21,10 @@ const { text } = x;
 const aboutMd = about.blocks.filter((b) => b.type === 'text').map((b: any) => b.md).join('\n\n');
 const intro = sentenceStarting(aboutMd, 'The name Achates 360');
 if (!intro) throw new Error('Homepage intro: no About paragraph starts with "The name Achates 360" (spec §4.1)');
-const words = intro.split(' ');
-const [introDark, introMuted] = [words.slice(0, 5).join(' '), words.slice(5).join(' ')];
+// After nationalgallery.sg: the sentence in ink with its key phrase in brand orange (display only).
+const KEY = 'faithful companion and trusted friend';
+const at = intro.indexOf(KEY);
+const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.slice(0, at), KEY, intro.slice(at + KEY.length)];
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
@@ -41,7 +43,7 @@ const quote = x.testimonials[0];
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
     <Eyebrow><T s={text('intro-eyebrow')} /></Eyebrow>
-    <h2 id="intro-title" class="display two-tone" data-split>{introDark} <span class="muted">{introMuted}</span></h2>
+    <h2 id="intro-title" class="display two-tone" data-split>{introBefore}{introKey && <span class="key">{introKey}</span>}{introAfter}</h2>
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
@@ -63,7 +65,7 @@ const quote = x.testimonials[0];
   .h-intro { padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
   .h-intro :global(.eyebrow) { justify-content: center; }
   .two-tone { max-width: 30ch; margin-block: var(--s-3) var(--s-6); font-size: clamp(1.5rem, 1.25rem + 1.1vw, 2.25rem); line-height: 1.3; }
-  .two-tone .muted { color: var(--muted); }
+  .two-tone .key { color: var(--accent-deep); }
   .h-quote { padding-block: var(--section-y); }
   .h-quote figure { margin: 0 auto; max-width: 40ch; text-align: center; }
   .h-quote blockquote { margin: 0; }
