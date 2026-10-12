@@ -71,7 +71,6 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     --cx: var(--x, 0); --cz: var(--z, 0); --cry: var(--ry, 0); --co: var(--o, 1);
     transform: translate3d(calc(var(--cx) * 1vw), 0, calc(var(--cz) * 1vw)) rotateY(calc(var(--cry) * -1deg));
     opacity: calc(var(--co) * var(--in, 1));
-    box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
     /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
     filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
   }

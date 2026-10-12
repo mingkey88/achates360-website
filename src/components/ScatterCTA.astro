@@ -31,7 +31,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   <div class="scta-stage">
     <ul class="scta-pics" aria-hidden="true">
       {pics.map(({ thumb, p }, i) => (
-        <li class:list={['pic', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
+        <li class:list={['pic crop', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
           <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 28vw, 14vw" />
         </li>
       ))}
@@ -53,7 +53,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
   .pic {
     position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1vw);
-    translate: -50% -50%; z-index: var(--z); overflow: hidden; background: var(--stone); box-shadow: 0 20px 40px -24px rgb(0 0 0 / .35);
+    translate: -50% -50%; z-index: var(--z); background: var(--stone); --cm-len: 9px; --cm-gap: 5px;
   }
   .pic :global(img) { display: block; width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; }
   .pic::after { content: ''; position: absolute; inset: 0; background: var(--grain); opacity: .14; mix-blend-mode: overlay; }

@@ -79,7 +79,8 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs })];
   .h-intro { position: relative; padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
   .h-intro :global(.eyebrow) { justify-content: center; }
   .two-tone { max-width: 30ch; margin-block: var(--s-3) var(--s-6); font-size: clamp(1.5rem, 1.25rem + 1.1vw, 2.25rem); line-height: 1.3; }
-  .two-tone .key { color: var(--accent-deep); }
+  /* Print touch: the orange plate printed a hair off register, a lighter orange peeking out below right. */
+  .two-tone .key { color: var(--accent-deep); text-shadow: .03em .024em 0 rgb(255 144 21 / .45); }
 </style>
 <script>
   import { run } from '../scripts/motion/index';
