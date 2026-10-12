@@ -13,16 +13,19 @@ const isText = (b: any) => b.type === 'text' || b.type === 'link';
 // are untouched).
 const depths = blocks.filter((b) => b.type === 'text').flatMap((b) => [...b.md.matchAll(/^\s*(#{1,6})\s/gm)].map((m) => m[1].length));
 const demote = depths.length ? 2 - Math.min(...depths) : 0;
+// Pictures whose exported description is a file name are described as "<title>, image n".
+const imgNo = new Map(blocks.filter((b) => b.type === 'image').map((b, i) => [b, i + 1]));
+const fb = (b: any) => (pageTitle && imgNo.has(b) ? `${pageTitle}, image ${imgNo.get(b)}` : pageTitle);
 ---
 <div class="media-rows">
   {segments.map((s) => {
     if (s.kind === 'single') {
-      return <div class:list={['seg', isText(s.block) ? 'seg-text' : 'seg-media']}><Block block={s.block} pageTitle={pageTitle} lead={s.block === firstText} demote={demote} /></div>;
+      return <div class:list={['seg', isText(s.block) ? 'seg-text' : 'seg-media']}><Block block={s.block} pageTitle={pageTitle} altFallback={fb(s.block)} lead={s.block === firstText} demote={demote} /></div>;
     }
     if (s.kind === 'grid') {
       return (
         <div class="seg seg-grid" style={`--cols: ${s.cols}`}>
-          {s.blocks.map((b) => <Block block={b} pageTitle={pageTitle} demote={demote} sizes={`(max-width: 767px) 100vw, ${Math.round(92 / s.cols)}vw`} />)}
+          {s.blocks.map((b) => <Block block={b} pageTitle={pageTitle} altFallback={fb(b)} demote={demote} sizes={`(max-width: 767px) 100vw, ${Math.round(92 / s.cols)}vw`} />)}
         </div>
       );
     }
@@ -31,9 +34,9 @@ const demote = depths.length ? 2 - Math.min(...depths) : 0;
         <div class="seg seg-stage" style={`--cols: ${Math.min(s.items.length, 3)}`}>
           {s.items.map((it) => (
             <div class="stage" style={it.block.box ? `aspect-ratio: ${it.block.box.w} / ${it.block.box.h}` : undefined}>
-              <Block block={it.block} pageTitle={pageTitle} demote={demote} />
+              <Block block={it.block} pageTitle={pageTitle} altFallback={fb(it.block)} demote={demote} />
               {it.overlays.map((o) => (
-                <div class="overlay" style={`left: ${o.left}%; top: ${o.top}%; width: ${o.width}%`}><Block block={o.block} pageTitle={pageTitle} demote={demote} sizes="(max-width: 767px) 50vw, 25vw" /></div>
+                <div class="overlay" style={`left: ${o.left}%; top: ${o.top}%; width: ${o.width}%`}><Block block={o.block} pageTitle={pageTitle} altFallback={fb(o.block)} demote={demote} sizes="(max-width: 767px) 50vw, 25vw" /></div>
               ))}
             </div>
           ))}
@@ -42,7 +45,7 @@ const demote = depths.length ? 2 - Math.min(...depths) : 0;
     }
     return (
       <div class="seg seg-split">
-        {s.blocks.map((b) => <div class={isText(b) ? 'cell-text' : 'cell-media'}><Block block={b} pageTitle={pageTitle} lead={b === firstText} demote={demote} sizes="(max-width: 767px) 100vw, 46vw" /></div>)}
+        {s.blocks.map((b) => <div class={isText(b) ? 'cell-text' : 'cell-media'}><Block block={b} pageTitle={pageTitle} altFallback={fb(b)} lead={b === firstText} demote={demote} sizes="(max-width: 767px) 100vw, 46vw" /></div>)}
       </div>
     );
   })}
@@ -55,6 +58,9 @@ const demote = depths.length ? 2 - Math.min(...depths) : 0;
   .seg-grid, .seg-split, .seg-stage { display: grid; gap: var(--s-4); grid-template-columns: minmax(0, 1fr); }
   .seg-split { gap: var(--s-6); align-items: start; }
   .media-rows :global(:is(.block-image, .bgvideo)) { display: block; border-radius: var(--r-card); overflow: hidden; }
+  /* Never wider than the picture itself: small exports (author portraits, icons, 464 px stickers) were
+     stretched up to 8× across the column. --nat is the source width (Block.astro). */
+  .media-rows :global(.block-image) { max-width: min(100%, var(--nat, 100%)); }
   .media-rows :global(.block-img) { width: 100%; height: auto; }
   .media-rows :global(.block-gallery) { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
   .media-rows :global(.block-link) { margin: 0; }

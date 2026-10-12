@@ -24,6 +24,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # Encoded images (AVIF is slow to encode): reuse them between runs.
+      - uses: actions/cache@v6
+        with:
+          path: node_modules/.astro
+          key: astro-assets-${{ hashFiles('src/assets/**', 'astro.config.mjs', 'package-lock.json') }}
+          restore-keys: astro-assets-
       - run: npm test
       - run: npm run build
       - run: npm run verify

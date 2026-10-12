@@ -2,7 +2,9 @@
 import { getEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { SITE_ENV } from 'astro:env/server';
-import { robotsMeta, canonicalUrl } from '../lib/seo';
+import { robotsMeta, canonicalUrl, CANONICAL_ALIASES, tidy, ldJson } from '../lib/seo';
+import ogDefault from '../assets/og-default.jpg';
+import { meta } from '../lib/img';
 import { pagePath } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
 import { withServices, withCategories, withContactPage } from '../lib/menu';
@@ -23,14 +25,31 @@ import '../styles/base.css';
 import '../styles/type.css';
 
 // overHero: the page opens with a full-bleed hero, so the header starts transparent over it.
-interface Props { title: string; description?: string; ogImage?: ImageMetadata; page: PageKind; overHero?: boolean }
-const { title, description, ogImage, page, overHero = false } = Astro.props;
+// ogImage: the page's share picture (a project passes its hero); ogAlt describes it. jsonLd: structured
+// data for search engines (schema.org objects), inlined as one ld+json script.
+interface Props {
+  title: string; description?: string; ogImage?: ImageMetadata; ogAlt?: string; ogType?: 'website' | 'article';
+  page: PageKind; overHero?: boolean; jsonLd?: Record<string, unknown>[]; noindex?: boolean;
+}
+const { ogImage, ogAlt, ogType = 'website', page, overHero = false, jsonLd = [], noindex = false } = Astro.props;
+const title = tidy(Astro.props.title);
+const description = Astro.props.description ? tidy(Astro.props.description) : undefined;
 const site = (await getEntry('site', 'site'))!.data;
 const { text } = await loadExtras();
-const robots = robotsMeta(SITE_ENV);
-const og = ogImage ? new URL((await getImage({ src: ogImage, width: 1200, format: 'jpg' })).src, Astro.site).href : undefined;
-const canonical = canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL);
+// noindex: pages that must never be indexed (the 404), on any host.
+const robots = noindex ? 'noindex, nofollow' : robotsMeta(SITE_ENV);
+// Share image, cropped to the 1200x630 card every network shows. Transparent PNGs (the export's
+// shared logo) would flatten to black as JPG, so they give way to the paper-and-logo default.
+const shareSrc = ogImage && meta(ogImage).format !== 'png' ? ogImage : ogDefault;
+const OG_W = 1200, OG_H = 630;
+const og = new URL((await getImage({ src: shareSrc, width: OG_W, height: OG_H, fit: 'cover', format: 'jpg' })).src, Astro.site).href;
+const ogImageAlt = shareSrc === ogDefault ? 'Achates 360' : (ogAlt ?? title);
 const path = pagePath(Astro.url.pathname);
+// A Wix duplicate kept at its permanent URL names the page it copies as canonical.
+const alias = CANONICAL_ALIASES[path];
+const canonical = alias
+  ? canonicalUrl(import.meta.env.BASE_URL.replace(/\/$/, '') + alias + '.html', Astro.site!, import.meta.env.BASE_URL)
+  : canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL);
 const icon = async (w: number) => site.favicon && (await getImage({ src: site.favicon.src, width: w, height: w, format: 'png' })).src;
 const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(180)]);
 const projectsIndex = (await getEntry('projectsIndex', 'projects'))!.data;
@@ -52,10 +71,17 @@ const menu = withContactPage(withCategories(withServices(site.menu ?? [], text('
     {icon180 && <link rel="apple-touch-icon" href={icon180} />}
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
-    {og && <meta property="og:image" content={og} />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_SG" />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content={String(OG_W)} />
+    <meta property="og:image:height" content={String(OG_H)} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:site_name" content="Achates 360" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#fffef2" />
+    {jsonLd.length > 0 && <script type="application/ld+json" set:html={ldJson(jsonLd.length === 1 ? jsonLd[0] : jsonLd)} />}
     {/* `js` gates hidden-until-revealed styles; motion-ready lifts them. If the motion bundle never
         arrives, the timeout lifts them after 3s so nothing stays invisible (Review Focus 1). */}
     <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>
@@ -65,6 +91,7 @@ const menu = withContactPage(withCategories(withServices(site.menu ?? [], text('
     <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} subLabel={text('nav-categories')} />
     <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
     <main id="main"><slot /></main>
-    <Footer blocks={site.footer} />
+    {/* The homepage closes with the footer's own intro line (ScatterCTA), so the footer skips it there. */}
+    <Footer blocks={site.footer} hideIntro={page === 'home'} />
   </body>
 </html>

@@ -9,6 +9,9 @@ import NextProject from '../components/NextProject.astro';
 import { loadExtras } from '../lib/extras';
 import { backLinkHref, withBase } from '../lib/paths';
 import { nextProject, slugOf } from '../lib/next-project';
+import { categorySlug } from '../lib/categories';
+import { creativeWorkLd, breadcrumbLd } from '../lib/seo';
+import { firstYear } from '../lib/meta';
 interface Props { entry: CollectionEntry<'projects'> }
 const { id, data: d } = Astro.props.entry;
 const { text } = await loadExtras();
@@ -18,10 +21,19 @@ const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is
 const next = nextProject(id, order, (s) => built.has(s));
 const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback');
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
+// Share picture and structured data: the project's own hero, the case study, and where it sits
+// (Projects › its first category › the project).
+const shareImage = d.hero ? (d.hero.type === 'image' ? d.hero.src : d.hero.poster) : undefined;
+const abs = (p: string) => new URL(withBase(p), Astro.site).href;
+const cat = d.categories[0];
+const jsonLd = [
+  creativeWorkLd({ name: d.title, url: abs(`/${id}`), client: d.client, year: firstYear(d.copyright) ?? undefined, description: d.seo.description, publisherUrl: abs('/') }),
+  breadcrumbLd([['Projects', abs('/projects')], ...(cat ? [[cat, abs(`/projects/${categorySlug(cat)}`)] as [string, string]] : []), [d.title, abs(`/${id}`)]]),
+];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="project" overHero={!!d.hero}>
+<Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" overHero={!!d.hero}>
   <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
-    {d.hero && <HeroMedia media={d.hero} />}
+    {d.hero && <HeroMedia media={d.hero} fallbackAlt={d.title} />}
     <div class="p-hero-text wrap">
       {d.categories[0] && <Sticker>{d.categories[0]}</Sticker>}
       <h1 class="display h1" data-split>{d.title}</h1>

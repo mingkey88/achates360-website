@@ -25,4 +25,6 @@ const { line, cta, href } = Astro.props;
   .cta { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
   .cta :global(.pill) { pointer-events: auto; }
   .cta :global(.pill) { font-size: clamp(1.25rem, 1rem + 1vw, 2rem); padding: 14px 28px 11px; }
+  /* On the narrowest phones the centred button reaches the pause toggle: the toggle moves to the corner. */
+  @media (max-width: 359px) { .connect :global(.mq-toggle) { top: var(--s-3); translate: 0 0; } }
 </style>

@@ -35,7 +35,7 @@ const [cover, ...rows] = all;
     {rows.map((r, i) => (
       <li class:list={['sw-row', { flip: i % 2 === 1 }]} style={`--tint: ${r.tint}`}>
         <div class="sw-media">
-          <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="5 / 4" sizes="(max-width: 767px) 100vw, 50vw" widths={[640, 960, 1280, 1600]} wipe />
+          <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="5 / 4" sizes="(max-width: 767px) 100vw, 50vw" widths={[640, 960, 1280, 1600, 1900]} wipe duplicateLink={!!r.title} />
         </div>
         <div class="sw-text">
           {r.meta && <p class="sw-meta">{r.meta}</p>}

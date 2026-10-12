@@ -5,6 +5,8 @@ import ProjectGrid from '../../components/ProjectGrid.astro';
 import CategoryPicker from '../../components/CategoryPicker.astro';
 import { loadExtras } from '../../lib/extras';
 import { projectCategories } from '../../lib/categories';
+import { breadcrumbLd } from '../../lib/seo';
+import { withBase } from '../../lib/paths';
 // One page per project category (direction B): the supplied section heading and its gallery, verbatim,
 // with the category dropdown to move between them.
 export async function getStaticPaths() {
@@ -15,9 +17,10 @@ const d = (await getEntry('projectsIndex', 'projects'))!.data;
 const { text } = await loadExtras();
 const cats = projectCategories(d.sections);
 const cat = cats.find((c) => c.slug === Astro.params.category)!;
+const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const picker = cats.map((c) => ({ heading: c.heading, href: c.href, count: c.items.length }));
 ---
-<Base title={`${cat.heading} | ${d.seo.title}`} description={d.seo.description} ogImage={d.seo.ogImage} page="projects">
+<Base title={`${cat.heading} | Achates 360`} description={d.seo.description} ogImage={cat.items[0]?.thumb} ogAlt={cat.heading} jsonLd={[breadcrumbLd([['Projects', abs('/projects')], [cat.heading, abs(cat.href)]])]} page="projects">
   <header class="wrap cat-head">
     <h1 class="display h1" data-split>{cat.heading}</h1>
     <CategoryPicker label={text('category-label')} current={cat.heading} all={{ label: text('next-fallback'), href: '/projects' }} categories={picker} path={cat.href} />

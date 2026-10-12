@@ -82,3 +82,7 @@ Logo motif: LogoSketch.astro draws the logo's five figures as one thin, clean in
 
 Closing section (after kitpro-croma): the contact form moves to its own page, /contact (the menu's CONTACT item and old /#contact links now go there). The homepage ends with ScatterCTA: nine project pictures start as a pile in the middle of a sticky stage and spread to the edges as you scroll (scripts/motion/scatter.ts, scrubbed), revealing "Write to us.", the footer's own intro sentence and a "Get in touch" button to /contact. Without motion the pictures sit spread out with the message visible.
 
+
+## 12 Oct 2026 — cover and lens, after the audit
+- **Selected work cover, after nationalgallery.sg's "EXPERIENCE ART YOUR WAY":** the sheet of paper now covers only the top of the screen (64svh desktop, 38svh phones) with a stepped lower edge (the left 40% stops 7svh higher), so the film runs plain below it. The heading is cut out in heavy capitals (display only; the h2 keeps "Selected work"), both lines right-aligned on one edge, and the logo's five figures are cut out beside the second line like an alpha mask, so the film shows through them too. The paper still scrolls up and away to uncover the whole film.
+- **Hero lens, deeper curve:** the cylinder's radius is now 0.68 of the camera distance (--R vs --P), so the camera stands behind the axis and the side cards come nearer, taller than the centre ones. Steps re-derived: 28.65° desktop, 48.55° phones.

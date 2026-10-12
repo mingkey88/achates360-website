@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Pic from './ui/Pic.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
@@ -30,7 +30,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
     <ul class="scta-pics" aria-hidden="true">
       {pics.map(({ thumb, p }, i) => (
         <li class:list={['pic', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
-          <Image src={thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 34vw, 20vw" loading="lazy" />
+          <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 34vw, 20vw" />
         </li>
       ))}
     </ul>
@@ -42,8 +42,11 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   </div>
 </section>
 <style>
-  /* Scroll room: the stage stays stuck for the section's extra height while the pile spreads. */
-  .scta { position: relative; height: 240svh; }
+  /* Scroll room: the stage stays stuck for the section's extra height while the pile spreads. Only
+     when the motion runs (motion-live): without it (reduced motion, or the script arriving after the
+     3s fallback) there is nothing to scrub, so the section is one screen. */
+  .scta { position: relative; }
+  :global(html.motion-live) .scta { height: 190svh; }
   .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; }
   .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
   .pic {
@@ -59,7 +62,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   .scta-msg h2 { margin: 0; font: 400 var(--fs-h1)/1.15 var(--font-display); }
   .scta-msg p { margin: 0 0 var(--s-3); max-width: 46ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); }
   @media (max-width: 767px) {
-    .scta { height: 200svh; }
+    :global(html.motion-live) .scta { height: 170svh; }
     .pic { left: calc(var(--mx) * 1%); top: calc(var(--my) * 1%); width: calc(var(--mw) * 1vw); }
     .pic.desk-only { display: none; }
   }

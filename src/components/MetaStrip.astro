@@ -4,6 +4,7 @@ import { withBase, linkAttrs } from '../lib/paths';
 import { metaColumns, type MetaKey } from '../lib/meta';
 import type { UiString } from '../lib/strings';
 import Chip from './ui/Chip.astro';
+import { categorySlug } from '../lib/categories';
 import T from './ui/T.astro';
 interface Props {
   client?: string; copyright?: string; categories: string[];
@@ -20,7 +21,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
         <dd>
           {k === 'client' && client}
           {k === 'year' && copyright}
-          {k === 'services' && <ul class="chips">{categories.map((c) => <li><Chip>{c}</Chip></li>)}</ul>}
+          {k === 'services' && <ul class="chips">{categories.map((c) => <li><Chip href={`/projects/${categorySlug(c)}`}>{c}</Chip></li>)}</ul>}
           {k === 'recognition' && (
             <ul class="badges">
               {badges.map((b) => {

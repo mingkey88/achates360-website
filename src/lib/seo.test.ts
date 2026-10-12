@@ -31,3 +31,52 @@ describe('canonicalUrl', () => {
     expect(canonicalUrl('/dxv.html', site, '/')).toBe('https://www.achates360.com/dxv');
   });
 });
+
+import { robotsTxtWithSitemap, sitemapXml, isFileNameAlt, altOr, tidy, breadcrumbLd, ldJson, CANONICAL_ALIASES, SITEMAP_EXCLUDED } from './seo';
+
+describe('robotsTxtWithSitemap', () => {
+  it('names the sitemap in production only', () => {
+    expect(robotsTxtWithSitemap('production')).toBe('User-agent: *\nAllow: /\nSitemap: https://www.achates360.com/sitemap.xml\n');
+    expect(robotsTxtWithSitemap('staging')).toBe('User-agent: *\nDisallow: /\n');
+  });
+});
+
+describe('sitemapXml', () => {
+  it('lists each URL once, sorted, escaped', () => {
+    const xml = sitemapXml(['https://x.test/b', 'https://x.test/a&b', 'https://x.test/b']);
+    expect(xml.match(/<loc>/g)).toHaveLength(2);
+    expect(xml).toContain('<loc>https://x.test/a&amp;b</loc>');
+    expect(xml.indexOf('a&amp;b')).toBeLessThan(xml.indexOf('/b<'));
+  });
+  it('keeps aliases and the 404 page out', () => {
+    for (const p of Object.keys(CANONICAL_ALIASES)) expect(SITEMAP_EXCLUDED.has(p)).toBe(true);
+    expect(SITEMAP_EXCLUDED.has('/404')).toBe(true);
+  });
+});
+
+describe('alt text', () => {
+  it('treats file names as missing', () => {
+    expect(isFileNameAlt('SMRT_290926_ED-169.jpg')).toBe(true);
+    expect(isFileNameAlt('Building Memories_cover.JPEG ')).toBe(true);
+    expect(isFileNameAlt('A bespoke gift box')).toBe(false);
+    expect(altOr('1.jpeg', 'R151 Movia')).toBe('R151 Movia');
+    expect(altOr('', 'R151 Movia')).toBe('R151 Movia');
+    expect(altOr('Ribbon-pull ceremony', 'R151 Movia')).toBe('Ribbon-pull ceremony');
+  });
+});
+
+describe('tidy', () => {
+  it('collapses whitespace', () => {
+    expect(tidy('  IGBC  Conference\n | Achates 360 ')).toBe('IGBC Conference | Achates 360');
+  });
+});
+
+describe('JSON-LD', () => {
+  it('numbers breadcrumb positions from 1', () => {
+    const ld = breadcrumbLd([['Projects', 'https://x.test/projects'], ['Events', 'https://x.test/projects/events']]) as any;
+    expect(ld.itemListElement.map((i: any) => i.position)).toEqual([1, 2]);
+  });
+  it('cannot close its script element', () => {
+    expect(ldJson({ name: '</script><b>' })).not.toContain('</script>');
+  });
+});

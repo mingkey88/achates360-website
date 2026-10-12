@@ -1,6 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
-import { Image } from 'astro:assets';
+import Pic from '../components/ui/Pic.astro';
 import Base from '../layouts/Base.astro';
 import CategoryPicker from '../components/CategoryPicker.astro';
 import { loadExtras } from '../lib/extras';
@@ -32,7 +32,7 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
       {cats.map((c, i) => (
         <li>
           <a class="tile" href={withBase(c.href)} data-reveal>
-            <span class="tile-media"><Image src={c.items[0].thumb} alt="" widths={[480, 800, 1200]} sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" loading={i < 3 ? 'eager' : 'lazy'} /></span>
+            <span class="tile-media"><Pic src={c.items[0].thumb} alt="" crop={4 / 3} widths={[480, 800, 1200, 1600]} sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" loading={i < 3 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} /></span>
             <span class="tile-text"><span class="tile-name">{c.heading}</span><span class="tile-count">{c.items.length}</span></span>
           </a>
         </li>

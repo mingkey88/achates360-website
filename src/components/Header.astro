@@ -62,6 +62,9 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel, subLabel } = Astro.
     const set = (open: boolean) => { btn.setAttribute('aria-expanded', String(open)); li.classList.toggle('is-open', open); };
     btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
     li.addEventListener('keydown', (e) => { if (e.key === 'Escape' && li.classList.contains('is-open')) { set(false); btn.focus(); } });
+    // A menu opened by hovering closes on Escape too, and stays shut until the pointer leaves.
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && li.matches(':hover')) li.classList.add('is-dismissed'); });
+    li.addEventListener('mouseleave', () => li.classList.remove('is-dismissed'));
     document.addEventListener('click', (e) => { if (!li.contains(e.target as Node)) set(false); });
     li.addEventListener('focusout', (e) => { if (!li.contains(e.relatedTarget as Node)) set(false); });
   }
@@ -105,6 +108,7 @@ const { menu, path, overHero, wordmark, menuLabel, navLabel, subLabel } = Astro.
     opacity: 0; visibility: hidden; translate: -50% 6px; transition: opacity .25s, translate .3s var(--ease-out), visibility 0s .25s;
   }
   .has-sub:hover .sub, .has-sub.is-open .sub { opacity: 1; visibility: visible; translate: -50% 0; transition-delay: 0s; }
+  .has-sub.is-dismissed:hover:not(.is-open) .sub { opacity: 0; visibility: hidden; }
   .sub a { display: block; padding: 10px var(--s-5); font-size: var(--fs-small); text-decoration: none; text-transform: none; white-space: nowrap; }
   .sub a::first-letter { text-transform: none; }
   .sub a:is(:hover, [aria-current]) { background: var(--stone); text-decoration: none; }

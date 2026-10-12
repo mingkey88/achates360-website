@@ -1,0 +1,83 @@
+---
+/*
+ * One responsive picture, cropped at build time to the frame it is shown in, as AVIF with a WebP
+ * fallback (direction B audit, 12 Oct 2026).
+ *
+ * Why crop here: frames that use object-fit: cover (5:4 rows, 4:3 tiles, full-height covers) crop wide
+ * sources in the browser, which then needs height × source-ratio pixels, not the width `sizes`
+ * describes, so retina screens upscaled them (up to 3.5× on the phone cover). A build-time crop makes
+ * every srcset candidate the frame's own shape, so `sizes` is exact.
+ *
+ * crop / mobileCrop: the frame's width ÷ height (desktop, and ≤767px when it differs, e.g. a portrait
+ * phone frame). Without crop the picture keeps its own proportions. Widths are capped at what the
+ * source can give in that shape (never enlarged).
+ * Animated GIFs stay one animated WebP <img> (sharp writes AVIF stills).
+ */
+import { getImage } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+import { meta } from '../../lib/img';
+
+type Img = HTMLAttributes<'img'>;
+interface Props {
+  src: ImageMetadata; alt: string; sizes: string; widths: number[];
+  crop?: number; mobileCrop?: number; mobileSizes?: string; mobileWidths?: number[];
+  loading?: 'eager' | 'lazy'; fetchpriority?: 'high' | 'low' | 'auto'; position?: string;
+  class?: string; draggable?: Img['draggable']; decoding?: Img['decoding'];
+}
+const {
+  src, alt, sizes, widths, crop, mobileCrop, mobileSizes = sizes, mobileWidths = widths,
+  loading = 'lazy', fetchpriority, position = 'center', class: cls, draggable, decoding = 'async',
+} = Astro.props;
+
+const MOBILE = '(max-width: 767px)';
+const m = meta(src); // size and format, read without shipping the original
+const animated = m.format === 'gif';
+
+/** The widths this source can fill in a frame of `ratio` (w ÷ h), ascending, largest possible last. */
+function fit(ws: number[], ratio?: number): { ws: number[]; max: number } {
+  const max = Math.floor(ratio ? Math.min(m.width, m.height * ratio) : m.width);
+  const out = [...new Set(ws.filter((w) => w < max))].sort((a, b) => a - b);
+  if (!out.length || out.at(-1)! < max) out.push(Math.min(max, Math.max(...ws)));
+  return { ws: [...new Set(out)].sort((a, b) => a - b), max };
+}
+
+async function srcset(ws: number[], ratio: number | undefined, format: 'avif' | 'webp') {
+  const imgs = await Promise.all(ws.map((w) => getImage({
+    src, width: w, ...(ratio ? { height: Math.round(w / ratio), fit: 'cover' as const, position } : {}), format,
+  })));
+  return { set: imgs.map((im, i) => `${im.src} ${ws[i]}w`).join(', '), first: imgs.at(-1)!.src };
+}
+
+const desk = fit(widths, crop);
+const phone = mobileCrop !== undefined ? fit(mobileWidths, mobileCrop) : null;
+const height = (w: number, ratio?: number) => Math.round(ratio ? w / ratio : (w * m.height) / m.width);
+
+let sources: { media?: string; type: string; srcset: string; sizes: string }[] = [];
+let fallback = { src: '', srcset: '' };
+if (!animated) {
+  const [dA, dW, pA, pW] = await Promise.all([
+    srcset(desk.ws, crop, 'avif'), srcset(desk.ws, crop, 'webp'),
+    phone ? srcset(phone.ws, mobileCrop, 'avif') : null, phone ? srcset(phone.ws, mobileCrop, 'webp') : null,
+  ]);
+  sources = [
+    ...(pA && pW ? [
+      { media: MOBILE, type: 'image/avif', srcset: pA.set, sizes: mobileSizes },
+      { media: MOBILE, type: 'image/webp', srcset: pW.set, sizes: mobileSizes },
+    ] : []),
+    { type: 'image/avif', srcset: dA.set, sizes },
+  ];
+  fallback = { src: dW.first, srcset: dW.set };
+} else {
+  const a = await getImage({ src, width: Math.min(m.width, Math.max(...widths)), format: 'webp' });
+  fallback = { src: a.src, srcset: '' };
+}
+const w = desk.ws.at(-1)!;
+---
+<picture style="display: contents">
+  {sources.map((s) => <source media={s.media} type={s.type} srcset={s.srcset} sizes={s.sizes} />)}
+  <img
+    class={cls} src={fallback.src} srcset={fallback.srcset || undefined} sizes={fallback.srcset ? sizes : undefined}
+    alt={alt} width={w} height={height(w, crop)} loading={loading} decoding={decoding}
+    fetchpriority={fetchpriority} draggable={draggable}
+  />
+</picture>

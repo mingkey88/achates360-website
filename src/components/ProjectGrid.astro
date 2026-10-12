@@ -1,4 +1,5 @@
 ---
+import { isFileNameAlt } from '../lib/seo';
 import MediaCard from './ui/MediaCard.astro';
 // Gallery items from the export (homepage All Projects, /projects sections, /copy-of-projects),
 // titles and descriptions verbatim (🏆 markers included).
@@ -7,8 +8,10 @@ interface Props { items: Item[] }
 const { items } = Astro.props;
 ---
 <ul class="project-grid">
-  {items.map((it) => (
-    <li><MediaCard image={it.thumb} alt={it.alt} href={it.href} title={it.title} subtitle={it.description} previewVideo={it.video} ratio="16 / 9" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt wipe /></li>
+  {/* The first row paints at once: loaded eagerly, not held back by the scroll reveal or the wipe
+      (on the category pages it held the largest paint to 7 s). */}
+  {items.map((it, i) => (
+    <li><MediaCard image={it.thumb} alt={isFileNameAlt(it.alt) ? '' : it.alt} href={it.href} title={it.title} subtitle={it.description} previewVideo={it.video} ratio="16 / 9" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 25vw" tilt eager={i < 4} reveal={i >= 4} wipe={i >= 4} /></li>
   ))}
 </ul>
 <style>
