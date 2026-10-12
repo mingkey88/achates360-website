@@ -5,7 +5,7 @@
  * form after Aesop: boxed fields with labels above, a grid of square checkboxes, one solid submit).
  *
  * Field names: the message box has no name in the export, so it posts as `message`; the checkbox
- * groups post as group-1 / group-2. Submit posts the FormData to PUBLIC_FORM_ENDPOINT (staging
+ * groups post as group-1 (Wix's overflow group "Selection 2" is joined onto the services list). Submit posts the FormData to PUBLIC_FORM_ENDPOINT (staging
  * without one says so). Each required checkbox group is validated in script, with an alert region
  * per group and a dashed outline once a submit has been tried.
  */
@@ -13,6 +13,7 @@ import { renderMd } from '../lib/markdown';
 import T from './ui/T.astro';
 import LogoSketch from './LogoSketch.astro';
 import type { UiString } from '../lib/strings';
+import { mergeContinuationGroups } from '../lib/form';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }
 interface Group { name: string; label: string; required: boolean; options: string[] }
 // heading: a draft replacement for the supplied intro ("Drop us a message…"), pending approval
@@ -28,6 +29,8 @@ const boxes = form.fields.filter((f) => f.type === 'textarea');
 const inputType = (f: Field) => f.type as astroHTML.JSX.HTMLInputTypeAttribute;
 const autocomplete = (f: Field) => ({ name: 'name', company: 'organization', email: 'email' } as Record<string, string>)[f.name];
 const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : 'field');
+// Wix's second "Selection 2" group is the overflow of the services list: shown as one list.
+const groups = mergeContinuationGroups(form.groups);
 ---
 <section id="contact" class="contact">
   <LogoSketch id="contact-sketch" class="c-sketch" />
@@ -40,11 +43,12 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
         {lines.map((f) => (
           <label class:list={['field', { wide: f.type === 'email' }]}>
             <span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
-            <input type={inputType(f)} name={fieldName(f)} required={f.required} autocomplete={autocomplete(f)} />
+            <input type={inputType(f)} name={fieldName(f)} required={f.required} autocomplete={autocomplete(f)} aria-describedby={f.required ? `err-${fieldName(f)}` : undefined} />
+            {f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}
           </label>
         ))}
       </div>
-      {form.groups.map((g, i) => (
+      {groups.map((g, i) => (
         <fieldset class="group" data-required={g.required ? 'true' : 'false'} aria-describedby={g.required ? `group-error-${i + 1}` : undefined}>
           <legend class="flabel">{g.label}{g.required && <span class="req" aria-hidden="true"> *</span>}{g.required && <span class="sr-only"> Required</span>}</legend>
           <div class="options">
@@ -58,9 +62,9 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       ))}
       {boxes.map((f) => (
         f.label
-          ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6"></textarea></label>
+          ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
           /* Wix's message box has no label: its placeholder (verbatim) shows in the box and names it for screen readers. */
-          : <div class="field"><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined} rows="6"></textarea></div>
+          : <div class="field"><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</div>
       ))}
       <div class="send-row">
         <button type="submit" class="send">{form.submitLabel}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>
@@ -85,10 +89,26 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       fs.classList.toggle('invalid', !any);
       return any;
     };
+    // Text fields: the browser's own validity, shown inline (not as a browser bubble) and
+    // announced through aria-invalid + aria-describedby.
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('.field :is(input, textarea)[required]')];
+    const checkField = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      const ok = el.checkValidity();
+      const error = document.getElementById(el.getAttribute('aria-describedby') ?? '');
+      const text = ok ? '' : el.validity.typeMismatch ? 'Please enter a valid email address.' : 'Please fill in this field.';
+      if (error && error.textContent !== text) error.textContent = text;
+      if (ok) el.removeAttribute('aria-invalid'); else el.setAttribute('aria-invalid', 'true');
+      return ok;
+    };
     // Once a submit has been tried, keep the error state in step with what the visitor fixes.
     form.addEventListener('change', (e) => {
+      if (!form.classList.contains('tried')) return;
       const fs = (e.target as Element).closest<HTMLFieldSetElement>('fieldset[data-required="true"]');
-      if (fs && form.classList.contains('tried')) checkGroup(fs);
+      if (fs) checkGroup(fs);
+    });
+    form.addEventListener('input', (e) => {
+      const el = e.target as HTMLInputElement;
+      if (form.classList.contains('tried') && fields.includes(el)) checkField(el);
     });
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -97,11 +117,14 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
       success?.setAttribute('hidden', '');
       status.textContent = '';
       form.classList.add('tried');
-      let ok = form.checkValidity();
+      let ok = true;
+      for (const el of fields) ok = checkField(el) && ok;
       for (const fs of groups) ok = checkGroup(fs) && ok;
       if (!ok) {
-        if (!form.checkValidity()) form.reportValidity();
-        else groups.find((fs) => fs.classList.contains('invalid'))?.querySelector('input')?.focus();
+        // First problem in reading order; scroll-padding keeps it clear of the sticky header.
+        const first = fields.find((el) => el.hasAttribute('aria-invalid'))
+          ?? groups.find((fs) => fs.classList.contains('invalid'))?.querySelector('input');
+        first?.focus();
         return;
       }
       if (!PUBLIC_FORM_ENDPOINT) { status.textContent = 'Form not connected on staging'; return; }
@@ -158,6 +181,8 @@ const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : '
   .option input:checked + .box::after { opacity: 1; }
   .option input:focus-visible + .box { outline: 2px solid var(--ink); outline-offset: 2px; }
   .group.invalid .box { border-color: var(--accent-deep); }
+  .field-error { font-size: var(--fs-small); color: var(--accent-deep); }
+  .field-error:empty { display: none; }
   .group-error { margin: var(--s-3) 0 0; font-size: var(--fs-small); color: var(--accent-deep); }
   .group-error:empty { display: none; }
 

@@ -3,8 +3,8 @@ import { renderMd } from '../lib/markdown';
 import { withBase, linkAttrs } from '../lib/paths';
 import Logo from './ui/Logo.astro';
 import SocialIcon from './ui/SocialIcon.astro';
-interface Props { blocks: any[] }
-const { blocks } = Astro.props;
+interface Props { blocks: any[]; hideIntro?: boolean }
+const { blocks, hideIntro = false } = Astro.props;
 // site.md footer blocks, verbatim: the intro line, then the legal lines; each "###### Label" text
 // block (Contact, Social) opens a column. Social icons become text links named by their alt text.
 const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
@@ -20,7 +20,8 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
 ---
 <footer class="site-footer">
   <div class="wrap grid">
-    {intro && <div class="intro" set:html={md(intro.md)} />}
+    {/* Hidden intro keeps its (empty) grid cell so the columns stay where they are. */}
+    {intro && <div class="intro" set:html={hideIntro ? '' : md(intro.md)} />}
     {rest.map((col) => (
       <div class="col">
         {col.filter((b) => b.type === 'text').map((b) => <div class="md" set:html={md(b.md)} />)}

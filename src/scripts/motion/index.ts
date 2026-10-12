@@ -19,6 +19,8 @@ export function run(...mods: Array<() => void>): void {
   const late = root.classList.contains('motion-ready');
   root.classList.add('motion-ready');
   if (reduced || late) return;
+  // motion-live: the modules really run, so scroll-scrubbed sections may claim their extra scroll room.
+  root.classList.add('motion-live');
   for (const m of mods) {
     try { m(); } catch (e) { console.error('[motion]', e); }
   }
