@@ -25,6 +25,15 @@ const allowRemovals = args.includes('--allow-removals');
 const onlyIdx = args.findIndex((a) => a === '--only' || a.startsWith('--only='));
 const onlyVal = onlyIdx < 0 ? null : args[onlyIdx].startsWith('--only=') ? args[onlyIdx].slice(7) : args[onlyIdx + 1];
 const only = onlyVal ? onlyVal.split(',').filter(Boolean) : null;
+// --unlock a,b: password-protected pages to export with the page password in WIX_PAGE_PASSWORD
+// (never committed). They join this run's page list as if listed in the sitemap; only these
+// pages are unlocked, so other protected pages stay uncloned.
+const unlockIdx = args.findIndex((a) => a === '--unlock' || a.startsWith('--unlock='));
+const unlockVal = unlockIdx < 0 ? null : args[unlockIdx].startsWith('--unlock=') ? args[unlockIdx].slice(9) : args[unlockIdx + 1];
+const unlockSlugs = unlockVal ? unlockVal.split(',').filter(Boolean) : [];
+const pagePassword = process.env.WIX_PAGE_PASSWORD;
+if (unlockSlugs.length && !pagePassword) throw new Error('--unlock needs the page password in WIX_PAGE_PASSWORD');
+if (unlockSlugs.length && offline) throw new Error('--unlock and --offline cannot be combined');
 const CACHE = '.cache/rendered';
 const SHOTS = 'docs/reference';
 const COLLECTIONS = ['home', 'projectsIndex', 'projects', 'cards', 'basic', 'site'];
@@ -45,6 +54,7 @@ if (offline) {
   if (!only) await writeFile('scripts/export-wix/sitemap-urls.json', JSON.stringify(paths, null, 2) + '\n');
   console.log(`sitemap: ${paths.length} pages`);
 }
+for (const s of unlockSlugs) if (!paths.includes(`/${s}`)) paths.push(`/${s}`);
 
 // 2. Render (cached). A cache entry is the HTML, its gallery sidecar and both screenshots;
 // anything missing (e.g. an HTML rendered before sidecars existed) means render again.
@@ -61,7 +71,8 @@ async function rendered(slug) {
     for (let attempt = 1; ; attempt++) {
       console.log(`render ${slug}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
       try {
-        await renderPage(browser, slug, { htmlDir: CACHE, shotDir: SHOTS, mobileContext });
+        const password = unlockSlugs.includes(slug) ? pagePassword : undefined;
+        await renderPage(browser, slug, { htmlDir: CACHE, shotDir: SHOTS, mobileContext, password });
         break;
       } catch (e) {
         console.log(`render ${slug} failed: ${e.message}`);

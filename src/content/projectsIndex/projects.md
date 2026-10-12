@@ -571,11 +571,16 @@ sections:
   - id: cat-9
     heading: Events
     items:
-      - title: Heritage Wall and Panel Design
+      - title: R151 Last Train Handover Ceremony
+        description: Alstom Asia Pacific
+        href: /alstom-r151-last-train-handover
+        thumb: ../../assets/wix/1aae46_7e8af384434b46f5ac4b8e18e0fcc82d.jpg
+        alt: ""
+      - title: Frasers Property Heritage Wall and Display
         description: ""
         href: /copy-of-international-green-building
         thumb: ../../assets/wix/1aae46_d35a890f9ca34592b41e2c1f45c4f59e.jpg
-        alt: 3D Outdoor Wall Design, Environmental Graphics
+        alt: ""
       - title: |-
           Singapore Conference Hall ’50/50
           – A Shared History’ Exhibition
@@ -625,4 +630,14 @@ sections:
         href: /singaporeroadsafetycampaign
         thumb: ../../assets/wix/9766c0_b81565ed2d6e40d99e33b5b6ef3bd08f.jpg
         alt: Singapore Road Safety Campaign
+      - title: Patient Safety Appreciation Night
+        description: Singapore General Hospital
+        href: /sgh-patient-safety-appreciation-night
+        thumb: ../../assets/wix/1aae46_7e4a3ff372384839b69fb1425affb83f.jpeg
+        alt: ""
+      - title: Singapore Urban Mobility Week 2026
+        description: Alstom Asia Pacific
+        href: /alstom-singapore-urban-mobility-week-2026
+        thumb: ../../assets/wix/1aae46_e044da7197d348628fd8b2e6cfb43594.jpg
+        alt: ""
 ---

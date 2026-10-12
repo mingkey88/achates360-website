@@ -116,12 +116,32 @@ export async function annotate(page, mobileBoxes = {}) {
   }, { boxes, mobileBoxes, compId: COMP_ID });
 }
 
-export async function renderPage(browser, slug, { htmlDir, shotDir, mobileContext } = {}) {
+// Wix answers a password-protected page with 403 to a headless Chrome user agent, so pages
+// opened for unlocking present as desktop Chrome.
+const DESKTOP_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
+
+// Wix's "Guest Area" password prompt: submit the page password, then wait for the page itself.
+// Wix asks again on every visit, so each render (desktop and mobile) unlocks on its own.
+export async function unlock(page, password) {
+  const field = page.locator('input[type="password"]');
+  try {
+    await field.first().waitFor({ timeout: 8000 });
+  } catch {
+    return; // no prompt: nothing to unlock
+  }
+  await field.first().fill(password);
+  await field.first().press('Enter');
+  await field.first().waitFor({ state: 'detached', timeout: 30000 });
+  await page.waitForLoadState('load');
+}
+
+export async function renderPage(browser, slug, { htmlDir, shotDir, mobileContext, password } = {}) {
   if (shotDir && !mobileContext) throw new Error('renderPage: mobileContext is required when shotDir is set');
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, ...(password ? { userAgent: DESKTOP_UA } : {}) });
   const galleryBodies = recordGalleryResponses(page.context());
   try {
     await page.goto(pageUrl(slug), { waitUntil: 'load', timeout: 60000 });
+    if (password) await unlock(page, password);
     await settle(page);
     // Wix lays out the same components for mobile by user agent: their mobile boxes tell which
     // desktop rows Wix keeps side by side on phones.
@@ -130,6 +150,7 @@ export async function renderPage(browser, slug, { htmlDir, shotDir, mobileContex
       const m = await mobileContext.newPage();
       try {
         await m.goto(pageUrl(slug), { waitUntil: 'load', timeout: 60000 });
+        if (password) await unlock(m, password);
         await settle(m);
         mobileBoxes = await pageBoxes(m);
         if (shotDir) {

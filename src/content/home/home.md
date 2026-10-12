@@ -81,6 +81,11 @@ slides:
 allProjects:
   md: "## [All Projects](/projects)"
   items:
+    - title: R151 Movia™ Last Train Handover
+      description: Alstom Asia Pacific
+      href: /alstom-r151-last-train-handover
+      thumb: ../../assets/wix/1aae46_7e8af384434b46f5ac4b8e18e0fcc82d.jpg
+      alt: ""
     - title: Affluent Segment AI Assets
       description: DBS Private Bank
       href: /dbs-affluent-segment-ai-assets
@@ -378,6 +383,16 @@ allProjects:
       href: /corporate-powerpoint-presentations
       thumb: ../../assets/wix/24d1a3_5da729051f2f43828af0f3a135ee8426.png
       alt: Corporate Powerpoint Presentations
+    - title: Patient Safety Appreciation Night
+      description: Singapore General Hospital
+      href: /sgh-patient-safety-appreciation-night
+      thumb: ../../assets/wix/1aae46_7e4a3ff372384839b69fb1425affb83f.jpeg
+      alt: ""
+    - title: Singapore Urban Mobility Week 2026
+      description: Alstom Asia Pacific
+      href: /alstom-singapore-urban-mobility-week-2026
+      thumb: ../../assets/wix/1aae46_e044da7197d348628fd8b2e6cfb43594.jpg
+      alt: ""
 contact:
   md:
     - "## Drop us a message and we'll get back to you!"

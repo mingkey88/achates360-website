@@ -341,7 +341,7 @@ blocks:
     color: "#2f2e2e"
     box:
       x: 242
-      y: 5000
+      y: 5004
       w: 448
       h: 34
     mbox:
@@ -392,7 +392,7 @@ blocks:
         alt: The_Brook_Clown_header-2.jpg
     box:
       x: 242
-      y: 5067
+      y: 5071
       w: 956
       h: 830
     mbox:
@@ -405,7 +405,7 @@ blocks:
     color: "#2f2e2e"
     box:
       x: 242
-      y: 5990
+      y: 5994
       w: 448
       h: 34
     mbox:
@@ -467,7 +467,7 @@ blocks:
         alt: China Cultural Centre
     box:
       x: 242
-      y: 6054
+      y: 6058
       w: 956
       h: 1116
     mbox:
@@ -480,7 +480,7 @@ blocks:
     color: "#2f2e2e"
     box:
       x: 242
-      y: 7235
+      y: 7239
       w: 448
       h: 34
     mbox:
@@ -546,7 +546,7 @@ blocks:
         alt: The V Edit
     box:
       x: 242
-      y: 7301
+      y: 7305
       w: 956
       h: 1116
     mbox:
@@ -559,7 +559,7 @@ blocks:
     color: "#2f2e2e"
     box:
       x: 242
-      y: 8427
+      y: 8431
       w: 448
       h: 34
     mbox:
@@ -608,7 +608,7 @@ blocks:
         alt: ChurchWedding_GraphicDesign_InvitationCard_2-1.gif
     box:
       x: 242
-      y: 8489
+      y: 8493
       w: 956
       h: 830
     mbox:
@@ -621,7 +621,7 @@ blocks:
     color: "#2f2e2e"
     box:
       x: 242
-      y: 9351
+      y: 9355
       w: 448
       h: 34
     mbox:
@@ -631,6 +631,11 @@ blocks:
       h: 30
   - type: gallery
     items:
+      - title: R151 Movia™ Last Train Handover
+        description: Alstom Asia Pacific
+        href: /alstom-r151-last-train-handover
+        thumb: ../../assets/wix/1aae46_7e8af384434b46f5ac4b8e18e0fcc82d.jpg
+        alt: ""
       - title: |-
           Singapore Conference Hall ’50/50
           – A Shared History’ Exhibition
@@ -677,14 +682,24 @@ blocks:
         href: /the-v-edit-e-zine
         thumb: ../../assets/wix/e9d9c2_bab7215c43334dce83d031dc1cc34325.gif
         alt: The V Edit
+      - title: Patient Safety Appreciation Night
+        description: Singapore General Hospital
+        href: /sgh-patient-safety-appreciation-night
+        thumb: ../../assets/wix/1aae46_7e4a3ff372384839b69fb1425affb83f.jpeg
+        alt: ""
+      - title: Singapore Urban Mobility Week 2026
+        description: Alstom Asia Pacific
+        href: /alstom-singapore-urban-mobility-week-2026
+        thumb: ../../assets/wix/1aae46_e044da7197d348628fd8b2e6cfb43594.jpg
+        alt: ""
     box:
       x: 242
-      y: 9411
+      y: 9415
       w: 956
-      h: 830
+      h: 1116
     mbox:
       x: 20
       y: 22253
       w: 280
-      h: 2409
+      h: 3219
 ---

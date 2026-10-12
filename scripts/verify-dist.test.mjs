@@ -17,8 +17,10 @@ describe('missingPages', () => {
 describe('permanent URLs', () => {
   const permanent = JSON.parse(readFileSync(new URL('./export-wix/permanent-urls.json', import.meta.url), 'utf8'));
   it('the committed list holds every snapshot page, including the six business cards', () => {
-    expect(permanent).toHaveLength(68);
+    // 68 from the 6 Oct snapshot + the 3 Events projects added on Wix behind a page password (12 Oct).
+    expect(permanent).toHaveLength(71);
     expect(permanent).toContain('/');
+    for (const p of ['/alstom-r151-last-train-handover', '/sgh-patient-safety-appreciation-night', '/alstom-singapore-urban-mobility-week-2026']) expect(permanent).toContain(p);
     for (const slug of CARD_SLUGS) expect(permanent).toContain(`/${slug}`);
   });
   it('a page dropped from a re-exported sitemap is still required', () => {
