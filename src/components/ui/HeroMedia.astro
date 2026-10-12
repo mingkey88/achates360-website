@@ -1,6 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import BgVideo from '../BgVideo.astro';
+import Pic from './Pic.astro';
 import { BLANK_IMAGE } from '../../lib/paths';
 import { loadExtras } from '../../lib/extras';
 import { altOr } from '../../lib/seo';
@@ -26,7 +27,7 @@ const load = eager ? 'eager' : 'lazy';
       <noscript><img class="hm-still" src={stillUrl} alt="" /></noscript>
     </>
   ) : (
-    <Image class="hm-image" src={media.src} alt={altOr(media.alt, fallbackAlt)} widths={[480, 960, 1440, 1920, 2560]} sizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
+    <Pic class="hm-image" src={media.src} alt={altOr(media.alt, fallbackAlt)} widths={[960, 1440, 1920, 2560]} sizes="100vw" mobileCrop={3 / 4} mobileWidths={[480, 768, 1080, 1440]} mobileSizes="100vw" loading={load} fetchpriority={eager ? 'high' : undefined} />
   )}
 </div>
 <style>

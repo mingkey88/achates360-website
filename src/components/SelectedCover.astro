@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Pic from './ui/Pic.astro';
 import type { CollectionEntry } from 'astro:content';
 import BgVideo from './BgVideo.astro';
 import Pill from './ui/Pill.astro';
@@ -33,7 +33,7 @@ const B = 4000;
 <div class="cover" data-placeholder={heading.placeholder ? '' : undefined}>
   <h2 id={id} class="sr-only">{heading.text}</h2>
   <div class="cover-film" data-bgvideo-viewport>
-    <Image class="cover-media" src={poster} alt="" widths={[640, 1280, 1920]} sizes="100vw" />
+    <Pic class="cover-media" src={poster} alt="" widths={[640, 1280, 1920, 2560]} sizes="100vw" mobileCrop={9 / 16} mobileWidths={[360, 480, 640, 768]} mobileSizes="100vw" />
     {media.type === 'video' && <BgVideo src={media.src} poster={media.poster} desktopOnly class="cover-media" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />}
     <div class="cover-card">
       {project.meta && <p class="cc-meta">{project.meta}</p>}

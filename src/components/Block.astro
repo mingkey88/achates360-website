@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Pic from './ui/Pic.astro';
 import { renderMd } from '../lib/markdown';
 import { withBase, backLinkHref, linkAttrs } from '../lib/paths';
 import BgVideo from './BgVideo.astro';
@@ -8,6 +8,7 @@ import Player from './Player.astro';
 import MediaCard from './ui/MediaCard.astro';
 import { loadExtras } from '../lib/extras';
 import { altOr, isFileNameAlt } from '../lib/seo';
+import { meta } from '../lib/img';
 // One exported content block in the new design. Copy is rendered verbatim; the clone's per-block
 // colours (b.color) belonged to Wix's layout and are not used.
 interface Props { block: any; pageTitle?: string; altFallback?: string; lead?: boolean; sizes?: string; demote?: number }
@@ -18,8 +19,8 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
 {b.type === 'text' && <div class:list={['block-text', 'prose', { lead }]} data-reveal set:html={renderMd(b.md, undefined, { demote })} />}
 {b.type === 'link' && (() => { const m = String(b.label).match(/^(←\s*)?(.*)$/)!; return <p class="block-link"><a class="back-link" href={withBase(backLinkHref(b.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
 {b.type === 'image' && (b.href
-  ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)} data-reveal><Image class="block-img" src={b.src} alt={altOr(b.alt, altFallback)} widths={[480, 960, 1440, 1920]} sizes={sizes} /></a>
-  : <div class="block-image" data-reveal><Image class="block-img" src={b.src} alt={altOr(b.alt, altFallback)} widths={[480, 960, 1440, 1920]} sizes={sizes} /></div>)}
+  ? <a class="block-image" href={withBase(b.href)} {...linkAttrs(b.href)} style={`--nat: ${meta(b.src).width}px`} data-reveal><Pic class="block-img" src={b.src} alt={altOr(b.alt, altFallback)} widths={[480, 960, 1440, 1920, 2560]} sizes={sizes} /></a>
+  : <div class="block-image" style={`--nat: ${meta(b.src).width}px`} data-reveal><Pic class="block-img" src={b.src} alt={altOr(b.alt, altFallback)} widths={[480, 960, 1440, 1920, 2560]} sizes={sizes} /></div>)}
 {b.type === 'gallery' && (
   <ul class="block-gallery">
     {b.items.map((it: any) => <li><MediaCard image={it.thumb} alt={isFileNameAlt(it.alt) ? (it.href && it.title ? '' : altFallback) : it.alt} href={it.href} title={it.href ? it.title : undefined} previewVideo={it.video} ratio="auto" sizes="(max-width: 767px) calc(100vw - 32px), 45vw" /></li>)}

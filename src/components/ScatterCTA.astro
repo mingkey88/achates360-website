@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Pic from './ui/Pic.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
@@ -30,7 +30,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
     <ul class="scta-pics" aria-hidden="true">
       {pics.map(({ thumb, p }, i) => (
         <li class:list={['pic', { 'desk-only': p.mx === undefined }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
-          <Image src={thumb} alt="" widths={[320, 640]} sizes="(max-width: 767px) 34vw, 20vw" loading="lazy" />
+          <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 34vw, 20vw" />
         </li>
       ))}
     </ul>

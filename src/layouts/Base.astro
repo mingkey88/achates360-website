@@ -4,6 +4,7 @@ import { getImage } from 'astro:assets';
 import { SITE_ENV } from 'astro:env/server';
 import { robotsMeta, canonicalUrl, CANONICAL_ALIASES, tidy, ldJson } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
+import { meta } from '../lib/img';
 import { pagePath } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
 import { withServices, withCategories, withContactPage } from '../lib/menu';
@@ -39,7 +40,7 @@ const { text } = await loadExtras();
 const robots = noindex ? 'noindex, nofollow' : robotsMeta(SITE_ENV);
 // Share image, cropped to the 1200x630 card every network shows. Transparent PNGs (the export's
 // shared logo) would flatten to black as JPG, so they give way to the paper-and-logo default.
-const shareSrc = ogImage && ogImage.format !== 'png' ? ogImage : ogDefault;
+const shareSrc = ogImage && meta(ogImage).format !== 'png' ? ogImage : ogDefault;
 const OG_W = 1200, OG_H = 630;
 const og = new URL((await getImage({ src: shareSrc, width: OG_W, height: OG_H, fit: 'cover', format: 'jpg' })).src, Astro.site).href;
 const ogImageAlt = shareSrc === ogDefault ? 'Achates 360' : (ogAlt ?? title);

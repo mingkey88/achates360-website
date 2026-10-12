@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import Pic from './Pic.astro';
 import { withBase, mediaUrl, linkAttrs } from '../../lib/paths';
 import Sticker from './Sticker.astro';
 // An image card. previewVideo: a muted preview that plays on hover, only on hover-capable pointers and
@@ -12,12 +12,15 @@ interface Props {
   previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean;
 }
 const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false } = Astro.props;
+// A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
+const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
+const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
 const Wrap = href ? 'a' : 'div';
 const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplicateLink ? { tabindex: -1, 'aria-hidden': 'true' } : {}) } : {};
 ---
 <Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal>
   <div class="mc-media" style={`aspect-ratio: ${ratio}`} data-wipe={wipe ? '' : undefined}>
-    <Image src={image} alt={alt} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+    <Pic src={image} alt={alt} crop={crop} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
     {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
   </div>

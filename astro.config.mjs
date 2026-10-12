@@ -28,6 +28,18 @@ export default defineConfig({
   site,
   base,
   integrations: [sitemap],
+  // Encoder settings (image audit, 12 Oct 2026): AVIF first (ui/Pic.astro), WebP as the fallback.
+  // 4:4:4 chroma keeps coloured type and fine lines crisp in design work; smartSubsample does the
+  // same for WebP.
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        avif: { quality: 60, effort: 4, chromaSubsampling: '4:4:4' },
+        webp: { quality: 82, effort: 5, smartSubsample: true },
+      },
+    },
+  },
   trailingSlash: 'never',
   build: { format: 'file', inlineStylesheets: 'always' },
   env: {

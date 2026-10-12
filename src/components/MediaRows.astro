@@ -58,6 +58,9 @@ const fb = (b: any) => (pageTitle && imgNo.has(b) ? `${pageTitle}, image ${imgNo
   .seg-grid, .seg-split, .seg-stage { display: grid; gap: var(--s-4); grid-template-columns: minmax(0, 1fr); }
   .seg-split { gap: var(--s-6); align-items: start; }
   .media-rows :global(:is(.block-image, .bgvideo)) { display: block; border-radius: var(--r-card); overflow: hidden; }
+  /* Never wider than the picture itself: small exports (author portraits, icons, 464 px stickers) were
+     stretched up to 8× across the column. --nat is the source width (Block.astro). */
+  .media-rows :global(.block-image) { max-width: min(100%, var(--nat, 100%)); }
   .media-rows :global(.block-img) { width: 100%; height: auto; }
   .media-rows :global(.block-gallery) { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
   .media-rows :global(.block-link) { margin: 0; }
