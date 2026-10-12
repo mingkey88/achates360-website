@@ -52,7 +52,9 @@ const toggle = pauseLabel && playLabel;
     for (const e of entries) e.isIntersecting ? set.add(e.target) : set.delete(e.target);
     for (const v of videos) if (entries.some((e) => e.target === area(v))) update(v);
   }, { rootMargin });
-  const nearIO = watch(near, '100% 0px');
+  // Half a screen ahead: early enough to start smoothly, late enough to leave the first screen's
+  // bandwidth to the hero (a full screen ahead fetched the cover video during page load).
+  const nearIO = watch(near, '50% 0px');
   const seenIO = watch(seen, '0px');
   for (const el of new Set(videos.map(area))) { nearIO.observe(el); seenIO.observe(el); }
   for (const v of videos) update(v);

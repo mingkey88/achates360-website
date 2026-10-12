@@ -5,6 +5,13 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 export { gsap, ScrollTrigger, SplitText };
 
+/** A motion module. lateSafe: it only adds motion and never hides visible content, so it may still
+ * run when the bundle arrives after the 3s fallback has shown everything (slow connections). */
+export type MotionFn = (() => void) & { lateSafe?: boolean };
+
+/** Whether the bundle arrived after the 3s fallback (content already shown): modules skip entrances. */
+export const isLate = () => document.documentElement.classList.contains('motion-late');
+
 /**
  * Start a page's motion modules (spec §5). Under reduced motion none run and content simply shows.
  * A failing module is logged and skipped so the rest of the page still animates and reveals.
@@ -12,16 +19,20 @@ export { gsap, ScrollTrigger, SplitText };
  * and gsap.from() reads an element's current opacity as its end value, so it must not read the hidden 0.
  * Each from() applies its start state synchronously, so nothing flashes.
  */
-export function run(...mods: Array<() => void>): void {
+export function run(...mods: MotionFn[]): void {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const root = document.documentElement;
   // Already ready means the 3s fallback fired before the bundle arrived: content is visible, so don't re-hide it.
   const late = root.classList.contains('motion-ready');
   root.classList.add('motion-ready');
-  if (reduced || late) return;
+  if (reduced) return;
+  // Late (slow connection): only the modules that never hide content run, without their entrances.
+  if (late) root.classList.add('motion-late');
+  const live = late ? mods.filter((m) => m.lateSafe) : mods;
+  if (!live.length) return;
   // motion-live: the modules really run, so scroll-scrubbed sections may claim their extra scroll room.
   root.classList.add('motion-live');
-  for (const m of mods) {
+  for (const m of live) {
     try { m(); } catch (e) { console.error('[motion]', e); }
   }
   ScrollTrigger.sort(); // creation order != page order once something pins

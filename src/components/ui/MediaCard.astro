@@ -5,20 +5,21 @@ import Sticker from './Sticker.astro';
 // An image card. previewVideo: a muted preview that plays on hover, only on hover-capable pointers and
 // without reduced motion (Review Focus 5). wipe: the image is unveiled on scroll (motion/reveal.ts).
 // Linked cards get a soft follow-the-pointer arrow on fine pointers (direction B).
+// reveal: false for cards on the first screen, which should paint at once (largest-paint candidates).
 // duplicateLink: the same page is linked by a named title next to the card, so the picture link stays
 // clickable but is left out of the tab order and the accessibility tree (no unnamed repeat stop).
 interface Props {
   image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string;
-  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean;
+  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
 // A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
 const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
 const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
 const Wrap = href ? 'a' : 'div';
 const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplicateLink ? { tabindex: -1, 'aria-hidden': 'true' } : {}) } : {};
 ---
-<Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal>
+<Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal={reveal ? '' : undefined}>
   <div class="mc-media" style={`aspect-ratio: ${ratio}`} data-wipe={wipe ? '' : undefined}>
     <Pic src={image} alt={alt} crop={crop} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
     {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}

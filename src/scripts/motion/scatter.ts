@@ -39,3 +39,6 @@ export function scatter(): void {
     if (msg) tl.from(msg, { autoAlpha: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
   });
 }
+
+// Below the fold and fully scroll-driven: safe to start late.
+scatter.lateSafe = true;
