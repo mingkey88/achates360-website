@@ -34,9 +34,9 @@ export function hero(): void {
     tl.from(g, { x: Math.cos(a) * 120, y: Math.sin(a) * 80, rotation: (i % 2 ? 1 : -1) * (90 + i * 25), scale: .3, opacity: 0, transformOrigin: '50% 50%', duration: 1.6 }, .5 + i * .1);
     tl.fromTo(g, { fill: ARRIVAL[i % ARRIVAL.length] }, { fill: '#333333', duration: 1, ease: 'power1.inOut' }, 1.7);
   });
-  // The logo's lowercase wordmark letters settle in under the figures, then the copy fades up.
-  tl.from(q('.lg-ch'), { opacity: 0, y: 6, duration: 1.2, stagger: .04 }, 1.2)
-    .from(q('.ha-tagline, .ha-blurb, .ha-copy > .pill'), { opacity: 0, y: 14, duration: 1.4, stagger: .12 }, 1.6);
+  // The logo's lowercase wordmark letters settle in under the figures. The words beside it (tagline,
+  // description, button) are there from the first frame: the message never waits on the motion.
+  tl.from(q('.lg-ch'), { opacity: 0, y: 6, duration: 1.2, stagger: .04 }, 1.2);
   // Late bundle (slow connection): the hero is already showing, so jump the entrance to its end
   // (from() states apply at once, so it must not sit at its start) and keep only the drift.
   if (isLate()) tl.progress(1);
