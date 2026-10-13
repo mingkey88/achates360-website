@@ -18,7 +18,7 @@ const { services, eyebrow, cta } = Astro.props;
     <ol class="si-list">
       {services.map((s, i) => (
         <li class="si-row" data-placeholder={s.placeholder ? '' : undefined}>
-          <a class="si-link" href={withBase('/services')}>
+          <a class="si-link" href={withBase(`/services#${s.id}`)}>
             <span class="si-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
             <span class="si-title">{s.title}<DraftTag when={s.placeholder} /></span>
             <span class="si-tags">{s.tags.join(' · ')}</span>
