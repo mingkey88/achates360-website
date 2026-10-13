@@ -52,9 +52,12 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   // screens; hides while scrolling down, returns on scroll up or when anything in it takes keyboard focus.
   const header = document.querySelector<HTMLElement>('.site-header');
   if (header) {
-    let last = window.scrollY;
+    // A page can hold its content still for the first stretch of scroll (the projects cover sets
+    // html[data-scroll-hold]); the header counts scroll from the end of that hold.
+    const scrolled = () => Math.max(0, window.scrollY - Number(document.documentElement.dataset.scrollHold ?? 0));
+    let last = scrolled();
     const update = () => {
-      const y = window.scrollY;
+      const y = scrolled();
       header.classList.toggle('is-solid', y > 80 || !header.hasAttribute('data-over-hero'));
       header.classList.toggle('is-condensed', y > 80);
       header.classList.toggle('is-hidden', y > last && y > 240 && !header.contains(document.activeElement));

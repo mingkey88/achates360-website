@@ -48,6 +48,12 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
 </Base>
 <style>
   .pi { position: relative; z-index: 1; }
+  /* While held under the cover the page carries its own paper and grid (the body's would scroll behind
+     it), offset by --grid-y (motion/cover.ts) so the lines run on from the body's without a seam. */
+  .pi:global(.is-held) {
+    background: var(--paper-tex), var(--grid), var(--paper);
+    background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
+  }
   .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); border-bottom: 1px solid var(--line); }
   .pi-head h1 { margin: 0; }
   /* The count sits up by the heading like a folio. */

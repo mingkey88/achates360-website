@@ -1,7 +1,7 @@
 ---
 import logo from '../assets/logo-stacked-parts.svg?raw';
 // The projects index's cover (direction B), after the die-cut dove in 'Building Memories': a sheet of
-// the brand orange (Pantone 1495 U) laid over the top of the page, with the logo's five figures and the
+// the page's own paper (as the homepage's Selected work cover) laid over the top of the page, with the logo's five figures and the
 // word PROJECTS cut clean through it, so the page underneath (the heading and the first pictures) shows
 // in the cut. Crop marks and a printer's colour bar mark it as a press sheet. With motion
 // (motion/cover.ts) the page holds still while the sheet slides away to the left; without motion the
@@ -42,10 +42,11 @@ const B = 3000;
         <rect class="pc-paper" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} mask={`url(#pc-${c.k}-m)`} filter={`url(#pc-${c.k}-f)`} />
       </svg>
     ))}
+    <span class="pc-tex"></span>
     </div></div>
     <p class="pc-no">№ 001 – {last}</p>
-    {/* A press sheet's colour bar: the four process inks, then the spot colour the sheet is printed in. */}
-    <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot"></span><span class="pc-bar-l">1495 U</span></p>
+    {/* A press sheet's colour bar: the four process inks, then the brand's spot colour. */}
+    <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot" style="--c: var(--accent)"></span><span class="pc-bar-l">1495 U</span></p>
   </div>
 </div>
 <style>
@@ -65,13 +66,14 @@ const B = 3000;
   }
   .pc-cut { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
   .pc-cut text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
-  .pc-paper { fill: var(--accent); }
+  .pc-paper { fill: var(--paper); }
+  /* The paper's fibre, as on the page and the homepage cover. */
+  .pc-tex { position: absolute; inset: 0; background: var(--paper-tex); pointer-events: none; }
   .pc-cut-n { display: none; }
   .pc-no, .pc-bar { position: absolute; left: var(--s-6); margin: 0; color: var(--ink); }
   .pc-no { top: var(--s-6); font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
   .pc-bar { top: calc(var(--s-6) + 1.8em); display: flex; align-items: center; gap: 3px; font-size: var(--fs-small); }
   .pc-bar span:not(.pc-bar-l) { width: 12px; height: 12px; background: var(--c); }
-  .pc-bar .spot { background: var(--accent); outline: 1px solid rgb(51 51 51 / .5); outline-offset: -1px; }
   .pc-bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; }
   @media (max-width: 767px) {
     /* Shorter crop marks, so they stay inside the 16px gutter. */
