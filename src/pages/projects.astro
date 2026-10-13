@@ -1,11 +1,13 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Pic from '../components/ui/Pic.astro';
 import Base from '../layouts/Base.astro';
 import CategoryPicker from '../components/CategoryPicker.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
+import { itemListLd } from '../lib/seo';
+import { slugOf } from '../lib/next-project';
 // The projects overview (direction B): the category dropdown, then one tile per category leading to
 // its own page (/projects/<slug>). Headings and images are the supplied sections', verbatim.
 const d = (await getEntry('projectsIndex', 'projects'))!.data;
@@ -16,9 +18,15 @@ const heading = site.menu?.find((m) => m.href === '/projects')?.label ?? d.secti
 const cats = projectCategories(d.sections);
 const picker = cats.map((c) => ({ heading: c.heading, href: c.href, count: c.items.length }));
 // Old /projects#<section> links (Wix's in-page chips) forward to the category page.
+// Structured data: every listed case study, in the homepage list's order.
+const home = (await getEntry('home', 'home'))!.data;
+const listed = new Map((await getCollection('projects')).filter((e) => e.data.listed).map((e) => [e.id, e.data.title]));
+const abs = (p: string) => new URL(withBase(p), Astro.site).href;
+const order = [...new Set(home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null && listed.has(s)))];
+const jsonLd = [itemListLd('Projects', order.map((s) => ({ name: listed.get(s)!, url: abs(`/${s}`) })))];
 const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => [c.id, c.href])].map(([k, v]) => [k, withBase(v)]));
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="projects">
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="projects">
   <script is:inline define:vars={{ redirects }}>
     { const to = redirects[location.hash.slice(1)]; if (to) location.replace(to); }
   </script>

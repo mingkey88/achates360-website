@@ -28,7 +28,7 @@ const shareImage = d.hero ? (d.hero.type === 'image' ? d.hero.src : d.hero.poste
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const cat = d.categories[0];
 const jsonLd = [
-  creativeWorkLd({ name: d.title, url: abs(`/${id}`), client: d.client, year: firstYear(d.copyright) ?? undefined, description: d.seo.description, publisherUrl: abs('/') }),
+  creativeWorkLd({ name: d.title, url: abs(`/${id}`), client: d.client, year: firstYear(d.copyright) ?? undefined, description: d.seo.description, categories: d.categories, publisherUrl: abs('/') }),
   breadcrumbLd([['Projects', abs('/projects')], ...(cat ? [[cat, abs(`/projects/${categorySlug(cat)}`)] as [string, string]] : []), [d.title, abs(`/${id}`)]]),
 ];
 ---

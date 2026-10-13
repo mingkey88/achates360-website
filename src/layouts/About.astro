@@ -8,6 +8,8 @@ import QuoteBand from '../components/QuoteBand.astro';
 import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
 import { firstYear } from '../lib/meta';
+import { withBase } from '../lib/paths';
+import { aboutPageLd } from '../lib/seo';
 // /about in direction B: the existing About blocks verbatim in an editorial column on the paper, then
 // the homepage's own pieces: the numbers, clients and awards band, the story, one quotation, and the
 // quiet close to the contact page.
@@ -34,8 +36,10 @@ const timeline = x.timeline.map((t: any) => {
 const blocks = d.blocks.filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
 // A different quotation from the homepage's, where there is one.
 const quote = x.testimonials[1] ?? x.testimonials[0];
+const abs = (p: string) => new URL(withBase(p), Astro.site).href;
+const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, homeUrl: abs('/') })];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="about">
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="about">
   <section class="wrap ab-intro">
     <h1 class="display h1 sc" data-split>{heading}</h1>
     <div class="ab-blocks">{blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>

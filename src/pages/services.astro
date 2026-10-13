@@ -7,6 +7,8 @@ import ProcessSteps from '../components/ProcessSteps.astro';
 import Reel from '../components/Reel.astro';
 import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
+import { withBase } from '../lib/paths';
+import { servicesLd } from '../lib/seo';
 const x = await loadExtras();
 const { text } = x;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
@@ -18,8 +20,9 @@ const services = x.services.map((s: any) => {
 const reel = (await getEntry('home', 'home'))!.data.slides[0].media;
 if (reel.type !== 'video') throw new Error('Reel: homepage slide-1 is no longer a video');
 const heading = text('services-heading');
+const jsonLd = servicesLd(new URL(withBase('/'), Astro.site).href, x.services.map((s: any) => ({ name: s.title, categories: s.tags })));
 ---
-<Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} page="services">
+<Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} jsonLd={jsonLd} page="services">
   <header class="wrap sv-head" data-placeholder={heading.placeholder ? '' : undefined}>
     <h1 class="display h1" data-split><T s={heading} /></h1>
   </header>
