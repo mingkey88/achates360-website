@@ -65,4 +65,4 @@
   --ease-out: cubic-bezier(.22, 1, .36, 1);
 }
 /* Direction B: the desktop header is two rows (logo, then menu). */
-@media (min-width: 1024px) { :root { --header-h: 112px; } }
+@media (min-width: 1024px) { :root { --header-h: 88px; } }
