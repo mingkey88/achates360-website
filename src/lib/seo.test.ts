@@ -14,8 +14,20 @@ describe('robotsTxt', () => {
   it('disallows everything on staging', () => {
     expect(robotsTxt('staging')).toBe('User-agent: *\nDisallow: /\n');
   });
-  it('allows everything in production', () => {
-    expect(robotsTxt('production')).toBe('User-agent: *\nAllow: /\n');
+  it('allows everything in production and names the AI crawlers explicitly', () => {
+    const txt = robotsTxt('production');
+    expect(txt.startsWith('User-agent: *\nAllow: /\n')).toBe(true);
+    for (const bot of ['OAI-SearchBot', 'Claude-SearchBot', 'PerplexityBot', 'GPTBot', 'ClaudeBot', 'Google-Extended']) expect(txt).toContain(`User-agent: ${bot}`);
+    expect(txt).not.toContain('Disallow');
+  });
+  it('can opt out of AI training while keeping AI search', () => {
+    const txt = robotsTxt('production', false);
+    const training = txt.slice(txt.indexOf('# AI model training'));
+    const search = txt.slice(txt.indexOf('# AI search'), txt.indexOf('# AI model training'));
+    expect(training).toContain('User-agent: GPTBot');
+    expect(training).toContain('Disallow: /');
+    expect(search).toContain('Allow: /');
+    expect(search).not.toContain('Disallow');
   });
 });
 
@@ -36,7 +48,7 @@ import { robotsTxtWithSitemap, sitemapXml, isFileNameAlt, altOr, tidy, breadcrum
 
 describe('robotsTxtWithSitemap', () => {
   it('names the sitemap in production only', () => {
-    expect(robotsTxtWithSitemap('production')).toBe('User-agent: *\nAllow: /\nSitemap: https://www.achates360.com/sitemap.xml\n');
+    expect(robotsTxtWithSitemap('production').endsWith('\nSitemap: https://www.achates360.com/sitemap.xml\n')).toBe(true);
     expect(robotsTxtWithSitemap('staging')).toBe('User-agent: *\nDisallow: /\n');
   });
 });
@@ -78,5 +90,33 @@ describe('JSON-LD', () => {
   });
   it('cannot close its script element', () => {
     expect(ldJson({ name: '</script><b>' })).not.toContain('</script>');
+  });
+});
+
+import { organizationLd, websiteLd, aboutPageLd, itemListLd, servicesLd, creativeWorkLd, orgId } from './seo';
+
+describe('structured data for answer engines', () => {
+  const home = 'https://www.achates360.com/';
+  it('gives the studio one id that every page points to', () => {
+    const org = organizationLd({ url: home, logo: `${home}logo.jpg`, sameAs: [], knowsAbout: ['Strategic Branding'] });
+    expect(org['@id']).toBe(orgId(home));
+    expect(websiteLd(home).publisher).toEqual({ '@id': orgId(home) });
+    expect(aboutPageLd('AboutPage', { url: `${home}about`, name: 'About', homeUrl: home }).about).toEqual({ '@id': orgId(home) });
+    expect(servicesLd(home, [{ name: 'Branding', categories: ['Strategic Branding'] }])[0].provider).toEqual({ '@id': orgId(home) });
+    expect((creativeWorkLd({ name: 'X', url: `${home}x`, publisherUrl: home }).creator as any)['@id']).toBe(orgId(home));
+  });
+  it('states only settled facts: city and country, no phone, postcode or founding year', () => {
+    const org = organizationLd({ url: home, logo: 'l', sameAs: [] });
+    expect(org.address).toEqual({ '@type': 'PostalAddress', addressLocality: 'Singapore', addressCountry: 'SG' });
+    expect(org).not.toHaveProperty('telephone');
+    expect(org).not.toHaveProperty('foundingDate');
+  });
+  it('names the studio the same way with or without the trailing slash', () => {
+    expect(orgId('https://a.b/site')).toBe(orgId('https://a.b/site/'));
+  });
+  it('numbers the project list in order', () => {
+    const l = itemListLd('Projects', [{ name: 'A', url: 'a' }, { name: 'B', url: 'b' }]);
+    expect(l.numberOfItems).toBe(2);
+    expect((l.itemListElement as any[])[1]).toEqual({ '@type': 'ListItem', position: 2, name: 'B', url: 'b' });
   });
 });

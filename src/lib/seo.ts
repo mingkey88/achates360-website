@@ -4,8 +4,24 @@ export function robotsMeta(env: SiteEnv): string | null {
   return env === 'production' ? null : 'noindex, nofollow';
 }
 
-export function robotsTxt(env: SiteEnv): string {
-  return env === 'production' ? 'User-agent: *\nAllow: /\n' : 'User-agent: *\nDisallow: /\n';
+/**
+ * AI crawlers, named so the policy is explicit (AEO/GEO, 13 Oct 2026). Search crawlers read pages to
+ * answer and cite them (ChatGPT search, Claude, Perplexity); training crawlers collect text to train
+ * models. Both are allowed for now; set ALLOW_AI_TRAINING to false to keep answers and citations but
+ * opt out of training (CONTENT-QUERIES 48). Google-Extended governs Gemini's use, not Google Search.
+ */
+export const AI_SEARCH_CRAWLERS = ['OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User'];
+export const AI_TRAINING_CRAWLERS = ['GPTBot', 'ClaudeBot', 'Google-Extended', 'Applebot-Extended', 'CCBot'];
+export const ALLOW_AI_TRAINING = true;
+
+export function robotsTxt(env: SiteEnv, allowTraining = ALLOW_AI_TRAINING): string {
+  if (env !== 'production') return 'User-agent: *\nDisallow: /\n';
+  const group = (agents: string[], rule: string) => agents.map((a) => `User-agent: ${a}`).join('\n') + `\n${rule}\n`;
+  return [
+    'User-agent: *\nAllow: /\n',
+    '# AI search and answer engines: may read and cite the site.\n' + group(AI_SEARCH_CRAWLERS, 'Allow: /'),
+    `# AI model training: ${allowTraining ? 'allowed' : 'not allowed'}.\n` + group(AI_TRAINING_CRAWLERS, allowTraining ? 'Allow: /' : 'Disallow: /'),
+  ].join('\n');
 }
 
 /**
@@ -24,7 +40,7 @@ export const PRODUCTION_ORIGIN = 'https://www.achates360.com';
 
 /** robots.txt with the sitemap named in production, at the same /sitemap.xml path Wix uses. */
 export function robotsTxtWithSitemap(env: SiteEnv): string {
-  return env === 'production' ? `${robotsTxt(env)}Sitemap: ${PRODUCTION_ORIGIN}/sitemap.xml\n` : robotsTxt(env);
+  return env === 'production' ? `${robotsTxt(env)}\nSitemap: ${PRODUCTION_ORIGIN}/sitemap.xml\n` : robotsTxt(env);
 }
 
 /**
@@ -71,26 +87,65 @@ export function breadcrumbLd(items: [string, string][]): Ld {
   };
 }
 
+/** The studio's entity id: every page's structured data points at this one organisation. */
+export const homeKey = (homeUrl: string) => homeUrl.replace(/\/?$/, '/'); // one form, with or without the base's trailing slash
+export const orgId = (homeUrl: string) => `${homeKey(homeUrl)}#organization`;
+
 /**
- * The studio as an organisation. Only facts that are settled: phone and postcode are awaiting the
- * client's answer (CONTENT-QUERIES 17, 18), so no telephone or address yet.
+ * The studio as an organisation, with only facts that are settled and shown on the site: phone,
+ * postcode and founding year are awaiting the client's answer (CONTENT-QUERIES 17, 18, 43), so the
+ * address is the city alone and there is no telephone or founding date yet. description is the
+ * About page's own first sentence; knowsAbout the project categories.
  */
-export function organizationLd(o: { url: string; logo: string; email?: string; sameAs: string[] }): Ld {
+export function organizationLd(o: { url: string; logo: string; email?: string; sameAs: string[]; description?: string; knowsAbout?: string[] }): Ld {
   return {
-    '@context': 'https://schema.org', '@type': 'Organization', name: 'Achates 360', url: o.url, logo: o.logo,
-    ...(o.email ? { email: o.email } : {}), sameAs: o.sameAs,
+    '@context': 'https://schema.org', '@type': 'Organization', '@id': orgId(o.url), name: 'Achates 360', alternateName: 'Achates 360 Pte Ltd',
+    url: o.url, logo: o.logo,
+    ...(o.description ? { description: o.description } : {}),
+    ...(o.email ? { email: o.email } : {}),
+    address: { '@type': 'PostalAddress', addressLocality: 'Singapore', addressCountry: 'SG' },
+    areaServed: 'Singapore',
+    ...(o.knowsAbout?.length ? { knowsAbout: o.knowsAbout } : {}),
+    sameAs: o.sameAs,
   };
 }
 
+/** The site itself, published by the studio. */
+export function websiteLd(homeUrl: string): Ld {
+  return { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${homeKey(homeUrl)}#website`, name: 'Achates 360', url: homeKey(homeUrl), publisher: { '@id': orgId(homeUrl) } };
+}
+
+/** A page about the studio (AboutPage, ContactPage), so answer engines know whose page it is. */
+export function aboutPageLd(type: 'AboutPage' | 'ContactPage', o: { url: string; name: string; homeUrl: string }): Ld {
+  return { '@context': 'https://schema.org', '@type': type, name: o.name, url: o.url, isPartOf: { '@id': `${homeKey(o.homeUrl)}#website` }, about: { '@id': orgId(o.homeUrl) } };
+}
+
+/** The project list, in the site's own order. */
+export function itemListLd(name: string, items: { name: string; url: string }[]): Ld {
+  return {
+    '@context': 'https://schema.org', '@type': 'ItemList', name, numberOfItems: items.length,
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: it.url })),
+  };
+}
+
+/** The studio's services: names and the project categories each covers (no descriptions until supplied). */
+export function servicesLd(homeUrl: string, services: { name: string; categories: string[] }[]): Ld[] {
+  return services.map((sv) => ({
+    '@context': 'https://schema.org', '@type': 'Service', name: sv.name, serviceType: sv.categories,
+    provider: { '@id': orgId(homeUrl) }, areaServed: 'Singapore',
+  }));
+}
+
 /** A case study. */
-export function creativeWorkLd(w: { name: string; url: string; image?: string; client?: string; year?: string; description?: string; publisherUrl: string }): Ld {
+export function creativeWorkLd(w: { name: string; url: string; image?: string; client?: string; year?: string; description?: string; categories?: string[]; publisherUrl: string }): Ld {
   return {
     '@context': 'https://schema.org', '@type': 'CreativeWork', name: w.name, url: w.url,
     ...(w.image ? { image: w.image } : {}),
     ...(w.description ? { description: w.description } : {}),
     ...(w.year ? { dateCreated: w.year } : {}),
+    ...(w.categories?.length ? { genre: w.categories, keywords: w.categories.join(', ') } : {}),
     ...(w.client ? { sourceOrganization: { '@type': 'Organization', name: w.client } } : {}),
-    creator: { '@type': 'Organization', name: 'Achates 360', url: w.publisherUrl },
+    creator: { '@type': 'Organization', '@id': orgId(w.publisherUrl), name: 'Achates 360', url: w.publisherUrl },
   };
 }
 

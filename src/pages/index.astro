@@ -16,7 +16,7 @@ import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
-import { organizationLd } from '../lib/seo';
+import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
 
 const d = (await getEntry('home', 'home'))!.data;
@@ -52,7 +52,10 @@ const email = footerMd.match(/mailto:([^)\s]+)/)?.[1];
 const sameAs = site.footer.filter((b: any) => b.type === 'image' && /^https?:/.test(b.href ?? '')).map((b: any) => b.href);
 const homeUrl = new URL(import.meta.env.BASE_URL.replace(/\/?$/, '/'), Astro.site).href;
 const logoUrl = new URL((await getImage({ src: ogDefault, width: 1200, format: 'jpg' })).src, Astro.site).href;
-const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs })];
+// The About page's own first sentence describes the studio; its fields are the project categories.
+const description = sentenceStarting(aboutMd, 'We are an integrated creative agency') ?? undefined;
+const knowsAbout = [...new Set([...projects.values()].filter((p) => p.listed).flatMap((p) => p.categories))].sort();
+const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, description, knowsAbout }), websiteLd(homeUrl)];
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home">
   <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
