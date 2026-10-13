@@ -37,7 +37,6 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
         <span class="ha-cap"><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
       </div>
     ))}
-    <div class="ha-lens" aria-hidden="true"></div>
   </div>
   <div class="ha-copy">
     <h1 id="hero-title" class="ha-mark"><Fragment set:html={mark} /></h1>
@@ -52,7 +51,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
     position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
     display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: var(--s-5) var(--gutter) var(--s-6);
-    background: var(--paper) var(--paper-tex); color: var(--ink);
+    color: var(--ink); /* transparent: the page's paper and grid show through */
   }
   /* The lens (after kitpro-croma): cards stand edge to edge along a curve that stays almost flat in
      the middle and swings toward the viewer at the edges (lib/lens.ts); a wide-angle camera (short
@@ -74,20 +73,15 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
     filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
   }
-  /* Lens edges: the outer cards blur and fade into the white page. */
-  /* Taller than the arc (the edge cards stretch past it) and feathered top and bottom, so the blur has no hard edge. */
-  .ha-lens { position: absolute; inset: -30% calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
-  /* The edges now only fade into the paper; the softening itself is per card (depth of field). */
-  .ha-lens::before, .ha-lens::after { content: ''; position: absolute; inset-block: 0; width: 12%; }
-  .ha-lens::before {
-    left: 0; background: linear-gradient(90deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
-    -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
-  }
-  .ha-lens::after {
-    right: 0; background: linear-gradient(270deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
-    -webkit-mask-composite: source-in; mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
+  /* Lens edges: the outer cards fade out into the page. A mask, not a paper-coloured overlay, so the
+     page's grid runs on unbroken behind them; a small square over the pause button (top: --s-5, right:
+     --gutter, 44px) keeps it opaque, and so does the lower 44% where the logo and text sit (the cards end
+     above it), so on phones the full-width text is never faded. The
+     softening itself is per card (depth of field). */
+  .ha {
+    --fade: 12%;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent), linear-gradient(#000, #000) calc(100% - var(--gutter) + 8px) var(--s-4) / 60px 60px no-repeat, linear-gradient(#000, #000) 0 100% / 100% 44% no-repeat;
+    mask: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent), linear-gradient(#000, #000) calc(100% - var(--gutter) + 8px) var(--s-4) / 60px 60px no-repeat, linear-gradient(#000, #000) 0 100% / 100% 44% no-repeat;
   }
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   /* After terrot: the project name and client written on the card, over a soft shade. */
@@ -110,6 +104,6 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     /* Phones: tall cards, same lens. */
     .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; }
     .ha-card { --cx: var(--mx, 0); --cz: var(--mz, 0); --cry: var(--mry, 0); --co: var(--mo, 1); }
-    .ha-lens::before, .ha-lens::after { width: 16%; }
+    .ha { --fade: 16%; }
   }
 </style>
