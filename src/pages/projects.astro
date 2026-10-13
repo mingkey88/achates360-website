@@ -1,15 +1,16 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import ProjectIndex from '../components/ProjectIndex.astro';
+import ProjectsCover from '../components/ProjectsCover.astro';
+import MediaCard from '../components/ui/MediaCard.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
-import { itemListLd } from '../lib/seo';
+import { itemListLd, isFileNameAlt } from '../lib/seo';
 import { projectIndex } from '../lib/project-index';
-// The projects overview (direction B): every listed project, in the homepage list's order, with the
-// categories as filters (each also a link to its own page, /projects/<slug>) and a grid or catalogue view.
-// Titles, clients and pictures are the homepage gallery's; category headings the supplied sections', verbatim.
+// The projects overview (direction B): a die-cut cover, then every listed project in the homepage
+// list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
+// category pages (/projects/<slug>) stay, reached from the header's Projects menu.
 const d = (await getEntry('projectsIndex', 'projects'))!.data;
 const site = (await getEntry('site', 'site'))!.data;
 const { text } = await loadExtras();
@@ -18,14 +19,12 @@ const heading = site.menu?.find((m) => m.href === '/projects')?.label ?? d.secti
 const cats = projectCategories(d.sections);
 const home = (await getEntry('home', 'home'))!.data;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
-const entries = projectIndex(home.allProjects.items, projects, d.sections);
+const entries = projectIndex(home.allProjects.items, projects);
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 // Structured data: every listed case study, in the homepage list's order.
 const jsonLd = [itemListLd('Projects', entries.map((e) => ({ name: projects.get(e.slug)!.title, url: abs(e.href) })))];
-const labels = {
-  nav: text('nav-categories'), view: text('index-view'), grid: text('view-grid'), catalogue: text('view-catalogue'), count: text('index-count'),
-  no: text('col-no'), project: text('col-project'), client: text('col-client'), discipline: text('col-discipline'), year: text('col-year'),
-};
+// The cover's die-cut shows the first few projects' pictures in turn.
+const coverImages = entries.slice(0, 6).map((e) => ({ src: e.thumb }));
 // Old /projects#<section> links (Wix's in-page chips) forward to the category page.
 const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => [c.id, c.href])].map(([k, v]) => [k, withBase(v)]));
 ---
@@ -33,24 +32,39 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   <script is:inline define:vars={{ redirects }}>
     { const to = redirects[location.hash.slice(1)]; if (to) location.replace(to); }
   </script>
-  <header class="wrap pi-head">
-    <h1 class="display h1 sc" data-split>{heading}</h1>
-    <span class="pi-total" aria-hidden="true">{entries.length}</span>
-  </header>
-  <section class="wrap pi-body" aria-label={heading}>
-    <ProjectIndex entries={entries} categories={cats} all={text('next-fallback')} labels={labels} />
-  </section>
+  <ProjectsCover title={heading} count={entries.length} images={coverImages} />
+  <div class="pi">
+    <header class="wrap pi-head">
+      <h1 class="display h1 sc" data-split>{heading}</h1>
+      <span class="pi-total" aria-hidden="true">{entries.length}</span>
+    </header>
+    <section class="wrap pi-body" aria-labelledby="pi-title">
+      <h2 id="pi-title" class="sr-only">{text('next-fallback').text}</h2>
+      <ul class="pi-grid">
+        {entries.map((e, i) => (
+          <li><MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt reveal={i >= 3} wipe={i >= 3} /></li>
+        ))}
+      </ul>
+    </section>
+  </div>
 </Base>
 <style>
-  .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-5); }
+  .pi { position: relative; z-index: 1; }
+  /* With motion the list starts under the pinned cover (one cover-height up), so it is there as the cover opens. */
+  :global(.motion-live) .pi { margin-top: calc((100svh - var(--header-h)) * -1); }
+  .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); border-bottom: 1px solid var(--line); }
   .pi-head h1 { margin: 0; }
   /* The count sits up by the heading like a folio. */
   .pi-total { padding-top: .4em; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
-  .pi-body { padding-bottom: var(--section-y); }
+  .pi-body { padding-block: var(--s-7) var(--section-y); }
+  .pi-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .pi-grid li { min-width: 0; }
+  @media (min-width: 1024px) { .pi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>
 <script>
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { tilt } from '../scripts/motion/tilt';
-  run(reveal, tilt);
+  import { cover } from '../scripts/motion/cover';
+  run(cover, reveal, tilt);
 </script>
