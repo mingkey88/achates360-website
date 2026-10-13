@@ -172,7 +172,19 @@ const strings = defineCollection({
   schema: z.object({ ...flagged, text: z.string() }).strict(),
 });
 
+// Art direction for case studies (src/lib/art.ts): an optional layout per project, keyed by its slug.
+const art = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/art' }),
+  schema: z.object({
+    sections: z.array(z.object({
+      text: z.array(z.number().int()).optional(),
+      media: z.array(z.number().int()).optional(),
+      layout: z.enum(['full', 'pair', 'trio', 'grid4', 'beside', 'beside-left']).optional(),
+    }).strict()),
+  }).strict(),
+});
+
 export const collections = {
   projects, cards, basic, home, projectsIndex, site,
-  services, process: processSteps, timeline, stats, clients, testimonials, strings,
+  services, process: processSteps, timeline, stats, clients, testimonials, strings, art,
 };

@@ -1,0 +1,72 @@
+---
+import Block from './Block.astro';
+import { renderMd } from '../lib/markdown';
+import { paragraphs, media, subheading, checkArt, type Art } from '../lib/art';
+// An art-directed case-study body (src/content/art/<slug>.yaml): the page's own paragraphs and pictures
+// set in sections. Text alone reads as a column of good measure (the page's first paragraph as the
+// lead, a bold-only paragraph as a subheading); "beside" sets a passage next to its picture; pictures
+// alone run full width, in pairs, threes or a grid of four. The build fails if the layout drops or
+// repeats anything (checkArt).
+interface Props { blocks: any[]; art: Art; pageTitle: string; slug: string }
+const { blocks, art, pageTitle, slug } = Astro.props;
+const paras = paragraphs(blocks);
+const items = media(blocks);
+const problems = checkArt(art, paras.length, items.length);
+if (problems.length) throw new Error(`art/${slug}.yaml: ${problems.join('; ')}`);
+// Case-study copy styles its headings as ##### / ######: shift them so the shallowest becomes an h3
+// (below the section's own h2s), as MediaRows does.
+const depths = paras.flatMap((p) => [...p.matchAll(/^\s*(#{1,6})\s/gm)].map((m) => m[1].length));
+const demote = depths.length ? 3 - Math.min(...depths) : 0;
+const SIZES: Record<string, string> = {
+  full: '(max-width: 1023px) 100vw, 70vw', pair: '(max-width: 767px) 100vw, 36vw', trio: '(max-width: 767px) 100vw, 24vw',
+  grid4: '(max-width: 767px) 50vw, 18vw', beside: '(max-width: 899px) 100vw, 40vw', 'beside-left': '(max-width: 899px) 100vw, 40vw',
+};
+const asBlock = (i: number) => {
+  const m = items[i];
+  return m.kind === 'image' ? { type: 'image', src: m.src, alt: m.alt, href: m.href } : { type: 'video', src: m.src, poster: m.poster, controls: m.controls };
+};
+const alt = (i: number) => `${pageTitle}, image ${i + 1}`;
+---
+<div class="art">
+  {art.sections.map((s) => {
+    const layout = s.layout ?? (s.media?.length ? (s.media.length === 1 ? 'full' : s.media.length === 2 ? 'pair' : 'trio') : undefined);
+    const text = s.text?.length && (
+      <div class="art-text">
+        {s.text.map((i) => {
+          const h = subheading(paras[i]);
+          return h ? <h2 class="art-sub">{h}</h2> : <div class:list={['prose', { lead: i === 0 }]} set:html={renderMd(paras[i], undefined, { demote })} />;
+        })}
+      </div>
+    );
+    const pics = s.media?.length && (
+      <div class:list={['art-media', `m-${layout}`]}>
+        {s.media.map((i) => <Block block={asBlock(i)} pageTitle={pageTitle} altFallback={alt(i)} sizes={SIZES[layout ?? 'full']} />)}
+      </div>
+    );
+    return <section class:list={['art-sec', layout && `s-${layout}`]}>{text}{pics}</section>;
+  })}
+</div>
+<style>
+  .art { display: grid; gap: var(--s-8); }
+  .art-sec { display: grid; gap: var(--s-5); }
+  .art-text { display: grid; gap: var(--s-4); max-width: 62ch; }
+  .art-text .prose :global(p) { margin: 0; }
+  .art-text .lead { font-size: var(--fs-lead); line-height: 1.45; }
+  .art-sub { margin: var(--s-3) 0 0; font: 400 var(--fs-h3)/1.25 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  .art-media { display: grid; gap: var(--s-4); }
+  .art :global(.block-image) { display: block; max-width: none; border-radius: 0; overflow: hidden; }
+  .art :global(.block-img) { display: block; width: 100%; height: auto; }
+  .m-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 768px) {
+    .m-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .m-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+    .m-grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  /* A passage beside its picture: text in five columns, the picture in seven (mirrored for beside-left). */
+  @media (min-width: 900px) {
+    .s-beside, .s-beside-left { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-7); align-items: center; }
+    .s-beside-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+    .s-beside-left .art-media { grid-column: 1; grid-row: 1; }
+    .s-beside-left .art-text { grid-column: 2; }
+  }
+</style>

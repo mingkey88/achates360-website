@@ -5,6 +5,7 @@ import HeroMedia from '../components/ui/HeroMedia.astro';
 import Sticker from '../components/ui/Sticker.astro';
 import MetaStrip from '../components/MetaStrip.astro';
 import MediaRows from '../components/MediaRows.astro';
+import ArtRows from '../components/ArtRows.astro';
 import NextProject from '../components/NextProject.astro';
 import { loadExtras } from '../lib/extras';
 import { backLinkHref, withBase } from '../lib/paths';
@@ -22,6 +23,9 @@ const built = new Set((await getCollection('projects')).map((e) => e.id));
 const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null);
 const next = nextProject(id, order, (s) => built.has(s));
 const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback');
+// An art-directed layout for this project, if one has been made (src/content/art/<slug>.yaml).
+const art = (await getEntry('art', id))?.data;
+const body = visibleBlocks(d.blocks, d.pageBackground);
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
 // Share picture and structured data: the project's own hero, the case study, and where it sits
 // (Projects › its first category › the project).
@@ -46,7 +50,7 @@ const jsonLd = [
       facts sit in a narrow column that stays in view, the story and pictures fill the rest. */}
   <div class="wrap p-layout">
     <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} /></aside>
-    <article class="p-body"><MediaRows blocks={visibleBlocks(d.blocks, d.pageBackground)} pageTitle={d.title} /></article>
+    <article class="p-body">{art ? <ArtRows blocks={body} art={art} pageTitle={d.title} slug={id} /> : <MediaRows blocks={body} pageTitle={d.title} />}</article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
