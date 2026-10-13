@@ -352,6 +352,9 @@ replaced. Existing copy from the Wix site is unchanged.
     - Samsung: sapphire as "the second strongest material on earth".
 44. **/joinus job posting.** One posting covers two levels ("Client Account Executive / Manager") and refers to the account manager inside the account manager's posting. "Has 2 – 5 / 5 – 10 years' working experience" is unclear. It is undated and repeats the 2006 founding year. Is the role still open? Split it, or replace it with a general invitation to write in.
 
+45. **Text hidden on Wix (13 Oct 2026).** Seven text blocks on the Wix site are coloured like the page, so visitors never see them, and the new site now leaves them out too (list: docs/hidden-wix-text-2026-10-13.md). One is a leftover: Nötter's award list sits, hidden, on /singaporeroadsafetycampaign. Delete it on Wix too? The other six are award lines on the right pages (Nötter, Julius Baer, Brooks Clown, Building Memories, Moving Memories, National Theatre pop-up kit). Should any of them be shown?
+46. **Pictures from another project.** /bank-of-singapore shows four greeting-card pictures that are also on /vpbank, and their file names say VP Bank Mid-Autumn ("VPBANK_MidAutumn_Cover.jpg" and others). Are these Bank of Singapore's cards, or were VP Bank's put there by mistake? /ritz-carlton-mid-autumn shows a picture named "RC_Xmas2021_Brochure_Brochure+GiftTag.jpg": is it part of the Mid-Autumn set?
+
 **Draft wording we suggest for our own labels** (all still marked DRAFT; approve or replace):
 - "Get in touch" → "Make an enquiry": it sits right under the footer's "Get in touch with us…".
 - "View all projects" / "All projects" / "All Projects" / "BACK TO PROJECTS" → "All projects" everywhere.
