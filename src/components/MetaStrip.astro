@@ -25,7 +25,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
           {k === 'recognition' && (
             <ul class="badges">
               {badges.map((b) => {
-                const img = <Image src={b.src} alt={b.alt} height={72} densities={[1, 2]} />;
+                const img = <Image src={b.src} alt={b.alt} height={72} densities={[1, 2, 3]} />;
                 return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
               })}
             </ul>

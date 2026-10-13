@@ -12,6 +12,7 @@ import { nextProject, slugOf } from '../lib/next-project';
 import { categorySlug } from '../lib/categories';
 import { creativeWorkLd, breadcrumbLd } from '../lib/seo';
 import { firstYear } from '../lib/meta';
+import { visibleBlocks } from '../lib/visibility';
 interface Props { entry: CollectionEntry<'projects'> }
 const { id, data: d } = Astro.props.entry;
 const { text } = await loadExtras();
@@ -44,7 +45,7 @@ const jsonLd = [
       facts sit in a narrow column that stays in view, the story and pictures fill the rest. */}
   <div class="wrap p-layout">
     <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} /></aside>
-    <article class="p-body"><MediaRows blocks={d.blocks} pageTitle={d.title} /></article>
+    <article class="p-body"><MediaRows blocks={visibleBlocks(d.blocks, d.pageBackground)} pageTitle={d.title} /></article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} />
