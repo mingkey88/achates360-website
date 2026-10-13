@@ -1,0 +1,21 @@
+---
+import MediaCard from './ui/MediaCard.astro';
+import { isFileNameAlt } from '../lib/seo';
+// The projects pages' grid (/projects and each category): one card per project, picture 4:3 with its
+// title and client under it, three across on wide screens. Titles and clients are the supplied
+// gallery's, verbatim. Cards simply show, with no entrance animation (client: the scroll reveals made
+// the second row arrive late); the first row's pictures load at once.
+interface Item { title: string; description: string; href?: string; thumb: ImageMetadata; alt: string; video?: string }
+interface Props { items: Item[] }
+const { items } = Astro.props;
+---
+<ul class="cards">
+  {items.map((e, i) => (
+    <li><MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt eager={i < 3} reveal={false} /></li>
+  ))}
+</ul>
+<style>
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .cards li { min-width: 0; }
+  @media (min-width: 1024px) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

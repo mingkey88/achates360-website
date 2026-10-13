@@ -1,0 +1,97 @@
+---
+import Pic from './ui/Pic.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+// The Services page's opening (direction B): a book's contents page. Each service is a numbered line,
+// its name set large, a dotted leader running to the number of projects it covers, and a link down to
+// its spread. On fine pointers a picture from that service's work follows the pointer over its line.
+// Service names are the draft titles (services.yaml) until the studio supplies its own.
+interface Props {
+  heading: UiString; countLabel: UiString;
+  services: { id: string; title: string; placeholder: boolean; count: number; image: ImageMetadata }[];
+}
+const { heading, countLabel, services } = Astro.props;
+const no = (i: number) => String(i + 1).padStart(2, '0');
+---
+<header class="toc wrap" data-toc>
+  <div class="toc-head">
+    <h1 class="display h1" data-split><T s={heading} /></h1>
+    <p class="toc-col" aria-hidden="true">{countLabel.text}</p>
+  </div>
+  <ol class="toc-list">
+    {services.map((s, i) => (
+      <li>
+        <a href={`#${s.id}`} data-toc-item={i} data-placeholder={s.placeholder ? '' : undefined}>
+          <span class="toc-no">{no(i)}</span>
+          <span class="toc-title">{s.title}</span>
+          <span class="toc-dots" aria-hidden="true"></span>
+          <span class="toc-n">{s.count}<span class="sr-only"> {countLabel.text.toLowerCase()}</span></span>
+        </a>
+      </li>
+    ))}
+  </ol>
+  <div class="toc-peek" aria-hidden="true">
+    {services.map((s, i) => <span class="toc-img" data-peek={i}><Pic src={s.image} alt="" crop={4 / 5} widths={[320, 480, 640]} sizes="280px" loading="lazy" /></span>)}
+  </div>
+</header>
+
+<script>
+  // The picture beside the pointer: fine pointers only, and not under reduced motion.
+  const toc = document.querySelector<HTMLElement>('[data-toc]');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (toc && fine) {
+    const peek = toc.querySelector<HTMLElement>('.toc-peek')!;
+    const imgs = [...peek.querySelectorAll<HTMLElement>('[data-peek]')];
+    for (const img of peek.querySelectorAll('img')) img.loading = 'eager';
+    let x = 0, y = 0, tx = 0, ty = 0, raf = 0;
+    const tick = () => {
+      x += (tx - x) * .18; y += (ty - y) * .18;
+      peek.style.translate = `${x}px ${y}px`;
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > .3 ? requestAnimationFrame(tick) : 0;
+    };
+    for (const a of toc.querySelectorAll<HTMLElement>('[data-toc-item]')) {
+      a.addEventListener('pointerenter', (e) => {
+        const i = a.dataset.tocItem;
+        for (const img of imgs) img.classList.toggle('is-on', img.dataset.peek === i);
+        if (!peek.classList.contains('is-on')) { x = tx = e.clientX; y = ty = e.clientY; peek.style.translate = `${x}px ${y}px`; }
+        peek.classList.add('is-on');
+      });
+      a.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; if (!raf) raf = requestAnimationFrame(tick); });
+      a.addEventListener('pointerleave', () => peek.classList.remove('is-on'));
+    }
+  }
+</script>
+
+<style>
+  .toc { padding-block: var(--s-8) var(--s-7); }
+  .toc-head { display: flex; align-items: end; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-4); border-bottom: 1px solid var(--ink); }
+  .toc-head h1 { margin: 0; }
+  .toc-col { margin: 0; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+  .toc-list { list-style: none; margin: 0; padding: 0; }
+  .toc-list a {
+    display: grid; grid-template-columns: 3.5rem auto minmax(2rem, 1fr) 3rem; align-items: baseline; column-gap: var(--s-3);
+    padding-block: var(--s-4); border-bottom: 1px solid var(--line); color: inherit; text-decoration: none;
+  }
+  .toc-no { font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
+  .toc-title { font: 400 clamp(1.75rem, 1rem + 3vw, 4rem)/1.05 var(--font-display); letter-spacing: -.025em; transition: translate .4s var(--ease-out); }
+  /* Dot leaders, as on a contents page. */
+  .toc-dots { align-self: end; height: 1px; margin-bottom: .55em; background: radial-gradient(circle, var(--text-2) .9px, transparent 1.1px) 0 50% / 8px 2px repeat-x; opacity: .7; }
+  .toc-n { justify-self: end; font: 400 var(--fs-lead)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .toc-list a:hover .toc-title, .toc-list a:focus-visible .toc-title { translate: 10px 0; }
+  .toc-list a:hover .toc-n { color: var(--accent-deep); }
+  /* The following picture: small, set off to the lower right of the pointer, cross-fading between services. */
+  .toc-peek {
+    position: fixed; left: 0; top: 0; z-index: 50; width: 220px; aspect-ratio: 4 / 5; margin: 24px 0 0 24px; pointer-events: none;
+    opacity: 0; scale: .92; transition: opacity .3s, scale .4s var(--ease-out); background: var(--stone);
+  }
+  .toc-peek.is-on { opacity: 1; scale: 1; }
+  .toc-img { position: absolute; inset: 0; opacity: 0; transition: opacity .25s; }
+  .toc-img.is-on { opacity: 1; }
+  .toc-img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 767px) {
+    .toc-list a { grid-template-columns: 2.25rem minmax(0, 1fr) 2.5rem; }
+    .toc-dots { display: none; }
+    .toc-peek { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toc-title { transition: none; } }
+</style>

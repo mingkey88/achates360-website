@@ -15,7 +15,7 @@ export function cover(): void {
   const page = pc?.closest<HTMLElement>('[data-pin-container]');
   if (!pc || !page) return;
   const sheet = pc.querySelector<HTMLElement>('.pc-sheet')!;
-  const hold = () => Math.round(innerHeight * .7);
+  const hold = () => Math.round(innerHeight * Number(pc.dataset.hold || .7));
   const root = document.documentElement;
   const sync = (st: ScrollTrigger) => {
     const d = st.end - st.start;
@@ -24,7 +24,7 @@ export function cover(): void {
     const top = (page.parentElement?.getBoundingClientRect().top ?? 0) + scrollY;
     page.style.setProperty('--grid-y', `${-(top + d)}px`);
   };
-  // The cover is the first thing on the page, so the hold runs from scroll 0.
+  // The cover is the first thing on the page, so the hold runs from scroll 0 (data-hold screens long).
   gsap.timeline({ scrollTrigger: { trigger: page, start: 0, end: () => `+=${hold()}`, pin: true, scrub: .6, invalidateOnRefresh: true, onRefresh: sync } })
     .fromTo(sheet, { x: 0 }, { x: () => -(sheet.offsetLeft + sheet.offsetWidth + 40), ease: 'power2.inOut' });
   page.classList.add('is-held');

@@ -2,11 +2,11 @@
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ProjectsCover from '../components/ProjectsCover.astro';
-import MediaCard from '../components/ui/MediaCard.astro';
+import ProjectCards from '../components/ProjectCards.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
-import { itemListLd, isFileNameAlt } from '../lib/seo';
+import { itemListLd } from '../lib/seo';
 import { projectIndex } from '../lib/project-index';
 // The projects overview (direction B): a die-cut cover over the top, then every listed project in the homepage
 // list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
@@ -38,30 +38,17 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
     </header>
     <section class="wrap pi-body" aria-labelledby="pi-title">
       <h2 id="pi-title" class="sr-only">{text('next-fallback').text}</h2>
-      <ul class="pi-grid">
-        {entries.map((e, i) => (
-          <li><MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt reveal={i >= 3} wipe={i >= 3} /></li>
-        ))}
-      </ul>
+      <ProjectCards items={entries} />
     </section>
   </div>
 </Base>
 <style>
   .pi { position: relative; z-index: 1; }
-  /* While held under the cover the page carries its own paper and grid (the body's would scroll behind
-     it), offset by --grid-y (motion/cover.ts) so the lines run on from the body's without a seam. */
-  .pi:global(.is-held) {
-    background: var(--paper-tex), var(--grid), var(--paper);
-    background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
-  }
   .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); border-bottom: 1px solid var(--line); }
   .pi-head h1 { margin: 0; }
   /* The count sits up by the heading like a folio. */
   .pi-total { padding-top: .4em; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
   .pi-body { padding-block: var(--s-7) var(--section-y); }
-  .pi-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-  .pi-grid li { min-width: 0; }
-  @media (min-width: 1024px) { .pi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

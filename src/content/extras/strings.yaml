@@ -42,3 +42,8 @@
 - { id: skip-link, text: Skip to content, placeholder: true }
 - { id: notfound-title, text: Page not found, placeholder: true }
 - { id: notfound-body, text: "The page you were looking for has moved or no longer exists. These may help:", placeholder: true }
+- { id: contents-count, text: Projects, placeholder: true }
+- { id: showreel-label, text: Showreel, placeholder: true }
+- { id: showreel-play, text: Play with sound, placeholder: true }
+- { id: showreel-close, text: Close, placeholder: true }
+- { id: service-covers, text: Covers, placeholder: true }

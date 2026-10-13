@@ -27,8 +27,8 @@
      lines every 24px and a stronger line every fifth (120px), in a faint blueprint blue; centred on the
      page so the columns sit symmetrically. Only the page's own paper shows it: bands, panels and
      pictures cover it. */
-  --grid-minor: rgb(52 98 138 / .06);
-  --grid-major: rgb(52 98 138 / .11);
+  --grid-minor: rgb(52 98 138 / .04);
+  --grid-major: rgb(52 98 138 / .075);
   --grid:
     linear-gradient(var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
     linear-gradient(90deg, var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
