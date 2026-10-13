@@ -1,15 +1,20 @@
 ---
-// Wix autoplays the DBS YouTube embed muted; the clone deliberately does not autoplay third-party
-// players (allowed difference, spec §6). For autoplay, append `?autoplay=1&mute=1` to the src.
+import { embedSrc } from '../lib/embed';
+// A Vimeo or YouTube film. It plays muted and loops as soon as it loads (the iframe loads lazily, as it
+// nears the screen), so the provider's end screen ("More from Achates 360") never appears; the player's
+// own controls pause it or turn the sound on. Under reduced motion it is swapped, before it loads, for
+// the plain player that waits for the play button.
 interface Props { provider: 'vimeo' | 'youtube'; id: string; title?: string }
 const { provider, id, title = 'Video' } = Astro.props;
-const src = provider === 'youtube'
-  ? `https://www.youtube-nocookie.com/embed/${id}`
-  : `https://player.vimeo.com/video/${id}?title=0&autopause=0`;
 ---
 <div class="embed">
-  <iframe src={src} title={title} loading="lazy" allow="autoplay; fullscreen; picture-in-picture"></iframe>
+  <iframe src={embedSrc(provider, id, true)} data-still={embedSrc(provider, id, false)} title={title} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 </div>
+<script>
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const f of document.querySelectorAll<HTMLIFrameElement>('.embed iframe[data-still]')) f.src = f.dataset.still!;
+  }
+</script>
 <style>
   .embed { position: relative; aspect-ratio: 16 / 9; background: var(--ink); border-radius: var(--r-card); overflow: hidden; }
   .embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }

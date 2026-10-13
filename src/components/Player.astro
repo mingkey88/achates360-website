@@ -1,15 +1,28 @@
 ---
 import { getImage } from 'astro:assets';
 import { mediaUrl } from '../lib/paths';
-// A Wix-hosted video player (Wix's VideoPlayer component, e.g. on /dxv): a plain video with the
-// browser's controls, poster first, nothing loads beyond metadata until the visitor plays it.
+// A film from the studio's own files (Wix's VideoPlayer component, e.g. on /dxv), with the browser's
+// controls. It plays muted, looping, while it is on screen and pauses when scrolled away; once the
+// visitor pauses it, it stays paused. Under reduced motion it waits for the play button.
 interface Props { src: string; poster: ImageMetadata; label?: string }
 const { src, poster, label } = Astro.props;
 const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
 ---
 <div class="player">
-  <video src={/^https?:\/\//.test(src) ? src : mediaUrl(src)} poster={posterUrl} controls preload="metadata" playsinline aria-label={label}></video>
+  <video src={/^https?:\/\//.test(src) ? src : mediaUrl(src)} poster={posterUrl} controls muted loop preload="metadata" playsinline aria-label={label} data-autoplay></video>
 </div>
+<script>
+  import { shouldPlay } from '../lib/video-policy';
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const v of document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]')) {
+    let userPaused = false, ours = false;
+    v.addEventListener('pause', () => { if (!ours) userPaused = true; ours = false; });
+    new IntersectionObserver(([e]) => {
+      if (shouldPlay({ onScreen: e.isIntersecting, reduced, userPaused, allowedHere: true })) void v.play().catch(() => {});
+      else if (!v.paused) { ours = true; v.pause(); }
+    }, { threshold: .35 }).observe(v);
+  }
+</script>
 <style>
   .player video { display: block; width: 100%; height: auto; background: var(--ink); border-radius: var(--r-card); }
 </style>
