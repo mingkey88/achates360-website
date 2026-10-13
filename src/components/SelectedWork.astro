@@ -27,8 +27,8 @@ const LAYOUTS = {
 const ROWS = [
   { layout: 'lead', flip: false, tint: 'var(--blush)' },
   { layout: 'spread', flip: false, tint: 'none' },
-  { layout: 'lead', flip: false, tint: 'var(--sage)' },
-  { layout: 'lead', flip: true, tint: 'var(--blush)' },
+  { layout: 'lead', flip: true, tint: 'var(--sage)' },
+  { layout: 'lead', flip: false, tint: 'var(--blush)' },
 ] as const;
 const all = items.map(({ slide, project }) => ({
   image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
