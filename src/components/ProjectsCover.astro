@@ -1,29 +1,35 @@
 ---
 import logo from '../assets/logo-stacked-parts.svg?raw';
-// The projects index's cover (direction B), after the die-cut dove in 'Building Memories': a sheet of
-// the page's own paper (as the homepage's Selected work cover) laid over the top of the page, with the logo's five figures and the
-// word PROJECTS cut clean through it, so the page underneath (the heading and the first pictures) shows
-// in the cut. Crop marks and a printer's colour bar mark it as a press sheet. With motion
-// (motion/cover.ts) the page holds still while the sheet slides away to the left; without motion the
-// sheet sits at the top of the page, over plain paper. Its outline is cut in square steps, like the
-// buildings on the book's cover (and the stepped edge of the homepage's Selected work cover).
-// Decorative: the page's own h1 and list follow.
-interface Props { title: string; count: number }
-const { title, count } = Astro.props;
+import { cutLines, cutSize } from '../lib/cut-lines';
+// The projects pages' cover (direction B), after the die-cut dove in 'Building Memories': a sheet of the
+// page's own paper (as the homepage's Selected work cover) laid over the top of the page, with the logo's
+// five figures and the page's heading (PROJECTS, or a category's name) cut clean through it, so the page
+// underneath (its heading and first pictures) shows in the cut. Crop marks and a printer's colour bar mark
+// it as a press sheet; its outline is cut in square steps, like the buildings on the book's cover. With
+// motion (motion/cover.ts) the page holds still while the sheet slides away to the left; without motion
+// the sheet sits at the top of the page, over plain paper. Decorative: the page's own h1 and list follow.
+// hold: how long the page holds still while the sheet slides away, in screen heights.
+interface Props { title: string; count: number; hold?: number }
+const { title, count, hold = .7 } = Astro.props;
 const last = String(count).padStart(3, '0');
-const word = title.toUpperCase();
+// The heading in heavy capitals, broken into lines and sized so the longest fills the space for it.
+const lines = cutLines(title.toUpperCase(), 13);
 // The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), as on the Selected work cover.
 const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
 const FIG = { x: 50, y: -3, w: 94, h: 103 };
 // Two cuts in the drawing's own units: wide screens set the figures at the upper right and the word
 // across the foot; tall screens put the figures above the word. xMaxYMax keeps both in the lower right.
+const layout = (k: string, w: number, h: number, fig: { x: number; y: number; h: number }, right: number, base: number, width: number, cap: number) => {
+  const size = cutSize(lines, width, cap);
+  return { k, w, h, fig, size, lines: lines.map((t, i) => ({ t, x: right, y: base - (lines.length - 1 - i) * Math.round(size * .92) })) };
+};
 const cuts = [
-  { k: 'w', w: 1000, h: 700, fig: { x: 600, y: 80, h: 340 }, text: { x: 955, y: 655, size: 166 } },
-  { k: 'n', w: 460, h: 1000, fig: { x: 70, y: 330, h: 380 }, text: { x: 440, y: 960, size: 80 } },
+  layout('w', 1000, 700, { x: 600, y: 80, h: 340 }, 955, 655, 895, 166),
+  layout('n', 460, 1000, { x: 70, y: 330, h: 380 }, 440, 960, 420, 80),
 ];
 const B = 3000;
 ---
-<div class="pc" data-pcover aria-hidden="true">
+<div class="pc" data-pcover data-hold={hold} aria-hidden="true">
   <div class="pc-sheet crop">
     <div class="pc-shadow"><div class="pc-face">
     {cuts.map((c) => (
@@ -32,7 +38,7 @@ const B = 3000;
           <mask id={`pc-${c.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
             <rect x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} fill="#fff" />
             <g transform={`translate(${c.fig.x} ${c.fig.y}) scale(${c.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
-            <text x={c.text.x} y={c.text.y} text-anchor="end" font-size={c.text.size}>{word}</text>
+            {c.lines.map((l) => <text x={l.x} y={l.y} text-anchor="end" font-size={c.size}>{l.t}</text>)}
           </mask>
           {/* The cut edge: the sheet casts a little shadow onto the page under it. */}
           <filter id={`pc-${c.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
@@ -54,6 +60,12 @@ const B = 3000;
      screen and slides away while the page holds still (motion/cover.ts). */
   .pc { --pin: calc(100svh - var(--header-h)); position: relative; z-index: 2; height: var(--pin); pointer-events: none; }
   :global(.motion-live) .pc { position: absolute; inset: 0 0 auto; }
+  /* While held under the cover the page carries its own paper and grid (the body's would scroll behind
+     it), offset by --grid-y (motion/cover.ts) so the lines run on from the body's without a seam. */
+  :global([data-pin-container].is-held) {
+    background: var(--paper-tex), var(--grid), var(--paper);
+    background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
+  }
   .pc-sheet { position: absolute; inset: var(--s-4) var(--gutter) var(--s-6); --cm-c: rgb(51 51 51 / .55); }
   /* The sheet is trimmed in square steps inside its crop marks (which mark the full trim box); the
      shadow sits on a wrapper so it follows the steps. --st is one step. */
@@ -61,8 +73,9 @@ const B = 3000;
   .pc-face {
     --st: clamp(28px, 4vw, 60px); position: absolute; inset: 0;
     /* Steps kept clear of what is printed and cut: the top drops after the small print, the right edge
-       is notched between the figures and the word, the lower left corner steps in left of the word. */
-    clip-path: polygon(0 0, 44% 0, 44% var(--st), 100% var(--st), 100% 62%, calc(100% - var(--st)) 62%, calc(100% - var(--st)) 74%, 100% 74%, 100% 100%, 16% 100%, 16% calc(100% - var(--st)), 0 calc(100% - var(--st)));
+       is notched beside the figures (a heading of two lines reaches the edge lower down), the lower left
+       corner steps in left of the heading. */
+    clip-path: polygon(0 0, 44% 0, 44% var(--st), 100% var(--st), 100% 40%, calc(100% - var(--st)) 40%, calc(100% - var(--st)) 52%, 100% 52%, 100% 100%, 16% 100%, 16% calc(100% - var(--st)), 0 calc(100% - var(--st)));
   }
   .pc-cut { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
   .pc-cut text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
