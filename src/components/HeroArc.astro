@@ -9,9 +9,11 @@ import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../lib/lens';
 // Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
 // inside of a cylinder, a lens view: the centre card is furthest away, the side cards come nearer,
 // turn toward the viewer and blur into white at the edges. Wide cards on desktop, tall on phones.
+// Each card carries a plate caption under it, as in a printed catalogue: the pictures stay clean.
 // Under the strip, on wide screens, the copy is split along a hairline like a title block: the stacked
-// logo at the left, the tagline (corporate sheet) beside it, the site description (Wix SEO text) and the
-// button at the right, all verbatim. Phones and narrow tablets stack it centred. hero.ts drifts the cards;
+// logo at the left, the tagline (corporate sheet) beside it set large as the page's statement, the site
+// description (Wix SEO text) and the button at the right, all verbatim. Phones and narrow tablets stack
+// it centred. hero.ts drifts the cards;
 // without motion they render at the composed angles computed here.
 interface Item { thumb: ImageMetadata; alt: string; title: string; description: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string; cta: UiString }
@@ -69,7 +71,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   .ha-arc:active { cursor: grabbing; }
   .ha-card {
     position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
-    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; overflow: hidden; background: var(--panel);
+    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; background: var(--panel);
     --cx: var(--x, 0); --cz: var(--z, 0); --cry: var(--ry, 0); --co: var(--o, 1);
     transform: translate3d(calc(var(--cx) * 1vw), 0, calc(var(--cz) * 1vw)) rotateY(calc(var(--cry) * -1deg));
     opacity: calc(var(--co) * var(--in, 1));
@@ -89,27 +91,27 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   }
   .ha-copy { position: relative; z-index: 1; } /* above the stretched arc, so its links stay clickable */
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-  /* After terrot: the project name and client written on the card, over a soft shade. */
-  /* Film grain over each photograph, under the caption. */
+  /* Film grain over each photograph. */
   .ha-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--grain); opacity: .16; mix-blend-mode: overlay; pointer-events: none; }
-  .ha-card::after { content: ''; position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .55)); pointer-events: none; }
-  .ha-cap { position: absolute; inset: auto 0 0; z-index: 2; display: grid; gap: 4px; padding: 6% 7%; color: var(--white); text-align: center; pointer-events: none; }
-  .ha-cap-t { font: 500 clamp(.875rem, .5rem + .9vw, 1.5rem)/1.05 var(--font-title); letter-spacing: -.02em; text-wrap: balance; }
-  .ha-cap-d { font: 500 clamp(.5625rem, .5rem + .2vw, .6875rem)/1.2 var(--font-text); letter-spacing: 0; opacity: .85; }
+  /* A plate caption under each picture, as in a printed catalogue: the project in ink, the client
+     beneath in grey. Nothing is written over the work (some pictures carry their own type). */
+  .ha-cap { position: absolute; top: calc(100% + .7em); left: 0; right: 0; display: grid; gap: 2px; color: var(--ink); text-align: left; pointer-events: none; font-size: clamp(.6875rem, .35rem + .5vw, .9375rem); }
+  .ha-cap-t { font: 500 1em/1.25 var(--font-text); letter-spacing: -.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ha-cap-d { font: 400 .82em/1.3 var(--font-text); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* After Aesop: one centred stack (logo, tagline, a short paragraph, one button). */
   .ha-copy { display: grid; justify-items: center; gap: var(--s-3); padding-top: var(--s-5); text-align: center; }
-  .ha-mark { margin: 0 0 var(--s-2); width: clamp(120px, 11vw, 168px); color: var(--ink); }
+  .ha-mark { margin: 0 0 var(--s-1); width: clamp(84px, 8vw, 132px); color: var(--ink); }
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
-  .ha-tagline { margin: 0; font: 400 var(--fs-lead)/1.4 var(--font-text); }
+  .ha-tagline { margin: 0; max-width: 18ch; font: 400 clamp(2rem, .4rem + 4.4vw, 5rem)/1.02 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
   .ha-blurb { margin: 0 0 var(--s-4); max-width: 52ch; font: 400 var(--fs-small)/1.6 var(--font-text); color: var(--text-2); }
   @media (min-width: 900px) {
     .ha-copy {
       grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); row-gap: 0; align-items: end;
       justify-items: start; text-align: left; margin-top: var(--s-5); border-top: 1px solid var(--line);
     }
-    .ha-mark { grid-column: 1 / 4; grid-row: 1 / 3; margin: 0; width: clamp(110px, 9vw, 150px); }
-    .ha-tagline { grid-column: 4 / 9; grid-row: 1 / 3; font-size: var(--fs-h3); line-height: 1.3; }
+    .ha-mark { grid-column: 1 / 3; grid-row: 1 / 3; align-self: end; margin: 0; padding-top: var(--s-5); width: clamp(96px, 8vw, 132px); }
+    .ha-tagline { grid-column: 3 / 9; grid-row: 1 / 3; padding-top: var(--s-5); }
     .ha-blurb { grid-column: 9 / 13; grid-row: 1; margin: 0; }
     .ha-copy > :global(.pill) { grid-column: 9 / 13; grid-row: 2; margin-top: var(--s-4); }
   }

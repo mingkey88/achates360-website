@@ -46,7 +46,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     card.addEventListener('pointerleave', () => { card.classList.remove('is-playing'); v.pause(); });
   }
 
-  // A circle with an arrow follows the pointer over linked cards, easing behind it.
+  // A small circle with an arrow follows the pointer over linked cards, easing behind it.
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
   const links = document.querySelectorAll<HTMLElement>('a.media-card');
   if (links.length && fine.matches && !reduce.matches) {
@@ -57,7 +57,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     document.body.append(dot);
     let x = 0, y = 0, tx = 0, ty = 0, raf = 0, idle = 0;
     const tick = () => {
-      x += (tx - x) * .2; y += (ty - y) * .2;
+      x += (tx - x) * .3; y += (ty - y) * .3;
       dot.style.translate = `${x}px ${y}px`;
       raf = Math.abs(tx - x) + Math.abs(ty - y) > .3 ? requestAnimationFrame(tick) : 0;
     };
@@ -85,12 +85,14 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   .mc-text { padding-top: var(--s-3); }
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
+  /* A small hairline circle with an arrow, set off to the lower right of the pointer so it never sits
+     over what the pointer is on. */
   :global(.mc-cursor) {
-    position: fixed; left: 0; top: 0; z-index: 60; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%;
-    display: grid; place-items: center; background: var(--paper); color: var(--ink); pointer-events: none;
-    scale: 0; transition: scale .45s var(--ease-out); box-shadow: 0 10px 30px rgb(0 0 0 / .15);
+    position: fixed; left: 0; top: 0; z-index: 60; width: 34px; height: 34px; margin: 14px 0 0 14px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--paper); color: var(--ink); border: 1px solid rgb(51 51 51 / .35); pointer-events: none;
+    scale: 0; transition: scale .35s var(--ease-out);
   }
   :global(.mc-cursor.is-on) { scale: 1; }
-  :global(.mc-cursor svg) { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+  :global(.mc-cursor svg) { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
   @media (prefers-reduced-motion: reduce) { .mc-media :global(img) { transition: none; } }
 </style>

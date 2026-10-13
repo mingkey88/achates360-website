@@ -1,0 +1,93 @@
+---
+import logo from '../assets/logo-stacked-parts.svg?raw';
+// The projects index's cover (direction B), after the die-cut dove in 'Building Memories': a sheet of
+// the page's own paper (as the homepage's Selected work cover) laid over the top of the page, with the logo's five figures and the
+// word PROJECTS cut clean through it, so the page underneath (the heading and the first pictures) shows
+// in the cut. Crop marks and a printer's colour bar mark it as a press sheet. With motion
+// (motion/cover.ts) the page holds still while the sheet slides away to the left; without motion the
+// sheet sits at the top of the page, over plain paper. Its outline is cut in square steps, like the
+// buildings on the book's cover (and the stepped edge of the homepage's Selected work cover).
+// Decorative: the page's own h1 and list follow.
+interface Props { title: string; count: number }
+const { title, count } = Astro.props;
+const last = String(count).padStart(3, '0');
+const word = title.toUpperCase();
+// The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), as on the Selected work cover.
+const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
+const FIG = { x: 50, y: -3, w: 94, h: 103 };
+// Two cuts in the drawing's own units: wide screens set the figures at the upper right and the word
+// across the foot; tall screens put the figures above the word. xMaxYMax keeps both in the lower right.
+const cuts = [
+  { k: 'w', w: 1000, h: 700, fig: { x: 600, y: 80, h: 340 }, text: { x: 955, y: 655, size: 166 } },
+  { k: 'n', w: 460, h: 1000, fig: { x: 70, y: 330, h: 380 }, text: { x: 440, y: 960, size: 80 } },
+];
+const B = 3000;
+---
+<div class="pc" data-pcover aria-hidden="true">
+  <div class="pc-sheet crop">
+    <div class="pc-shadow"><div class="pc-face">
+    {cuts.map((c) => (
+      <svg class={`pc-cut pc-cut-${c.k}`} viewBox={`0 0 ${c.w} ${c.h}`} preserveAspectRatio="xMaxYMax meet" focusable="false">
+        <defs>
+          <mask id={`pc-${c.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
+            <rect x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} fill="#fff" />
+            <g transform={`translate(${c.fig.x} ${c.fig.y}) scale(${c.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
+            <text x={c.text.x} y={c.text.y} text-anchor="end" font-size={c.text.size}>{word}</text>
+          </mask>
+          {/* The cut edge: the sheet casts a little shadow onto the page under it. */}
+          <filter id={`pc-${c.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity=".3" />
+          </filter>
+        </defs>
+        <rect class="pc-paper" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} mask={`url(#pc-${c.k}-m)`} filter={`url(#pc-${c.k}-f)`} />
+      </svg>
+    ))}
+    <span class="pc-tex"></span>
+    </div></div>
+    <p class="pc-no">№ 001 – {last}</p>
+    {/* A press sheet's colour bar: the four process inks, then the brand's spot colour. */}
+    <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot" style="--c: var(--accent)"></span><span class="pc-bar-l">1495 U</span></p>
+  </div>
+</div>
+<style>
+  /* Without motion: one screen tall, at the top of the page. With motion it lies over the page's first
+     screen and slides away while the page holds still (motion/cover.ts). */
+  .pc { --pin: calc(100svh - var(--header-h)); position: relative; z-index: 2; height: var(--pin); pointer-events: none; }
+  :global(.motion-live) .pc { position: absolute; inset: 0 0 auto; }
+  .pc-sheet { position: absolute; inset: var(--s-4) var(--gutter) var(--s-6); --cm-c: rgb(51 51 51 / .55); }
+  /* The sheet is trimmed in square steps inside its crop marks (which mark the full trim box); the
+     shadow sits on a wrapper so it follows the steps. --st is one step. */
+  .pc-shadow { position: absolute; inset: 0; filter: drop-shadow(0 22px 26px rgb(0 0 0 / .2)); }
+  .pc-face {
+    --st: clamp(28px, 4vw, 60px); position: absolute; inset: 0;
+    /* Steps kept clear of what is printed and cut: the top drops after the small print, the right edge
+       is notched between the figures and the word, the lower left corner steps in left of the word. */
+    clip-path: polygon(0 0, 44% 0, 44% var(--st), 100% var(--st), 100% 62%, calc(100% - var(--st)) 62%, calc(100% - var(--st)) 74%, 100% 74%, 100% 100%, 16% 100%, 16% calc(100% - var(--st)), 0 calc(100% - var(--st)));
+  }
+  .pc-cut { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+  .pc-cut text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
+  .pc-paper { fill: var(--paper); }
+  /* The paper's fibre, as on the page and the homepage cover. */
+  .pc-tex { position: absolute; inset: 0; background: var(--paper-tex); pointer-events: none; }
+  .pc-cut-n { display: none; }
+  .pc-no, .pc-bar { position: absolute; left: var(--s-6); margin: 0; color: var(--ink); }
+  .pc-no { top: var(--s-6); font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .pc-bar { top: calc(var(--s-6) + 1.8em); display: flex; align-items: center; gap: 3px; font-size: var(--fs-small); }
+  .pc-bar span:not(.pc-bar-l) { width: 12px; height: 12px; background: var(--c); }
+  .pc-bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; }
+  @media (max-width: 767px) {
+    /* Shorter crop marks, so they stay inside the 16px gutter. */
+    .pc-sheet { --cm-len: 8px; --cm-gap: 4px; }
+  }
+  /* Tall screens (phones, portrait tablets) take the tall composition. */
+  @media (max-width: 767px), (max-aspect-ratio: 4 / 5) {
+    .pc-face { --st: 26px; clip-path: polygon(0 0, 55% 0, 55% var(--st), 100% var(--st), 100% 100%, 0 100%, 0 62%, var(--st) 62%, var(--st) 46%, 0 46%); }
+    .pc-cut-w { display: none; }
+    .pc-cut-n { display: block; }
+  }
+  @media (max-width: 767px) {
+    .pc-no, .pc-bar { left: var(--s-4); }
+    .pc-no { top: var(--s-4); }
+    .pc-bar { top: calc(var(--s-4) + 1.8em); }
+  }
+</style>
