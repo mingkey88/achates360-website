@@ -1,95 +1,73 @@
 ---
-import Pic from './ui/Pic.astro';
 import logo from '../assets/logo-stacked-parts.svg?raw';
 // The projects index's cover (direction B), after the die-cut dove in 'Building Memories': a sheet of
-// the brand orange (Pantone 1495 U) with the logo's five figures cut through it, the work showing in the
-// cut and changing every few seconds. Crop marks and a printer's colour bar mark it as a press sheet.
-// With motion (motion/cover.ts) the sheet stays put while the page scrolls and slides away to the left,
-// uncovering the index beneath it; without motion it is simply the top of the page. Decorative
-// throughout: the page's own h1 and the list follow it.
-interface Props { title: string; count: number; images: { src: ImageMetadata }[] }
-const { title, count, images } = Astro.props;
+// the brand orange (Pantone 1495 U) laid over the top of the page, with the logo's five figures and the
+// word PROJECTS cut clean through it, so the page underneath (the heading and the first pictures) shows
+// in the cut. Crop marks and a printer's colour bar mark it as a press sheet. With motion
+// (motion/cover.ts) the page holds still while the sheet slides away to the left; without motion the
+// sheet sits at the top of the page, over plain paper. Decorative: the page's own h1 and list follow.
+interface Props { title: string; count: number }
+const { title, count } = Astro.props;
 const last = String(count).padStart(3, '0');
+const word = title.toUpperCase();
 // The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), as on the Selected work cover.
 const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
 const FIG = { x: 50, y: -3, w: 94, h: 103 };
-// Two cuts in the drawing's own units: wide screens set the figures large at the right; phones lower
-// down the tall sheet. xMaxYMax keeps them in the sheet's lower right corner.
+// Two cuts in the drawing's own units: wide screens set the figures at the upper right and the word
+// across the foot; phones put the figures above the word. xMaxYMax keeps both in the lower right.
 const cuts = [
-  { k: 'w', w: 1000, h: 700, fig: { x: 400, y: 30, h: 650 } },
-  { k: 'n', w: 460, h: 1000, fig: { x: 12, y: 500, h: 490 } },
+  { k: 'w', w: 1000, h: 700, fig: { x: 600, y: 40, h: 360 }, text: { x: 955, y: 655, size: 166 } },
+  { k: 'n', w: 460, h: 1000, fig: { x: 70, y: 330, h: 380 }, text: { x: 440, y: 960, size: 80 } },
 ];
 const B = 3000;
 ---
 <div class="pc" data-pcover aria-hidden="true">
-  <div class="pc-pin">
-    <div class="pc-sheet crop">
-      <div class="pc-face">
-      <div class="pc-window">
-        {images.map((im, i) => <Pic class={i === 0 ? 'pc-img is-on' : 'pc-img'} src={im.src} alt="" widths={[640, 960, 1440, 1920]} sizes="100vw" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />)}
-      </div>
-      {cuts.map((c) => (
-        <svg class={`pc-cut pc-cut-${c.k}`} viewBox={`0 0 ${c.w} ${c.h}`} preserveAspectRatio="xMaxYMax meet" focusable="false">
-          <defs>
-            <mask id={`pc-${c.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
-              <rect x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} fill="#fff" />
-              <g transform={`translate(${c.fig.x} ${c.fig.y}) scale(${c.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
-            </mask>
-            {/* The cut edge: the sheet casts a little shadow onto the picture behind it. */}
-            <filter id={`pc-${c.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
-              <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity=".45" />
-            </filter>
-          </defs>
-          <rect class="pc-paper" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} mask={`url(#pc-${c.k}-m)`} filter={`url(#pc-${c.k}-f)`} />
-        </svg>
-      ))}
-      <span class="pc-tex"></span>
-      <p class="pc-title sc">{title}</p>
-      <p class="pc-no">№ 001 – {last}</p>
-      {/* A press sheet's colour bar: the four process inks, then the spot colour the sheet is printed in. */}
-      <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot"></span><span class="pc-bar-l">1495 U</span></p>
-      </div>
-    </div>
+  <div class="pc-sheet crop">
+    {cuts.map((c) => (
+      <svg class={`pc-cut pc-cut-${c.k}`} viewBox={`0 0 ${c.w} ${c.h}`} preserveAspectRatio="xMaxYMax meet" focusable="false">
+        <defs>
+          <mask id={`pc-${c.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
+            <rect x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} fill="#fff" />
+            <g transform={`translate(${c.fig.x} ${c.fig.y}) scale(${c.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
+            <text x={c.text.x} y={c.text.y} text-anchor="end" font-size={c.text.size}>{word}</text>
+          </mask>
+          {/* The cut edge: the sheet casts a little shadow onto the page under it. */}
+          <filter id={`pc-${c.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity=".3" />
+          </filter>
+        </defs>
+        <rect class="pc-paper" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} mask={`url(#pc-${c.k}-m)`} filter={`url(#pc-${c.k}-f)`} />
+      </svg>
+    ))}
+    <p class="pc-no">№ 001 – {last}</p>
+    {/* A press sheet's colour bar: the four process inks, then the spot colour the sheet is printed in. */}
+    <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot"></span><span class="pc-bar-l">1495 U</span></p>
   </div>
 </div>
 <style>
-  /* Without motion: one screen tall, the list follows. With motion the cover claims extra scroll room
-     (--open) while it stays pinned and opens; the page pulls what follows up underneath it by --pin. */
-  .pc { --pin: calc(100svh - var(--header-h)); --open: 80svh; position: relative; z-index: 2; height: var(--pin); pointer-events: none; }
-  :global(.motion-live) .pc { height: calc(var(--pin) + var(--open)); }
-  .pc-pin { position: sticky; top: var(--header-h); height: var(--pin); overflow-x: clip; }
-  .pc-sheet {
-    position: absolute; inset: var(--s-4) var(--gutter) var(--s-6);
-    --cm-c: rgb(51 51 51 / .55); box-shadow: 0 1px 0 rgb(0 0 0 / .06), 0 24px 50px -30px rgb(0 0 0 / .45);
-  }
-  /* The sheet's face: everything printed on it, trimmed to its edge (the crop marks sit outside). */
-  .pc-face { position: absolute; inset: 0; overflow: hidden; }
-  .pc-window { position: absolute; inset: 0; background: var(--ink); }
-  .pc-window :global(.pc-img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s var(--ease-out); }
-  .pc-window :global(.pc-img.is-on) { opacity: 1; }
-  .pc-cut { position: absolute; inset: var(--s-6) var(--s-6) var(--s-5); width: calc(100% - 2 * var(--s-6)); height: calc(100% - var(--s-6) - var(--s-5)); overflow: visible; }
+  /* Without motion: one screen tall, at the top of the page. With motion it lies over the page's first
+     screen and slides away while the page holds still (motion/cover.ts). */
+  .pc { --pin: calc(100svh - var(--header-h)); position: relative; z-index: 2; height: var(--pin); pointer-events: none; }
+  :global(.motion-live) .pc { position: absolute; inset: 0 0 auto; }
+  .pc-sheet { position: absolute; inset: var(--s-4) var(--gutter) var(--s-6); --cm-c: rgb(51 51 51 / .55); }
+  /* The sheet is trimmed to its edge (the crop marks sit outside it), with a soft shadow under it. */
+  .pc-cut { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; filter: drop-shadow(0 24px 30px rgb(0 0 0 / .18)); }
+  .pc-cut text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
   .pc-paper { fill: var(--accent); }
   .pc-cut-n { display: none; }
-  /* Uncoated stock: the page's paper fibre over the ink. */
-  .pc-tex { position: absolute; inset: 0; background: var(--paper-tex); mix-blend-mode: multiply; opacity: .9; pointer-events: none; }
-  .pc-title, .pc-no, .pc-bar { position: absolute; left: var(--s-6); margin: 0; color: var(--ink); }
-  .pc-title { top: var(--s-6); font: 500 var(--fs-h2)/1.1 var(--font-display); letter-spacing: -.02em; }
-  .pc-no { top: calc(var(--s-6) + var(--fs-h2) * 1.1 + var(--s-2)); font-size: var(--fs-small); font-variant-numeric: tabular-nums; }
-  .pc-bar { bottom: var(--s-5); display: flex; align-items: center; gap: 3px; }
+  .pc-no, .pc-bar { position: absolute; left: var(--s-6); margin: 0; color: var(--ink); }
+  .pc-no { top: var(--s-6); font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .pc-bar { top: calc(var(--s-6) + 1.8em); display: flex; align-items: center; gap: 3px; font-size: var(--fs-small); }
   .pc-bar span:not(.pc-bar-l) { width: 12px; height: 12px; background: var(--c); }
   .pc-bar .spot { background: var(--accent); outline: 1px solid rgb(51 51 51 / .5); outline-offset: -1px; }
   .pc-bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; }
   @media (max-width: 767px) {
-    .pc { --open: 60svh; }
     /* Shorter crop marks, so they stay inside the 16px gutter. */
     .pc-sheet { --cm-len: 8px; --cm-gap: 4px; }
     .pc-cut-w { display: none; }
     .pc-cut-n { display: block; }
-    .pc-cut { inset: var(--s-5) var(--s-4) var(--s-4); width: calc(100% - 2 * var(--s-4)); height: calc(100% - var(--s-5) - var(--s-4)); }
-    .pc-title, .pc-no, .pc-bar { left: var(--s-4); }
-    .pc-title { top: var(--s-4); }
-    .pc-no { top: calc(var(--s-4) + var(--fs-h2) * 1.1 + var(--s-2)); }
-    .pc-bar { bottom: var(--s-4); }
+    .pc-no, .pc-bar { left: var(--s-4); }
+    .pc-no { top: var(--s-4); }
+    .pc-bar { top: calc(var(--s-4) + 1.8em); }
   }
-  @media (prefers-reduced-motion: reduce) { .pc-window :global(.pc-img) { transition: none; } }
 </style>
