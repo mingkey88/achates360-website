@@ -1,20 +1,23 @@
 ---
 import Pic from './ui/Pic.astro';
+import logo from '../assets/logo-stacked-parts.svg?raw';
 // The projects index's cover (direction B), after the die-cut dove in 'Building Memories': a sheet of
-// the brand orange (Pantone 1495 U) with the number of projects cut through it, the work showing in the
+// the brand orange (Pantone 1495 U) with the logo's five figures cut through it, the work showing in the
 // cut and changing every few seconds. Crop marks and a printer's colour bar mark it as a press sheet.
-// With motion (motion/cover.ts) the sheet stays put while the page scrolls and swings open on its left
-// edge like a book cover, uncovering the index beneath it; without motion it is simply the top of the
-// page. Decorative throughout: the page's own h1 and the list follow it.
+// With motion (motion/cover.ts) the sheet stays put while the page scrolls and slides away to the left,
+// uncovering the index beneath it; without motion it is simply the top of the page. Decorative
+// throughout: the page's own h1 and the list follow it.
 interface Props { title: string; count: number; images: { src: ImageMetadata }[] }
 const { title, count, images } = Astro.props;
-const n = String(count);
 const last = String(count).padStart(3, '0');
-// Two cuts: wide screens set the number on one line, bottom right; phones stack its digits.
-// Coordinates are the drawing's own units; xMaxYMax keeps the number in the sheet's lower right corner.
+// The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), as on the Selected work cover.
+const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
+const FIG = { x: 50, y: -3, w: 94, h: 103 };
+// Two cuts in the drawing's own units: wide screens set the figures large at the right; phones lower
+// down the tall sheet. xMaxYMax keeps them in the sheet's lower right corner.
 const cuts = [
-  { k: 'w', w: 1000, h: 700, size: 780, lines: [{ t: n, x: 985, y: 680 }] },
-  { k: 'n', w: 460, h: 1000, size: 600, lines: [...n].map((t, i, all) => ({ t, x: 455, y: 990 - (all.length - 1 - i) * 480 })) },
+  { k: 'w', w: 1000, h: 700, fig: { x: 400, y: 30, h: 650 } },
+  { k: 'n', w: 460, h: 1000, fig: { x: 12, y: 500, h: 490 } },
 ];
 const B = 3000;
 ---
@@ -30,7 +33,7 @@ const B = 3000;
           <defs>
             <mask id={`pc-${c.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
               <rect x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B} fill="#fff" />
-              {c.lines.map((l) => <text x={l.x} y={l.y} text-anchor="end" font-size={c.size}>{l.t}</text>)}
+              <g transform={`translate(${c.fig.x} ${c.fig.y}) scale(${c.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
             </mask>
             {/* The cut edge: the sheet casts a little shadow onto the picture behind it. */}
             <filter id={`pc-${c.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={c.w + 2 * B} height={c.h + 2 * B}>
@@ -45,7 +48,6 @@ const B = 3000;
       <p class="pc-no">№ 001 – {last}</p>
       {/* A press sheet's colour bar: the four process inks, then the spot colour the sheet is printed in. */}
       <p class="pc-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot"></span><span class="pc-bar-l">1495 U</span></p>
-      <span class="pc-shade"></span>
       </div>
     </div>
   </div>
@@ -55,9 +57,9 @@ const B = 3000;
      (--open) while it stays pinned and opens; the page pulls what follows up underneath it by --pin. */
   .pc { --pin: calc(100svh - var(--header-h)); --open: 80svh; position: relative; z-index: 2; height: var(--pin); pointer-events: none; }
   :global(.motion-live) .pc { height: calc(var(--pin) + var(--open)); }
-  .pc-pin { position: sticky; top: var(--header-h); height: var(--pin); perspective: 3200px; perspective-origin: 30% 50%; }
+  .pc-pin { position: sticky; top: var(--header-h); height: var(--pin); overflow-x: clip; }
   .pc-sheet {
-    position: absolute; inset: var(--s-4) var(--gutter) var(--s-6); transform-origin: 0% 50%; backface-visibility: hidden;
+    position: absolute; inset: var(--s-4) var(--gutter) var(--s-6);
     --cm-c: rgb(51 51 51 / .55); box-shadow: 0 1px 0 rgb(0 0 0 / .06), 0 24px 50px -30px rgb(0 0 0 / .45);
   }
   /* The sheet's face: everything printed on it, trimmed to its edge (the crop marks sit outside). */
@@ -66,7 +68,6 @@ const B = 3000;
   .pc-window :global(.pc-img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s var(--ease-out); }
   .pc-window :global(.pc-img.is-on) { opacity: 1; }
   .pc-cut { position: absolute; inset: var(--s-6) var(--s-6) var(--s-5); width: calc(100% - 2 * var(--s-6)); height: calc(100% - var(--s-6) - var(--s-5)); overflow: visible; }
-  .pc-cut text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.045em; }
   .pc-paper { fill: var(--accent); }
   .pc-cut-n { display: none; }
   /* Uncoated stock: the page's paper fibre over the ink. */
@@ -78,8 +79,6 @@ const B = 3000;
   .pc-bar span:not(.pc-bar-l) { width: 12px; height: 12px; background: var(--c); }
   .pc-bar .spot { background: var(--accent); outline: 1px solid rgb(51 51 51 / .5); outline-offset: -1px; }
   .pc-bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; }
-  /* Light falls off the cover as it swings open (motion/cover.ts raises it). */
-  .pc-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
   @media (max-width: 767px) {
     .pc { --open: 60svh; }
     /* Shorter crop marks, so they stay inside the 16px gutter. */
