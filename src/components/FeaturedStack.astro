@@ -31,7 +31,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
               <BgVideo src={slide.media.src} poster={slide.media.poster} desktopOnly class="sc-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={videoDraft} />
               <picture class="sc-pic">
                 <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
-                <Image class="sc-still" src={slide.media.poster} alt="" widths={[480, 960]} sizes="100vw" />
+                <Image class="sc-still" src={slide.media.poster} alt="" widths={[480, 960, 1440, 1920]} sizes="100vw" />
               </picture>
               <noscript><img class="sc-still" src={stills[i]} alt="" /></noscript>
             </>

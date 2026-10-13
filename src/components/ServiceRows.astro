@@ -26,10 +26,10 @@ const draft = text('video-pause').placeholder || text('video-play').placeholder;
               <BgVideo src={s.hero.src} poster={s.hero.poster} desktopOnly class="svc-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={draft} />
               <picture class="svc-pic">
                 <source media="(min-width: 768px)" srcset={BLANK_IMAGE} />
-                <Image class="svc-still" src={s.hero.poster} alt="" widths={[480, 960]} sizes="100vw" loading="lazy" />
+                <Image class="svc-still" src={s.hero.poster} alt="" widths={[480, 960, 1440, 1920]} sizes="100vw" loading="lazy" />
               </picture>
             </>)
-          : <Image src={s.hero.src} alt={s.hero.alt} widths={[480, 960, 1440]} sizes="(max-width: 1023px) 100vw, 45vw" />}
+          : <Image src={s.hero.src} alt={s.hero.alt} widths={[480, 960, 1440, 2048]} sizes="(max-width: 1023px) 100vw, 45vw" />}
       </div>
     </li>
   ))}
