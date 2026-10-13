@@ -49,7 +49,7 @@ const jsonLd = [
     <article class="p-body"><MediaRows blocks={visibleBlocks(d.blocks, d.pageBackground)} pageTitle={d.title} /></article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
-  <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} />
+  <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
 </Base>
 <style>
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }

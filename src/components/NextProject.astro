@@ -2,22 +2,36 @@
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
-interface Props { href: string; title: string | UiString; label: UiString }
-const { href, title, label } = Astro.props;
+// The end of a case study: the next project, large, and beside it the way to start one like this.
+interface Props { href: string; title: string | UiString; label: UiString; discuss?: { label: UiString; href: string } }
+const { href, title, label, discuss } = Astro.props;
 ---
 <section class="next-project">
-  <a class="np wrap" href={withBase(href)}>
-    <span class="label"><T s={label} /></span>
-    <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />}</span>
-    <span class="np-arrow" aria-hidden="true">→</span>
-  </a>
+  <div class="np-band wrap">
+    <a class="np" href={withBase(href)}>
+      <span class="label"><T s={label} /></span>
+      <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />}</span>
+      <span class="np-arrow" aria-hidden="true">→</span>
+    </a>
+    {discuss && (
+      <a class="np-discuss" href={withBase(discuss.href)}><T s={discuss.label} /> <span aria-hidden="true">→</span></a>
+    )}
+  </div>
 </section>
 <style>
   /* A stone band ending on a hairline, so it no longer runs into the charcoal footer. */
   .next-project { background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
-  .np { display: grid; gap: var(--s-3); padding-block: var(--section-y); text-decoration: none; }
+  .np-band { display: grid; gap: var(--s-6); padding-block: var(--section-y); }
+  .np { display: grid; gap: var(--s-3); text-decoration: none; }
   .np-title { font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
   .np-arrow { font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent-deep); transition: transform .3s var(--ease-out); }
   .np:hover .np-arrow { transform: translateX(12px); }
-  @media (prefers-reduced-motion: reduce) { .np-arrow { transition: none; } }
+  /* The second action: a framed link, like the header's Contact. */
+  .np-discuss {
+    justify-self: start; align-self: end; display: inline-flex; gap: 10px; padding: 12px 20px; border: 1px solid var(--ink);
+    color: var(--ink); font-size: var(--fs-small); text-decoration: none; transition: background-color .25s, color .25s;
+  }
+  .np-discuss:hover { background: var(--ink); color: var(--paper); }
+  @media (min-width: 900px) { .np-band { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--s-8); } }
+  @media (prefers-reduced-motion: reduce) { .np-arrow, .np-discuss { transition: none; } }
 </style>
