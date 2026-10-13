@@ -1,0 +1,187 @@
+---
+import MediaCard from './ui/MediaCard.astro';
+import T from './ui/T.astro';
+import { withBase } from '../lib/paths';
+import { isFileNameAlt } from '../lib/seo';
+import type { IndexEntry } from '../lib/project-index';
+import type { UiString } from '../lib/strings';
+// The all-projects index (direction B). Category chips filter the list in place; each chip is also a
+// link to its category page, so without JS it still goes somewhere useful. Two views of the same
+// projects: a grid of pictures, and a catalogue after the library cards in 'Building Memories' (a
+// numbered, ruled entry per project with its year stamped in blue ink). Without JS: the grid only.
+interface Props {
+  entries: IndexEntry[];
+  categories: { slug: string; heading: string; href: string }[];
+  all: UiString;
+  labels: { nav: UiString; view: UiString; grid: UiString; catalogue: UiString; no: UiString; project: UiString; client: UiString; discipline: UiString; year: UiString; count: UiString };
+}
+const { entries, categories, all, labels } = Astro.props;
+const headingOf = new Map(categories.map((c) => [c.slug, c.heading]));
+const chips = categories.map((c) => ({ ...c, count: entries.filter((e) => e.cats.includes(c.slug)).length })).filter((c) => c.count > 0);
+const no = (n: number) => String(n).padStart(3, '0');
+// A rubber stamp never lands square: each year leans a little, the same way on every visit.
+const lean = (n: number) => `${(((n * 37) % 7) - 3) * .6}deg`;
+---
+<div class="pix" data-index data-count-label={labels.count.text}>
+  <div class="pix-bar">
+    <nav class="pix-chips" aria-label={labels.nav.text}>
+      <ul>
+        <li><a href={withBase('/projects')} data-cat="" aria-current="page"><T s={all} /> <span class="n">{entries.length}</span></a></li>
+        {chips.map((c) => <li><a href={withBase(c.href)} data-cat={c.slug}>{c.heading} <span class="n">{c.count}</span></a></li>)}
+      </ul>
+    </nav>
+    <div class="pix-views" role="group" aria-label={labels.view.text}>
+      <button type="button" data-view="grid" aria-pressed="true"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 1.5h5v5h-5zM9.5 1.5h5v5h-5zM1.5 9.5h5v5h-5zM9.5 9.5h5v5h-5z" /></svg><T s={labels.grid} /></button>
+      <button type="button" data-view="catalogue" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 3.5h14M1 8h14M1 12.5h14" /></svg><T s={labels.catalogue} /></button>
+    </div>
+  </div>
+  <p class="sr-only" aria-live="polite" data-live></p>
+
+  <ul class="pix-grid" data-list="grid">
+    {entries.map((e, i) => (
+      <li data-cats={e.cats.join(' ')}>
+        <MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt eager={i < 3} reveal={i >= 3} wipe={i >= 3} />
+      </li>
+    ))}
+  </ul>
+
+  <div class="pix-cat" data-list="catalogue" hidden>
+    <div class="pix-row pix-head" aria-hidden="true">
+      <span class="c-no">{labels.no.text}</span><span class="c-title">{labels.project.text}</span><span class="c-client">{labels.client.text}</span><span class="c-disc">{labels.discipline.text}</span><span class="c-year">{labels.year.text}</span>
+    </div>
+    <ol>
+      {entries.map((e) => (
+        <li data-cats={e.cats.join(' ')}>
+          <a class="pix-row" href={withBase(e.href)}>
+            <span class="c-no">№&thinsp;{no(e.no)}</span>
+            <span class="c-title">{e.title.trim()}</span>
+            <span class="c-client">{e.description}</span>
+            <span class="c-disc">{e.cats.map((c) => headingOf.get(c)).filter(Boolean).join(' · ')}</span>
+            <span class="c-year">{e.year && <span class="stamp" style={`--lean: ${lean(e.no)}`}>{e.year}</span>}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</div>
+
+<script>
+  import { ScrollTrigger } from '../scripts/motion/index';
+  for (const root of document.querySelectorAll<HTMLElement>('[data-index]')) {
+    root.classList.add('is-ready');
+    const chips = [...root.querySelectorAll<HTMLAnchorElement>('[data-cat]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-cats]')];
+    const lists = [...root.querySelectorAll<HTMLElement>('[data-list]')];
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
+    const countLabel = root.dataset.countLabel ?? '{n}';
+    const base = location.pathname;
+
+    const filter = (cat: string, announce: boolean) => {
+      if (cat && !chips.some((c) => c.dataset.cat === cat)) cat = '';
+      for (const c of chips) {
+        if (c.dataset.cat === cat) c.setAttribute('aria-current', 'page');
+        else c.removeAttribute('aria-current');
+      }
+      let shown = 0;
+      for (const it of items) {
+        const on = !cat || it.dataset.cats!.split(' ').includes(cat);
+        it.hidden = !on;
+        if (on && it.closest('[data-list="grid"]')) shown++;
+      }
+      if (announce) live.textContent = countLabel.replace('{n}', String(shown));
+      ScrollTrigger.refresh();
+    };
+    const view = (v: string) => {
+      if (v !== 'catalogue') v = 'grid';
+      for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.view === v));
+      for (const l of lists) l.hidden = l.dataset.list !== v;
+      root.dataset.view = v;
+      try { localStorage.setItem('projects-view', v); } catch {}
+      ScrollTrigger.refresh();
+    };
+    const sync = (cat: string) => {
+      const q = cat ? `?c=${cat}` : '';
+      history.replaceState(null, '', base + q + location.hash);
+    };
+
+    for (const c of chips) c.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // a new tab still opens the category page
+      e.preventDefault();
+      filter(c.dataset.cat!, true);
+      sync(c.dataset.cat!);
+    });
+    for (const b of buttons) b.addEventListener('click', () => view(b.dataset.view!));
+
+    let saved = 'grid';
+    try { saved = localStorage.getItem('projects-view') ?? 'grid'; } catch {}
+    view(saved);
+    filter(new URLSearchParams(location.search).get('c') ?? '', false);
+  }
+</script>
+
+<style>
+  /* Filtered-out entries and the view not shown: [hidden] must win over the lists' own display. */
+  [data-index] [hidden] { display: none !important; }
+  .pix-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4) var(--s-6); padding-block: var(--s-5); border-bottom: 1px solid var(--line); }
+  /* Chips: a ruled row of category labels with their counts, like the tabs of an index. */
+  .pix-chips { min-width: 0; flex: 1 1 520px; }
+  .pix-chips ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .pix-chips a {
+    display: inline-flex; align-items: baseline; gap: 6px; padding: 7px 12px; border: 1px solid var(--line); color: inherit;
+    font-size: var(--fs-small); text-decoration: none; white-space: nowrap; transition: border-color .2s, background-color .2s, color .2s;
+  }
+  .pix-chips a:hover { border-color: var(--ink); }
+  .pix-chips a[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .n { font-size: .78em; font-variant-numeric: tabular-nums; opacity: .6; }
+  /* Phones: one swiping row of chips instead of a tall block. */
+  @media (max-width: 767px) {
+    .pix-chips { flex-basis: 100%; margin-inline: calc(var(--gutter) * -1); }
+    .pix-chips ul { flex-wrap: nowrap; overflow-x: auto; padding-inline: var(--gutter); scrollbar-width: none; }
+    .pix-chips ul::-webkit-scrollbar { display: none; }
+  }
+
+  .pix-views { display: none; gap: 0; }
+  .is-ready .pix-views { display: inline-flex; }
+  .pix-views button {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--line); background: none; color: inherit;
+    font: 400 var(--fs-small)/1.2 var(--font-text); cursor: pointer;
+  }
+  .pix-views button + button { border-left: 0; }
+  .pix-views button[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .pix-views svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+
+  .pix-grid { list-style: none; margin: 0; padding: var(--s-7) 0 0; display: grid; gap: var(--s-7) var(--s-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .pix-grid li { min-width: 0; }
+  @media (min-width: 1024px) { .pix-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* The catalogue: one ruled entry per project, after a library's index cards. */
+  .pix-cat { padding-top: var(--s-6); }
+  .pix-cat ol { list-style: none; margin: 0; padding: 0; }
+  .pix-row {
+    display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 6rem; column-gap: var(--s-4); row-gap: 2px; align-items: baseline;
+    padding: var(--s-3) var(--s-2); border-bottom: 1px solid var(--line); color: inherit; text-decoration: none;
+  }
+  .pix-head { padding-block: var(--s-2); border-bottom-color: var(--ink); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); }
+  .pix-head > span { font: inherit; letter-spacing: inherit; color: inherit; }
+  a.pix-row { transition: background-color .2s; }
+  a.pix-row:hover, a.pix-row:focus-visible { background: rgb(255 254 242 / .7); }
+  a.pix-row:hover .c-title { text-decoration: underline; text-underline-offset: .18em; text-decoration-thickness: 1px; }
+  .c-no { font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
+  .c-title { font: 400 var(--fs-lead)/1.3 var(--font-display); letter-spacing: -.01em; }
+  .c-client, .c-disc { font-size: var(--fs-small); color: var(--text-2); }
+  .c-year { grid-column: 3; grid-row: 1; justify-self: end; }
+  .c-client { grid-column: 2; }
+  .c-disc { display: none; }
+  .pix-head .c-client, .pix-head .c-disc { display: none; }
+  /* Year, as a rubber date stamp: blueprint-blue ink in a thin frame, set a hair off square. */
+  .stamp {
+    display: inline-block; padding: 2px 7px 1px; border: 1px solid currentColor; color: var(--stamp); rotate: var(--lean, 0deg);
+    font: 500 .75rem/1.3 var(--font-text); letter-spacing: .08em; font-variant-numeric: tabular-nums; white-space: nowrap; opacity: .9;
+  }
+  @media (min-width: 900px) {
+    .pix-row { grid-template-columns: 5.5rem minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.2fr) 7rem; }
+    .c-client, .c-disc, .pix-head .c-client, .pix-head .c-disc { display: block; grid-column: auto; }
+    .c-year { grid-column: auto; grid-row: auto; }
+  }
+</style>

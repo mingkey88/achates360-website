@@ -29,6 +29,7 @@
      pictures cover it. */
   --grid-minor: rgb(52 98 138 / .06);
   --grid-major: rgb(52 98 138 / .11);
+  --stamp: rgb(52 98 138); /* rubber-stamp ink (the catalogue's years), the grid's blueprint blue at full strength */
   --grid:
     linear-gradient(var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
     linear-gradient(90deg, var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
