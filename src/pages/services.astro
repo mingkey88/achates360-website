@@ -1,40 +1,47 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import T from '../components/ui/T.astro';
-import ServiceRows from '../components/ServiceRows.astro';
+import ServicesContents from '../components/ServicesContents.astro';
+import Showreel from '../components/Showreel.astro';
+import ServiceSpread from '../components/ServiceSpread.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
-import Reel from '../components/Reel.astro';
 import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
 import { withBase } from '../lib/paths';
 import { servicesLd } from '../lib/seo';
+import { projectCategories } from '../lib/categories';
+import { serviceCount, categoryCount } from '../lib/service-counts';
+import showreelPoster from '../assets/showreel-poster.jpg';
+// The Services page (direction B), read like a book: a contents page, the studio's showreel, one spread
+// per service (words first, one picture), how the studio works, and the way to get in touch.
 const x = await loadExtras();
 const { text } = x;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
+const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
+const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
+const cats = new Map(projectCategories(sections).map((c) => [c.heading, c]));
 const services = x.services.map((s: any) => {
-  const hero = projects.get(s.project)?.hero;
-  if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
-  return { ...s, hero };
+  const p = projects.get(s.project);
+  if (!p?.hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
+  const image = p.hero.type === 'video' ? p.hero.poster : p.hero.src;
+  const covers = s.tags.map((h: string) => {
+    const c = cats.get(h);
+    if (!c) throw new Error(`services/${s.id}: "${h}" is not a project category`);
+    return { heading: h, href: c.href, count: categoryCount(h, sections, listed) };
+  });
+  return { ...s, image, covers, count: serviceCount(s.tags, sections, listed), plate: { image, title: p.title, client: p.client, href: `/${s.project}` } };
 });
-const reel = (await getEntry('home', 'home'))!.data.slides[0].media;
-if (reel.type !== 'video') throw new Error('Reel: homepage slide-1 is no longer a video');
 const heading = text('services-heading');
+const reel = text('showreel-label');
 const jsonLd = servicesLd(new URL(withBase('/'), Astro.site).href, x.services.map((s: any) => ({ name: s.title, categories: s.tags })));
 ---
 <Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} jsonLd={jsonLd} page="services">
-  <header class="wrap sv-head" data-placeholder={heading.placeholder ? '' : undefined}>
-    <h1 class="display h1" data-split><T s={heading} /></h1>
-  </header>
-  <ServiceRows services={services} />
+  <ServicesContents heading={heading} countLabel={text('contents-count')} services={services} />
+  <Showreel label={reel.text} draft={reel.placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="1:30" />
+  {services.map((s: any, i: number) => <ServiceSpread index={i} total={services.length} coversLabel={text('service-covers')} service={s} covers={s.covers} plate={s.plate} />)}
   <ProcessSteps steps={x.process} heading={text('process-heading')} stepLabel={text('process-step')} />
-  <Reel src={reel.src} poster={reel.poster} label={`${text('reel-left').text} ${text('reel-right').text}`} />
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>
-<style>
-  .sv-head { padding-block: var(--s-8) var(--s-7); border-bottom: 1px solid var(--line); }
-  .sv-head h1 { margin: 0; }
-</style>
 <script>
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';

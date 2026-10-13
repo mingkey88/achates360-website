@@ -1,0 +1,74 @@
+---
+import { getImage } from 'astro:assets';
+import BgVideo from './BgVideo.astro';
+import { mediaUrl } from '../lib/paths';
+import { loadExtras } from '../lib/extras';
+// The studio's showreel on the Services page (direction B): set on the page like a print proof, framed
+// by crop marks, with a silent cut (24 s of the film, no sound) looping in place while it is on screen.
+// "Play with sound" opens the full film (1:30) in a dark full-screen dialog with the browser's own
+// controls. Swap the files in public/media/video to update the reel; the poster is a still from it.
+interface Props { label: string; playLabel: string; closeLabel: string; draft: boolean; src: string; preview: string; poster: ImageMetadata; duration: string }
+const { label, playLabel, closeLabel, draft, src, preview, poster, duration } = Astro.props;
+const { text: t } = await loadExtras();
+const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
+---
+<section class="sr wrap" aria-label={label} data-showreel>
+  <div class="sr-head">
+    <p class="sr-label" data-placeholder={draft ? '' : undefined}>{label}</p>
+    <p class="sr-dur">{duration}</p>
+  </div>
+  <div class="sr-frame crop">
+    <BgVideo src={preview} poster={poster} class="sr-loop" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
+    <button class="sr-play" type="button" data-placeholder={draft ? '' : undefined}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg>
+      <span>{playLabel}</span>
+    </button>
+  </div>
+  <dialog class="sr-dialog" aria-label={label}>
+    <button class="sr-close" type="button"><span class="sr-only">{closeLabel}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg></button>
+    <video data-src={mediaUrl(src)} poster={posterUrl} controls playsinline preload="none"></video>
+  </dialog>
+</section>
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-showreel]')) {
+    const dialog = root.querySelector<HTMLDialogElement>('.sr-dialog')!;
+    const video = dialog.querySelector('video')!;
+    root.querySelector('.sr-play')!.addEventListener('click', () => {
+      if (!video.src) video.src = video.dataset.src!;
+      dialog.showModal();
+      void video.play().catch(() => {});
+    });
+    root.querySelector('.sr-close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('close', () => video.pause());
+  }
+</script>
+<style>
+  .sr { padding-block: 0 var(--s-8); }
+  .sr-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: var(--s-3); margin-bottom: var(--s-5); border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
+  .sr-head p { margin: 0; }
+  .sr-dur { color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .sr-frame { position: relative; aspect-ratio: 16 / 9; background: var(--ink); --cm-c: rgb(51 51 51 / .55); }
+  .sr-frame :global(.sr-loop), .sr-frame :global(.sr-loop video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .sr-frame :global(.bv-toggle) { z-index: 2; top: auto; bottom: var(--s-5); right: var(--s-5); }
+  .sr-play {
+    position: absolute; left: var(--s-5); bottom: var(--s-5); z-index: 2; display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 20px 12px 16px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; font: 400 var(--fs-small)/1 var(--font-text);
+    transition: background-color .25s, color .25s;
+  }
+  .sr-play:hover { background: var(--ink); color: var(--paper); }
+  .sr-play svg { width: 14px; height: 14px; fill: currentColor; }
+  .sr-dialog { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #0d0d0d; }
+  .sr-dialog::backdrop { background: #0d0d0d; }
+  .sr-dialog video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .sr-close {
+    position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; z-index: 1; width: 44px; height: 44px; display: grid; place-items: center;
+    border: 1px solid rgb(255 255 255 / .5); border-radius: 50%; background: rgb(13 13 13 / .5); color: #fff; cursor: pointer;
+  }
+  .sr-close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; }
+  @media (max-width: 767px) {
+    .sr-frame { --cm-len: 8px; --cm-gap: 4px; } /* crop marks inside the 16px gutter */
+    .sr-play { left: var(--s-3); bottom: var(--s-3); padding: 10px 14px 10px 12px; }
+    .sr-frame :global(.bv-toggle) { bottom: var(--s-3); right: var(--s-3); }
+  }
+</style>
