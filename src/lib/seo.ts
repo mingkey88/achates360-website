@@ -53,7 +53,14 @@ export const CANONICAL_ALIASES: Record<string, string> = {
 };
 
 /** Pages that are built but never listed in the sitemap. */
-export const SITEMAP_EXCLUDED = new Set(['/404', ...Object.keys(CANONICAL_ALIASES)]);
+/**
+ * Pages kept out of search engines and AI answers (noindex, no sitemap) while they show another
+ * project's work (CONTENT-QUERIES 46; decided 13 Oct 2026). They stay reachable at their address.
+ * Remove a path once Achates has fixed its content.
+ */
+export const HELD_FROM_SEARCH = new Set(['/bank-of-singapore', '/ritz-carlton-mid-autumn']);
+
+export const SITEMAP_EXCLUDED = new Set(['/404', ...Object.keys(CANONICAL_ALIASES), ...HELD_FROM_SEARCH]);
 
 /** sitemap.xml for absolute page URLs (already canonical: no .html, home with its slash). */
 export function sitemapXml(urls: string[]): string {

@@ -120,3 +120,13 @@ describe('structured data for answer engines', () => {
     expect((l.itemListElement as any[])[1]).toEqual({ '@type': 'ListItem', position: 2, name: 'B', url: 'b' });
   });
 });
+
+import { HELD_FROM_SEARCH } from './seo';
+describe('pages held from search', () => {
+  it('keeps the two pages showing another project\'s work out of the sitemap', () => {
+    for (const p of ['/bank-of-singapore', '/ritz-carlton-mid-autumn']) {
+      expect(HELD_FROM_SEARCH.has(p)).toBe(true);
+      expect(SITEMAP_EXCLUDED.has(p)).toBe(true);
+    }
+  });
+});
