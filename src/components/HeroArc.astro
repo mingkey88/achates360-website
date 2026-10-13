@@ -9,8 +9,9 @@ import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../lib/lens';
 // Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
 // inside of a cylinder, a lens view: the centre card is furthest away, the side cards come nearer,
 // turn toward the viewer and blur into white at the edges. Wide cards on desktop, tall on phones.
-// The five logo figures gather above a calm title; the tagline (corporate sheet) and site
-// description (Wix SEO text) sit in the bottom corners, both verbatim. hero.ts drifts the cards;
+// Under the strip, on wide screens, the copy is split along a hairline like a title block: the stacked
+// logo at the left, the tagline (corporate sheet) beside it, the site description (Wix SEO text) and the
+// button at the right, all verbatim. Phones and narrow tablets stack it centred. hero.ts drifts the cards;
 // without motion they render at the composed angles computed here.
 interface Item { thumb: ImageMetadata; alt: string; title: string; description: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string; cta: UiString }
@@ -37,7 +38,6 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
         <span class="ha-cap"><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
       </div>
     ))}
-    <div class="ha-lens" aria-hidden="true"></div>
   </div>
   <div class="ha-copy">
     <h1 id="hero-title" class="ha-mark"><Fragment set:html={mark} /></h1>
@@ -52,7 +52,9 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
     position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
     display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: var(--s-5) var(--gutter) var(--s-6);
-    background: var(--paper) var(--paper-tex); color: var(--ink);
+    /* Plain paper, no grid: the drifting cards and their edge fade read cleanly on it. The page's grid
+       fades in over the hero's last 140px, behind the copy, instead of starting at a hard edge. */
+    background: var(--paper-tex), linear-gradient(var(--paper) calc(100% - 140px), rgb(255 254 242 / 0)); color: var(--ink);
   }
   /* The lens (after kitpro-croma): cards stand edge to edge along a curve that stays almost flat in
      the middle and swings toward the viewer at the edges (lib/lens.ts); a wide-angle camera (short
@@ -71,25 +73,21 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     --cx: var(--x, 0); --cz: var(--z, 0); --cry: var(--ry, 0); --co: var(--o, 1);
     transform: translate3d(calc(var(--cx) * 1vw), 0, calc(var(--cz) * 1vw)) rotateY(calc(var(--cry) * -1deg));
     opacity: calc(var(--co) * var(--in, 1));
-    box-shadow: 0 30px 60px -30px rgb(0 0 0 / .35);
     /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
     filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
   }
-  /* Lens edges: the outer cards blur and fade into the white page. */
-  /* Taller than the arc (the edge cards stretch past it) and feathered top and bottom, so the blur has no hard edge. */
-  .ha-lens { position: absolute; inset: -30% calc(var(--gutter) * -1); z-index: 1; pointer-events: none; }
-  /* The edges now only fade into the paper; the softening itself is per card (depth of field). */
-  .ha-lens::before, .ha-lens::after { content: ''; position: absolute; inset-block: 0; width: 12%; }
-  .ha-lens::before {
-    left: 0; background: linear-gradient(90deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
-    -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
+  /* Lens edges: the strip itself fades out at the sides (a mask), so the cards dissolve into the paper
+     with no overlay strips. The arc's box is stretched past its grid row (negative margin, matching
+     padding: the centre and the perspective origin stay put) and to the screen's edges, so the tall
+     edge cards are inside the mask instead of clipped by it. The softening itself is per card
+     (depth of field). */
+  .ha-arc {
+    --fade: 12%;
+    margin: -120px calc(var(--gutter) * -1); padding-block: 120px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
   }
-  .ha-lens::after {
-    right: 0; background: linear-gradient(270deg, var(--paper), rgb(247 244 239 / .55) 35%, transparent);
-    -webkit-mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
-    -webkit-mask-composite: source-in; mask-image: linear-gradient(270deg, #000 30%, transparent), linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent); mask-composite: intersect;
-  }
+  .ha-copy { position: relative; z-index: 1; } /* above the stretched arc, so its links stay clickable */
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   /* After terrot: the project name and client written on the card, over a soft shade. */
   /* Film grain over each photograph, under the caption. */
@@ -105,12 +103,22 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
   .ha-tagline { margin: 0; font: 400 var(--fs-lead)/1.4 var(--font-text); }
   .ha-blurb { margin: 0 0 var(--s-4); max-width: 52ch; font: 400 var(--fs-small)/1.6 var(--font-text); color: var(--text-2); }
+  @media (min-width: 900px) {
+    .ha-copy {
+      grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); row-gap: 0; align-items: end;
+      justify-items: start; text-align: left; margin-top: var(--s-5); border-top: 1px solid var(--line);
+    }
+    .ha-mark { grid-column: 1 / 4; grid-row: 1 / 3; margin: 0; width: clamp(110px, 9vw, 150px); }
+    .ha-tagline { grid-column: 4 / 9; grid-row: 1 / 3; font-size: var(--fs-h3); line-height: 1.3; }
+    .ha-blurb { grid-column: 9 / 13; grid-row: 1; margin: 0; }
+    .ha-copy > :global(.pill) { grid-column: 9 / 13; grid-row: 2; margin-top: var(--s-4); }
+  }
   .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
     .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; }
     .ha-card { --cx: var(--mx, 0); --cz: var(--mz, 0); --cry: var(--mry, 0); --co: var(--mo, 1); }
-    .ha-lens::before, .ha-lens::after { width: 16%; }
+    .ha-arc { --fade: 16%; }
   }
 </style>

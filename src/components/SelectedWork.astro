@@ -9,14 +9,28 @@ import { firstYear } from '../lib/meta';
 import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
-// Direction B homepage (after Aesop): each selected project as a split composition, the image on one
-// half and a tinted panel with its name, client · discipline · year and a link on the other,
-// alternating sides. Videos play on hover (MediaCard).
+// Direction B homepage: after the cover, the selected projects are set like the spreads of a printed
+// portfolio (Batch 2, step 4). Two layouts:
+//   lead   - a large picture with a tinted panel overlapping its corner (after nationalgallery.sg),
+//            the picture on the left, or on the right when flipped
+//   spread - the picture across the page, client · discipline · year and the title on one caption line under it
+// The client chose spread for the second row only (12 Oct 2026); the rest keep the original lead rows.
+// More rows than layouts repeat the sequence. Videos play on hover (MediaCard).
 // The first item is the cover (SelectedCover: paper-cut heading over its film); the rest follow as rows.
 interface Props { items: { slide: Slide; project?: Project }[]; eyebrow: UiString; cta: UiString; total: number }
 const { items, eyebrow, cta, total } = Astro.props;
-const TINTS = ['var(--stone)', 'var(--blush)', 'var(--sage)', 'var(--stone)'];
-const all = items.map(({ slide, project }, i) => ({
+const LAYOUTS = {
+  lead: { ratio: '5 / 4', sizes: '(max-width: 899px) 100vw, 67vw', widths: [640, 960, 1280, 1600, 1900] },
+  spread: { ratio: '16 / 7', sizes: '100vw', widths: [640, 960, 1280, 1600, 1920, 2400] },
+} as const;
+// Stone is too close to the paper now the panels have no shadow, so the lead panels use blush and sage.
+const ROWS = [
+  { layout: 'lead', flip: false, tint: 'var(--blush)' },
+  { layout: 'spread', flip: false, tint: 'none' },
+  { layout: 'lead', flip: true, tint: 'var(--sage)' },
+  { layout: 'lead', flip: false, tint: 'var(--blush)' },
+] as const;
+const all = items.map(({ slide, project }) => ({
   image: slide.media.type === 'video' ? slide.media.poster : slide.media.src,
   alt: slide.media.type === 'image' ? slide.media.alt : '',
   video: slide.media.type === 'video' ? slide.media.src : undefined,
@@ -25,49 +39,81 @@ const all = items.map(({ slide, project }, i) => ({
   title: project?.title,
   meta: [project?.client, project?.categories[0], firstYear(project?.copyright)].filter(Boolean).join(' · '),
   media: slide.media,
-  tint: TINTS[i % TINTS.length],
 }));
 const [cover, ...rows] = all;
 ---
 <section class="sw" aria-labelledby="sw-title">
   {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} />}
   <ol class="sw-list">
-    {rows.map((r, i) => (
-      <li class:list={['sw-row', { flip: i % 2 === 1 }]} style={`--tint: ${r.tint}`}>
-        <div class="sw-media">
-          <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="5 / 4" sizes="(max-width: 767px) 100vw, 50vw" widths={[640, 960, 1280, 1600, 1900]} wipe duplicateLink={!!r.title} />
-        </div>
-        <div class="sw-text">
-          {r.meta && <p class="sw-meta">{r.meta}</p>}
-          {r.title && <h3 class="sw-title">{r.href ? <a href={withBase(r.href)}>{r.title}</a> : r.title}</h3>}
-          {r.href && r.label && <Pill href={r.href}><span class="sc">{r.label}</span></Pill>}
-        </div>
-      </li>
-    ))}
+    {rows.map((r, i) => {
+      const row = ROWS[i % ROWS.length], l = LAYOUTS[row.layout];
+      return (
+        <li class:list={['sw-row', `sw-${row.layout}`, { flip: row.flip }]} style={`--tint: ${row.tint}`}>
+          <div class="sw-media crop">
+            <span class="sw-folio" aria-hidden="true">{String(i + 2).padStart(2, '0')}</span>
+            <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio={l.ratio} sizes={l.sizes} widths={[...l.widths]} wipe duplicateLink={!!r.title} />
+          </div>
+          <div class="sw-text">
+            {r.meta && <p class="sw-meta">{r.meta}</p>}
+            {r.title && <h3 class="sw-title">{r.href ? <a href={withBase(r.href)}>{r.title}</a> : r.title}</h3>}
+            {r.href && r.label && <Pill href={r.href}><span class="sc">{r.label}</span></Pill>}
+          </div>
+        </li>
+      );
+    })}
   </ol>
   <div class="sw-foot"><Pill href="/projects" variant="fill"><T s={cta} /> <span class="sw-count">({total})</span></Pill></div>
 </section>
 <style>
   /* No overflow clipping here: it would stop the cover's sticky film. */
   .sw { padding-bottom: var(--section-y); }
-  .sw-list { list-style: none; margin: var(--section-y) 0 0; padding: 0; display: grid; gap: var(--s-8); }
+  .sw-list { list-style: none; margin: var(--section-y) 0 0; padding: 0; display: grid; gap: var(--s-9); }
   .sw-row { position: relative; display: grid; }
   .sw :global(.mc-media) { border-radius: 0; }
-  .sw-text { position: relative; z-index: 1; display: grid; align-content: center; justify-items: start; gap: var(--s-4); padding: var(--s-7) var(--gutter); background: var(--tint); }
+  .sw-text { position: relative; z-index: 1; display: grid; align-content: center; justify-items: start; gap: var(--s-4); padding: var(--s-7) var(--gutter) 0; }
   .sw-meta { margin: 0; font-size: var(--fs-small); color: var(--text-2); }
   .sw-title { margin: 0; max-width: 20ch; font: 400 var(--fs-h2)/1.2 var(--font-display); text-wrap: balance; }
   .sw-title a { color: inherit; text-decoration: none; }
   .sw-title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
   .sw-text :global(.pill) { margin-top: var(--s-3); }
-  .sw-foot { display: flex; justify-content: center; margin-top: var(--s-9); }
+  .sw-foot { display: flex; justify-content: center; margin-top: var(--s-10); }
   .sw-count { font-variant-numeric: tabular-nums; }
-  /* Desktop: the tinted card overlaps the picture's edge and drops below it (after nationalgallery.sg). */
+  /* Folio: the project's place in the list, set beside the picture's crop marks. */
+  .sw-folio {
+    position: absolute; bottom: 100%; right: 0; margin-bottom: calc(var(--cm-len) + var(--cm-gap) + 4px);
+    font: 500 var(--fs-small)/1 var(--font-text); font-variant-numeric: tabular-nums; letter-spacing: .08em; color: var(--text-2);
+  }
+
+  /* Phones and narrow tablets: both layouts stack picture then details; the pictures run full width,
+     so there are no corners to mark. */
+  @media (max-width: 899px) {
+    .sw-media.crop::before { display: none; }
+    .sw-folio { right: var(--gutter); }
+    .sw-lead .sw-text { padding-block: var(--s-7); background: var(--tint); }
+  }
+
   @media (min-width: 900px) {
-    .sw-row { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
-    .sw-media { grid-column: 1 / 9; grid-row: 1; }
-    .sw-text { grid-column: 8 / 13; grid-row: 1; margin-bottom: calc(var(--s-8) * -1); padding: var(--s-8) clamp(var(--s-6), 4vw, var(--s-9)); box-shadow: 0 30px 60px -40px rgb(0 0 0 / .35); }
-    .sw-row.flip .sw-media { grid-column: 5 / 13; }
-    .sw-row.flip .sw-text { grid-column: 1 / 6; }
-    .sw-list { gap: calc(var(--s-10) + var(--s-6)); padding-bottom: var(--s-8); }
+    .sw-row { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); }
+    .sw-media, .sw-text { grid-row: 1; }
+    .sw-text { padding: 0; }
+
+    /* lead: the tinted card overlaps the picture's edge and drops below it (after nationalgallery.sg). */
+    .sw-lead { align-items: end; column-gap: 0; padding-bottom: var(--s-8); }
+    .sw-lead .sw-media { grid-column: 1 / 9; }
+    .sw-lead .sw-text { grid-column: 8 / 13; margin-bottom: calc(var(--s-8) * -1); padding: var(--s-8) clamp(var(--s-6), 4vw, var(--s-9)); background: var(--tint); }
+    .sw-lead .sw-folio { bottom: auto; right: auto; top: 0; left: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); translate: 0 -50%; margin: 0; }
+    .sw-lead.flip .sw-media { grid-column: 5 / 13; }
+    .sw-lead.flip .sw-text { grid-column: 1 / 6; }
+    .sw-lead.flip .sw-folio { left: auto; right: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); }
+
+    /* spread: the picture across the page inside the margins, one caption line under it. */
+    .sw-spread { padding-inline: var(--gutter); row-gap: var(--s-6); }
+    .sw-spread .sw-media { grid-column: 1 / 13; }
+    .sw-spread .sw-text { grid-column: 1 / 13; grid-row: 2; grid-template-columns: subgrid; align-items: baseline; padding-top: var(--s-5); border-top: 1px solid var(--line); }
+    .sw-spread .sw-meta { grid-column: 1 / 4; }
+    .sw-spread .sw-title { grid-column: 4 / 10; max-width: none; }
+    .sw-spread .sw-text :global(.pill) { grid-column: 10 / 13; justify-self: end; margin: 0; }
+
+    .sw-list { gap: calc(var(--s-10) + var(--s-6)); }
   }
 </style>
