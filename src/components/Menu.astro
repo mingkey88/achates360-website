@@ -13,11 +13,19 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
     </button>
     <nav aria-label={navLabel.text}>
       <ul class="top">
-        {menu.map((it) => (
+        {menu.map((it, i) => (
           <li>
-            <a class="big" href={withBase(it.href)} aria-current={menuCurrent(it, path) === 'page' ? 'page' : undefined}>{it.label}</a>
+            <div class="row">
+              <a class="big" href={withBase(it.href)} aria-current={menuCurrent(it, path) === 'page' ? 'page' : undefined}>{it.label}</a>
+              {it.items && it.items.length > 0 && (
+                <button class="more" type="button" aria-expanded="false" aria-controls={`menu-sub-${i}`}>
+                  <span class="sr-only">{it.label}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" /></svg>
+                </button>
+              )}
+            </div>
             {it.items && it.items.length > 0 && (
-              <ul class="sub" aria-label={it.label}>
+              <ul class="sub" id={`menu-sub-${i}`} aria-label={it.label}>
                 {it.items.map((s) => <li><a href={withBase(s.href)} aria-current={s.href === path ? 'page' : undefined}>{s.label}</a></li>)}
               </ul>
             )}
@@ -39,6 +47,12 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
     dialog.addEventListener('close', () => { opener.setAttribute('aria-expanded', 'false'); opener.focus(); });
     // An in-page link (e.g. /#contact while on the homepage) must close the menu too.
     dialog.addEventListener('click', (e) => { if ((e.target as Element).closest('a')) dialog.close(); });
+    // A section's sub-pages (the project categories) stay folded under it until the + is tapped, so the
+    // main pages read first. Without JS they show open.
+    dialog.classList.add('is-ready');
+    for (const btn of dialog.querySelectorAll<HTMLButtonElement>('.more')) {
+      btn.addEventListener('click', () => btn.setAttribute('aria-expanded', String(btn.getAttribute('aria-expanded') !== 'true')));
+    }
   }
 </script>
 <style>
@@ -59,6 +73,14 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
   .big { display: inline-block; font: 400 clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem)/1.2 var(--font-display); text-decoration: none; overflow-wrap: anywhere; text-transform: lowercase; }
   .big::first-letter { text-transform: uppercase; }
   .big:hover, .big[aria-current] { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 8px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); }
+  .more { flex: none; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+  .more svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: rotate .3s var(--ease-out); }
+  .more[aria-expanded='true'] svg { rotate: 45deg; }
+  .more { display: none; }
+  .is-ready .more { display: grid; }
+  .is-ready .row:has(.more[aria-expanded='false']) + .sub { display: none; }
+  @media (prefers-reduced-motion: reduce) { .more svg { transition: none; } }
   .sub { columns: 2 220px; column-gap: var(--s-6); margin: var(--s-4) 0 var(--s-5); font-size: var(--fs-small); }
   .sub li { break-inside: avoid; }
   /* 44px touch targets (the links were 18px tall). */
