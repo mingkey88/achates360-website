@@ -18,8 +18,10 @@ interface Field { name: string; type: string; label: string; required: boolean; 
 interface Group { name: string; label: string; required: boolean; options: string[] }
 // heading: a draft replacement for the supplied intro ("Drop us a message…"), pending approval
 // (CONTENT-QUERIES 23); the supplied text stays in home.md.
-interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString }
-const { md, form, heading } = Astro.props;
+// direct: the studio's email and phone from the footer, offered beside the form for those who would
+// rather write or call.
+interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString; direct?: { label: UiString; email?: string; phone?: string } }
+const { md, form, heading, direct } = Astro.props;
 const success = md.find((m) => m.startsWith('Thanks for submitting'));
 const intro = md.filter((m) => m !== success);
 // Wix lays the single-line fields out first, then the checkbox groups, then the message box.
@@ -37,6 +39,13 @@ const groups = mergeContinuationGroups(form.groups);
   <div class="inner">
     <div class="intro">
       {heading ? <h2><T s={heading} /></h2> : intro.map((m) => <div set:html={renderMd(m)} />)}
+      {direct && (direct.email || direct.phone) && (
+        <div class="direct">
+          <p class="direct-l"><T s={direct.label} /></p>
+          {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
+          {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
+        </div>
+      )}
     </div>
     <form class="enquiry" novalidate>
       <div class="lines">
@@ -150,11 +159,23 @@ const groups = mergeContinuationGroups(form.groups);
 <style>
   /* Direction B (after Aesop): one centred column. Boxed fields with small labels above, the service
      choices as an even grid of square checkboxes, a proper message box and one solid button. */
-  .contact { position: relative; isolation: isolate; overflow: hidden; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
+  .contact { position: relative; isolation: isolate; overflow: clip; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
   .contact > :global(.c-sketch) { position: absolute; z-index: -1; left: -6vw; bottom: -4vw; width: clamp(220px, 30vw, 460px); color: rgb(51 51 51 / .12); }
   .inner { max-width: 760px; margin-inline: auto; display: grid; gap: var(--s-7); }
-  .intro { text-align: center; }
+  .intro { text-align: center; display: grid; gap: var(--s-5); align-content: start; }
+  .direct { display: grid; gap: 4px; justify-items: center; font-size: var(--fs-lead); }
+  .direct p { margin: 0; }
+  .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
+  .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+  .direct a:hover { color: var(--accent-deep); }
   .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }
+  /* Wide screens: the invitation and the direct lines beside the form, staying in view while it is filled in. */
+  @media (min-width: 1024px) {
+    .inner { max-width: 1180px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); column-gap: var(--s-9); align-items: start; }
+    .intro { position: sticky; top: calc(var(--header-h) + var(--s-6)); text-align: left; }
+    .intro :global(h2) { margin: 0; text-align: left; }
+    .direct { justify-items: start; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); }
+  }
   .enquiry { display: grid; gap: var(--s-6); }
   .lines { display: grid; gap: var(--s-5); }
   .field { display: grid; gap: var(--s-2); }

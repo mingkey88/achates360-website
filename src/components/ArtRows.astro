@@ -1,0 +1,107 @@
+---
+import Block from './Block.astro';
+import { renderMd } from '../lib/markdown';
+import { paragraphs, media, links, subheading, runIn, checkArt, type Art } from '../lib/art';
+// The case-study body in the standard template (src/lib/art.ts: autoArt, or a hand-made layout from
+// src/content/art/<slug>.yaml). The page's own words, pictures and links, set as a printed feature:
+// - the first paragraph as a standfirst across the full width;
+// - each passage on a two-column grid, its subheading in the narrow left column (or nothing, a margin)
+//   and its paragraphs in the wide right column, so the text fills the width at a readable measure;
+// - a passage that Wix set beside a picture stays beside it;
+// - pictures full width, at half width, in pairs, threes or a grid of four.
+// The build fails if the layout drops or repeats anything (checkArt).
+interface Props { blocks: any[]; art: Art; pageTitle: string; slug: string }
+const { blocks, art, pageTitle, slug } = Astro.props;
+const paras = paragraphs(blocks);
+const items = media(blocks);
+const actions = links(blocks);
+const problems = checkArt(art, paras.length, items.length, actions.length);
+if (problems.length) throw new Error(`${slug}: the case-study layout ${problems.join('; ')}`);
+// Case-study copy styles its headings as ##### / ######: shift them so the shallowest becomes an h3
+// (below the subheadings, which are h2s), as MediaRows does.
+const depths = paras.flatMap((p) => [...p.matchAll(/^\s*(#{1,6})\s/gm)].map((m) => m[1].length));
+const demote = depths.length ? 3 - Math.min(...depths) : 0;
+const SIZES: Record<string, string> = {
+  full: '(max-width: 1023px) 100vw, 70vw', half: '(max-width: 767px) 100vw, 35vw', pair: '(max-width: 767px) 100vw, 36vw',
+  trio: '(max-width: 767px) 100vw, 24vw', grid4: '(max-width: 767px) 50vw, 18vw',
+  beside: '(max-width: 899px) 100vw, 40vw', 'beside-left': '(max-width: 899px) 100vw, 40vw',
+};
+const alt = (i: number) => `${pageTitle}, image ${i + 1}`;
+// A passage's paragraphs in runs, each run under the subheading before it (or under none).
+// A paragraph that opens with a bold line keeps that line as its subheading (lib/art.ts runIn).
+const chunks = (ids: number[]) => {
+  const out: { head?: string; paras: string[] }[] = [];
+  for (const i of ids) {
+    const h = subheading(paras[i]), r = runIn(paras[i]);
+    if (h) out.push({ head: h, paras: [] });
+    else if (r) out.push({ head: r.head, paras: [r.rest] });
+    else if (!out.length) out.push({ paras: [paras[i]] });
+    else out[out.length - 1].paras.push(paras[i]);
+  }
+  return out;
+};
+---
+<div class="art">
+  {art.sections.map((s) => {
+    const layout = s.layout ?? (s.media?.length ? 'full' : undefined);
+    const beside = layout === 'beside' || layout === 'beside-left';
+    const body = s.text?.length && (
+      layout === 'lead'
+        ? <div class="art-lead prose" set:html={renderMd(paras[s.text[0]], undefined, { demote })} />
+        : <div class:list={['art-text', { compact: beside }]}>
+            {chunks(s.text).map((c) => (
+              <div class="chunk">
+                {c.head ? <h2 class="art-sub">{c.head}</h2> : <span class="art-margin" aria-hidden="true"></span>}
+                {c.paras.length > 0 && <div class="art-paras">{c.paras.map((p) => <div class="prose" set:html={renderMd(p, undefined, { demote })} />)}</div>}
+              </div>
+            ))}
+            {s.links?.length && beside && <p class="art-links">{s.links.map((i) => <Block block={actions[i]} pageTitle={pageTitle} />)}</p>}
+          </div>
+    );
+    const pics = s.media?.length && (
+      <div class:list={['art-media', `m-${layout}`]}>
+        {s.media.map((i) => <Block block={items[i].block} pageTitle={pageTitle} altFallback={alt(i)} sizes={SIZES[layout ?? 'full']} />)}
+      </div>
+    );
+    const acts = s.links?.length && !beside && <p class="art-links">{s.links.map((i) => <Block block={actions[i]} pageTitle={pageTitle} />)}</p>;
+    return <section class:list={['art-sec', layout && `s-${layout}`]}>{body}{pics}{acts}</section>;
+  })}
+</div>
+<style>
+  .art { display: grid; gap: var(--s-8); }
+  .art-sec { display: grid; gap: var(--s-5); }
+  .art :global(.prose p) { margin: 0; }
+  /* Long web addresses in the copy break rather than widen the page. */
+  .art :global(.prose), .art-sub { overflow-wrap: anywhere; }
+  .art-text, .art-media, .art-sec > * { min-width: 0; }
+  /* The standfirst: the opening paragraph, larger, across the full width. */
+  .art-lead { max-width: 52ch; font: 400 clamp(1.1875rem, 1rem + .6vw, 1.5rem)/1.45 var(--font-display); letter-spacing: -.005em; }
+  .art-text { display: grid; gap: var(--s-6); }
+  .chunk { display: grid; gap: var(--s-3); }
+  .art-paras { display: grid; gap: var(--s-4); max-width: 68ch; }
+  .art-sub { margin: 0; font: 400 var(--fs-h3)/1.25 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  .art-margin { display: none; }
+  .art-links { display: flex; flex-wrap: wrap; gap: var(--s-3); margin: 0; }
+  .art-media { display: grid; gap: var(--s-4); }
+  .art :global(.block-image) { display: block; max-width: none; border-radius: 0; overflow: hidden; }
+  .art :global(.block-img) { display: block; width: 100%; height: auto; }
+  .art :global(.embed) { border-radius: 0; }
+  .m-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 768px) {
+    .m-half { width: 50%; }
+    .m-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .m-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+    .m-grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  /* Wide screens: a passage sits on the hairline grid, subheading left (a third), paragraphs right. */
+  @media (min-width: 900px) {
+    .art-text:not(.compact) .chunk { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: var(--s-7); align-items: start; padding-top: var(--s-4); border-top: 1px solid var(--line); }
+    .art-text:not(.compact) .art-margin { display: block; }
+    .art-text:not(.compact) .art-links { padding-left: calc((100% - var(--s-7)) / 3 + var(--s-7)); }
+    /* A passage beside its picture: text in five columns, the picture in seven (mirrored for beside-left). */
+    .s-beside, .s-beside-left { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-7); align-items: center; }
+    .s-beside-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+    .s-beside-left .art-media { grid-column: 1; grid-row: 1; }
+    .s-beside-left .art-text { grid-column: 2; }
+  }
+</style>

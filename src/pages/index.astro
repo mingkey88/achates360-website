@@ -37,7 +37,19 @@ const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // point of view (the work comes first, so the second screen is work, not words), the service index, one proof band,
 // one testimonial, contact. The full project list lives on /projects.
 // Star Wars Luzerne (homepage slide 5) leads as the cover, then the first four slides.
-const selected = [featured[4], ...featured.slice(0, 4)].filter(Boolean);
+// A featured slide whose project is unlisted (hidden from the project list) is swapped for a listed one,
+// shown with that project's hero and the slide's own link label. DBS Discretionary Portfolio Management
+// is unlisted, so St Regis TeaRoom & Patisserie (2025, branding) takes its place (14 Oct 2026,
+// CONTENT-QUERIES 50).
+const SWAP: Record<string, string> = { 'dbs-discretionary-portfolio-management': 'st-regis-tearoom-patisserie' };
+const swapped = featured.map((f) => {
+  const to = SWAP[slugOf(f.slide.cta?.href) ?? ''];
+  const project = to ? projects.get(to) : undefined;
+  if (!to) return f;
+  if (!project?.listed || !project.hero) throw new Error(`Selected work: swap target "${to}" is unlisted or has no hero`);
+  return { slide: { ...f.slide, media: project.hero, cta: { label: f.slide.cta!.label, href: `/${to}` } }, project };
+});
+const selected = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean);
 const services = x.services.map((s: any) => {
   const hero = projects.get(s.project)?.hero;
   if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);

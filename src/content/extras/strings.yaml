@@ -47,3 +47,6 @@
 - { id: showreel-play, text: Play with sound, placeholder: true }
 - { id: showreel-close, text: Close, placeholder: true }
 - { id: service-covers, text: Covers, placeholder: true }
+- { id: scroll-cue, text: Scroll, placeholder: true }
+- { id: discuss-cta, text: Discuss a similar project, placeholder: true }
+- { id: contact-direct, text: Or write to us directly, placeholder: true }

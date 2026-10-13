@@ -1,0 +1,18 @@
+# Art direction for /st-regis-tearoom-patisserie (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 the hotel, 1 subheading, 2 the refresh, 3 the brief,
+# 4 the Patisserie, 5 the Tea Room menus, 6 the result. Pictures: 0 Patisserie posters, 1 Tea Room
+# name cards, 2-9 the Patisserie packaging on marble, 10 Patisserie name cards.
+sections:
+  - text: [0]
+  - text: [1, 2, 3]
+  - text: [5]
+    media: [1]
+    layout: beside
+  - text: [4]
+    media: [0]
+    layout: beside-left
+  - media: [2, 3, 4, 5, 6, 7, 8, 9]
+    layout: grid4
+  - text: [6]
+    media: [10]
+    layout: beside
