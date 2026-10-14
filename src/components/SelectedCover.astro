@@ -121,5 +121,9 @@ const B = 4000;
     .cover-paper :global(.draft-tag) { top: var(--s-4); }
     .paper-w { display: none; }
     .paper-n { display: block; }
+    /* Phones: the card runs the full width, so its words sit centred; the pause button moves to the
+       film's top corner, clear of the card's button. */
+    .cover-card { justify-items: center; text-align: center; }
+    .cover :global(.bv-toggle) { top: var(--s-4); bottom: auto; }
   }
 </style>

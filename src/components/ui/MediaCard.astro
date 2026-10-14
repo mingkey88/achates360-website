@@ -55,9 +55,11 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     dot.setAttribute('aria-hidden', 'true');
     dot.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>';
     document.body.append(dot);
+    // The disc stands in for the pointer over linked cards (the browser's hand is hidden there).
+    document.documentElement.classList.add('has-mc-cursor');
     let x = 0, y = 0, tx = 0, ty = 0, raf = 0, idle = 0;
     const tick = () => {
-      x += (tx - x) * .3; y += (ty - y) * .3;
+      x += (tx - x) * .55; y += (ty - y) * .55;
       dot.style.translate = `${x}px ${y}px`;
       raf = Math.abs(tx - x) + Math.abs(ty - y) > .3 ? requestAnimationFrame(tick) : 0;
     };
@@ -85,14 +87,15 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   .mc-text { padding-top: var(--s-3); }
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
-  /* A small hairline circle with an arrow, set off to the lower right of the pointer so it never sits
-     over what the pointer is on. */
+  /* A small hairline circle with an arrow that replaces the pointer over linked cards: centred on the
+     pointer, following it closely; the browser's hand is hidden there so only one shows. */
   :global(.mc-cursor) {
-    position: fixed; left: 0; top: 0; z-index: 60; width: 34px; height: 34px; margin: 14px 0 0 14px; border-radius: 50%;
+    position: fixed; left: 0; top: 0; z-index: 60; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
     display: grid; place-items: center; background: var(--paper); color: var(--ink); border: 1px solid rgb(51 51 51 / .35); pointer-events: none;
     scale: 0; transition: scale .35s var(--ease-out);
   }
   :global(.mc-cursor.is-on) { scale: 1; }
+  :global(.has-mc-cursor) a.media-card, :global(.has-mc-cursor) a.media-card :global(*) { cursor: none; }
   :global(.mc-cursor svg) { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
   @media (prefers-reduced-motion: reduce) { .mc-media :global(img) { transition: none; } }
 </style>
