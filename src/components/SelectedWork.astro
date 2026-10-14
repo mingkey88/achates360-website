@@ -68,7 +68,12 @@ const [cover, ...rows] = all;
     position: absolute; bottom: 100%; right: 0; margin-bottom: calc(var(--cm-len) + var(--cm-gap) + 4px);
     font: 500 var(--fs-small)/1 var(--font-text); font-variant-numeric: tabular-nums; letter-spacing: .08em; color: var(--text-2);
   }
-  @media (max-width: 767px) { .sw-media { --cm-len: 8px; --cm-gap: 4px; } }
+  @media (max-width: 767px) {
+    .sw-media { --cm-len: 8px; --cm-gap: 4px; }
+    /* Phones: one project per row, its caption centred under the picture. */
+    .sw-text { justify-items: center; text-align: center; }
+    .sw-title { margin-inline: auto; }
+  }
   @media (min-width: 768px) {
     .sw-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* The second column sits a little lower, like prints laid on a table. */
