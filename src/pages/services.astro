@@ -37,7 +37,7 @@ const jsonLd = servicesLd(new URL(withBase('/'), Astro.site).href, x.services.ma
 ---
 <Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} jsonLd={jsonLd} page="services">
   <ServicesContents heading={heading} countLabel={text('contents-count')} services={services} />
-  <Showreel label={reel.text} draft={reel.placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="1:30" />
+  <Showreel label={reel.text} draft={reel.placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="2:00" />
   {services.map((s: any, i: number) => <ServiceSpread index={i} total={services.length} coversLabel={text('service-covers')} service={s} covers={s.covers} plate={s.plate} />)}
   <ProcessSteps steps={x.process} heading={text('process-heading')} stepLabel={text('process-step')} />
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
