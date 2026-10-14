@@ -7,7 +7,9 @@ import type { UiString } from '../lib/strings';
 // One service as an open book's spread (direction B, Services page). The left page carries the words:
 // the number, the service's name, its description and what it covers (its project categories, each a
 // link to the category page with its count). The right page carries one picture from a project in
-// it, captioned like a plate. A hairline down the middle is the fold; the folio sits at the foot.
+// it, captioned like a plate. A hairline down the middle is the fold. Spreads alternate as a book's
+// pages do: every second one (a verso) mirrors, the picture on the left page and the words on the
+// right; pictures sit against the page's outer edge, and the folio at the outer corner.
 // Words lead and the work supports: the full work lives on the Projects pages.
 interface Props {
   index: number; total: number; coversLabel: UiString;
@@ -18,7 +20,7 @@ interface Props {
 const { index, total, coversLabel, service, covers, plate } = Astro.props;
 const no = (n: number) => String(n).padStart(2, '0');
 ---
-<section class="spread wrap" id={service.id} aria-labelledby={`${service.id}-t`}>
+<section class:list={['spread', 'wrap', { verso: index % 2 === 1 }]} id={service.id} aria-labelledby={`${service.id}-t`}>
   <div class="sp-pages">
     <div class="sp-left">
       <p class="sp-no" aria-hidden="true">{no(index + 1)}</p>
@@ -62,9 +64,15 @@ const no = (n: number) => String(n).padStart(2, '0');
   /* Wide screens: two pages with the fold between them. */
   @media (min-width: 900px) {
     .sp-pages { grid-template-columns: 1fr 1fr; gap: 0; background: linear-gradient(var(--line), var(--line)) 50% 0 / 1px 100% no-repeat; }
-    .sp-left { padding-right: var(--s-8); }
-    /* The picture is held to the screen's height (less the header and caption), so a spread fits one screen. */
-    .sp-right { padding-left: var(--s-8); align-self: start; width: min(100%, calc(var(--s-8) + (100svh - var(--header-h) - 200px) * .8)); }
+    .sp-left { grid-column: 1; grid-row: 1; padding-right: var(--s-8); }
+    /* The picture is held to the screen's height (less the header and caption), so a spread fits one
+       screen, and set against the page's outer edge. */
+    .sp-right { grid-column: 2; grid-row: 1; justify-self: end; align-self: start; width: min(calc(100% - var(--s-8)), calc((100svh - var(--header-h) - 200px) * .8)); }
+    .sp-folio { text-align: right; }
+    /* Verso: mirrored. */
+    .verso .sp-left { grid-column: 2; padding-right: 0; padding-left: var(--s-8); }
+    .verso .sp-right { grid-column: 1; justify-self: start; }
+    .verso .sp-folio { text-align: left; }
   }
   @media (prefers-reduced-motion: reduce) { .sp-pic :global(img), .sp-covers a { transition: none; } }
 </style>
