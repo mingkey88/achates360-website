@@ -69,10 +69,16 @@ const swapped = featured.map((f) => {
 // Each selected project carries its catalogue number; DXV's film gets a still where its title has
 // formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
 const POSTERS: Record<string, ImageMetadata> = { dxv: dxvPoster };
-const selected = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
+// The lead plate after the cover is 'Building Memories', the studio's own art book and this direction's
+// source (15 Oct 2026, CONTENT-QUERIES 51); the other three keep the homepage's slide order.
+const LEAD = 'building-memories-artbook';
+const numbered = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
   const slug = slugOf(f.slide.cta?.href) ?? '';
-  return { ...f, no: numberOf.get(slug), poster: POSTERS[slug] };
+  return { ...f, slug, no: numberOf.get(slug), poster: POSTERS[slug] };
 });
+const lead = numbered.findIndex((f, i) => i > 0 && f.slug === LEAD);
+if (lead < 0) throw new Error(`Selected work: the lead "${LEAD}" is not among the selected projects`);
+const selected = [numbered[0], numbered[lead], ...numbered.filter((_, i) => i > 0 && i !== lead)];
 if (SCATTER.some((slug) => selected.some((f) => slugOf(f.slide.cta?.href) === slug))) throw new Error('Homepage scatter repeats a selected project');
 // The service contents: each service's number of listed projects, counted as on /services.
 const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
