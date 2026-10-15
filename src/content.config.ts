@@ -149,7 +149,7 @@ const services = defineCollection({
 });
 const processSteps = defineCollection({
   loader: file('src/content/extras/process.yaml'),
-  schema: z.object({ ...flagged, step: z.number().int().positive(), title: z.string(), body: z.string() }).strict(),
+  schema: z.object({ ...flagged, step: z.number().int().positive(), title: z.string(), body: z.string(), points: z.array(z.string()).optional() }).strict(),
 });
 const timeline = defineCollection({
   loader: file('src/content/extras/timeline.yaml'),

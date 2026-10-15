@@ -46,5 +46,6 @@ const jsonLd = servicesLd(new URL(withBase('/'), Astro.site).href, x.services.ma
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { tilt } from '../scripts/motion/tilt';
-  run(reveal, tilt);
+  import { press } from '../scripts/motion/press';
+  run(reveal, tilt, press);
 </script>

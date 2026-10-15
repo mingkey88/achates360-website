@@ -1,5 +1,26 @@
-# Process steps on /services (spec §4.4). All placeholder.
-- { id: brief, step: 1, title: Brief, body: "[Draft] What happens at this step.", placeholder: true }
-- { id: concept, step: 2, title: Concept, body: "[Draft] What happens at this step.", placeholder: true }
-- { id: design, step: 3, title: Design, body: "[Draft] What happens at this step.", placeholder: true }
-- { id: deliver, step: 4, title: Deliver, body: "[Draft] What happens at this step.", placeholder: true }
+# Process steps on /services (spec §4.4). All placeholder: drafted by the web team (16 Oct 2026) for the
+# studio to approve or rewrite (CONTENT-QUERIES 54). body: what happens; points: what the client receives.
+- id: brief
+  step: 1
+  title: Brief
+  body: "We start by listening. Together we pin down what the work must achieve, who it is for, the budget and the dates, and agree them in a written brief before any design begins."
+  points: ["Objectives and audience", "Scope, budget and schedule", "An agreed creative brief"]
+  placeholder: true
+- id: concept
+  step: 2
+  title: Concept
+  body: "We study your brand, your market and your competitors, then develop two or three distinct creative routes. Each comes with the thinking behind it, so you choose a direction with confidence."
+  points: ["Research and insight", "Two or three creative routes", "A chosen direction"]
+  placeholder: true
+- id: design
+  step: 3
+  title: Design
+  body: "The chosen route is designed in full across every piece, from layout and typography to images and words. We refine it with you, review by review, until every detail is right."
+  points: ["Every piece designed", "Rounds of review", "Approved artwork"]
+  placeholder: true
+- id: deliver
+  step: 4
+  title: Deliver
+  body: "We prepare press-ready and digital files, check proofs and colour with the printer, and see the job through production until the finished work is in your hands."
+  points: ["Press-ready and digital files", "Colour proofs", "Production through to delivery"]
+  placeholder: true
