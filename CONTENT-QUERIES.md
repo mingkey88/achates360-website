@@ -392,3 +392,5 @@ replaced. Existing copy from the Wix site is unchanged.
     - The same picture twice: /journal-of-aviation-management (one spread appears twice) and /singapore-conference-hall-sg5050 (the panorama appears twice). Keep both, or drop one?
     - /alstom-singapore-urban-mobility-week-2026 still opens with "[Write-up to be added]" (item 26).
     - Vertical social films (TikTok, Shorts, Reels) embedded from YouTube show as small strips in 16:9 frames. If the studio has the files, they can play upright.
+
+53. **Nötter's awards (15 Oct 2026).** The Wix /notter page has the line "Nötter Nuts has won the following awards: Singapore Packaging Awards, NY DRIVENxDESIGN", set white on white so visitors never see it (the page shows only an unlabelled white badge). Show the award names on the page (and on the homepage's Notter card)?

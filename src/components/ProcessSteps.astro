@@ -1,39 +1,152 @@
 ---
 import T from './ui/T.astro';
 import DraftTag from './ui/DraftTag.astro';
+import logo from '../assets/logo-stacked-parts.svg?raw';
 import type { UiString } from '../lib/strings';
-// How we work (direction B): four columns between hairlines, like the homepage's service index:
-// a small step number, the step in the heading size, its sentence. No boxes, all text visible.
+// How we work (direction B), as a press run: one printed sheet goes through the studio's four steps
+// while the steps scroll past beside it.
+//   1 Brief    a blank sheet in its crop marks, the job's lines ruled in;
+//   2 Concept  the pencil layout: column guides and an empty picture frame;
+//   3 Design   four plates slide in from off register and land in register, each printing some of the
+//              logo's figures in a brand colour (1495 orange, turquoise, lime) over the black keyline;
+//   4 Deliver  trimmed (the crop marks go), the colour bar printed, the sheet on a stack of the run.
+// Wide screens with motion: the sheet stays in view (sticky) and takes the stage of the step at the
+// middle of the screen. Phones, reduced motion and no JS: the finished sheet, then the steps.
+// Step words are the draft ones (process.yaml) until the studio supplies its own.
 interface Props { steps: { id: string; step: number; title: string; body: string; placeholder: boolean }[]; heading: UiString; stepLabel: UiString }
 const { steps, heading, stepLabel } = Astro.props;
+// The logo's five figures (viewBox region 50 -3 94 103 of the stacked logo), one plate per colour.
+const figs = [...(logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '').matchAll(/<g class="lg-fig"[^>]*>(.*?)<\/g>/g)].map((m) => m[1]);
+const PLATES = [
+  { k: 'orange', c: 'var(--accent)', figs: [0, 4], dx: -18, dy: 0 },
+  { k: 'teal', c: '#7fcfcf', figs: [1, 3], dx: 0, dy: -18 },
+  { k: 'lime', c: '#c3e070', figs: [2], dx: 18, dy: 0 },
+];
+// The picture frame on the sheet, and the figures' place in it.
+const F = { x: 78, y: 150, w: 244, h: 190 };
+const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) translate(-50 3)`;
 ---
-<section class="process wrap" aria-labelledby="process-title">
+<section class="process wrap" aria-labelledby="process-title" data-press>
   <h2 id="process-title" class="display h2" data-split><T s={heading} /></h2>
-  <ol class="steps">
-    {steps.map((s) => (
-      <li class="step" data-placeholder={s.placeholder ? '' : undefined} data-reveal>
-        <span class="num"><span class="sr-only">{stepLabel.text} </span>{String(s.step).padStart(2, '0')}</span>
-        <h3 class="step-title">{s.title}<DraftTag when={s.placeholder} /></h3>
-        <p>{s.body}</p>
-      </li>
-    ))}
-  </ol>
+  <div class="press">
+    <figure class="press-fig" aria-hidden="true">
+      <svg class="pr" viewBox="0 0 400 500" data-s2 data-s3 data-s4 focusable="false">
+        {/* The rest of the run, stacked under the sheet once it is delivered. */}
+        <g class="l-stack">
+          <rect x="56" y="54" width="320" height="420" class="sheet-under" transform="rotate(1.2 216 264)" />
+          <rect x="48" y="47" width="320" height="420" class="sheet-under" transform="rotate(-.8 208 257)" />
+        </g>
+        <rect class="sheet" x="40" y="40" width="320" height="420" />
+        {/* Crop marks at the trim corners; cut away on delivery. */}
+        <g class="l-crop">
+          <path d="M40 22v12M22 40h12M360 22v12M378 40h-12M40 478v-12M22 460h12M360 478v-12M378 460h-12" />
+        </g>
+        {/* 1 Brief: the job's lines, ruled in. */}
+        <g class="l-brief">
+          <rect x="78" y="78" width="120" height="7" /><rect x="78" y="94" width="186" height="3" /><rect x="78" y="103" width="162" height="3" /><rect x="78" y="112" width="174" height="3" />
+          <rect x="296" y="78" width="26" height="26" class="ticket" />
+        </g>
+        {/* 2 Concept: column guides and the empty frame, in pencil. */}
+        <g class="l-sketch">
+          <path class="guide" d="M78 64v372M200 64v372M322 64v372" />
+          <rect x={F.x} y={F.y} width={F.w} height={F.h} class="frame" />
+          <path class="frame-x" d={`M${F.x} ${F.y}L${F.x + F.w} ${F.y + F.h}M${F.x + F.w} ${F.y}L${F.x} ${F.y + F.h}`} />
+          <rect x="78" y="362" width="104" height="3" /><rect x="78" y="371" width="96" height="3" /><rect x="218" y="362" width="104" height="3" /><rect x="218" y="371" width="88" height="3" />
+        </g>
+        {/* 3 Design: the black keyline, then the colour plates landing in register. */}
+        <g class="l-key">
+          <rect x={F.x} y={F.y} width={F.w} height={F.h} class="keyline" />
+          <circle cx="58" cy={F.y + F.h / 2} r="6" class="reg" /><path class="reg" d={`M50 ${F.y + F.h / 2}h16M58 ${F.y + F.h / 2 - 8}v16`} />
+          <circle cx="342" cy={F.y + F.h / 2} r="6" class="reg" /><path class="reg" d={`M334 ${F.y + F.h / 2}h16M342 ${F.y + F.h / 2 - 8}v16`} />
+        </g>
+        {PLATES.map((p, i) => (
+          <g class={`plate plate-${p.k}`} style={`--dx: ${p.dx}px; --dy: ${p.dy}px; --i: ${i}; fill: ${p.c}`}>
+            <g transform={fig} set:html={p.figs.map((f) => figs[f]).join('')} />
+          </g>
+        ))}
+        {/* 4 Deliver: the colour bar along the foot of the sheet. */}
+        <g class="l-bar">
+          <rect x="78" y="414" width="12" height="12" style="fill: #00a0e3" /><rect x="92" y="414" width="12" height="12" style="fill: #e5007e" /><rect x="106" y="414" width="12" height="12" style="fill: #ffed00" /><rect x="120" y="414" width="12" height="12" style="fill: #1d1d1b" /><rect x="134" y="414" width="12" height="12" style="fill: var(--accent)" />
+        </g>
+      </svg>
+    </figure>
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li class="step" data-step={i + 1} data-placeholder={s.placeholder ? '' : undefined}>
+          <span class="num"><span class="sr-only">{stepLabel.text} </span>{String(s.step).padStart(2, '0')}</span>
+          <h3 class="step-title">{s.title}<DraftTag when={s.placeholder} /></h3>
+          <p>{s.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
 </section>
+
+<script>
+  // Wide screens with motion: the sheet takes the stage of the step at the middle of the screen.
+  const root = document.querySelector<HTMLElement>('[data-press]');
+  const wide = matchMedia('(min-width: 1024px)');
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  if (root && wide.matches && !still.matches) {
+    const svg = root.querySelector<SVGSVGElement>('.pr')!;
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const stage = (n: number) => {
+      for (const k of [2, 3, 4]) svg.toggleAttribute(`data-s${k}`, n >= k);
+      for (const s of steps) s.classList.toggle('is-on', Number(s.dataset.step) === n);
+    };
+    root.classList.add('is-live');
+    stage(1);
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) stage(Number((e.target as HTMLElement).dataset.step));
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    steps.forEach((s) => io.observe(s));
+  }
+</script>
+
 <style>
   .process { padding-block: var(--section-y); }
   .process h2 { margin: 0; }
-  .steps { list-style: none; margin: var(--s-7) 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--line); }
+  .press { display: grid; gap: var(--s-7); margin-top: var(--s-7); }
+  .press-fig { margin: 0; justify-self: center; width: min(100%, 420px); }
+  .pr { display: block; width: 100%; height: auto; overflow: visible; }
+  /* The sheet is a separate piece of paper, so it casts a shadow (photos printed on the page do not). */
+  .sheet { fill: #fffef6; filter: drop-shadow(0 6px 10px rgb(0 0 0 / .14)); }
+  .sheet-under { fill: #fbf9ee; stroke: rgb(51 51 51 / .12); stroke-width: 1; }
+  .l-crop path { fill: none; stroke: var(--ink); stroke-width: 1; }
+  .l-brief rect { fill: rgb(51 51 51 / .22); }
+  .l-brief .ticket { fill: none; stroke: rgb(51 51 51 / .4); stroke-width: 1; }
+  .l-sketch .guide { fill: none; stroke: #7aa2c9; stroke-width: .8; stroke-dasharray: 3 4; opacity: .6; }
+  .l-sketch .frame, .l-sketch .frame-x { fill: none; stroke: rgb(51 51 51 / .45); stroke-width: 1; stroke-dasharray: 5 4; }
+  .l-sketch rect:not(.frame) { fill: rgb(51 51 51 / .16); }
+  .l-key .keyline { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+  .l-key .reg { fill: none; stroke: var(--ink); stroke-width: .9; }
+  .plate { mix-blend-mode: multiply; }
+  /* Each layer appears with its stage (attributes on the svg). Without JS all are set: the finished sheet. */
+  .l-sketch, .l-key, .plate, .l-bar, .l-stack { opacity: 0; }
+  .pr[data-s2] .l-sketch, .pr[data-s3] .l-key, .pr[data-s3] .plate, .pr[data-s4] .l-bar, .pr[data-s4] .l-stack { opacity: 1; }
+  /* Designed: the pencil guides fade and the empty frame's cross goes, the picture fills it. */
+  .pr[data-s3] .l-sketch .guide, .pr[data-s3] .l-sketch .frame-x { opacity: 0; }
+  .pr[data-s3] .l-sketch .frame { opacity: 0; }
+  /* Delivered: trimmed, so the crop marks go. */
+  .pr[data-s4] .l-crop { opacity: 0; }
+
+  .steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
   .step { display: grid; gap: var(--s-3); align-content: start; padding: var(--s-6) 0; border-bottom: 1px solid var(--line); }
   .num { font-size: var(--fs-small); color: var(--text-2); font-variant-numeric: tabular-nums; }
-  .step-title { margin: 0; font: 400 var(--fs-h3)/1.2 var(--font-display); }
-  .step p { margin: 0; max-width: 34ch; font-size: var(--fs-small); line-height: 1.6; color: var(--text-2); }
-  @media (min-width: 768px) {
-    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .step { padding-right: var(--s-6); }
-  }
+  .step-title { margin: 0; font: 400 var(--fs-h2)/1.15 var(--font-display); }
+  .step p { margin: 0; max-width: 40ch; font-size: var(--fs-small); line-height: 1.6; color: var(--text-2); }
+
   @media (min-width: 1024px) {
-    .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
-    .step { border-bottom: 0; padding: var(--s-6) var(--s-5) var(--s-7) 0; }
-    .step + .step { padding-left: var(--s-5); border-left: 1px solid var(--line); }
+    .press { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-8); align-items: start; }
+    .press-fig { position: sticky; top: calc(var(--header-h) + var(--s-6)); width: 100%; max-height: calc(100svh - var(--header-h) - var(--s-8)); }
+    .pr { max-height: calc(100svh - var(--header-h) - var(--s-8)); }
+    /* With motion each step holds the screen a while, so the sheet has time to change. */
+    .is-live .step { min-height: 52svh; padding-block: var(--s-7); transition: opacity .4s; }
+    .is-live .step:not(.is-on) { opacity: .35; }
+    /* The plates arrive one after another from off register, and land. */
+    .is-live .l-sketch, .is-live .l-key, .is-live .l-bar, .is-live .l-stack, .is-live .l-crop, .is-live .l-sketch * { transition: opacity .6s var(--ease-out); }
+    .is-live .plate { transform: translate(var(--dx), var(--dy)); transition: opacity .5s var(--ease-out) calc(var(--i) * .18s), transform .9s var(--ease-out) calc(var(--i) * .18s); }
+    .is-live .pr[data-s3] .plate { transform: none; }
   }
+  @media (prefers-reduced-motion: reduce) { .step, .plate { transition: none !important; } }
 </style>
