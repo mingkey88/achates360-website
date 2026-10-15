@@ -45,6 +45,11 @@ describe('checkArt', () => {
     expect(p).toContain('section 0 is empty');
     expect(p).toContain('section 1: "beside" needs both text and media');
   });
+  it('counts a backdrop as a picture used, and needs pictures in front of it', () => {
+    expect(checkArt({ sections: [{ media: [1, 2], backdrop: 0, layout: 'pair' }] }, 0, 3)).toEqual([]);
+    expect(checkArt({ sections: [{ media: [0, 1], backdrop: 0, layout: 'pair' }] }, 0, 2)).toContain('picture 0 is used 2 times');
+    expect(checkArt({ sections: [{ text: [0], backdrop: 0 }] }, 1, 1)).toContain('section 0: a backdrop needs pictures to sit behind');
+  });
   it('reports a lead with more than one paragraph (only the first would show)', () => {
     expect(checkArt({ sections: [{ text: [0, 1], layout: 'lead' }] }, 2, 0)).toContain('section 0: "lead" takes exactly one paragraph and no pictures');
   });

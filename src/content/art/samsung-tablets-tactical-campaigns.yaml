@@ -3,16 +3,16 @@
 # 0 leaflet, 1 roll-up standee, 2 microwave point-of-sale (1.69), 3 Food Showcase fridges (1.89),
 # 4 brochures (1.50), 5 TANGS Orchard wall (1.11), 6 standees (1.42), 7 2014 catalogue, 8 magazine
 # spread (1.53), 9 Christmas flyers, 10 11 lightbox posters (portrait), 12 13 CNY red packets.
+# 15 Oct: the only paragraph opens the page as its standfirst, like every other case study.
 sections:
   - text: [0]
-    media: [5]
-    layout: beside
+    layout: lead
+  - media: [5, 0, 1]
+    layout: trio
   - media: [3, 2]
     layout: pair
-  - media: [0, 1, 9]
+  - media: [9, 4, 8]
     layout: trio
-  - media: [4, 8]
-    layout: pair
   - media: [6, 7]
     layout: pair
   - media: [10, 11]

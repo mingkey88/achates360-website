@@ -2,15 +2,18 @@
 # used once. Paragraphs: 0 the brief, 1 localised options, 2 the mascot, 3 heading "Chinese New Year with Kichi
 # 2022", 4 the social teaser. Pictures: 0 sunburst sticker, 1 WhatsApp icon, 2-9 Kichi stickers, 10 phones with
 # the sticker pack, 11 Facebook teaser post. Link: 0 "Get stickers".
+# 15 Oct: the eight stickers sit on the sunburst (M0) as Wix set them, instead of the sunburst
+# standing among them as a ninth tile. The WhatsApp icon (51px) sits small under its heading, not enlarged.
 sections:
   - text: [0]
     layout: lead
   - text: [1, 2]
-    media: [1]
-    layout: beside
   - text: [3]
-  - media: [0, 2, 3, 4, 5, 6, 7, 8, 9]
-    layout: trio
+  - media: [1]
+    layout: grid4
+  - media: [2, 3, 4, 5, 6, 7, 8, 9]
+    backdrop: 0
+    layout: grid4
     links: [0]
   - text: [4]
   - media: [10, 11]
