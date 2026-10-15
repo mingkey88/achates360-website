@@ -1,0 +1,20 @@
+---
+import DraftTag from './DraftTag.astro';
+// A press sheet's small print, shared by the covers (ProjectsCover, SelectedCover): the catalogue range
+// ("№ 001 – 052") and a printer's colour bar, the four process inks then the brand's spot colour (1495 U),
+// one under the other. The parent places it; draft: a Draft mark that belongs to the sheet's heading.
+interface Props { count: number; draft?: boolean; class?: string }
+const { count, draft = false, class: cls } = Astro.props;
+---
+<div class:list={['pm', cls]} aria-hidden="true">
+  <p class="pm-no">№ 001 – {String(count).padStart(3, '0')}<DraftTag when={draft} /></p>
+  <p class="pm-bar"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span class="spot" style="--c: var(--accent)"></span><span class="pm-bar-l">1495 U</span></p>
+</div>
+<style>
+  .pm { display: grid; justify-items: start; gap: .55em; color: var(--ink); font-size: var(--fs-small); }
+  .pm p { margin: 0; }
+  .pm-no { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .pm-bar { display: flex; align-items: center; gap: 3px; }
+  .pm-bar span:not(.pm-bar-l) { width: 12px; height: 12px; background: var(--c); }
+  .pm-bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; }
+</style>

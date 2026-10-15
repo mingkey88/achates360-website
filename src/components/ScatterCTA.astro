@@ -6,7 +6,8 @@ import type { UiString } from '../lib/strings';
 import { withBase } from '../lib/paths';
 // The homepage's closing section (after kitpro-croma): project pictures start as one stacked pile in
 // the middle and spread out to the edges as you scroll, revealing the call to action in the space they
-// leave. Motion: scripts/motion/scatter.ts (scrubbed to scroll inside a sticky stage). Without motion
+// leave. A short run (130svh, phones 120): the pile starts already loosened, so no frame is empty paper,
+// and the message arrives early. Motion: scripts/motion/scatter.ts (scrubbed to scroll inside a sticky stage). Without motion
 // the pictures simply sit in their spread-out places with the message visible.
 // Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts).
 interface Item { thumb: ImageMetadata; title: string; href?: string }
@@ -57,7 +58,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
      when the motion runs (motion-live): without it (reduced motion, or the script arriving after the
      3s fallback) there is nothing to scrub, so the section is one screen. */
   .scta { position: relative; }
-  :global(html.motion-live) .scta { height: 190svh; }
+  :global(html.motion-live) .scta { height: 130svh; }
   .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; }
   .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
   .pic {
@@ -87,7 +88,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
   .scta-msg h2 { margin: 0; font: 400 var(--fs-h1)/1.15 var(--font-display); }
   .scta-msg p { margin: 0 0 var(--s-4); max-width: 44ch; font-size: var(--fs-lead); line-height: 1.6; color: var(--text-2); text-wrap: balance; }
   @media (max-width: 767px) {
-    :global(html.motion-live) .scta { height: 170svh; }
+    :global(html.motion-live) .scta { height: 120svh; }
     .pic { left: calc(var(--mx) * 1% + var(--dx, 0px)); top: calc(var(--my) * 1% + var(--dy, 0px)); width: calc(var(--mw) * 1vw); }
     .pic.desk-only { display: none; }
   }
