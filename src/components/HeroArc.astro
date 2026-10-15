@@ -1,10 +1,9 @@
 ---
 import Pic from './ui/Pic.astro';
 import MarqueeToggle from './ui/MarqueeToggle.astro';
-import Pill from './ui/Pill.astro';
-import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
 import logo from '../assets/logo-stacked-parts.svg?raw';
+import { withBase } from '../lib/paths';
 import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../lib/lens';
 // Direction B homepage hero (after kitpro-croma): a quiet white stage. Project images sit on the
 // inside of a cylinder, a lens view: the centre card is furthest away, the side cards come nearer,
@@ -12,12 +11,15 @@ import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../lib/lens';
 // Each card carries a plate caption under it, as in a printed catalogue: the pictures stay clean.
 // Under the strip, on wide screens, the copy is split along a hairline like a title block: the stacked
 // logo at the left, the tagline (corporate sheet) beside it set large as the page's statement, the site
-// description (Wix SEO text) and the button at the right, all verbatim. Phones and narrow tablets stack
-// it centred. hero.ts drifts the cards;
-// without motion they render at the composed angles computed here.
-interface Item { thumb: ImageMetadata; alt: string; title: string; description: string }
-interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string; cta: UiString }
-const { items, name, tagline, blurb, cta } = Astro.props;
+// description (Wix SEO text) at the right, all verbatim. Phones and narrow tablets stack it centred.
+// Every card opens its case study and carries its catalogue number (№, as on /projects): a shortcut for
+// mouse and touch. The strip drifts, so it stays out of the keyboard and screen-reader order (aria-hidden,
+// tabindex -1); the same projects are reached through Selected work and /projects. The cards are on the
+// paper from the first frame (no fade-in). hero.ts drifts the cards; without motion they render
+// at the composed angles computed here.
+interface Item { thumb: ImageMetadata; alt: string; title: string; description: string; no: number; href: string }
+interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
+const { items, name, tagline, blurb } = Astro.props;
 // Each card's place on the lens curve (lib/lens.ts), for wide screens (--x/--z/--ry/--o) and phones
 // (--mx/--mz/--mry/--mo); CSS picks one set per breakpoint. hero.ts then drifts the strip and writes
 // the live values (--cx/--cz/--cry/--co) for the current breakpoint.
@@ -25,34 +27,37 @@ const mid = Math.floor(items.length / 2);
 // Depth of field, as hero.ts computes it: sharp near the centre, softening and losing a little colour outward.
 const dof = (u: number) => { const d = Math.max(0, Math.abs(u) - .55); return `--blur: ${(Math.min(d * 1.6, 5)).toFixed(2)}px; --sat: ${(1 - Math.min(d * .18, .35)).toFixed(2)}`; };
 const f = (n: number) => n.toFixed(3);
+// Captions only on the centre card and its neighbours: further out they would be blurred and skewed.
+const cap = (u: number) => `--cap: ${Math.abs(u) <= 1.5 ? 1 : 0}`;
 const pose = (u: number) => {
   const d = lensPose(u, LENS_DESKTOP), m = lensPose(u, LENS_PHONE);
-  return `--u: ${u}; ${dof(u)}; --x: ${f(d.x)}; --z: ${f(d.z)}; --ry: ${f(d.ry)}; --o: ${f(lensOpacity(d, LENS_DESKTOP))}; --mx: ${f(m.x)}; --mz: ${f(m.z)}; --mry: ${f(m.ry)}; --mo: ${f(lensOpacity(m, LENS_PHONE))}`;
+  return `--u: ${u}; ${dof(u)}; ${cap(u)}; --x: ${f(d.x)}; --z: ${f(d.z)}; --ry: ${f(d.ry)}; --o: ${f(lensOpacity(d, LENS_DESKTOP))}; --mx: ${f(m.x)}; --mz: ${f(m.z)}; --mry: ${f(m.ry)}; --mo: ${f(lensOpacity(m, LENS_PHONE))}`;
 };
+// Cards fully faded out at a breakpoint are hidden there (no stray clicks), until hero.ts takes over.
+const off = (u: number) => ({ 'data-off-d': lensOpacity(lensPose(u, LENS_DESKTOP), LENS_DESKTOP) <= 0 ? '' : undefined, 'data-off-m': lensOpacity(lensPose(u, LENS_PHONE), LENS_PHONE) <= 0 ? '' : undefined });
 // The full stacked logo (figures over the lowercase wordmark) is the page's h1, named by the wordmark.
 const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-label="${name.text.replace(/"/g, '&quot;')}" `);
 ---
 <section class="ha" data-hero data-mq-scope aria-labelledby="hero-title">
   <div class="ha-arc" data-arc aria-hidden="true">
     {items.map((it, i) => (
-      <div class="ha-card" style={pose(i - mid)}>
+      <a class="ha-card" href={withBase(it.href)} style={pose(i - mid)} {...off(i - mid)} tabindex="-1" draggable="false">
         <Pic src={it.thumb} alt="" crop={4 / 3} mobileCrop={3 / 4} widths={[320, 480, 640, 960]} mobileWidths={[240, 360, 480, 640]} sizes="24vw" mobileSizes="41vw" loading={Math.abs(i - mid) <= 1 ? 'eager' : 'lazy'} fetchpriority={i === mid ? 'high' : 'low'} draggable="false" />
-        <span class="ha-cap"><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
-      </div>
+        <span class="ha-cap"><span class="ha-cap-n">№ {String(it.no).padStart(3, '0')}</span><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
+      </a>
     ))}
   </div>
   <div class="ha-copy">
     <h1 id="hero-title" class="ha-mark"><Fragment set:html={mark} /></h1>
     <p class="ha-tagline" data-placeholder={tagline.placeholder ? '' : undefined}>{tagline.text}</p>
     <p class="ha-blurb">{blurb}</p>
-    <Pill href="/projects"><T s={cta} /></Pill>
   </div>
   <MarqueeToggle />
 </section>
 <style>
   .ha {
     /* The header is solid here (no overHero), so the hero fills the screen below it. */
-    position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: hidden; isolation: isolate;
+    position: relative; height: max(calc(100svh - var(--header-h)), 560px); overflow: clip; isolation: isolate;
     display: grid; grid-template-rows: minmax(0, 1fr) auto; padding: var(--s-5) var(--gutter) var(--s-6);
     /* Plain paper, no grid: the drifting cards and their edge fade read cleanly on it. The page's grid
        fades in over the hero's last 140px, behind the copy, instead of starting at a hard edge. */
@@ -68,13 +73,13 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;
   }
-  .ha-arc:active { cursor: grabbing; }
+  .ha-arc:active, .ha-arc:active .ha-card { cursor: grabbing; }
   .ha-card {
-    position: absolute; left: 50%; top: 50%; width: var(--card-w); aspect-ratio: var(--card-ratio);
-    translate: -50% calc(-50% + var(--rise, 0) * 1px); border-radius: 0; background: var(--panel);
+    position: absolute; left: 50%; top: 50%; display: block; width: var(--card-w); aspect-ratio: var(--card-ratio);
+    translate: -50% -50%; border-radius: 0; background: var(--panel); color: inherit; text-decoration: none; cursor: pointer;
     --cx: var(--x, 0); --cz: var(--z, 0); --cry: var(--ry, 0); --co: var(--o, 1);
     transform: translate3d(calc(var(--cx) * 1vw), 0, calc(var(--cz) * 1vw)) rotateY(calc(var(--cry) * -1deg));
-    opacity: calc(var(--co) * var(--in, 1));
+    opacity: var(--co);
     /* Depth of field: like a wide-open lens, the cards soften gradually toward the edges. */
     filter: blur(var(--blur, 0px)) saturate(var(--sat, 1));
   }
@@ -89,17 +94,22 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
     mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
   }
-  .ha-copy { position: relative; z-index: 1; } /* above the stretched arc, so its links stay clickable */
+  .ha-copy { position: relative; z-index: 1; } /* above the stretched arc's padding, so the copy can be selected */
   .ha-card :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   /* Film grain over each photograph. */
   .ha-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--grain); opacity: .16; mix-blend-mode: overlay; pointer-events: none; }
   /* A plate caption under each picture, as in a printed catalogue: the project in ink, the client
      beneath in grey. Nothing is written over the work (some pictures carry their own type). */
-  .ha-cap { position: absolute; top: calc(100% + .7em); left: 0; right: 0; display: grid; gap: 2px; color: var(--ink); text-align: left; pointer-events: none; font-size: clamp(.6875rem, .35rem + .5vw, .9375rem); }
+  .ha-cap { position: absolute; top: calc(100% + .7em); left: 0; right: 0; display: grid; gap: 2px; color: var(--ink); text-align: left; pointer-events: none; font-size: clamp(.6875rem, .35rem + .5vw, .9375rem); opacity: var(--cap, 1); transition: opacity .5s; }
+  /* The catalogue number, as in the /projects index: small, tabular, above the title. */
+  .ha-cap-n { font: 400 .78em/1.3 var(--font-text); font-variant-numeric: tabular-nums; color: var(--text-2); }
+  .ha-card:hover .ha-cap-t { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+  @media (min-width: 768px) { .ha-card[data-off-d] { visibility: hidden; } }
+  @media (max-width: 767px) { .ha-card[data-off-m] { visibility: hidden; } }
   .ha-cap-t { font: 500 1em/1.25 var(--font-text); letter-spacing: -.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ha-cap-d { font: 400 .82em/1.3 var(--font-text); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* After Aesop: one centred stack (logo, tagline, a short paragraph, one button). */
+  /* After Aesop: one centred stack (logo, tagline, a short paragraph). */
   .ha-copy { display: grid; justify-items: center; gap: var(--s-3); padding-top: var(--s-5); text-align: center; }
   .ha-mark { margin: 0 0 var(--s-1); width: clamp(84px, 8vw, 132px); color: var(--ink); }
   .ha-mark :global(svg) { display: block; width: 100%; height: auto; overflow: visible; }
@@ -112,15 +122,18 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
     }
     .ha-mark { grid-column: 1 / 3; grid-row: 1 / 3; align-self: end; margin: 0; padding-top: var(--s-5); width: clamp(96px, 8vw, 132px); }
     .ha-tagline { grid-column: 3 / 9; grid-row: 1 / 3; padding-top: var(--s-5); }
-    .ha-blurb { grid-column: 9 / 13; grid-row: 1; margin: 0; }
-    .ha-copy > :global(.pill) { grid-column: 9 / 13; grid-row: 2; margin-top: var(--s-4); }
+    .ha-blurb { grid-column: 9 / 13; grid-row: 1 / 3; align-self: end; margin: 0; }
   }
-  .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; background: var(--paper); border-color: var(--ink); color: var(--ink); }
+  /* The pause control: a small square hairline key in the corner, like a mark in a print margin. */
+  .ha :global(.mq-toggle) { top: var(--s-5); bottom: auto; translate: none; width: 40px; height: 40px; border: 1px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink); }
+  .ha :global(.mq-toggle svg) { width: 14px; height: 14px; }
 
   @media (max-width: 767px) {
     /* Phones: tall cards, same lens. */
     .ha { --card-w: 40.8vw; --card-ratio: 3 / 4; --P: 74.4vw; }
     .ha-card { --cx: var(--mx, 0); --cz: var(--mz, 0); --cry: var(--mry, 0); --co: var(--mo, 1); }
     .ha-arc { --fade: 16%; }
+    /* Room between the captions under the cards and the logo. */
+    .ha-copy { padding-top: var(--s-7); }
   }
 </style>

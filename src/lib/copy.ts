@@ -24,3 +24,10 @@ export function splitRoleHeading(md: string): { title: string; lead: string; res
 export function titleFromSeo(t: string): string {
   return t.split(' | ')[0].trim();
 }
+
+/** Text split before its last word, so a mark set after it can be kept on the same line:
+ * "Campaigns & Promotions" → ["Campaigns & ", "Promotions"], "Nokia" → ["", "Nokia"]. */
+export function splitLastWord(t: string): [string, string] {
+  const i = t.lastIndexOf(' ');
+  return [t.slice(0, i + 1), t.slice(i + 1)];
+}

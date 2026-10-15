@@ -6,10 +6,10 @@ const ARRIVAL = ['#ff9015', '#99d9d9', '#cbe880', '#99d9d9', '#ff9015'];
 const DRIFT = .14; // cards per second
 
 /**
- * Direction B homepage hero (after kitpro-croma): the lens of project images rises in from the centre
- * outward and drifts slowly round the cylinder (drag to scrub, pause button stops it); the five logo figures
- * gather above the logo's wordmark, and the centred copy fades up (after Aesop). Scrolling away lifts
- * the arc and fades the copy.
+ * Direction B homepage hero (after kitpro-croma): the lens of project images is on the paper from the
+ * first frame and drifts slowly round the cylinder (drag to scrub, pause button stops it; it eases to a
+ * stop under the mouse so a card can be opened); the five logo figures gather above
+ * the logo's wordmark. Scrolling away lifts the arc and fades the copy.
  */
 export function hero(): void {
   const root = document.querySelector<HTMLElement>('[data-hero]');
@@ -24,11 +24,8 @@ export function hero(): void {
   const phone = window.matchMedia('(max-width: 767px)');
   const lens = () => (phone.matches ? LENS_PHONE : LENS_DESKTOP);
 
-  // Cards rise in from the centre outward. Only CSS variables are tweened: a GSAP transform would
-  // overwrite the lens transform, and fading the arc itself would flatten its 3D.
-  const order = cards.map((_, i) => Math.abs(i - (n - 1) / 2));
+  // The cards are not animated in: the work is there from the first frame. Only the logo assembles.
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-  tl.fromTo(cards, { '--in': 0, '--rise': 60 }, { '--in': 1, '--rise': 0, duration: 1.6, stagger: (i) => order[i] * .09 }, .2);
   figs.forEach((g, i) => {
     const a = (i / figs.length) * Math.PI * 2 + .6;
     tl.from(g, { x: Math.cos(a) * 120, y: Math.sin(a) * 80, rotation: (i % 2 ? 1 : -1) * (90 + i * 25), scale: .3, opacity: 0, transformOrigin: '50% 50%', duration: 1.6 }, .5 + i * .1);
@@ -43,7 +40,7 @@ export function hero(): void {
 
   // Drift: every card moves along the curve on a track that wraps after n cards. Cards fade out as
   // they turn edge-on at the sides, long before they wrap round to the other end.
-  const state = { offset: 0, boost: 0 };
+  const state = { offset: 0, boost: 0, speed: DRIFT };
   // Last value written per card and property: a style write (and the blur re-raster it causes) only
   // happens when the value actually changes.
   const written = cards.map(() => new Map<string, string>());
@@ -67,29 +64,50 @@ export function hero(): void {
     const d = Math.max(0, Math.abs(u) - .55);
     set(i, '--blur', `${Math.round(Math.min(d * 1.6, 5) * 4) / 4}px`);
     set(i, '--sat', (1 - Math.min(d * .18, .35)).toFixed(2));
+    // Captions on the centre card and its neighbours only (as HeroArc.astro renders them).
+    set(i, '--cap', Math.abs(u) <= 1.5 ? '1' : '0');
   });
   // The drift runs only while the hero is on screen (also right after a reload that restores the
   // scroll position further down, where no scroll event would have switched it on or off).
-  let active = false;
+  let active = false, hovering = false;
   new IntersectionObserver(([e]) => { active = e.isIntersecting; }).observe(root);
   gsap.ticker.add((_t, dt) => {
     if (!active) return;
-    const paused = root.hasAttribute('data-paused');
-    state.offset -= ((paused ? 0 : DRIFT) + state.boost) * dt / 1000;
+    // Paused, or a card under the mouse: the drift eases to a stop.
+    const still = root.hasAttribute('data-paused') || hovering;
+    state.speed += ((still ? 0 : DRIFT) - state.speed) * (1 - Math.pow(.9, dt / (1000 / 60)));
+    state.offset -= (state.speed + state.boost) * dt / 1000;
     state.boost *= Math.pow(.93, dt / (1000 / 60)); // the same decay at any refresh rate
     place();
   });
 
-  let lastX = 0, lastT = 0, dragging = false;
-  arc.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastT = e.timeStamp; arc.setPointerCapture(e.pointerId); });
+  arc.addEventListener('pointerover', (e) => { hovering = e.pointerType === 'mouse' && !!(e.target as Element).closest('.ha-card'); });
+  arc.addEventListener('pointerleave', () => { hovering = false; });
+
+  // Drag to scrub. A press only becomes a drag after 6px of movement, so a plain click still opens the
+  // card's project; the click that ends a drag is swallowed.
+  let lastX = 0, lastT = 0, startX = 0, down = false, dragging = false, dragged = false;
+  arc.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return; // primary button or touch only
+    down = true; dragging = false; dragged = false; startX = lastX = e.clientX; lastT = e.timeStamp;
+  });
   arc.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+    // A press released outside the arc (before capture) never sends it a pointerup: no button, no drag.
+    if (down && e.buttons === 0) down = dragging = false;
+    if (!down) return;
+    if (!dragging) {
+      if (Math.abs(e.clientX - startX) < 6) return;
+      dragging = dragged = true;
+      arc.setPointerCapture(e.pointerId);
+    }
     const du = (e.clientX - lastX) / (cards[0].offsetWidth * .85);
     state.offset += du;
     state.boost = gsap.utils.clamp(-4, 4, (-du * 1000) / Math.max(e.timeStamp - lastT, 1));
     lastX = e.clientX; lastT = e.timeStamp;
   });
-  const release = () => { dragging = false; };
+  // The click that ends a drag arrives straight after pointerup; after that, clicks open cards again.
+  const release = () => { down = dragging = false; if (dragged) setTimeout(() => { dragged = false; }, 0); };
+  arc.addEventListener('click', (e) => { if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; } }, true);
   arc.addEventListener('pointerup', release);
   arc.addEventListener('pointercancel', release);
 

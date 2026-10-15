@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sentenceStarting, splitRoleHeading, titleFromSeo } from './copy';
+import { sentenceStarting, splitRoleHeading, titleFromSeo, splitLastWord } from './copy';
 
 const about = 'We are an integrated creative agency.  \n \n\nThe name Achates 360 reflects our company philosophy of being a faithful companion and trusted friend to our clients. Relationships are central to our company\'s ethos.  \n​\n\nBelieving that design is thinking made visual.';
 
@@ -26,4 +26,14 @@ describe('splitRoleHeading', () => {
 describe('titleFromSeo', () => {
   it('drops the site suffix', () => expect(titleFromSeo('Project Categories | Achates 360')).toBe('Project Categories'));
   it('keeps a title without a suffix', () => expect(titleFromSeo('Projects')).toBe('Projects'));
+});
+
+describe('splitLastWord', () => {
+  it('splits before the last word, keeping every character', () => {
+    expect(splitLastWord('Campaigns & Promotions')).toEqual(['Campaigns & ', 'Promotions']);
+    expect(splitLastWord('VP Bank Ltd Singapore').join('')).toBe('VP Bank Ltd Singapore');
+  });
+  it('leaves a single word whole', () => {
+    expect(splitLastWord('Nokia')).toEqual(['', 'Nokia']);
+  });
 });

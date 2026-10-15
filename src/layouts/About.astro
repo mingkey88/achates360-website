@@ -34,8 +34,10 @@ const timeline = x.timeline.map((t: any) => {
 // The Wix About page carried a "Back to projects" link (a leftover of its page template); it leads
 // nowhere useful from About, so it is not shown here (the record keeps it).
 const blocks = d.blocks.filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
-// A different quotation from the homepage's, where there is one.
-const quote = x.testimonials[1] ?? x.testimonials[0];
+// A different quotation from the homepage's, where there is one. Draft quotations are not shown (the
+// band appears once the client supplies real ones, CONTENT-QUERIES 10).
+const quotes = x.testimonials.filter((t: any) => !t.placeholder);
+const quote = quotes[1] ?? quotes[0];
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, homeUrl: abs('/') })];
 ---
@@ -44,7 +46,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
     <h1 class="display h1 sc" data-split>{heading}</h1>
     <div class="ab-blocks">{blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>
   </section>
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} />
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
   <Timeline items={timeline} heading={text('timeline-heading')} />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />

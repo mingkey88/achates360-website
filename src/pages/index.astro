@@ -8,12 +8,12 @@ import T from '../components/ui/T.astro';
 import SelectedWork from '../components/SelectedWork.astro';
 import ServiceIndex from '../components/ServiceIndex.astro';
 import Credentials from '../components/Credentials.astro';
-import DraftTag from '../components/ui/DraftTag.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
+import { projectIndex } from '../lib/project-index';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
@@ -33,9 +33,16 @@ const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.sl
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
-// Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a paper-cut cover), then the
-// point of view (the work comes first, so the second screen is work, not words), the service index, one proof band,
-// one testimonial, contact. The full project list lives on /projects.
+// The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
+// study with its /projects catalogue number. Unlisted gallery items (no case study to open) are skipped.
+const lens = projectIndex(d.allProjects.items, projects).slice(0, 10);
+if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
+// The closing scatter takes the nine gallery pictures after the lens's last one, so no picture repeats.
+const lensEnd = d.allProjects.items.findIndex((it) => slugOf(it.href) === lens[lens.length - 1].slug) + 1;
+const scatter = d.allProjects.items.slice(lensEnd, lensEnd + 9);
+// Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a paper-cut cover), the
+// imprint (clients, awards, figures) straight after the work, then the point of view, the service index, one
+// testimonial (only once the client has supplied a real one), contact. The full project list lives on /projects.
 // Star Wars Luzerne (homepage slide 5) leads as the cover, then the first four slides.
 // A featured slide whose project is unlisted (hidden from the project list) is swapped for a listed one,
 // shown with that project's hero and the slide's own link label. DBS Discretionary Portfolio Management
@@ -55,7 +62,9 @@ const services = x.services.map((s: any) => {
   if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
   return { ...s, image: hero.type === 'video' ? hero.poster : hero.src };
 });
-const quote = x.testimonials[0];
+// The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
+// appears once the client supplies a real quotation (CONTENT-QUERIES 10).
+const quote = x.testimonials.find((t: any) => !t.placeholder);
 // The closing call to action's line is the footer's own intro sentence (site.md), verbatim.
 const site = (await getEntry('site', 'site'))!.data;
 const footerIntro = String((site.footer as any[]).find((b) => b.type === 'text')?.md ?? '').replace(/^#+\s*/, '');
@@ -75,9 +84,11 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);
   </script>
-  <HeroArc items={d.allProjects.items.slice(0, 10)} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} cta={text('selected-cta')} />
+  <HeroArc items={lens} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
 
   <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
+
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
     <Eyebrow><T s={text('intro-eyebrow')} /></Eyebrow>
@@ -86,11 +97,10 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </section>
 
   <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} />
 
-  <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />
+  {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
-  <ScatterCTA items={d.allProjects.items.slice(10, 19)} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
+  <ScatterCTA items={scatter} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
   .h-intro { position: relative; padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
