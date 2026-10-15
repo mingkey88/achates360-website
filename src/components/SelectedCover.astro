@@ -16,7 +16,8 @@ type Media = CollectionEntry<'home'>['data']['slides'][number]['media'];
 // sheet scrolls up and away, uncovering it whole; the project's card overlaps its lower corner.
 // The sheet is the same press sheet as the /projects cover: its lower edge die-cut in square steps, and
 // the catalogue range and colour bar printed in its top corner (PressMarks).
-// Pure CSS scrolling (no script), so it also works under reduced motion. The heading is a visually
+// With motion the cover holds still and the sheet slides away to the left instead (motion/cover.ts), as
+// the /projects cover does; without motion it is pure CSS scrolling, so it works under reduced motion. The heading is a visually
 // hidden h2 (the capitals are display only); the paper SVG is decorative; the video keeps its pause button.
 interface Props {
   id: string; heading: UiString; media: Media; count: number;
@@ -47,7 +48,7 @@ const sheets: Sheet[] = [
 ];
 const B = 4000;
 ---
-<div class="cover" data-placeholder={heading.placeholder ? '' : undefined}>
+<div class="cover" data-scover data-placeholder={heading.placeholder ? '' : undefined}>
   <h2 id={id} class="sr-only">{heading.text}</h2>
   <div class="cover-film" data-bgvideo-viewport>
     <Pic class="cover-media" src={poster} alt="" widths={[640, 1280, 1920, 2560]} sizes="100vw" mobileCrop={9 / 16} mobileWidths={[360, 480, 640, 768]} mobileSizes="100vw" />
@@ -100,6 +101,12 @@ const B = 4000;
      the lettering. */
   .cover-paper :global(.cover-marks) { position: absolute; left: var(--gutter); top: calc(var(--header-h) + var(--s-3)); }
   .cover-run { height: calc(var(--ph) + var(--v) * .1); }
+  /* With motion (motion/cover.ts): the cover is pinned for a stretch and the sheet slides off to the left
+     over the film instead of scrolling up; the film is one plain screen, the sheet laid over its top. */
+  .cover.is-slide { overflow: clip; }
+  .cover.is-slide .cover-film { position: relative; }
+  .cover.is-slide .cover-paper { position: absolute; top: 0; left: 0; right: 0; margin: 0; will-change: transform; }
+  .cover.is-slide .cover-run { display: none; }
   /* The letters sit clear of the stepped edge. (The header hides while scrolling down, so the sheet
      needs only a margin at the top, not the header's height.) */
   .paper { position: absolute; left: var(--gutter); right: var(--gutter); top: var(--s-7); height: calc(100% - var(--s-7) - var(--step-h) - var(--s-5)); width: calc(100% - 2 * var(--gutter)); }
