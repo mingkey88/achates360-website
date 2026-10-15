@@ -2,7 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import HeroArc from '../components/HeroArc.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
+import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
 import SelectedWork from '../components/SelectedWork.astro';
@@ -18,6 +18,8 @@ import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
+import dxvPoster from '../assets/dxv-poster.jpg';
+import { serviceCount } from '../lib/service-counts';
 
 const d = (await getEntry('home', 'home'))!.data;
 const about = (await getEntry('basic', 'about'))!.data;
@@ -35,11 +37,19 @@ const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
 // study with its /projects catalogue number. Unlisted gallery items (no case study to open) are skipped.
-const lens = projectIndex(d.allProjects.items, projects).slice(0, 10);
+const catalogue = projectIndex(d.allProjects.items, projects);
+const lens = catalogue.slice(0, 10);
+const numberOf = new Map(catalogue.map((e) => [e.slug, e.no]));
 if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
-// The closing scatter takes the nine gallery pictures after the lens's last one, so no picture repeats.
-const lensEnd = d.allProjects.items.findIndex((it) => slugOf(it.href) === lens[lens.length - 1].slug) + 1;
-const scatter = d.allProjects.items.slice(lensEnd, lensEnd + 9);
+// The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
+// end on, none of them already in the lens or Selected work. The first six are the ones phones show.
+const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
+const scatter = SCATTER.map((slug) => {
+  const it = catalogue.find((e) => e.slug === slug);
+  if (!it) throw new Error(`Homepage scatter: "${slug}" is not a listed project in the gallery`);
+  if (lens.some((e) => e.slug === slug)) throw new Error(`Homepage scatter: "${slug}" is already in the hero lens`);
+  return it;
+});
 // Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a paper-cut cover), the
 // imprint (clients, awards, figures) straight after the work, then the point of view, the service index, one
 // testimonial (only once the client has supplied a real one), contact. The full project list lives on /projects.
@@ -56,12 +66,18 @@ const swapped = featured.map((f) => {
   if (!project?.listed || !project.hero) throw new Error(`Selected work: swap target "${to}" is unlisted or has no hero`);
   return { slide: { ...f.slide, media: project.hero, cta: { label: f.slide.cta!.label, href: `/${to}` } }, project };
 });
-const selected = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean);
-const services = x.services.map((s: any) => {
-  const hero = projects.get(s.project)?.hero;
-  if (!hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
-  return { ...s, image: hero.type === 'video' ? hero.poster : hero.src };
+// Each selected project carries its catalogue number; DXV's film gets a still where its title has
+// formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
+const POSTERS: Record<string, ImageMetadata> = { dxv: dxvPoster };
+const selected = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
+  const slug = slugOf(f.slide.cta?.href) ?? '';
+  return { ...f, no: numberOf.get(slug), poster: POSTERS[slug] };
 });
+if (SCATTER.some((slug) => selected.some((f) => slugOf(f.slide.cta?.href) === slug))) throw new Error('Homepage scatter repeats a selected project');
+// The service contents: each service's number of listed projects, counted as on /services.
+const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
+const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
+const services = x.services.map((s: any) => ({ ...s, count: serviceCount(s.tags, sections, listed) }));
 // The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
 // appears once the client supplies a real quotation (CONTENT-QUERIES 10).
 const quote = x.testimonials.find((t: any) => !t.placeholder);
@@ -88,26 +104,29 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
 
   <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
 
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
+  {/* Folios: the homepage's sections numbered as a book's, Selected work (its cover) being the first. */}
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} folio="02" />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
-    <Eyebrow><T s={text('intro-eyebrow')} /></Eyebrow>
-    <h2 id="intro-title" class="display two-tone" data-split>{introBefore}{introKey && <span class="key">{introKey}</span>}{introAfter}</h2>
+    <RunningHead as="p" s={text('intro-eyebrow')} folio="03" />
+    <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="key">{introKey}</span>}{introAfter}</h2>
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
-  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
+  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} countLabel={text('contents-count')} folio="04" />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
   <ScatterCTA items={scatter} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  .h-intro { position: relative; padding-block: var(--section-y) var(--s-6); display: grid; justify-items: center; text-align: center; }
-  .h-intro :global(.eyebrow) { justify-content: center; }
-  .two-tone { max-width: 30ch; margin-block: var(--s-3) var(--s-6); font-size: clamp(1.5rem, 1.25rem + 1.1vw, 2.25rem); line-height: 1.3; }
+  /* The studio's sentence as an opening statement, set left on the page's grid under its running head. */
+  .h-intro { padding-block: var(--s-9) var(--s-9); display: grid; justify-items: start; }
+  .two-tone { max-width: 30ch; margin-block: var(--s-7) var(--s-6); font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.75rem); line-height: 1.25; text-wrap: pretty; }
+  @media (min-width: 1024px) { .two-tone { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } .h-intro :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
+  .h-intro > :global(.rh) { justify-self: stretch; }
   /* Print touch: the orange plate printed a hair off register, a lighter orange peeking out below right. */
-  .two-tone .key { color: var(--accent-deep); text-shadow: .03em .024em 0 rgb(255 144 21 / .45); }
+  .two-tone .key { color: var(--accent-deep); text-shadow: .05em .04em 0 rgb(255 144 21 / .45); }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

@@ -1,0 +1,17 @@
+---
+import T from './T.astro';
+import type { UiString } from '../../lib/strings';
+// A book's running head over a homepage section: the section's name at the left (its heading, or a
+// label when the section's heading is something else), its folio at the right, on a hairline.
+interface Props { s: UiString; folio: string; as?: 'h2' | 'p'; id?: string }
+const { s, folio, as: Tag = 'h2', id } = Astro.props;
+---
+<div class="rh">
+  <Tag class="rh-name" id={id}><T s={s} /></Tag>
+  <span class="rh-folio" aria-hidden="true">{folio}</span>
+</div>
+<style>
+  .rh { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-3); border-bottom: 1px solid var(--ink); }
+  .rh-name { margin: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
+  .rh-folio { font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--text-2); }
+</style>

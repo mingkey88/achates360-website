@@ -1,8 +1,9 @@
 import { gsap } from './index';
 
 /**
- * Homepage closing section (after kitpro-croma): the pictures begin as one stacked, slightly turned pile
- * at the centre of the sticky stage and spread to their places as you scroll; the message then rises in.
+ * Homepage closing section (after kitpro-croma): the pictures begin as a loose, slightly turned pile
+ * around the centre of the sticky stage (already part-way out, so the screen is never bare) and spread to
+ * their places as you scroll; the message rises in early, within the first third of the run.
  * The places are the CSS ones, so the pile is a .from() state and no motion leaves the final layout.
  */
 export function scatter(): void {
@@ -28,14 +29,14 @@ export function scatter(): void {
     });
     pics.forEach((p, i) => {
       tl.from(p, {
-        x: () => offset(p, 'x') * .92 + (i % 3 - 1) * 24,
-        y: () => offset(p, 'y') * .92 + (i % 2 ? 14 : -14),
+        x: () => offset(p, 'x') * .55 + (i % 3 - 1) * 24,
+        y: () => offset(p, 'y') * .55 + (i % 2 ? 14 : -14),
         rotation: (i % 2 ? 1 : -1) * (3 + (i % 4) * 2), scale: .62, duration: .5,
       }, i * .035);
     });
     // autoAlpha: while hidden the message (and its button) is visibility:hidden, so not focusable.
-    // On phones the pictures settle around the message, so it waits until they have.
-    const at = ctx.conditions?.phone ? .66 : .5;
+    // On phones the pictures pass close to the message, so it comes a little later there.
+    const at = ctx.conditions?.phone ? .35 : .2;
     if (msg) tl.from(msg, { autoAlpha: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
   });
 }
