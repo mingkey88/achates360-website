@@ -1,0 +1,17 @@
+# Art direction for /the-v-edit-e-zine (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 The V Edit, 1 the splash logo, 2 the website. Pictures:
+# 0 animated logo on white, 1 business cards, 2 tablet among beauty products (wide), 3 website on
+# tablet and phone.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1]
+    media: [0]
+    layout: beside
+  - media: [1]
+    layout: full
+  - text: [2]
+    media: [3]
+    layout: beside-left
+  - media: [2]
+    layout: full

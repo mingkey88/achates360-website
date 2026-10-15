@@ -1,0 +1,32 @@
+# Art direction for /building-memories-artbook (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs (26 visible; the hidden award-list paragraph is left out by visibleBlocks):
+# 0 S. Rajaratnam quote, 1 its source, 2 subheading Singapore Memory Project, 3-5 the book,
+# 6-7 National Theatre Pop-Up Kit, 8-9 Singapore Book Awards 2017, 10 Radio 938LIVE interview,
+# 11-12 pre-launch talk, 13-25 Retail Outlets. Pictures: 0-9 award logos (1-4 square: three SBPA seals and HOW;
+# 6-9 The Design 100 badges; 0 A'Design, 5 GD USA, both portrait), 10 Vimeo, 11-16 the book photographed,
+# 17 pop-up kit Vimeo, 18 Straits Times clipping, 19 awards-night collage, 20 938LIVE studio,
+# 21 pre-launch collage.
+sections:
+  - text: [0, 1]
+  - text: [2, 3, 4, 5]
+  - media: [10]
+    layout: full
+  - media: [11, 12, 13, 14, 15, 16]
+    layout: pair
+  - text: [6, 7]
+  - media: [17]
+    layout: full
+  - text: [8, 9]
+    media: [18]
+    layout: beside
+  - media: [19]
+    layout: full
+  - media: [1, 2, 3, 4, 6, 7, 8, 9, 0, 5]
+    layout: grid4
+  - text: [10]
+  - media: [20]
+    layout: full
+  - text: [11, 12]
+  - media: [21]
+    layout: full
+  - text: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]

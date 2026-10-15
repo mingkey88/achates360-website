@@ -1,0 +1,29 @@
+# Art direction for /changi-airport-group (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 CAG and the Learning Festival, 1 "2015: Game Changer",
+# 2 the movie-star speakers, 3 the magazine, fold-out poster and ticket stubs, 4 "2014: Making Ideas
+# Happen", 5 the diary and its spine, 6 subheading "2013: Service Through Design", 7 design thinking,
+# 8 the 3D pop-up. Pictures: 0 magazine cover with popcorn, 1 2 magazine spreads, 3 event poster on
+# the wall, 4 ticket stub close-up (square), 5 diary covers, 6 diary spread, 7 diary spine close-up,
+# 8 film of the pop-up.
+sections:
+  - text: [0]
+  - text: [1, 2]
+  - media: [0]
+    layout: full
+  - media: [1, 2]
+    layout: pair
+  - media: [3]
+    layout: full
+  - text: [3]
+    media: [4]
+    layout: beside
+  - text: [4]
+  - media: [5, 6]
+    layout: pair
+  - text: [5]
+    media: [7]
+    layout: beside-left
+  - text: [6, 7]
+  - text: [8]
+    media: [8]
+    layout: beside

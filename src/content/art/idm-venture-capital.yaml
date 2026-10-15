@@ -1,0 +1,17 @@
+# Art direction for /idm-venture-capital (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 the firm, 1 the brand signature and tree logo, 2 the website.
+# Pictures: 0 brand guide pages, 1 stationery and signage, 2 website film (laptop), 3 website film
+# (home page), 4 corporate gift.
+# Moves: the brand pictures (and the gift) follow the brand passage; the website passage sits beside its
+# film instead of above the brand boards.
+sections:
+  - text: [0, 1]
+  - media: [0, 1]
+    layout: pair
+  - media: [4]
+    layout: full
+  - text: [2]
+    media: [2]
+    layout: beside
+  - media: [3]
+    layout: full

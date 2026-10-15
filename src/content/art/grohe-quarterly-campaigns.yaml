@@ -1,0 +1,29 @@
+# Art direction for /grohe-quarterly-campaigns (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 the brief, 1 a hundred assets a quarter (videos, banners,
+# billboards, posters). Pictures: 0 opening film, 1 Euphoria key visual, 2 in-store display units,
+# 3 film, 4 Euphoria billboard, 5-6 films, 7-10 SmartControl posters, 11-12 films, 13 SmartControl
+# "Your life. Your rules." poster, 14 film.
+# Moves: the lone poster sits beside the passage that names the posters instead of at half width over
+# empty paper; the eight films go two to a row instead of eight full-width black screens.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1]
+    media: [13]
+    layout: beside
+  - media: [0]
+    layout: full
+  - media: [1]
+    layout: full
+  - media: [2]
+    layout: full
+  - media: [3, 5]
+    layout: pair
+  - media: [4]
+    layout: full
+  - media: [6, 11]
+    layout: pair
+  - media: [7, 8, 9, 10]
+    layout: grid4
+  - media: [12, 14]
+    layout: pair

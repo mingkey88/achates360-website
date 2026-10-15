@@ -4,6 +4,7 @@
 # name cards, 2-9 the Patisserie packaging on marble, 10 Patisserie name cards.
 sections:
   - text: [0]
+    layout: lead
   - text: [1, 2, 3]
   - text: [5]
     media: [1]

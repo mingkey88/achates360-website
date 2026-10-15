@@ -1,0 +1,35 @@
+# Art direction for /singapore-conference-hall-sg5050 (src/lib/art.ts). Layout only: the page's own
+# words and pictures, each used once. Paragraphs: 0 the exhibition, 1 the hall's history, 2 the logo
+# and exhibits (feature wall, island displays, photo booth, postcard corner), 3 the mosaic-tile
+# concept, 4 research and the handbook. Pictures: 0 atrium panorama, 1 exhibit through a display
+# (portrait), 2 Cultural Matching Fund panel, 3 50th-anniversary sign over the 1965 opening plaque
+# (portrait), 4-7 island displays, postcard corner and orchestra backdrop, 8 mosaic stamps,
+# 9 postcard wall, 10 atrium panorama (the same picture as 0), 11 three-storey feature wall
+# (portrait), 12 handbook covers, 13-14 handbook spreads.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1]
+    media: [3]
+    layout: beside
+  - media: [0]
+    layout: full
+  - text: [2]
+    media: [11]
+    layout: beside-left
+  - media: [2, 4, 5]
+    layout: trio
+  - media: [6, 7]
+    layout: pair
+  - text: [3]
+    media: [1]
+    layout: beside
+  - media: [8, 9]
+    layout: pair
+  - text: [4]
+    media: [12]
+    layout: beside-left
+  - media: [13, 14]
+    layout: pair
+  - media: [10]
+    layout: full

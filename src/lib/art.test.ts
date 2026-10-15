@@ -45,6 +45,9 @@ describe('checkArt', () => {
     expect(p).toContain('section 0 is empty');
     expect(p).toContain('section 1: "beside" needs both text and media');
   });
+  it('reports a lead with more than one paragraph (only the first would show)', () => {
+    expect(checkArt({ sections: [{ text: [0, 1], layout: 'lead' }] }, 2, 0)).toContain('section 0: "lead" takes exactly one paragraph and no pictures');
+  });
 });
 
 describe('arrangeMedia', () => {
@@ -52,11 +55,25 @@ describe('arrangeMedia', () => {
   it('sets wide shots full width and keeps their order', () => {
     expect(arrangeMedia([0, 1], by([1.9, 2]))).toEqual([{ media: [0], layout: 'full' }, { media: [1], layout: 'full' }]);
   });
+  it('opens a run of wide shots full width, then sets the rest two to a row', () => {
+    expect(arrangeMedia([0, 1, 2, 3], by([2.8, 2.8, 2.8, 2.8]))).toEqual([{ media: [0], layout: 'full' }, { media: [1, 2], layout: 'pair' }, { media: [3], layout: 'full' }]);
+  });
+  it('sets films two to a row, a lone film full width, a portrait film as a portrait', () => {
+    const film = () => true;
+    expect(arrangeMedia([0, 1, 2], by([16 / 9, 16 / 9, 16 / 9]), film)).toEqual([{ media: [0, 1], layout: 'pair' }, { media: [2], layout: 'full' }]);
+    expect(arrangeMedia([0], by([16 / 9]), film)).toEqual([{ media: [0], layout: 'full' }]);
+    expect(arrangeMedia([0], by([9 / 16]), film)).toEqual([{ media: [0], layout: 'half' }]);
+  });
   it('gathers squares and portraits into grids of four, three, a pair, or one at half width', () => {
     expect(arrangeMedia([0, 1, 2, 3, 4, 5, 6, 7], by(Array(8).fill(1)))).toEqual([{ media: [0, 1, 2, 3, 4, 5, 6, 7], layout: 'grid4' }]);
     expect(arrangeMedia([0, 1, 2, 3, 4, 5], by(Array(6).fill(.8)))).toEqual([{ media: [0, 1, 2, 3, 4, 5], layout: 'trio' }]);
     expect(arrangeMedia([0, 1], by([1, 1]))).toEqual([{ media: [0, 1], layout: 'pair' }]);
     expect(arrangeMedia([0], by([.75]))).toEqual([{ media: [0], layout: 'half' }]);
+  });
+  it('never leaves one portrait alone on a row: five are three and two, seven four and three', () => {
+    expect(arrangeMedia([0, 1, 2, 3, 4], by(Array(5).fill(1)))).toEqual([{ media: [0, 1, 2], layout: 'trio' }, { media: [3, 4], layout: 'pair' }]);
+    expect(arrangeMedia([0, 1, 2, 3, 4, 5, 6], by(Array(7).fill(1)))).toEqual([{ media: [0, 1, 2, 3], layout: 'grid4' }, { media: [4, 5, 6], layout: 'trio' }]);
+    expect(arrangeMedia([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], by(Array(10).fill(.8)))).toEqual([{ media: [0, 1, 2, 3, 4, 5, 6, 7], layout: 'grid4' }, { media: [8, 9], layout: 'pair' }]);
   });
   it('pairs landscapes, an odd one out full width', () => {
     expect(arrangeMedia([0, 1, 2, 3, 4], by([1.5, 1.4, 1.33, 1.5, 1.6]))).toEqual([{ media: [0, 1, 2, 3], layout: 'pair' }, { media: [4], layout: 'full' }]);
@@ -109,6 +126,24 @@ describe('autoArt, a lone tall picture', () => {
   });
 });
 
+describe('Markdown headings', () => {
+  it('reads a one-line heading as a subheading, and a heading over text as a run-in', () => {
+    expect(subheading('##### Chinese New Year 2021')).toBe('Chinese New Year 2021');
+    expect(subheading('##### **About the video**')).toBe('About the video');
+    expect(runIn('#### The brief\nWe were asked…')).toEqual({ head: 'The brief', rest: 'We were asked…' });
+  });
+});
+
+describe('autoArt, a lone tall picture with no passage before it', () => {
+  it('sets it beside the plain passage after it', () => {
+    const ratio = (m: any) => Number(String(m.src).split(':')[1]);
+    const blocks = [{ type: 'text', md: 'Lead.' }, { type: 'image', src: 'a:1.5' }, { type: 'image', src: 'b:0.8' }, { type: 'text', md: 'One.' }];
+    expect(autoArt(blocks, ratio).sections).toEqual([
+      { text: [0], layout: 'lead' }, { media: [0], layout: 'full' }, { text: [1], media: [1], layout: 'beside' },
+    ]);
+  });
+});
+
 describe('runIn and long openings', () => {
   it('reads a bold first line over text as a subheading', () => {
     expect(runIn('**2015: Game Changer**\nGame changers are…')).toEqual({ head: '2015: Game Changer', rest: 'Game changers are…' });
@@ -117,7 +152,7 @@ describe('runIn and long openings', () => {
   });
   it('opens with a passage, not a standfirst, when the first paragraph is long or headed', () => {
     const ratio = () => 1.5;
-    expect(autoArt([{ type: 'text', md: 'x'.repeat(300) }], ratio).sections).toEqual([{ text: [0] }]);
+    expect(autoArt([{ type: 'text', md: 'x'.repeat(500) }], ratio).sections).toEqual([{ text: [0] }]);
     expect(autoArt([{ type: 'text', md: '**Head**\nText.' }], ratio).sections).toEqual([{ text: [0] }]);
   });
 });

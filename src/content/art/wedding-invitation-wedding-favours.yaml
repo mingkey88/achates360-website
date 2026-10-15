@@ -1,0 +1,23 @@
+# Art direction for /wedding-invitation-wedding-favours (src/lib/art.ts). Layout only: the page's own
+# words and pictures, each used once. Paragraphs: 0 a friend's wedding, 1 two variations, 2 church vs
+# banquet styling, 3 the V&J logo and collaterals, 4 the red packets' well wishes. Pictures: 0 church
+# invitation pair, 1 church e-invitation, 2 grey red-packet pair, 3 eight well-wish red packets,
+# 4 banquet invitation pair, 5 banquet invitation, 6 phones with the e-invitations.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+  - media: [0]
+    layout: full
+  - media: [4]
+    layout: full
+  - media: [1, 5]
+    layout: pair
+  - text: [3]
+  - media: [6]
+    layout: full
+  - text: [4]
+    media: [3]
+    layout: beside
+  - media: [2]
+    layout: full

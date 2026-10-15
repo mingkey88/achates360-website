@@ -40,21 +40,23 @@ export function links(blocks: any[]): any[] {
   return blocks.filter((b) => b.type === 'link');
 }
 
-/** A paragraph that is only bold words ("**Refining the Guest Experience**") reads as a subheading. */
+/** A paragraph that is only bold words ("**Refining the Guest Experience**") or a one-line Markdown
+ * heading ("##### Chinese New Year 2021") reads as a subheading. */
 export function subheading(p: string): string | null {
-  const m = p.match(/^\*\*([^*]+)\*\*$/);
-  return m ? m[1].trim() : null;
+  const m = p.match(/^\*\*([^*]+)\*\*$/) ?? p.match(/^#{1,6}[ \t]+([^\n]+)$/);
+  return m ? m[1].replace(/\*\*/g, '').trim() || null : null;
 }
 
 /** A paragraph whose first line is only bold words, with text under it ("**2015: Game Changer**\nGame
  * changers are…"), reads as a subheading and its paragraph. */
 export function runIn(p: string): { head: string; rest: string } | null {
-  const m = p.match(/^\*\*([^*\n]+)\*\*[ \t]*\n([\s\S]+)$/);
-  return m && m[2].trim() ? { head: m[1].trim(), rest: m[2].trim() } : null;
+  const m = p.match(/^\*\*([^*\n]+)\*\*[ \t]*\n([\s\S]+)$/) ?? p.match(/^#{1,6}[ \t]+([^\n]+)\n([\s\S]+)$/);
+  const head = m?.[1].replace(/\*\*/g, '').trim();
+  return m && head && m[2].trim() ? { head, rest: m[2].trim() } : null;
 }
 
 /** The longest opening paragraph set as a standfirst; a longer one opens the first passage instead. */
-export const LEAD_MAX = 280;
+export const LEAD_MAX = 420;
 
 /** Problems with a layout, as sentences; empty when every paragraph, picture and link is used once. */
 export function checkArt(art: Art, paraCount: number, mediaCount: number, linkCount = 0): string[] {
@@ -74,6 +76,7 @@ export function checkArt(art: Art, paraCount: number, mediaCount: number, linkCo
   art.sections.forEach((s, i) => {
     if (!s.text?.length && !s.media?.length && !s.links?.length) problems.push(`section ${i} is empty`);
     if ((s.layout === 'beside' || s.layout === 'beside-left') && (!s.text?.length || !s.media?.length)) problems.push(`section ${i}: "${s.layout}" needs both text and media`);
+    if (s.layout === 'lead' && (s.text?.length !== 1 || s.media?.length)) problems.push(`section ${i}: "lead" takes exactly one paragraph and no pictures`);
   });
   return problems;
 }
@@ -82,29 +85,42 @@ export function checkArt(art: Art, paraCount: number, mediaCount: number, linkCo
 const WIDE = 1.7, TALL = 1.2;
 
 /**
- * Pictures in a run, arranged by shape and kept in order: a wide shot (or film) full width; a run of
- * squares or portraits as an even grid (fours, else threes, a pair, or one at half width); other
- * landscapes in pairs, an odd one out full width.
+ * Pictures in a run, arranged by shape and kept in order: films (and embedded players) two to a row, a
+ * lone one full width; wide shots full width, a run of them opening full width then two to a row; a run
+ * of squares or portraits as an even grid (fours, else threes, a pair, or one at half width); other
+ * landscapes in pairs, an odd one out full width. Rows of mixed shapes are set to one height (ArtRows).
+ * film: whether a picture is a film; a portrait film is placed as a portrait.
  */
-export function arrangeMedia(ids: number[], ratio: (i: number) => number): ArtSection[] {
+export function arrangeMedia(ids: number[], ratio: (i: number) => number, film: (i: number) => boolean = () => false): ArtSection[] {
   const out: ArtSection[] = [];
-  const kind = (i: number) => (ratio(i) >= WIDE ? 'wide' : ratio(i) < TALL ? 'tall' : 'land');
+  const kind = (i: number) => (ratio(i) < TALL ? 'tall' : film(i) ? 'film' : ratio(i) >= WIDE ? 'wide' : 'land');
+  const pairs = (run: number[]) => {
+    const even = run.length - (run.length % 2);
+    if (even) out.push({ media: run.slice(0, even), layout: 'pair' });
+    if (even < run.length) out.push({ media: run.slice(even), layout: 'full' });
+  };
   for (let a = 0; a < ids.length;) {
     const k = kind(ids[a]);
     let b = a + 1;
-    while (b < ids.length && k !== 'wide' && kind(ids[b]) === k) b++;
+    while (b < ids.length && kind(ids[b]) === k) b++;
     const run = ids.slice(a, b);
-    if (k === 'wide') out.push({ media: run, layout: 'full' });
+    if (k === 'film') { if (run.length === 1) out.push({ media: run, layout: 'full' }); else pairs(run); }
+    else if (k === 'wide') { out.push({ media: run.slice(0, 1), layout: 'full' }); pairs(run.slice(1)); }
     else if (k === 'tall') {
+      // Full rows only: fours (or threes when they divide evenly), the remainder as a three or a pair
+      // (five is three and two), never one left alone on a row.
       const n = run.length;
-      out.push({ media: run, layout: n === 1 ? 'half' : n === 2 ? 'pair' : n === 3 || (n % 4 !== 0 && n % 3 === 0) ? 'trio' : 'grid4' });
+      if (n <= 3 || n % 4 === 0 || n % 3 === 0) out.push({ media: run, layout: n === 1 ? 'half' : n === 2 ? 'pair' : n === 3 || n % 4 !== 0 ? 'trio' : 'grid4' });
+      else {
+        const rest = n % 4 === 1 ? 5 : n % 4;
+        if (n - rest) out.push({ media: run.slice(0, n - rest), layout: 'grid4' });
+        const tail = run.slice(n - rest);
+        if (tail.length === 5) out.push({ media: tail.slice(0, 3), layout: 'trio' }, { media: tail.slice(3), layout: 'pair' });
+        else out.push({ media: tail, layout: tail.length === 3 ? 'trio' : 'pair' });
+      }
     } else if (run.length === 1) out.push({ media: run, layout: 'full' });
     else if (run.length === 3) out.push({ media: run, layout: 'trio' });
-    else {
-      const even = run.length - (run.length % 2);
-      out.push({ media: run.slice(0, even), layout: 'pair' });
-      if (even < run.length) out.push({ media: run.slice(even), layout: 'full' });
-    }
+    else pairs(run);
     a = b;
   }
   return out;
@@ -128,12 +144,13 @@ export function autoArt(blocks: any[], ratio: (m: Media) => number): Art {
   }
   const all = media(blocks);
   const r = (i: number) => ratio(all[i]);
+  const isFilm = (i: number) => all[i].kind !== 'image';
   const paras = paragraphs(blocks);
 
   const sections: ArtSection[] = [];
   let run: number[] = [];
   let besides = 0;
-  const flush = () => { if (run.length) sections.push(...arrangeMedia(run, r)); run = []; };
+  const flush = () => { if (run.length) sections.push(...arrangeMedia(run, r, isFilm)); run = []; };
   const pushText = (ids: number[]) => {
     for (const i of ids) {
       const last = sections[sections.length - 1];
@@ -169,12 +186,15 @@ export function autoArt(blocks: any[], ratio: (m: Media) => number): Art {
   }
   flush();
   // A lone portrait or square picture would sit at half width beside empty paper: set it beside the
-  // plain passage before it instead (sides alternating), as a printed feature would.
-  for (let i = 1; i < sections.length; i++) {
-    const s = sections[i], prev = sections[i - 1];
-    if (s.layout === 'half' && prev.text?.length && !prev.media?.length && !prev.links?.length && !prev.layout) {
-      sections.splice(i - 1, 2, { text: prev.text, media: s.media, layout: besides++ % 2 ? 'beside-left' : 'beside' });
-    }
+  // plain passage before it instead, or failing that the one after it (sides alternating), as a printed
+  // feature would.
+  const plainText = (x?: ArtSection) => !!x && !!x.text?.length && !x.media?.length && !x.links?.length && !x.layout;
+  for (let i = 0; i < sections.length; i++) {
+    const s = sections[i];
+    if (s.layout !== 'half') continue;
+    const side = () => (besides++ % 2 ? 'beside-left' : 'beside') as ArtLayout;
+    if (plainText(sections[i - 1])) { sections.splice(i - 1, 2, { text: sections[i - 1].text, media: s.media, layout: side() }); i--; }
+    else if (plainText(sections[i + 1])) sections.splice(i, 2, { text: sections[i + 1].text, media: s.media, layout: side() });
   }
   return { sections };
 }

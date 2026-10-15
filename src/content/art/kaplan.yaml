@@ -1,0 +1,29 @@
+# Art direction for /kaplan (src/lib/art.ts). Layout only: the page's own words and pictures, each used
+# once. Paragraphs: 0 Downtown MRT, 1 the brief, 2 the concept, 3 a medium per course, 4 the station
+# takeover. Pictures: 0 platform doors, 1 platform pillars, 2 Accounting pillar, 3-13 the eleven course
+# key visuals (Language, Engineering, KLI, Postgraduate x2, Education, IT, Law, Hospitality, Accounting,
+# Business), 14 concourse pillar, 15 light box, 16 floor sticker at the gantry.
+# Moves: the three station views as one full plate and a pair; the eleven key visuals as a contact sheet
+# in threes under the passage about them; the takeover passage beside the floor sticker it names.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+  - media: [0]
+    layout: full
+  - media: [1, 2]
+    layout: pair
+  - text: [3]
+  - media: [3, 4, 5]
+    layout: trio
+  - media: [6, 7, 8]
+    layout: trio
+  - media: [9, 10, 11]
+    layout: trio
+  - media: [12, 13]
+    layout: pair
+  - text: [4]
+    media: [16]
+    layout: beside
+  - media: [14, 15]
+    layout: pair

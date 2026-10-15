@@ -1,0 +1,14 @@
+# Art direction for /infographics (src/lib/art.ts). Layout only: the page's own words and pictures, each
+# used once. Paragraphs: 0 the problem (standfirst), 1 the brief, 2 infographics as the answer.
+# Pictures: 0 Global Health Care infographic (0.44), 1 Bright Spots in Asia Credit infographic (0.27).
+# Moves: the two infographics are meant to be read, so each stands on its own at half width in the
+# paragraphs' column instead of sharing a justified row (which held them to one height and squeezed the
+# taller, narrower one to about a quarter of the column, too small to read).
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+  - media: [0]
+    layout: half
+  - media: [1]
+    layout: half

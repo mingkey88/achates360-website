@@ -1,0 +1,43 @@
+# Art direction for /samsung-the-freestyle (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 the projector, 1 the TikTok brief, 2 the dance challenge,
+# 3 tutorials and ad cuts, 4 the product video, 5 "Samsung The Freestyle video" heading, 6 "TikTok
+# videos" heading, 7 "Dance Tutorial", 8 "Join the Challenge Ad", 9 "TikTok 15s Branded Effect Ad"
+# (on Wix each of 7-9 is the caption under one of the three TikTok players, left to right), 10 "Behind
+# the scenes" heading. Pictures: 0 the product video, 1 Dance Tutorial, 2 Join the Challenge Ad,
+# 3 TikTok 15s Branded Effect Ad, 4 make-up (portrait), 5-6 studio set-up, 7 bedroom set (portrait),
+# 8-13 studio shoot, 14 dancers, 15 band at night (wide), 16 band (portrait), 17 crowd and camera
+# (wide), 18 cast and crew group.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2, 3, 4]
+  - text: [5]
+    media: [0]
+    layout: full
+  - text: [6]
+  - text: [7]
+    media: [1]
+    layout: beside
+  - text: [8]
+    media: [2]
+    layout: beside-left
+  - text: [9]
+    media: [3]
+    layout: beside
+  - text: [10]
+    media: [4, 7, 16]
+    layout: trio
+  - media: [5, 6]
+    layout: pair
+  - media: [8, 9]
+    layout: pair
+  - media: [14]
+    layout: full
+  - media: [10, 11]
+    layout: pair
+  - media: [12, 13]
+    layout: pair
+  - media: [15, 17]
+    layout: pair
+  - media: [18]
+    layout: full

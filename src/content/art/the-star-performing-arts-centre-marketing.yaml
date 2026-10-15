@@ -1,0 +1,37 @@
+# Art direction for /the-star-performing-arts-centre-marketing (src/lib/art.ts). Layout only: the
+# page's own words and pictures, each used once. Paragraphs: 0 the building, 1 the marketing kit,
+# 2 the four venue brochures and die-cut folder, 3 other promotional materials. Pictures: 0 folder
+# cover, 1 brochure spread, 2 die-cut close-up (portrait), 3 6 7 brochure spreads, 4 5 venue brochure
+# fronts and backs, 8 escalator panel stickers, 9 quarterly posters, 10 water bottles, 11 12 eDMs on
+# screens, 13 the animated video, 14 18 season's greetings, 15 venue brochure, 16 venue photo
+# collage, 17 function room, 19 atrium, 20 theatre.
+sections:
+  - text: [0, 1]
+    media: [0]
+    layout: beside
+  - text: [2]
+    media: [2]
+    layout: beside-left
+  - media: [1]
+    layout: full
+  - media: [4, 5]
+    layout: pair
+  - media: [3]
+    layout: full
+  - media: [6, 7]
+    layout: pair
+  - text: [3]
+    media: [8]
+    layout: beside
+  - media: [9, 10]
+    layout: pair
+  - media: [11, 12]
+    layout: pair
+  - media: [13]
+    layout: full
+  - media: [14, 15, 18]
+    layout: trio
+  - media: [16, 19]
+    layout: pair
+  - media: [17, 20]
+    layout: pair

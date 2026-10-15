@@ -1,0 +1,19 @@
+# Art direction for /the-skyline (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs: 0 the development, 1 the Singapore launch campaign and murals, 2 the
+# mobile display system, 3 press ads, emailers and brochure. Pictures: 0 1 murals at the launch venue,
+# 2 brochure cover (portrait), 3-6 brochure spreads, 7 infographic spread, 8 press ad.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+  - media: [0, 1]
+    layout: pair
+  - text: [3]
+    media: [2]
+    layout: beside
+  - media: [3, 4, 5, 6]
+    layout: pair
+  - media: [7]
+    layout: full
+  - media: [8]
+    layout: full

@@ -1,0 +1,33 @@
+# Art direction for /samsung-connected-home (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 title "Simplify everything with Connected Living", 1 smart
+# homes, 2 the 4K demo films, 3-6 the four film titles (Stay Secure, Healthy, Connected, Entertained),
+# 7 heading "Social Media Posts", 8 heading "Behind the scenes". Pictures: 0-3 the four YouTube demo
+# films, 4 6 8 10 Facebook post screenshots (portrait), 5 7 9 11 their 4:5 social films, 12-31 the
+# behind-the-scenes gallery (portraits 12-16 18 20-22 24 27-29 31; landscapes 17 19 23 25 26 30),
+# 32 a 9:16 behind-the-scenes film of the monitor.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2, 3, 4, 5, 6]
+  - media: [0, 1, 2, 3]
+    layout: pair
+  - text: [7]
+  - media: [4, 6, 8, 10]
+    layout: grid4
+  - media: [5, 7, 9, 11]
+    layout: grid4
+  - text: [8]
+    media: [32]
+    layout: beside
+  - media: [12, 13, 14, 15]
+    layout: grid4
+  - media: [17, 19, 23]
+    layout: trio
+  - media: [16, 18, 20, 21]
+    layout: grid4
+  - media: [22, 24, 27]
+    layout: trio
+  - media: [25, 26, 30]
+    layout: trio
+  - media: [28, 29, 31]
+    layout: trio

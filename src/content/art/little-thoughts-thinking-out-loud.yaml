@@ -1,0 +1,20 @@
+# Art direction for /little-thoughts-thinking-out-loud (src/lib/art.ts). Layout only: the page's own
+# words and pictures, each used once. Paragraphs: 0 the Little Thoughts Group, 1 the 90-page
+# publication, 2 the works and the 18 designers, 3 the sleek concept and muted tones. Pictures: 0 the
+# ochre cover, 1 "Humble Breakfast" spread, 2 chopsticks spread, 3 "GO Chicken" spread, 4-7 spreads
+# on grey stone.
+sections:
+  - text: [0]
+  - text: [1]
+    media: [0]
+    layout: beside
+  - media: [1]
+    layout: full
+  - text: [2]
+    media: [2]
+    layout: beside-left
+  - media: [3]
+    layout: full
+  - text: [3]
+    media: [4, 5, 6, 7]
+    layout: pair

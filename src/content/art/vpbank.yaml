@@ -1,0 +1,19 @@
+# Art direction for /vpbank (src/lib/art.ts). Layout only: the page's own words and pictures, each used once.
+# Paragraphs: 0 the brief, 1 the festive greetings, 2-5 the deliverables list, 6 heading Mid-Autumn Festival 2021,
+# 7 heading Greeting Card Design, 8 heading Christmas 2021. Pictures: 0 Mid-Autumn film, 1 card on blue,
+# 2-3 card front and inside, 4 Christmas film.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2, 3, 4, 5]
+  - text: [6]
+  - media: [0]
+    layout: full
+  - text: [7]
+  - media: [1]
+    layout: full
+  - media: [2, 3]
+    layout: pair
+  - text: [8]
+  - media: [4]
+    layout: full

@@ -1,0 +1,10 @@
+# Art direction for /nokia (src/lib/art.ts). Layout only: the page's own words and pictures, each used
+# once. Paragraphs: 0 the N-Gage briefcase media kit, 1 subheading "Nokia invitation card & thank-you
+# gift", 2 the chocolate theme. Pictures: 0 the briefcase kit, 1 the chocolate invitation and can.
+sections:
+  - text: [0]
+    media: [0]
+    layout: beside
+  - text: [1, 2]
+    media: [1]
+    layout: beside-left

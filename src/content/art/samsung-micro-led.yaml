@@ -1,0 +1,20 @@
+# Art direction for /samsung-micro-led (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs: 0 the MICRO LED TV, 1 the UHNWI kit, 2 The Frame idea, 3 "Samsung MICRO
+# LED TV Introduction Kit", 4 the Art Box Easel. Pictures: 0 unboxing film, 1-4 the kit, 5 leather
+# etching test, 6-8 leather strip and wood etching, 9 kit for Eduardo Saverin (tall), 10 kit for
+# Seheon Lee.
+# Moves: the text sits beside a finished, named kit instead of alone; the grid of four no longer leaves
+# a fifth picture stranded on its own row; the two same-shape portraits close as a pair (the tall
+# Saverin kit no longer sits next to a shorter one).
+sections:
+  - text: [0, 1, 2, 3, 4]
+    media: [9]
+    layout: beside
+  - media: [0]
+    layout: full
+  - media: [1, 2, 3, 4]
+    layout: grid4
+  - media: [6, 7, 8]
+    layout: trio
+  - media: [5, 10]
+    layout: pair

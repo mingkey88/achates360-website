@@ -1,0 +1,22 @@
+# Art direction for /the-art-of-tan-ping-chiang (src/lib/art.ts). Layout only: the page's own words
+# and pictures, each used once. Paragraphs: 0 the artist, 1 the sons' gift, 2 "Lines Are My Poem",
+# 3 the eight categories, 4-11 the eight series (a numbered list), 12 the title and the back-cover
+# sculpture, 13 the 37 "Drunken Talk" proses, 14 born in the pandemic, 15 print run and libraries,
+# 16-21 credits. Pictures: 0 covers on dark grey (portrait), 1 front and back covers, 2 stack of
+# books, 3 spread with a lifted page, 4 spread close-up, 5 embossed cover close-up (portrait).
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+    media: [0]
+    layout: beside
+  - text: [3, 4, 5, 6, 7, 8, 9, 10, 11]
+  - media: [1, 3, 4]
+    layout: trio
+  - text: [12]
+    media: [5]
+    layout: beside-left
+  - media: [2]
+    layout: full
+  - text: [13, 14, 15]
+  - text: [16, 17, 18, 19, 20, 21]

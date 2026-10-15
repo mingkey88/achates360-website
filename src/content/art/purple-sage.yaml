@@ -1,0 +1,27 @@
+# Art direction for /purple-sage (src/lib/art.ts). Layout only: the page's own words and pictures, each used once.
+# Paragraphs: 0 the partnership, 1 the logo, 2 the identity applied across stationery, equipment, uniforms,
+# advertising and website, 3 the 2005 Promising Brand Award. Pictures: 0 brand-positioning map, 1 value-system
+# page, 2 logo on white, 3 logo on purple, 4 vehicles, 5-6 stationery, 7 tableware and uniforms collage,
+# 8-11 packaging and menus, 12 advertising collage, 13 website.
+sections:
+  - text: [0]
+    layout: lead
+  - media: [0, 1]
+    layout: pair
+  - text: [1]
+  - media: [2, 3]
+    layout: pair
+  - text: [2]
+  - media: [4]
+    layout: full
+  - media: [5, 6]
+    layout: pair
+  - media: [7]
+    layout: full
+  - media: [8, 9, 10, 11]
+    layout: pair
+  - media: [12]
+    layout: full
+  - text: [3]
+    media: [13]
+    layout: beside-left

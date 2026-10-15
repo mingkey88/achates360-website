@@ -1,0 +1,19 @@
+# Art direction for /sgh-patient-safety-appreciation-night (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraph: 0 the event and our role. Pictures: 0 award presentation on stage,
+# 1-2 abstract-art easels, 3 group photo, 4 buffet with art easels, 5 gift boxes and backdrop, 6 stage lectern,
+# 7 function room, 8 "Safety Superstars" poster, 9 balloon-arch entrance, 10 "Safety Teams" poster,
+# 11 appreciation gift and cards, 12 YouTube film.
+sections:
+  - text: [0]
+  - media: [0]
+    layout: full
+  - media: [6, 9]
+    layout: pair
+  - media: [1, 2, 8, 10]
+    layout: grid4
+  - media: [3, 4, 5, 7]
+    layout: pair
+  - media: [11]
+    layout: full
+  - media: [12]
+    layout: full

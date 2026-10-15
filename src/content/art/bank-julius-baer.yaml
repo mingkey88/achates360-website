@@ -1,0 +1,25 @@
+# Art direction for /bank-julius-baer (src/lib/art.ts). Layout only: the page's own words and pictures, each used
+# once. Paragraphs (6 visible; the hidden award line is left out by visibleBlocks): 0 heading CNY 2021 Imperial
+# Porcelain, 1 the idea, 2 the pieces (pouch, carrier bag, red packets, box), 3 heading CNY 2020 Goldfish,
+# 4-5 the goldfish artwork. Pictures: 0 HK Design Awards 2021 Gold badge, 1 Imperial Porcelain flat lay,
+# 2-4 box cut-out, pouch lining, the set, 5 pouch in hand, 6-8 red packets, packet detail, the set on white,
+# 9 goldfish film, 10-13 goldfish pouch, red packets, bags, pouch lining.
+# The 2021 award badge closes the 2021 (Imperial Porcelain) passage, not the 2020 Goldfish one.
+sections:
+  - text: [0, 1]
+    media: [1]
+    layout: beside
+  - text: [2]
+    media: [5]
+    layout: beside-left
+  - media: [2, 3, 4]
+    layout: trio
+  - media: [6, 7, 8]
+    layout: trio
+  - media: [0]
+    layout: grid4
+  - text: [3, 4, 5]
+  - media: [9]
+    layout: full
+  - media: [10, 11, 12, 13]
+    layout: pair

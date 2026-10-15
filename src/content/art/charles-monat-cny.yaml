@@ -1,0 +1,25 @@
+# Art direction for /charles-monat-cny (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 Charles Monat, 1 the crane in Chinese culture, 2 the flock
+# of cranes, 3 the greeting 鸿图大展, 4 the box design, 5 title "Chinese New Year 2022 - Oriental
+# Crane". Pictures (all 3:2): 0 1 red packets, 2 hotstamped crane and 鸿图大展 close-up, 3 embroidered
+# pouch, 4 packet on brocade, 5 embroidery close-up, 6 boxes with the greeting card, 7 the set flat
+# lay, 8 the whole set on plinths.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [5]
+  - media: [8]
+    layout: full
+  - text: [1, 2]
+  - media: [0, 1]
+    layout: pair
+  - text: [3]
+    media: [2]
+    layout: beside
+  - media: [3, 4]
+    layout: pair
+  - text: [4]
+    media: [6]
+    layout: beside-left
+  - media: [5, 7]
+    layout: pair

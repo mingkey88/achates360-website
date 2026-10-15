@@ -1,0 +1,23 @@
+# Art direction for /journal-of-aviation-management (src/lib/art.ts). Layout only: the page's own
+# words and pictures, each used once. Paragraphs: 0 the journal, 1 our involvement since 2000, 2 the
+# Paperweight award. Pictures: 0 award-winning 2013 and 2014 covers (portrait), 1 2 orange spreads,
+# 3 two spreads side by side, 4 three covers, 5 purple spread, 6 and 8 the same two-spread image
+# (duplicate file), 7 purple macro, 9 red foil close-ups.
+sections:
+  - text: [0, 1, 2]
+    media: [0]
+    layout: beside
+  - media: [1, 2]
+    layout: pair
+  - media: [3]
+    layout: full
+  - media: [4]
+    layout: full
+  - media: [5, 7]
+    layout: pair
+  - media: [6]
+    layout: full
+  - media: [9]
+    layout: full
+  - media: [8]
+    layout: full
