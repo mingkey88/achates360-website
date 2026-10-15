@@ -52,9 +52,13 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   // screens; hides while scrolling down, returns on scroll up or when anything in it takes keyboard focus.
   const header = document.querySelector<HTMLElement>('.site-header');
   if (header) {
-    // A page can hold its content still for the first stretch of scroll (the projects cover sets
-    // html[data-scroll-hold]); the header counts scroll from the end of that hold.
-    const scrolled = () => Math.max(0, window.scrollY - Number(document.documentElement.dataset.scrollHold ?? 0));
+    // A page can hold its content still for a stretch of scroll while a cover slides away (motion/cover.ts
+    // sets html[data-scroll-hold] to "start:end" in scroll pixels); the header leaves that stretch out.
+    const held = () => {
+      const [s = 0, e = 0] = (document.documentElement.dataset.scrollHold ?? '').split(':').map(Number);
+      return { s, e };
+    };
+    const scrolled = () => { const y = window.scrollY, { s, e } = held(); return Math.max(0, y - Math.min(Math.max(y - s, 0), Math.max(e - s, 0))); };
     let last = scrolled();
     const update = () => {
       const y = scrolled();
