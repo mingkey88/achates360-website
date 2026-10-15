@@ -9,7 +9,7 @@ import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
 import { withBase } from '../lib/paths';
 import { servicesLd } from '../lib/seo';
-import { projectCategories } from '../lib/categories';
+import { projectCategories, withLinks } from '../lib/categories';
 import { serviceCount, categoryCount } from '../lib/service-counts';
 import showreelPoster from '../assets/showreel-poster.jpg';
 // The Services page (direction B), read like a book: a contents page, the studio's showreel, one spread
@@ -18,7 +18,7 @@ const x = await loadExtras();
 const { text } = x;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
-const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
+const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
 const cats = new Map(projectCategories(sections).map((c) => [c.heading, c]));
 const services = x.services.map((s: any) => {
   const p = projects.get(s.project);
