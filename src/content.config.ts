@@ -182,6 +182,8 @@ const art = defineCollection({
       media: z.array(z.number().int()).optional(),
       links: z.array(z.number().int()).optional(),
       layout: z.enum(['lead', 'full', 'half', 'pair', 'trio', 'grid4', 'beside', 'beside-left']).optional(),
+      backdrop: z.number().int().optional(),
+      legible: z.boolean().optional(),
     }).strict()),
   }).strict(),
 });

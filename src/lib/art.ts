@@ -13,7 +13,9 @@
 import { toSegments } from './segments';
 
 export type ArtLayout = 'lead' | 'full' | 'half' | 'pair' | 'trio' | 'grid4' | 'beside' | 'beside-left';
-export interface ArtSection { text?: number[]; media?: number[]; links?: number[]; layout?: ArtLayout }
+/** backdrop: a picture laid behind the section's pictures (as Wix set a sunburst behind the Konica stickers).
+ * legible: the pictures carry text to read (screenshots of posts), so phones show them one to a row. */
+export interface ArtSection { text?: number[]; media?: number[]; links?: number[]; layout?: ArtLayout; backdrop?: number; legible?: boolean }
 export interface Art { sections: ArtSection[] }
 
 export interface Media { kind: 'image' | 'video' | 'embed'; src?: any; alt: string; poster?: any; href?: string; controls?: boolean; block: any }
@@ -63,7 +65,7 @@ export function checkArt(art: Art, paraCount: number, mediaCount: number, linkCo
   const problems: string[] = [];
   const tally = (key: 'text' | 'media' | 'links', count: number, noun: string) => {
     const seen = new Map<number, number>();
-    for (const s of art.sections) for (const i of s[key] ?? []) seen.set(i, (seen.get(i) ?? 0) + 1);
+    for (const s of art.sections) for (const i of [...(s[key] ?? []), ...(key === 'media' && s.backdrop !== undefined ? [s.backdrop] : [])]) seen.set(i, (seen.get(i) ?? 0) + 1);
     for (const [i, n] of seen) {
       if (i < 0 || i >= count) problems.push(`${noun} ${i} does not exist (the page has ${count})`);
       else if (n > 1) problems.push(`${noun} ${i} is used ${n} times`);
@@ -77,6 +79,7 @@ export function checkArt(art: Art, paraCount: number, mediaCount: number, linkCo
     if (!s.text?.length && !s.media?.length && !s.links?.length) problems.push(`section ${i} is empty`);
     if ((s.layout === 'beside' || s.layout === 'beside-left') && (!s.text?.length || !s.media?.length)) problems.push(`section ${i}: "${s.layout}" needs both text and media`);
     if (s.layout === 'lead' && (s.text?.length !== 1 || s.media?.length)) problems.push(`section ${i}: "lead" takes exactly one paragraph and no pictures`);
+    if (s.backdrop !== undefined && !s.media?.length) problems.push(`section ${i}: a backdrop needs pictures to sit behind`);
   });
   return problems;
 }
