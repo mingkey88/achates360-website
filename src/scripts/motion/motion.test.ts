@@ -15,6 +15,5 @@ describe('motion manifest', () => {
   }
   it('case studies never ship the heavy modules', () => {
     expect(MOTION.project).not.toContain('stack');
-    expect(MOTION.project).not.toContain('timeline');
   });
 });

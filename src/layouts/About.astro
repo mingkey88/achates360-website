@@ -1,8 +1,12 @@
 ---
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
-import Block from '../components/Block.astro';
-import Timeline from '../components/Timeline.astro';
+import Chronology from '../components/Chronology.astro';
+import RunningHead from '../components/ui/RunningHead.astro';
+import PressMarks from '../components/ui/PressMarks.astro';
+import T from '../components/ui/T.astro';
+import Pic from '../components/ui/Pic.astro';
+import { renderMd } from '../lib/markdown';
 import Credentials from '../components/Credentials.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import CloseCTA from '../components/CloseCTA.astro';
@@ -10,8 +14,10 @@ import { loadExtras } from '../lib/extras';
 import { firstYear } from '../lib/meta';
 import { withBase } from '../lib/paths';
 import { aboutPageLd } from '../lib/seo';
-// /about in direction B: the existing About blocks verbatim in an editorial column on the paper, then
-// the homepage's own pieces: the numbers, clients and awards band, the story, one quotation, and the
+// /about in direction B, set as a book's front matter: the About text verbatim, its first sentence as
+// the page's statement in display type and the rest as the foreword in two columns, the studio's photo
+// as a plate; then the numbers, clients and awards; the story as a chronology (one ruled row per
+// milestone); one quotation once the client supplies it; a colophon (how the site is "printed"); the
 // quiet close to the contact page.
 interface Props { entry: CollectionEntry<'basic'> }
 const d = Astro.props.entry.data;
@@ -29,11 +35,20 @@ const timeline = x.timeline.map((t: any) => {
   if (!year || !p.hero) throw new Error(`timeline/${t.id}: project "${t.project}" needs a copyright year and a hero`);
   const image = p.hero.type === 'image' ? p.hero.src : p.hero.poster;
   const alt = p.hero.type === 'image' ? p.hero.alt : '';
-  return { id: t.id, year, label: p.title, body: t.body, image, alt, placeholder: t.placeholder };
+  return { id: t.id, year, label: p.title, body: t.body, image, alt, href: `/${t.project}`, placeholder: t.placeholder };
 });
 // The Wix About page carried a "Back to projects" link (a leftover of its page template); it leads
 // nowhere useful from About, so it is not shown here (the record keeps it).
 const blocks = d.blocks.filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
+// The About text, verbatim: its first paragraph is the statement, the others the foreword. Pictures
+// follow as plates. (Any other block would be dropped silently, so the build stops on one.)
+const paras = blocks.filter((b: any) => b.type === 'text').flatMap((b: any) => String(b.md).split(/\n\s*\n/).map((x: string) => x.trim()).filter(Boolean));
+const [statement, ...foreword] = paras;
+const plates = blocks.filter((b: any) => b.type === 'image');
+const other = blocks.find((b: any) => b.type !== 'text' && b.type !== 'image');
+if (!statement) throw new Error('About: no text to set as the statement');
+if (other) throw new Error(`About: a "${other.type}" block has no place in the layout`);
+const colophon = (['type', 'paper', 'ink', 'made'] as const).map((k) => ({ k, label: text(`colophon-${k}`), value: text(`colophon-${k}-text`) }));
 // A different quotation from the homepage's, where there is one. Draft quotations are not shown (the
 // band appears once the client supplies real ones, CONTENT-QUERIES 10).
 const quotes = x.testimonials.filter((t: any) => !t.placeholder);
@@ -43,33 +58,65 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="about">
   <section class="wrap ab-intro">
-    <h1 class="display h1 sc" data-split>{heading}</h1>
-    <div class="ab-blocks">{blocks.map((b: any) => <Block block={b} pageTitle={d.seo.title} />)}</div>
+    <header class="ab-head">
+      <h1 class="ab-h1 sc">{heading}</h1>
+      <PressMarks count={listedCount} />
+    </header>
+    <div class="ab-statement" set:html={renderMd(statement)} />
+    <div class="ab-foreword">{foreword.map((p) => <div class="ab-p" set:html={renderMd(p)} />)}</div>
+    {plates.map((b: any) => (
+      <figure class="ab-plate crop"><Pic src={b.src} alt={b.alt ?? ''} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 58vw" /></figure>
+    ))}
   </section>
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
-  <Timeline items={timeline} heading={text('timeline-heading')} />
+  <Chronology items={timeline} heading={text('timeline-heading')} />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
+  <section class="wrap ab-colophon" aria-labelledby="colophon-title">
+    <RunningHead id="colophon-title" s={text('colophon-heading')} folio={`№ 001 – ${String(listedCount).padStart(3, '0')}`} />
+    <dl class="colo">
+      {colophon.map((c) => (
+        <div class="colo-row">
+          <dt><T s={c.label} /></dt>
+          <dd><T s={c.value} />{c.k === 'ink' && <span class="colo-bar" aria-hidden="true"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span style="--c: var(--accent)"></span></span>}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  /* Editorial: the page title in the left columns, the studio's own words in a reading column. */
-  .ab-intro { display: grid; gap: var(--s-7); padding-block: var(--s-8) var(--section-y); border-bottom: 1px solid var(--line); }
-  .ab-intro h1 { margin: 0; }
-  .ab-blocks { display: grid; gap: var(--s-6); max-width: 60ch; }
-  .ab-blocks :global(.block-text) { font-size: var(--fs-lead); line-height: 1.55; }
-  .ab-blocks :global(.block-text p:first-child) { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem); line-height: 1.35; }
-  .ab-blocks :global(.block-image) { overflow: hidden; }
-  .ab-blocks :global(.block-img) { width: 100%; height: auto; }
+  /* Front matter: a running head (the page's name, the catalogue's small print), the statement in display
+     type across the page, the foreword in two columns, the studio as a plate. */
+  .ab-intro { display: grid; gap: var(--s-7); padding-block: var(--s-7) var(--section-y); }
+  .ab-head { display: flex; align-items: start; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-3); border-bottom: 1px solid var(--ink); }
+  .ab-h1 { margin: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
+  .ab-statement :global(p) { margin: 0; max-width: 24ch; font: 400 clamp(2rem, 1rem + 4vw, 4.5rem)/1.06 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
+  .ab-foreword { display: grid; gap: var(--s-4); font-size: var(--fs-lead); line-height: 1.6; }
+  .ab-p :global(p) { margin: 0; }
+  .ab-plate { position: relative; margin: 0; }
+  .ab-plate :global(img) { display: block; width: 100%; height: auto; }
+  @media (max-width: 767px) { .ab-plate { --cm-len: 8px; --cm-gap: 4px; } }
   @media (min-width: 1024px) {
-    .ab-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: start; }
-    .ab-intro h1 { grid-column: 1 / 5; position: sticky; top: calc(var(--header-h) + var(--s-6)); }
-    .ab-blocks { grid-column: 6 / 12; }
+    .ab-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); row-gap: var(--s-8); }
+    .ab-head, .ab-statement { grid-column: 1 / -1; }
+    /* The foreword in two columns, as a book's; the plate beside it. */
+    .ab-foreword { grid-column: 1 / 7; display: block; columns: 2; column-gap: var(--s-6); font-size: var(--fs-body, 1rem); }
+    .ab-p { break-inside: avoid; margin-bottom: var(--s-4); }
+    .ab-plate { grid-column: 8 / 13; align-self: start; }
   }
+  /* Colophon: how the site is "printed", as a book's last page sets it. */
+  .ab-colophon { padding-block: var(--section-y) var(--s-8); }
+  .colo { margin: 0; display: grid; }
+  .colo-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--s-5); padding-block: var(--s-3); border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
+  .colo dt { color: var(--text-2); }
+  .colo dd { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+  .colo-bar { display: inline-flex; gap: 3px; }
+  .colo-bar span { width: 12px; height: 12px; background: var(--c); }
+  @media (min-width: 1024px) { .colo-row { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); } .colo dt { grid-column: 1 / 4; } .colo dd { grid-column: 4 / 13; } }
 </style>
 <script>
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
-  import { timeline } from '../scripts/motion/timeline';
   import { counters } from '../scripts/motion/counters';
-  run(reveal, timeline, counters);
+  run(reveal, counters);
 </script>

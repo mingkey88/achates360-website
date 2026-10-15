@@ -1,0 +1,51 @@
+---
+import Pic from './ui/Pic.astro';
+import RunningHead from './ui/RunningHead.astro';
+import DraftTag from './ui/DraftTag.astro';
+import { withBase } from '../lib/paths';
+import type { UiString } from '../lib/strings';
+// The studio's story on /about as a book's chronology (direction B): one ruled row per milestone, the
+// year set large at the left, the project and its line in the middle, a small plate of its picture at the
+// right; each row opens the case study. It replaces the sideways-scrolling timeline (tilted stickers and a
+// long pinned scroll). Years and titles come from the projects (spec §6.2); only the lines are new copy.
+interface Item { id: string; year: string; label: string; body: string; image: ImageMetadata; alt: string; href: string; placeholder: boolean }
+interface Props { items: Item[]; heading: UiString }
+const { items, heading } = Astro.props;
+const years = items.map((i) => i.year).sort();
+const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
+---
+<section class="chron wrap section" aria-labelledby="chron-title">
+  <RunningHead id="chron-title" s={heading} folio={span} />
+  <ol class="chron-list">
+    {items.map((it) => (
+      <li data-placeholder={it.placeholder ? '' : undefined}>
+        <a class="chron-row" href={withBase(it.href)}>
+          <span class="chron-year">{it.year}</span>
+          <span class="chron-text">
+            <span class="chron-title">{it.label}</span>
+            <span class="chron-body">{it.body}<DraftTag when={it.placeholder} /></span>
+          </span>
+          <span class="chron-plate crop" aria-hidden="true"><Pic src={it.image} alt="" crop={4 / 3} widths={[240, 360, 480]} sizes="(max-width: 767px) 30vw, 180px" loading="lazy" /></span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .chron-list { list-style: none; margin: 0; padding: 0; }
+  .chron-row {
+    display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) 30vw; align-items: start; gap: var(--s-4);
+    padding-block: var(--s-5); border-bottom: 1px solid var(--line); color: inherit; text-decoration: none;
+  }
+  .chron-year { font: 400 clamp(1.75rem, 1.2rem + 2.4vw, 3.5rem)/.95 var(--font-display); letter-spacing: -.03em; font-variant-numeric: lining-nums tabular-nums; }
+  .chron-text { display: grid; gap: var(--s-2); align-content: start; padding-top: .3em; }
+  .chron-title { font: 400 var(--fs-h3)/1.25 var(--font-display); text-wrap: balance; }
+  .chron-body { font-size: var(--fs-small); line-height: 1.55; color: var(--text-2); max-width: 46ch; }
+  .chron-plate { position: relative; display: block; --cm-len: 8px; --cm-gap: 4px; }
+  .chron-plate :global(img) { display: block; width: 100%; height: auto; }
+  .chron-row:hover .chron-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+  @media (min-width: 768px) {
+    .chron-row { grid-template-columns: minmax(0, 3fr) minmax(0, 6fr) minmax(0, 3fr); column-gap: var(--s-5); padding-block: var(--s-6); }
+    .chron-plate { width: min(100%, 200px); justify-self: end; }
+  }
+</style>
