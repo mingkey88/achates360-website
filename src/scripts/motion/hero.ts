@@ -58,7 +58,8 @@ export function hero(): void {
     set(i, '--cz', p.z.toFixed(3));
     set(i, '--cry', p.ry.toFixed(3));
     set(i, '--co', o.toFixed(3));
-    set(i, 'visibility', o > 0 ? '' : 'hidden');
+    // Explicit 'visible' (not ''), so it overrides the server render's [data-off-*] hiding once the card drifts in.
+    set(i, 'visibility', o > 0 ? 'visible' : 'hidden');
     // Depth of field (same curve as the server render in HeroArc.astro), quantised so the blur is
     // only re-rasterised when it visibly changes.
     const d = Math.max(0, Math.abs(u) - .55);
