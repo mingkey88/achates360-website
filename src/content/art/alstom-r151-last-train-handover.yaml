@@ -1,0 +1,18 @@
+# Art direction for /alstom-r151-last-train-handover (src/lib/art.ts). Layout only: the page's own
+# words and pictures, each used once. Paragraphs: 0 the handover ceremony. Pictures: 0 Vimeo film,
+# 1-4 speeches, ribbon-pull and presentation (3:2), 5 the artist painting the train (portrait), 6 the
+# art print with EZ-Link cards (4:3), 7 guests at the buffet, 8-11 patisseries.
+sections:
+  - text: [0]
+    media: [5]
+    layout: beside
+  - media: [0]
+    layout: full
+  - media: [1, 2, 3, 4]
+    layout: pair
+  - media: [6]
+    layout: full
+  - media: [7, 8, 9]
+    layout: trio
+  - media: [10, 11]
+    layout: pair

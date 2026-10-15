@@ -1,0 +1,12 @@
+# Art direction for /dbs-wealth-feed (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs: 0 the problem, 1 the work with DBS Treasures, 2 the result, 3 the
+# copyright line. Pictures: 0 a full Wealth Feed article (very tall), 1-8 article banners (2.8:1).
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+    media: [0]
+    layout: beside
+  - media: [1, 2, 3, 4, 5, 6, 7, 8]
+    layout: pair
+  - text: [3]

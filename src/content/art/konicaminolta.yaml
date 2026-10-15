@@ -1,0 +1,17 @@
+# Art direction for /konicaminolta (src/lib/art.ts). Layout only: the page's own words, pictures and links, each
+# used once. Paragraphs: 0 the brief, 1 localised options, 2 the mascot, 3 heading "Chinese New Year with Kichi
+# 2022", 4 the social teaser. Pictures: 0 sunburst sticker, 1 WhatsApp icon, 2-9 Kichi stickers, 10 phones with
+# the sticker pack, 11 Facebook teaser post. Link: 0 "Get stickers".
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+    media: [1]
+    layout: beside
+  - text: [3]
+  - media: [0, 2, 3, 4, 5, 6, 7, 8, 9]
+    layout: trio
+    links: [0]
+  - text: [4]
+  - media: [10, 11]
+    layout: pair

@@ -1,0 +1,19 @@
+# Art direction for /dxv (src/lib/art.ts). Layout only: the page's own words and pictures, each used
+# once. Paragraphs: 0 the kaleidoscope key visual, 1 the website experience, 2 the inspiration-book
+# cover. Pictures: 0 book cover, 1-5 book spreads, 6 website film on a laptop, 7 full-length website
+# page (very tall, 0.27).
+sections:
+  - text: [0]
+    layout: lead
+  - media: [6]
+    layout: full
+  - text: [1]
+    media: [7]
+    layout: beside-left
+  - text: [2]
+    media: [0]
+    layout: beside
+  - media: [1, 2, 3]
+    layout: trio
+  - media: [4, 5]
+    layout: pair

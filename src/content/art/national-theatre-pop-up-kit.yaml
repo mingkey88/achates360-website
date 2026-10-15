@@ -1,0 +1,31 @@
+# Art direction for /national-theatre-pop-up-kit (src/lib/art.ts). Layout only: the page's own words
+# and pictures, each used once (numbered after the hidden award line is left out). Paragraphs: 0 the
+# kit, 1 the Gold award, 2 subheading "Pop-Up Kit Tutorial", 3 names in three languages, 4 ticket-style
+# packaging, 5 the tear-strip line, 6 the tear strip, 7 the folder write-ups, 8 perforation and
+# instructions, 9 the details, 10 subheading "Pop-up Workshop", 11 the workshop. Pictures: 0 HK Design
+# Awards Gold badge (204 px wide, kept small), 1 the tutorial film, 2 packaging front, 3 package torn
+# open, 4 tear strip and parts (wide), 5 parts sheet and folder, 6 assembled model, 7 workshop banner,
+# 8-11 the workshop.
+sections:
+  - text: [0, 1]
+    media: [0]
+    layout: grid4
+  - text: [2]
+    media: [1]
+    layout: full
+  - text: [3, 4]
+    media: [2]
+    layout: beside
+  - text: [5, 6]
+    media: [3]
+    layout: beside-left
+  - media: [4]
+    layout: full
+  - text: [7, 8, 9]
+    media: [5, 6]
+    layout: pair
+  - text: [10, 11]
+    media: [7]
+    layout: full
+  - media: [8, 9, 10, 11]
+    layout: pair

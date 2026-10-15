@@ -1,0 +1,23 @@
+# Art direction for /notter (src/lib/art.ts). Layout only: the page's own words and pictures, each used
+# once. Paragraphs (the white award list is hidden, so 0-1 only): 0 the packaging refresh, 1 the gift
+# box. Pictures: 0 Singapore Packaging Star Awards badge, 1 New York Design Awards Silver badge, 2 film,
+# 3 box lid detail, 4 box in the air, 5 the range, 6 the range from above (squarer), 7 box, bag and
+# packs, 8 packs, 9 Energy Mix pack, 10 open gift box, 11 gift box lid.
+# Moves: the work opens the page, not the two award badges (now small, at the foot); the gift-box
+# passage beside the full set; pictures in threes and a pair instead of a long run of pairs.
+sections:
+  - text: [0]
+    layout: lead
+  - media: [2]
+    layout: full
+  - media: [3, 4, 5]
+    layout: trio
+  - text: [1]
+    media: [6]
+    layout: beside
+  - media: [7, 8, 9]
+    layout: trio
+  - media: [10, 11]
+    layout: pair
+  - media: [0, 1]
+    layout: grid4

@@ -2,13 +2,17 @@
 import Block from './Block.astro';
 import { renderMd } from '../lib/markdown';
 import { paragraphs, media, links, subheading, runIn, checkArt, type Art } from '../lib/art';
+import { mediaRatio } from '../lib/media-ratio';
 // The case-study body in the standard template (src/lib/art.ts: autoArt, or a hand-made layout from
 // src/content/art/<slug>.yaml). The page's own words, pictures and links, set as a printed feature:
 // - the first paragraph as a standfirst across the full width;
 // - each passage on a two-column grid, its subheading in the narrow left column (or nothing, a margin)
 //   and its paragraphs in the wide right column, so the text fills the width at a readable measure;
 // - a passage that Wix set beside a picture stays beside it;
-// - pictures full width, at half width, in pairs, threes or a grid of four.
+// - pictures full width, at half width, in pairs, threes or a grid of four. Pairs and threes of mixed
+//   shapes are set to one height, each picture as wide as its shape needs (a justified row), so no row
+//   is ragged; a picture is never enlarged past its own width; text beside a tall picture is set at
+//   its top and stays in view while the picture scrolls past.
 // The build fails if the layout drops or repeats anything (checkArt).
 interface Props { blocks: any[]; art: Art; pageTitle: string; slug: string }
 const { blocks, art, pageTitle, slug } = Astro.props;
@@ -27,6 +31,8 @@ const SIZES: Record<string, string> = {
   beside: '(max-width: 899px) 100vw, 40vw', 'beside-left': '(max-width: 899px) 100vw, 40vw',
 };
 const alt = (i: number) => `${pageTitle}, image ${i + 1}`;
+// A subheading's own Markdown (a link, emphasis) rendered inline, without the paragraph around it.
+const inline = (md: string) => renderMd(md).trim().replace(/^<p>([\s\S]*)<\/p>$/, '$1');
 // A passage's paragraphs in runs, each run under the subheading before it (or under none).
 // A paragraph that opens with a bold line keeps that line as its subheading (lib/art.ts runIn).
 const chunks = (ids: number[]) => {
@@ -45,26 +51,34 @@ const chunks = (ids: number[]) => {
   {art.sections.map((s) => {
     const layout = s.layout ?? (s.media?.length ? 'full' : undefined);
     const beside = layout === 'beside' || layout === 'beside-left';
+    const tall = beside && (s.media ?? []).some((i) => mediaRatio(items[i]) < 1);
     const body = s.text?.length && (
       layout === 'lead'
         ? <div class="art-lead prose" set:html={renderMd(paras[s.text[0]], undefined, { demote })} />
         : <div class:list={['art-text', { compact: beside }]}>
             {chunks(s.text).map((c) => (
               <div class="chunk">
-                {c.head ? <h2 class="art-sub">{c.head}</h2> : <span class="art-margin" aria-hidden="true"></span>}
+                {c.head ? <h2 class="art-sub" set:html={inline(c.head)} /> : <span class="art-margin" aria-hidden="true"></span>}
                 {c.paras.length > 0 && <div class="art-paras">{c.paras.map((p) => <div class="prose" set:html={renderMd(p, undefined, { demote })} />)}</div>}
               </div>
             ))}
             {s.links?.length && beside && <p class="art-links">{s.links.map((i) => <Block block={actions[i]} pageTitle={pageTitle} />)}</p>}
           </div>
     );
+    const item = (i: number) => <div class="art-item" style={`--r: ${mediaRatio(items[i]).toFixed(4)}`}><Block block={items[i].block} pageTitle={pageTitle} altFallback={alt(i)} sizes={SIZES[layout ?? 'full']} /></div>;
+    // Pairs and threes are set row by row (each row justified to one height).
+    const per = layout === 'pair' ? 2 : layout === 'trio' ? 3 : 0;
+    // How unlike the row's shapes are: past 2 (a tall infographic beside a wide shot) one height would
+    // shrink the narrow picture past reading, so that row keeps equal widths instead.
+    const spread = (row: number[]) => { const r = row.map((i) => mediaRatio(items[i])); return Math.max(...r) / Math.min(...r); };
+    const rows = per ? Array.from({ length: Math.ceil((s.media?.length ?? 0) / per) }, (_, r) => s.media!.slice(r * per, r * per + per)) : [];
     const pics = s.media?.length && (
       <div class:list={['art-media', `m-${layout}`]}>
-        {s.media.map((i) => <Block block={items[i].block} pageTitle={pageTitle} altFallback={alt(i)} sizes={SIZES[layout ?? 'full']} />)}
+        {per ? rows.map((row) => <div class:list={['art-row', { small: row.every((i) => mediaRatio(items[i]) <= 1.05), uneven: spread(row) > 2 }]}>{row.map(item)}</div>) : s.media.map(item)}
       </div>
     );
     const acts = s.links?.length && !beside && <p class="art-links">{s.links.map((i) => <Block block={actions[i]} pageTitle={pageTitle} />)}</p>;
-    return <section class:list={['art-sec', layout && `s-${layout}`]}>{body}{pics}{acts}</section>;
+    return <section class:list={['art-sec', layout && `s-${layout}`, { tall }]}>{body}{pics}{acts}</section>;
   })}
 </div>
 <style>
@@ -83,25 +97,43 @@ const chunks = (ids: number[]) => {
   .art-margin { display: none; }
   .art-links { display: flex; flex-wrap: wrap; gap: var(--s-3); margin: 0; }
   .art-media { display: grid; gap: var(--s-4); }
+  .art-item { min-width: 0; }
+  .art-row { display: grid; gap: var(--s-4); }
+  /* Phones: a row of three small squares or portraits (stickers, logos, covers) stays one row. */
+  .m-trio .art-row.small { display: flex; align-items: flex-start; }
+  .m-trio .art-row > .art-item { flex: var(--r) 1 0%; }
+  /* A picture smaller than the column is shown at its own size, centred, not blown up (--nat: its width). */
+  .art .m-full :global(.block-image), .art .m-half :global(.block-image) { max-width: min(100%, var(--nat, 100%)); margin-inline: auto; }
   .art :global(.block-image) { display: block; max-width: none; border-radius: 0; overflow: hidden; }
   .art :global(.block-img) { display: block; width: 100%; height: auto; }
   .art :global(.embed) { border-radius: 0; }
   .m-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   @media (min-width: 768px) {
     .m-half { width: 50%; }
-    .m-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-    .m-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+    /* Justified rows: each picture's share of the row is its width ÷ height, so all stand one height. */
+    .art-row { display: flex; align-items: flex-start; gap: var(--s-4); }
+    .art-row > .art-item { flex: var(--r) 1 0%; }
+    .art-row.uneven > .art-item { flex: 1 1 0%; }
     .m-grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
   /* Wide screens: a passage sits on the hairline grid, subheading left (a third), paragraphs right. */
   @media (min-width: 900px) {
     .art-text:not(.compact) .chunk { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: var(--s-7); align-items: start; padding-top: var(--s-4); border-top: 1px solid var(--line); }
     .art-text:not(.compact) .art-margin { display: block; }
-    .art-text:not(.compact) .art-links { padding-left: calc((100% - var(--s-7)) / 3 + var(--s-7)); }
+    .art-text:not(.compact) .art-links, .art-sec:has(> .art-text:not(.compact)) > .art-links { padding-left: calc((100% - var(--s-7)) / 3 + var(--s-7)); }
     /* A passage beside its picture: text in five columns, the picture in seven (mirrored for beside-left). */
     .s-beside, .s-beside-left { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s-7); align-items: center; }
     .s-beside-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
     .s-beside-left .art-media { grid-column: 1; grid-row: 1; }
     .s-beside-left .art-text { grid-column: 2; }
+    /* Beside a tall picture: the picture takes less of the width and the text sits at its top, in view
+       as the picture scrolls past. */
+    .tall.s-beside { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start; }
+    .tall.s-beside-left { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+    .tall .art-text { position: sticky; top: calc(var(--header-h) + var(--s-6)); }
+    /* A picture left at half width lines up with the paragraphs' column, not the page's edge. */
+    .m-half { margin-left: calc((100% - var(--s-7)) / 3 + var(--s-7)); width: auto; max-width: 50%; }
+    /* So does a lone small picture in a grid cell (an award seal). */
+    .m-grid4:has(> .art-item:only-child) { margin-left: calc((100% - var(--s-7)) / 3 + var(--s-7)); }
   }
 </style>

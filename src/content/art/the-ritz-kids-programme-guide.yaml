@@ -1,0 +1,17 @@
+# Art direction for /the-ritz-kids-programme-guide (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs: 0 the programme, 1 the pocket booklet, 2 the one-movement fold.
+# Pictures: 0 film of the booklet opening, 1-2 the guide unfolded in hand, 3-6 fold details, 7-8 the flat spreads,
+# 9-10 short loops.
+sections:
+  - text: [0, 1]
+  - text: [2]
+    media: [0]
+    layout: beside
+  - media: [1, 2]
+    layout: pair
+  - media: [3, 4, 5, 6]
+    layout: grid4
+  - media: [7, 8]
+    layout: pair
+  - media: [9, 10]
+    layout: pair

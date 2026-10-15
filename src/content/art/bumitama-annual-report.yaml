@@ -1,0 +1,17 @@
+# Art direction for /bumitama-annual-report (src/lib/art.ts). Layout only: the page's own words,
+# pictures and link, each used once. Paragraphs: 0 Bumitama Agri, 1 heading "Cultivating a sustainable
+# landscape", 2 the paper-cut concept and colours, 3 graphics and infographics. Pictures (all square):
+# 0 paper-cut cover, 1 green spread among covers, 2 board-of-directors spread, 3 plantation spread,
+# 4 infographic spreads. Links: 0 "Read Annual Report".
+# The cover sits beside the concept it shows; the four spreads make one even row (five squares in a
+# grid of four left one alone on a second row); the link follows the pictures.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1, 2]
+    media: [0]
+    layout: beside
+  - text: [3]
+    media: [1, 2, 3, 4]
+    links: [0]
+    layout: grid4

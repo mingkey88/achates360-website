@@ -386,3 +386,9 @@ replaced. Existing copy from the Wix site is unchanged.
 50. **A hidden project among the homepage's selected work (14 Oct 2026).** Wix's homepage slides feature DBS Discretionary Portfolio Management, but that page is unlisted (not in the project list). The new homepage shows St Regis TeaRoom & Patisserie (2025, branding) in its place, with its own picture and the slide's link label; one line in src/pages/index.astro (SWAP) to undo. Keep St Regis, list the DBS page instead, or choose another project?
 
 51. **Selected work order (15 Oct 2026).** After the cover (Star Wars × Luzerne), the homepage now leads with 'Building Memories' Art Book as the large plate, then DXV, St Regis TeaRoom & Patisserie and Notter at a smaller size. The Wix slides had DXV first. One line in src/pages/index.astro (LEAD) to change. Also: the DXV film on the homepage now shows a still from 3 seconds in, where "THE LUXURY OF TIME" has formed, instead of the export's first frame. Please confirm.
+
+52. **Found while laying out the case studies (15 Oct 2026); layout cannot fix these:**
+    - Films that do not play: /dbs-cio-podcasts and /dbs-cio-animated-videos show "Video unavailable" (YouTube); /dbs-sustainable-investing-video's film is private; /alstom-r151-last-train-handover's Vimeo film shows "Sorry, we're having a little trouble". Please send working links or the files.
+    - The same picture twice: /journal-of-aviation-management (one spread appears twice) and /singapore-conference-hall-sg5050 (the panorama appears twice). Keep both, or drop one?
+    - /alstom-singapore-urban-mobility-week-2026 still opens with "[Write-up to be added]" (item 26).
+    - Vertical social films (TikTok, Shorts, Reels) embedded from YouTube show as small strips in 16:9 frames. If the studio has the files, they can play upright.

@@ -1,0 +1,13 @@
+# Art direction for /mosaic-magazine (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs: 0 the newsletter and its name. Pictures: 0-2 three issue covers (1320px
+# wide, wide crops), 3 inside spreads, 4 envelope.
+# Moves: the passage beside the first issue instead of floating alone; the other two issues as a pair
+# so the three covers read as a series (and the 1320px files are no longer stretched across the page).
+sections:
+  - text: [0]
+    media: [0]
+    layout: beside
+  - media: [1, 2]
+    layout: pair
+  - media: [3, 4]
+    layout: pair

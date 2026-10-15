@@ -1,0 +1,35 @@
+# Art direction for /enabling-village (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs: 0 the Village, 1 the logo, 2 Braille map, displays and print, 3 the
+# photographic archive. Pictures: 0-1 identity guidelines, 2 logo animation (strip), 3 brand signature,
+# 4 tent card, 5 leaflet in hand, 6-7 guide spreads (wider), 8 map, 9 Braille navigation map, 10 poster,
+# 11-14 environmental graphics in the Village (strips).
+# Moves: the logo opens the work; the logo passage beside the signature, the map passage beside the
+# Braille map; same-shape pictures paired (the two wider spreads together) so rows stop going ragged.
+sections:
+  - text: [0]
+    layout: lead
+  - media: [2]
+    layout: full
+  - text: [1]
+    media: [3]
+    layout: beside
+  - media: [0, 1]
+    layout: pair
+  - text: [2]
+    media: [9]
+    layout: beside-left
+  - media: [8, 10]
+    layout: pair
+  - media: [6, 7]
+    layout: pair
+  - media: [4, 5]
+    layout: pair
+  - text: [3]
+  - media: [11]
+    layout: full
+  - media: [12]
+    layout: full
+  - media: [13]
+    layout: full
+  - media: [14]
+    layout: full

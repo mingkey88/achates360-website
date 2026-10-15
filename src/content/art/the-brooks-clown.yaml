@@ -1,0 +1,30 @@
+# Art direction for /the-brooks-clown (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once. Paragraphs (the white award line is hidden, so 0-21 only): 0-2 the artbook, 3 About
+# the story, 4-6 the story, 7 Special cover treatment, 8 Snippets subheading, 9 Launch & Exhibition
+# Opening, 10 the launch, 11 Retail Outlets, 12-16 the outlets, 17 Events, 18-21 the exhibition.
+# Pictures: 0 HKDA DRIVENxDESIGN Gold badge (167px wide), 1 trailer film, 2 Haw Par Villa film, 3-5 the
+# cover, 6-9 spreads, 10 launch-day photo collage (tall), 11 Gramblanc drawing.
+# Moves: the tiny award badge leaves the top of the page (where it was blown up to half width) and sits
+# at a quarter width at the foot; the tall launch collage takes the launch and retail passages beside it
+# so the text fills its height.
+sections:
+  - text: [0, 1, 2]
+  - media: [1]
+    layout: full
+  - text: [3, 4, 5, 6]
+  - media: [2]
+    layout: full
+  - text: [7]
+  - media: [3, 4, 5]
+    layout: trio
+  - text: [8]
+  - media: [6, 7, 8, 9]
+    layout: pair
+  - text: [9, 10, 11, 12, 13, 14, 15, 16]
+    media: [10]
+    layout: beside
+  - text: [17, 18, 19, 20, 21]
+    media: [11]
+    layout: beside-left
+  - media: [0]
+    layout: grid4

@@ -1,0 +1,26 @@
+# Art direction for /moving-memories (src/lib/art.ts). Layout only: the page's own words and pictures,
+# each used once (numbered after the hidden award line is left out). Paragraphs: 0 the NAFA 80th
+# anniversary dioramas, 1 the eight-location tour, 2 the 16pp newspaper, 3 fluidity of art / social
+# posts, 4 walk-in selfie modules, 5 the hashtag. Pictures: 0 HK Design Awards Gold badge (167 px wide,
+# kept small), 1 dioramas with bicycles, 2 three dioramas in a mall, 3 the Nanyang Times newspaper,
+# 4 Instagram post on a phone, 5 visitor inside a diorama, 6 press clipping.
+sections:
+  - text: [0]
+    media: [0]
+    layout: grid4
+  - media: [1]
+    layout: full
+  - text: [1]
+    media: [2]
+    layout: beside-left
+  - text: [2]
+    media: [3]
+    layout: beside
+  - text: [3]
+    media: [4]
+    layout: beside-left
+  - text: [4, 5]
+    media: [5]
+    layout: full
+  - media: [6]
+    layout: full

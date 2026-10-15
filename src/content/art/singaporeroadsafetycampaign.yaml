@@ -1,0 +1,50 @@
+# Art direction for /singaporeroadsafetycampaign (src/lib/art.ts). Layout only: the page's own words and
+# pictures, each used once. Paragraphs (the white Nötter award list is hidden, so 0-6 only): 0 the
+# partners, 1 half a million pledges, 2 identity and Mr Zebra, 3 collaterals and website, 4 school pledge
+# packs, 5 pledging booths, 6 Mr Zebra with Singa (courtesy campaign). Pictures: 0 Chinese newspaper
+# (pledge drive), 1 English newspaper (courtesy drive and children), 2 pledge booth, 3 Mr Zebra and Singa,
+# 4 Shell Traffic Games launch, 5 signed pledge card, 6 pledge folder, 7 plush zebra, 8 car decal,
+# 9 website on phone, 10 pledge box at Sembawang CC, 11 courtesy bumper stickers, 12 taxi photo, 13 taxi
+# livery drawing, 14 school fence banner, 15 mascot strip, 16 mascot guidelines, 17 Courtesy on the Move
+# poster, 18 goodie bags, 19 courtesy cards, 20 Stay Safe on the Road.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1]
+    media: [5]
+    layout: beside
+  - media: [0]
+    layout: full
+  - text: [2]
+    media: [16]
+    layout: beside-left
+  - media: [15]
+    layout: full
+  - text: [3]
+    media: [9]
+    layout: beside
+  - media: [6, 7, 8]
+    layout: trio
+  - media: [12, 13]
+    layout: pair
+  - text: [4]
+    media: [1]
+    layout: beside-left
+  - media: [14]
+    layout: full
+  - text: [5]
+    media: [10]
+    layout: beside
+  - media: [2, 3]
+    layout: pair
+  - media: [4]
+    layout: full
+  - text: [6]
+    media: [17]
+    layout: beside-left
+  - media: [11]
+    layout: full
+  - media: [18, 19]
+    layout: pair
+  - media: [20]
+    layout: full
