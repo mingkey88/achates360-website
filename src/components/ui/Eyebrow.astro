@@ -1,5 +1,5 @@
 ---
-interface Props { as?: 'p' | 'h2'; id?: string }
+interface Props { as?: 'p' | 'h2' | 'h3'; id?: string }
 const { as: Tag = 'p', id } = Astro.props;
 ---
 <Tag class="eyebrow" id={id}><span class="dot" aria-hidden="true"></span><slot /></Tag>
