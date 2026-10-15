@@ -7,8 +7,8 @@ const DRIFT = .14; // cards per second
 
 /**
  * Direction B homepage hero (after kitpro-croma): the lens of project images is on the paper from the
- * first frame and drifts slowly round the cylinder (drag to scrub, pause button stops it; it eases to a
- * stop under the mouse so a card can be opened); the five logo figures gather above
+ * first frame and drifts slowly and continuously round the cylinder (drag to scrub, pause button stops
+ * it; a card can be clicked while it drifts); the five logo figures gather above
  * the logo's wordmark. Scrolling away lifts the arc and fades the copy.
  */
 export function hero(): void {
@@ -70,20 +70,17 @@ export function hero(): void {
   });
   // The drift runs only while the hero is on screen (also right after a reload that restores the
   // scroll position further down, where no scroll event would have switched it on or off).
-  let active = false, hovering = false;
+  let active = false;
   new IntersectionObserver(([e]) => { active = e.isIntersecting; }).observe(root);
   gsap.ticker.add((_t, dt) => {
     if (!active) return;
-    // Paused, or a card under the mouse: the drift eases to a stop.
-    const still = root.hasAttribute('data-paused') || hovering;
+    // The pause button eases the drift to a stop (and back).
+    const still = root.hasAttribute('data-paused');
     state.speed += ((still ? 0 : DRIFT) - state.speed) * (1 - Math.pow(.9, dt / (1000 / 60)));
     state.offset -= (state.speed + state.boost) * dt / 1000;
     state.boost *= Math.pow(.93, dt / (1000 / 60)); // the same decay at any refresh rate
     place();
   });
-
-  arc.addEventListener('pointerover', (e) => { hovering = e.pointerType === 'mouse' && !!(e.target as Element).closest('.ha-card'); });
-  arc.addEventListener('pointerleave', () => { hovering = false; });
 
   // Drag to scrub. A press only becomes a drag after 6px of movement, so a plain click still opens the
   // card's project; the click that ends a drag is swallowed.
