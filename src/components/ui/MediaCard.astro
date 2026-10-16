@@ -9,10 +9,10 @@ import Sticker from './Sticker.astro';
 // duplicateLink: the same page is linked by a named title next to the card, so the picture link stays
 // clickable but is left out of the tab order and the accessibility tree (no unnamed repeat stop).
 interface Props {
-  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string;
+  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string;
   previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, tag, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
 // A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
 const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
 const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
@@ -29,6 +29,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     <div class="mc-text">
       {title && <p class="mc-title">{title}</p>}
       {subtitle && <p class="mc-sub">{subtitle}</p>}
+      {tag && <p class="mc-tag">{tag}</p>}
     </div>
   )}
 </Wrap>
@@ -87,6 +88,8 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   .mc-text { padding-top: var(--s-3); }
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
+  /* A small label under the caption (an award the gallery notes): ink in a hairline box, like a stamp. */
+  .mc-tag { display: inline-block; margin: var(--s-2) 0 0; padding: 2px 7px; border: 1px solid currentColor; font: 500 .6875rem/1.4 var(--font-text); letter-spacing: .06em; text-transform: uppercase; color: var(--accent-deep); }
   /* A small hairline circle with an arrow that replaces the pointer over linked cards: centred on the
      pointer, following it closely; the browser's hand is hidden there so only one shows. */
   :global(.mc-cursor) {
