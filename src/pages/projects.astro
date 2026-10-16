@@ -1,4 +1,5 @@
 ---
+import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ProjectsCover from '../components/ProjectsCover.astro';
@@ -7,7 +8,6 @@ import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { itemListLd } from '../lib/seo';
-import { projectIndex } from '../lib/project-index';
 // The projects overview (direction B): a die-cut cover over the top, then every listed project in the homepage
 // list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
 // category pages (/projects/<slug>) stay, reached from the header's Projects menu.
@@ -19,7 +19,7 @@ const heading = site.menu?.find((m) => m.href === '/projects')?.label ?? d.secti
 const cats = projectCategories(d.sections);
 const home = (await getEntry('home', 'home'))!.data;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
-const entries = projectIndex(home.allProjects.items, projects);
+const entries = catalogueOf(home.allProjects.items, projects);
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 // Structured data: every listed case study, in the homepage list's order.
 const jsonLd = [itemListLd('Projects', entries.map((e) => ({ name: projects.get(e.slug)!.title, url: abs(e.href) })))];

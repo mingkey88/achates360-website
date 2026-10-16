@@ -1,4 +1,5 @@
 ---
+import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import HeroArc from '../components/HeroArc.astro';
@@ -13,7 +14,6 @@ import QuoteBand from '../components/QuoteBand.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
-import { projectIndex } from '../lib/project-index';
 import { withLinks } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
@@ -38,7 +38,7 @@ const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
 // study with its /projects catalogue number. Unlisted gallery items (no case study to open) are skipped.
-const catalogue = projectIndex(d.allProjects.items, projects);
+const catalogue = catalogueOf(d.allProjects.items, projects);
 const lens = catalogue.slice(0, 10);
 const numberOf = new Map(catalogue.map((e) => [e.slug, e.no]));
 if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);

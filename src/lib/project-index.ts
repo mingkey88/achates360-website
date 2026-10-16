@@ -6,7 +6,7 @@
 import { slugOf } from './next-project';
 
 export interface GalleryItem { title: string; description: string; href?: string; thumb: ImageMetadata; alt: string; video?: string }
-export interface IndexEntry extends GalleryItem { no: number; slug: string; href: string; year: string; award?: string }
+export interface IndexEntry extends GalleryItem { no: number; slug: string; href: string; year: string; award?: string; position?: string }
 
 /**
  * A card's title as the gallery supplies it, tidied for display: line breaks become spaces, and a
