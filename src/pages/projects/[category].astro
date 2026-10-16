@@ -1,4 +1,5 @@
 ---
+import { catalogueOf } from '../../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectsCover from '../../components/ProjectsCover.astro';
@@ -6,7 +7,7 @@ import ProjectCards from '../../components/ProjectCards.astro';
 import CategoryPicker from '../../components/CategoryPicker.astro';
 import { loadExtras } from '../../lib/extras';
 import { projectCategories } from '../../lib/categories';
-import { projectIndex, cardsFor } from '../../lib/project-index';
+import { cardsFor } from '../../lib/project-index';
 import { breadcrumbLd } from '../../lib/seo';
 import { withBase } from '../../lib/paths';
 // One page per project category (direction B): the supplied section heading and its gallery, verbatim,
@@ -24,7 +25,7 @@ const cats = projectCategories(d.sections);
 const cat = cats.find((c) => c.slug === Astro.params.category)!;
 const home = (await getEntry('home', 'home'))!.data;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
-const catalogue = projectIndex(home.allProjects.items, projects);
+const catalogue = catalogueOf(home.allProjects.items, projects);
 const cards = cardsFor(cat.items, catalogue);
 if (!cards.length) throw new Error(`/projects/${cat.slug}: no listed projects to show`);
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;

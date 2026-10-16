@@ -9,10 +9,10 @@ import Sticker from './Sticker.astro';
 // duplicateLink: the same page is linked by a named title next to the card, so the picture link stays
 // clickable but is left out of the tab order and the accessibility tree (no unnamed repeat stop).
 interface Props {
-  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string;
+  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string; position?: string;
   previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, tag, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, tag, position, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
 // A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
 const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
 const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
@@ -21,7 +21,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
 ---
 <Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal={reveal ? '' : undefined}>
   <div class="mc-media" style={`aspect-ratio: ${ratio}`} data-wipe={wipe ? '' : undefined}>
-    <Pic src={image} alt={alt} crop={crop} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
+    <Pic src={image} alt={alt} crop={crop} widths={widths} sizes={sizes} position={position} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
     {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
   </div>

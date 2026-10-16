@@ -1,4 +1,5 @@
 ---
+import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import HeroArc from '../components/HeroArc.astro';
@@ -13,13 +14,12 @@ import QuoteBand from '../components/QuoteBand.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
-import { projectIndex } from '../lib/project-index';
 import { withLinks } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
-import dxvPoster from '../assets/dxv-poster.jpg';
+import { STILLS } from '../lib/stills';
 import { serviceCount } from '../lib/service-counts';
 
 const d = (await getEntry('home', 'home'))!.data;
@@ -38,7 +38,7 @@ const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
 // study with its /projects catalogue number. Unlisted gallery items (no case study to open) are skipped.
-const catalogue = projectIndex(d.allProjects.items, projects);
+const catalogue = catalogueOf(d.allProjects.items, projects);
 const lens = catalogue.slice(0, 10);
 const numberOf = new Map(catalogue.map((e) => [e.slug, e.no]));
 if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
@@ -69,13 +69,12 @@ const swapped = featured.map((f) => {
 });
 // Each selected project carries its catalogue number; DXV's film gets a still where its title has
 // formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
-const POSTERS: Record<string, ImageMetadata> = { dxv: dxvPoster };
 // The lead plate after the cover is 'Building Memories', the studio's own art book and this direction's
 // source (15 Oct 2026, CONTENT-QUERIES 51); the other three keep the homepage's slide order.
 const LEAD = 'building-memories-artbook';
 const numbered = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
   const slug = slugOf(f.slide.cta?.href) ?? '';
-  return { ...f, slug, no: numberOf.get(slug), poster: POSTERS[slug] };
+  return { ...f, slug, no: numberOf.get(slug), poster: STILLS[slug] };
 });
 const lead = numbered.findIndex((f, i) => i > 0 && f.slug === LEAD);
 if (lead < 0) throw new Error(`Selected work: the lead "${LEAD}" is not among the selected projects`);

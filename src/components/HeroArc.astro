@@ -17,7 +17,7 @@ import { lensPose, lensOpacity, LENS_DESKTOP, LENS_PHONE } from '../lib/lens';
 // tabindex -1); the same projects are reached through Selected work and /projects. The cards are on the
 // paper from the first frame (no fade-in). hero.ts drifts the cards; without motion they render
 // at the composed angles computed here.
-interface Item { thumb: ImageMetadata; alt: string; title: string; description: string; no: number; href: string }
+interface Item { thumb: ImageMetadata; alt: string; title: string; description: string; no: number; href: string; position?: string }
 interface Props { items: Item[]; name: UiString; tagline: UiString; blurb: string }
 const { items, name, tagline, blurb } = Astro.props;
 // Each card's place on the lens curve (lib/lens.ts), for wide screens (--x/--z/--ry/--o) and phones
@@ -42,7 +42,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   <div class="ha-arc" data-arc aria-hidden="true">
     {items.map((it, i) => (
       <a class="ha-card" href={withBase(it.href)} style={pose(i - mid)} {...off(i - mid)} tabindex="-1" draggable="false">
-        <Pic src={it.thumb} alt="" crop={4 / 3} mobileCrop={3 / 4} widths={[320, 480, 640, 960]} mobileWidths={[240, 360, 480, 640]} sizes="24vw" mobileSizes="41vw" loading={Math.abs(i - mid) <= 1 ? 'eager' : 'lazy'} fetchpriority={i === mid ? 'high' : 'low'} draggable="false" />
+        <Pic src={it.thumb} alt="" position={it.position} crop={4 / 3} mobileCrop={3 / 4} widths={[320, 480, 640, 960]} mobileWidths={[240, 360, 480, 640]} sizes="24vw" mobileSizes="41vw" loading={Math.abs(i - mid) <= 1 ? 'eager' : 'lazy'} fetchpriority={i === mid ? 'high' : 'low'} draggable="false" />
         <span class="ha-cap"><span class="ha-cap-n">№ {String(it.no).padStart(3, '0')}</span><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
       </a>
     ))}
