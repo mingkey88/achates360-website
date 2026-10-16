@@ -27,7 +27,9 @@ const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('
 // The case study in the standard template (lib/art.ts autoArt), or a hand-made layout for this project
 // if one has been made (src/content/art/<slug>.yaml). Pictures are arranged by their shape (mediaRatio:
 // films by their poster, embedded players 16:9).
-const body = visibleBlocks(d.blocks, d.pageBackground);
+// A "Back to projects" link copied into a page's own content (one Wix page had it) is left out: the page
+// already ends with its own link back, so it would show twice.
+const body = visibleBlocks(d.blocks, d.pageBackground).filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
 const art = (await getEntry('art', id))?.data ?? autoArt(body, mediaRatio);
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
 // Share picture and structured data: the project's own hero, the case study, and where it sits

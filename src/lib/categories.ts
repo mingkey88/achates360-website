@@ -8,8 +8,32 @@ export function categorySlug(heading: string): string {
   return heading.trim().toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-export function projectCategories<T>(sections: { id: string; heading: string; items: T[] }[]): Category<T>[] {
+/** A title as a key: "The Ritz-Carlton SuperBrunch" and "The Ritz Carlton SuperBrunch" match. */
+export const titleKey = (t: string): string => t.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+/**
+ * The sections with every project linked. Wix lost the link on a few listings (the Ritz-Carlton
+ * SuperBrunch under Graphic Design, Ambrosia for the People under Publications), so those cards could
+ * not be clicked; such a listing takes the link of the same project (by title) in another section. A
+ * listing with no link anywhere stops the build rather than showing a dead card.
+ */
+export function withLinks<T extends { title: string; href?: string }, S extends { heading: string; items: T[] }>(sections: S[]): S[] {
+  const known = new Map<string, string>();
+  for (const s of sections) for (const it of s.items) if (it.href) known.set(titleKey(it.title), it.href);
+  return sections.map((s) => ({
+    ...s,
+    items: s.items.map((it) => {
+      if (it.href) return it;
+      const href = known.get(titleKey(it.title));
+      if (!href) throw new Error(`projects/${s.heading}: "${it.title}" has no link, and no other listing of it has one`);
+      return { ...it, href };
+    }),
+  }));
+}
+
+export function projectCategories<T extends { title: string; href?: string }>(raw: { id: string; heading: string; items: T[] }[]): Category<T>[] {
   const seen = new Set<string>();
+  const sections = withLinks(raw);
   return sections.map(({ id, heading, items }) => {
     const slug = categorySlug(heading);
     if (seen.has(slug)) throw new Error(`projects: two sections would share the page /projects/${slug}`);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { categorySlug, projectCategories, categoryForHash } from './categories';
+import { categorySlug, projectCategories, categoryForHash, withLinks } from './categories';
 import { withCategories } from './menu';
 
 describe('categorySlug', () => {
@@ -12,13 +12,13 @@ describe('categorySlug', () => {
 
 describe('projectCategories', () => {
   const sections = [
-    { id: 'cat-1', heading: 'Strategic Branding', items: [1, 2] },
-    { id: 'cat-2', heading: 'Events', items: [3] },
+    { id: 'cat-1', heading: 'Strategic Branding', items: [{ title: 'A', href: '/a' }, { title: 'B', href: '/b' }] },
+    { id: 'cat-2', heading: 'Events', items: [{ title: 'C', href: '/c' }] },
   ];
   it('gives each section a slug, a page href and keeps its items', () => {
     expect(projectCategories(sections)).toEqual([
-      { id: 'cat-1', heading: 'Strategic Branding', slug: 'strategic-branding', href: '/projects/strategic-branding', items: [1, 2] },
-      { id: 'cat-2', heading: 'Events', slug: 'events', href: '/projects/events', items: [3] },
+      { id: 'cat-1', heading: 'Strategic Branding', slug: 'strategic-branding', href: '/projects/strategic-branding', items: sections[0].items },
+      { id: 'cat-2', heading: 'Events', slug: 'events', href: '/projects/events', items: sections[1].items },
     ]);
   });
   it('refuses two sections that would share a page', () => {
@@ -47,5 +47,18 @@ describe('withCategories', () => {
   });
   it('leaves a menu without a projects item alone', () => {
     expect(withCategories([menu[0]], [{ label: 'x', href: '/x' }])).toEqual([menu[0]]);
+  });
+});
+
+describe('withLinks', () => {
+  const sections = [
+    { heading: 'Graphic Design', items: [{ title: 'The Ritz-Carlton SuperBrunch' }, { title: 'Notter', href: '/notter' }] },
+    { heading: 'Events', items: [{ title: 'The Ritz Carlton SuperBrunch', href: '/the-ritz-carlton-superbrunch' }] },
+  ];
+  it('gives a listing without a link the link of the same project elsewhere', () => {
+    expect(withLinks(sections)[0].items[0].href).toBe('/the-ritz-carlton-superbrunch');
+  });
+  it('stops on a listing that has no link anywhere', () => {
+    expect(() => withLinks([{ heading: 'X', items: [{ title: 'Nowhere' }] }])).toThrow(/"Nowhere" has no link/);
   });
 });

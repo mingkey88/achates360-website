@@ -1,16 +1,19 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectsCover from '../../components/ProjectsCover.astro';
 import ProjectCards from '../../components/ProjectCards.astro';
 import CategoryPicker from '../../components/CategoryPicker.astro';
 import { loadExtras } from '../../lib/extras';
 import { projectCategories } from '../../lib/categories';
+import { projectIndex, cardsFor } from '../../lib/project-index';
 import { breadcrumbLd } from '../../lib/seo';
 import { withBase } from '../../lib/paths';
 // One page per project category (direction B): the supplied section heading and its gallery, verbatim,
 // with the category dropdown to move between them. It opens like /projects, with the paper cover, the
-// category's name cut through it; the hold is shorter, as visitors hop between categories.
+// category's name cut through it; the hold is shorter, as visitors hop between categories. Its cards are
+// the same as /projects (one title, client and link per project, wherever it appears), listed projects
+// only, each once (cardsFor).
 export async function getStaticPaths() {
   const d = (await getEntry('projectsIndex', 'projects'))!.data;
   return projectCategories(d.sections).map((c) => ({ params: { category: c.slug } }));
@@ -19,19 +22,24 @@ const d = (await getEntry('projectsIndex', 'projects'))!.data;
 const { text } = await loadExtras();
 const cats = projectCategories(d.sections);
 const cat = cats.find((c) => c.slug === Astro.params.category)!;
+const home = (await getEntry('home', 'home'))!.data;
+const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
+const catalogue = projectIndex(home.allProjects.items, projects);
+const cards = cardsFor(cat.items, catalogue);
+if (!cards.length) throw new Error(`/projects/${cat.slug}: no listed projects to show`);
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
-const picker = cats.map((c) => ({ heading: c.heading, href: c.href, count: c.items.length }));
+const picker = cats.map((c) => ({ heading: c.heading, href: c.href, count: cardsFor(c.items, catalogue).length }));
 ---
-<Base title={`${cat.heading} | Achates 360`} description={d.seo.description} ogImage={cat.items[0]?.thumb} ogAlt={cat.heading} jsonLd={[breadcrumbLd([['Projects', abs('/projects')], [cat.heading, abs(cat.href)]])]} page="projects">
+<Base title={`${cat.heading} | Achates 360`} description={d.seo.description} ogImage={cards[0]?.thumb} ogAlt={cat.heading} jsonLd={[breadcrumbLd([['Projects', abs('/projects')], [cat.heading, abs(cat.href)]])]} page="projects">
   <div class="cat" data-pin-container>
-    <ProjectsCover title={cat.heading} count={cat.items.length} hold={.5} />
+    <ProjectsCover title={cat.heading} count={cards.length} hold={.5} />
     <header class="wrap cat-head">
       <h1 class="display h1" data-split>{cat.heading}</h1>
       <CategoryPicker label={text('category-label')} current={cat.heading} all={{ label: text('next-fallback'), href: '/projects' }} categories={picker} path={cat.href} />
     </header>
     <section class="wrap cat-grid" aria-labelledby="cat-title">
       <h2 id="cat-title" class="sr-only">{cat.heading}</h2>
-      <ProjectCards items={cat.items} />
+      <ProjectCards items={cards} />
     </section>
   </div>
 </Base>

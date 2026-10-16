@@ -14,6 +14,7 @@ import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { slugOf } from '../lib/next-project';
 import { projectIndex } from '../lib/project-index';
+import { withLinks } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
@@ -81,7 +82,7 @@ if (lead < 0) throw new Error(`Selected work: the lead "${LEAD}" is not among th
 const selected = [numbered[0], numbered[lead], ...numbered.filter((_, i) => i > 0 && i !== lead)];
 if (SCATTER.some((slug) => selected.some((f) => slugOf(f.slide.cta?.href) === slug))) throw new Error('Homepage scatter repeats a selected project');
 // The service contents: each service's number of listed projects, counted as on /services.
-const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
+const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
 const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
 const services = x.services.map((s: any) => ({ ...s, count: serviceCount(s.tags, sections, listed) }));
 // The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
