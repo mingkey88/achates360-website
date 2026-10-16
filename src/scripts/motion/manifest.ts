@@ -1,5 +1,5 @@
 import type { PageKind } from '../../lib/page-kind';
-export type MotionModule = 'reveal' | 'hero' | 'stack' | 'counters' | 'tilt' | 'scatter' | 'cover' | 'press';
+export type MotionModule = 'reveal' | 'hero' | 'stack' | 'counters' | 'tilt' | 'scatter' | 'cover' | 'press' | 'story';
 
 /** Which motion modules each page kind loads (spec §5: case studies only get the light reveals). */
 export const MOTION: Record<PageKind, MotionModule[]> = {
@@ -8,7 +8,7 @@ export const MOTION: Record<PageKind, MotionModule[]> = {
   projects: ['cover', 'reveal', 'tilt'],
   categories: ['reveal', 'tilt'],
   services: ['reveal', 'tilt', 'press'],
-  about: ['reveal', 'counters'],
+  about: ['reveal', 'counters', 'story'],
   joinus: ['reveal'],
   page: ['reveal'],
   card: [],

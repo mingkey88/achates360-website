@@ -7,6 +7,8 @@ import PressMarks from '../components/ui/PressMarks.astro';
 import T from '../components/ui/T.astro';
 import Pic from '../components/ui/Pic.astro';
 import { renderMd } from '../lib/markdown';
+import { STILLS } from '../lib/stills';
+import logo from '../assets/logo-stacked-parts.svg?raw';
 import Credentials from '../components/Credentials.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import CloseCTA from '../components/CloseCTA.astro';
@@ -33,7 +35,7 @@ const timeline = x.timeline.map((t: any) => {
   if (!p) throw new Error(`timeline/${t.id}: unknown project "${t.project}"`);
   const year = firstYear(p.copyright);
   if (!year || !p.hero) throw new Error(`timeline/${t.id}: project "${t.project}" needs a copyright year and a hero`);
-  const image = p.hero.type === 'image' ? p.hero.src : p.hero.poster;
+  const image = STILLS[t.project] ?? (p.hero.type === 'image' ? p.hero.src : p.hero.poster);
   const alt = p.hero.type === 'image' ? p.hero.alt : '';
   return { id: t.id, year, label: p.title, body: t.body, image, alt, href: `/${t.project}`, placeholder: t.placeholder };
 });
@@ -44,6 +46,20 @@ const blocks = d.blocks.filter((b: any) => !(b.type === 'link' && /back to proje
 // follow as plates. (Any other block would be dropped silently, so the build stops on one.)
 const paras = blocks.filter((b: any) => b.type === 'text').flatMap((b: any) => String(b.md).split(/\n\s*\n/).map((x: string) => x.trim()).filter(Boolean));
 const [statement, ...foreword] = paras;
+// The foreword told as chapters (motion/story.ts): "Since starting in 2001…" with the founding year and the
+// studio's photo; "The name Achates 360 reflects…" with the logo's five figures joining hands; "Believing
+// that design is thinking made visual…" inking in from pencil. A paragraph that fits none joins the first.
+const pick = (re: RegExp) => foreword.find((x) => re.test(x));
+const companion = pick(/Achates 360 reflects/);
+const visual = pick(/^Believing/);
+const since = foreword.filter((x) => x !== companion && x !== visual);
+const founded = x.stats.find((s: any) => s.id === 'founded')?.value;
+// The companion sentence's key phrase in brand orange, as on the homepage (display only, words unchanged).
+const KEY = 'faithful companion and trusted friend';
+const keyed = (md: string) => renderMd(md).replace(KEY, `<span class="key">${KEY}</span>`);
+// "Thinking made visual" word by word, so each word can ink in (plain text only; Markdown keeps its form).
+const visualWords = visual && !/[*_\[\]#`<>]/.test(visual) ? visual.split(/\s+/) : null;
+const figs = [...(logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '').matchAll(/<g class="lg-fig"[^>]*>(.*?)<\/g>/g)].map((m) => m[1]);
 const plates = blocks.filter((b: any) => b.type === 'image');
 const other = blocks.find((b: any) => b.type !== 'text' && b.type !== 'image');
 if (!statement) throw new Error('About: no text to set as the statement');
@@ -63,13 +79,32 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
       <PressMarks count={listedCount} />
     </header>
     <div class="ab-statement" set:html={renderMd(statement)} />
-    <div class="ab-foreword">{foreword.map((p) => <div class="ab-p" set:html={renderMd(p)} />)}</div>
+  </section>
+  {/* Chapter: since the founding year. */}
+  <section class="wrap ab-since">
+    {founded && <p class="ab-year" aria-hidden="true">{founded}</p>}
+    <div class="ab-since-text">{since.map((p) => <div class="ab-p" set:html={renderMd(p)} />)}</div>
     {plates.map((b: any) => (
-      <figure class="ab-plate crop"><Pic src={b.src} alt={b.alt ?? ''} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 58vw" /></figure>
+      <figure class="ab-plate crop" data-rise><Pic src={b.src} alt={b.alt ?? ''} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 50vw" /></figure>
     ))}
   </section>
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
   <Chronology items={timeline} heading={text('timeline-heading')} />
+  {/* Chapter: the name. The logo's five figures join hands as the chapter scrolls into view. */}
+  {companion && (
+    <section class="wrap ab-companion" data-gather>
+      <svg class="ab-figs" viewBox="44 -8 106 113" aria-hidden="true" focusable="false">
+        {figs.map((f, i) => <g class="st-fig" style={`--i: ${i}`} set:html={f} />)}
+      </svg>
+      <div class="ab-companion-text" set:html={keyed(companion)} />
+    </section>
+  )}
+  {/* Chapter: thinking made visual. The sentence starts in pencil outline and inks in word by word. */}
+  {visual && (
+    <section class="wrap ab-visual" data-ink>
+      {visualWords ? <p class="ab-visual-text">{visualWords.map((w, i) => <>{i > 0 && ' '}<span class="w">{w}</span></>)}</p> : <div class="ab-visual-text" set:html={renderMd(visual)} />}
+    </section>
+  )}
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
   <section class="wrap ab-colophon" aria-labelledby="colophon-title">
     <RunningHead id="colophon-title" s={text('colophon-heading')} folio={`№ 001 – ${String(listedCount).padStart(3, '0')}`} />
@@ -85,24 +120,43 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  /* Front matter: a running head (the page's name, the catalogue's small print), the statement in display
-     type across the page, the foreword in two columns, the studio as a plate. */
+  /* A narrative in chapters (motion/story.ts adds the movement; without it every chapter simply reads). */
   .ab-intro { display: grid; gap: var(--s-7); padding-block: var(--s-7) var(--section-y); }
   .ab-head { display: flex; align-items: start; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-3); border-bottom: 1px solid var(--ink); }
   .ab-h1 { margin: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
   .ab-statement :global(p) { margin: 0; max-width: 24ch; font: 400 clamp(2rem, 1rem + 4vw, 4.5rem)/1.06 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
-  .ab-foreword { display: grid; gap: var(--s-4); font-size: var(--fs-lead); line-height: 1.6; }
   .ab-p :global(p) { margin: 0; }
+
+  /* Since: the founding year drawn large in outline, the paragraph over it, the studio as a plate. */
+  .ab-since { position: relative; display: grid; gap: var(--s-7); padding-block: var(--s-8) var(--section-y); }
+  .ab-year { margin: 0; font: 800 clamp(7rem, 3rem + 18vw, 20rem)/.8 var(--font-display); letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+  .ab-since-text { display: grid; gap: var(--s-4); max-width: 46ch; font-size: var(--fs-lead); line-height: 1.6; }
   .ab-plate { position: relative; margin: 0; }
   .ab-plate :global(img) { display: block; width: 100%; height: auto; }
   @media (max-width: 767px) { .ab-plate { --cm-len: 8px; --cm-gap: 4px; } }
+
+  /* The name: the five figures large, the sentence beside them. */
+  .ab-companion { display: grid; gap: var(--s-7); align-items: center; padding-block: var(--section-y); border-top: 1px solid var(--line); }
+  .ab-figs { width: min(100%, 440px); justify-self: center; overflow: visible; fill: var(--ink); }
+  .ab-companion-text :global(p) { margin: 0; max-width: 30ch; font: 400 clamp(1.5rem, 1rem + 1.8vw, 2.5rem)/1.3 var(--font-display); letter-spacing: -.015em; text-wrap: pretty; }
+  .ab-companion-text :global(.key) { color: var(--accent-deep); text-shadow: .05em .04em 0 rgb(255 144 21 / .45); }
+
+  /* Thinking made visual: the sentence in display type; --k inks each word (1 = inked, the default). */
+  .ab-visual { padding-block: var(--section-y); border-top: 1px solid var(--line); }
+  .ab-visual-text { margin: 0; max-width: 26ch; font: 400 clamp(2rem, 1rem + 3.4vw, 4rem)/1.12 var(--font-display); letter-spacing: -.025em; }
+  .ab-visual-text .w { --k: 1; color: color-mix(in srgb, var(--ink) calc(var(--k) * 100%), transparent); -webkit-text-stroke: 1px color-mix(in srgb, var(--text-2) calc((1 - var(--k)) * 70%), transparent); }
+
   @media (min-width: 1024px) {
     .ab-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); row-gap: var(--s-8); }
     .ab-head, .ab-statement { grid-column: 1 / -1; }
-    /* The foreword in two columns, as a book's; the plate beside it. */
-    .ab-foreword { grid-column: 1 / 7; display: block; columns: 2; column-gap: var(--s-6); font-size: var(--fs-body, 1rem); }
-    .ab-p { break-inside: avoid; margin-bottom: var(--s-4); }
-    .ab-plate { grid-column: 8 / 13; align-self: start; }
+    .ab-since { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: end; }
+    .ab-year { grid-column: 1 / 8; grid-row: 1; }
+    .ab-since-text { grid-column: 1 / 7; grid-row: 2; }
+    .ab-plate { grid-column: 8 / 13; grid-row: 1 / 3; align-self: center; }
+    .ab-companion { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); }
+    .ab-figs { grid-column: 1 / 6; }
+    .ab-companion-text { grid-column: 7 / 13; }
+    .ab-visual-text { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); }
   }
   /* Colophon: how the site is "printed", as a book's last page sets it. */
   .ab-colophon { padding-block: var(--section-y) var(--s-8); }
@@ -118,5 +172,6 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { counters } from '../scripts/motion/counters';
-  run(reveal, counters);
+  import { story } from '../scripts/motion/story';
+  run(reveal, counters, story);
 </script>
