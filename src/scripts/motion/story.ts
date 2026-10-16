@@ -1,4 +1,4 @@
-import { gsap } from './index';
+import { gsap, ScrollTrigger } from './index';
 
 /**
  * /about told as a story (About.astro, Chronology.astro). Three movements, all driven by scroll:
@@ -31,9 +31,17 @@ function chronology(): void {
     let at = -1;
     const set = (k: number) => { if (k !== at) { at = k; show(k); } };
     set(0);
+    // While held, the stage carries its own copy of the page's paper and grid (the body's would scroll
+    // behind it), placed so its lines continue the body's at both ends: --grid-y from where the hold
+    // starts, and a hold of whole grid squares (120px), so the lines meet again where it ends.
+    const sync = (st: ScrollTrigger) => {
+      root.style.setProperty('--grid-y', `${-Math.round(st.start)}px`);
+      root.style.setProperty('--page-w', `${document.documentElement.clientWidth}px`);
+    };
     gsap.timeline({
       scrollTrigger: {
-        trigger: root, start: 'top top', end: () => `+=${Math.round(innerHeight * .32 * n)}`, pin: true, invalidateOnRefresh: true,
+        trigger: root, start: 'top top', end: () => `+=${Math.max(1, Math.round((innerHeight * .32 * n) / 120)) * 120}`, pin: true, invalidateOnRefresh: true,
+        onRefresh: sync,
         onUpdate: (st) => set(Math.min(n - 1, Math.floor(st.progress * n))),
       },
     });

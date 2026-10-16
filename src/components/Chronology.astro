@@ -59,6 +59,14 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   }
 
   /* Story mode (motion/story.ts, wide screens): one stage, a screen tall, held while the milestones turn. */
+  /* The held stage's own paper and grid, the full page width (the stage itself is the narrower .wrap), so
+     the background stands still with it (motion/story.ts sets --grid-y and --page-w). */
+  .chron.is-story { position: relative; isolation: isolate; }
+  .chron.is-story::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: calc(50% - var(--page-w, 100vw) / 2); width: var(--page-w, 100vw); z-index: -1;
+    background: var(--paper-tex), var(--grid), var(--paper);
+    background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
+  }
   .chron.is-story { height: 100svh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding-block: calc(var(--header-h) + var(--s-5)) var(--s-6); }
   .is-story .chron-list { position: relative; min-height: 0; }
   .is-story .chron-item { position: absolute; inset: 0; pointer-events: none; }
