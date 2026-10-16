@@ -66,7 +66,14 @@
 - { id: case-notes, text: Case notes, placeholder: true }
 # About: the awards chapter's line, from the March 2026 portfolio deck's slide 5 (17 Oct 2026).
 - { id: awards-chapter, text: "Leaving a mark, hand in hand", placeholder: false }
-# Homepage closing scatter (17 Oct 2026): the proof-mark hint on the first print, and the link that puts
-# the moved prints back. New wording, for approval.
+# Homepage closing scatter (17 Oct 2026): the proof-mark hint on the first print, and the button that puts
+# the moved prints back (client: "just have a reset button"). New wording, for approval.
 - { id: drag-hint, text: Drag me, placeholder: true }
-- { id: drag-reset, text: Put them back, placeholder: true }
+- { id: drag-reset, text: Reset, placeholder: true }
+# The office photographs (Achates360_Office.pdf, 17 Oct 2026): their captions are the PDF's own labels.
+- { id: office-building, text: Building, placeholder: false }
+- { id: office-directory, text: Directory, placeholder: false }
+- { id: office-lobby, text: Lobby, placeholder: false }
+- { id: office-meeting, text: Meeting Room, placeholder: false }
+- { id: office-studio, text: Studio, placeholder: false }
+- { id: contact-find, text: Finding us, placeholder: true }

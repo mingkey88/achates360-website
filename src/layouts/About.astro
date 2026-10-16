@@ -9,6 +9,9 @@ import Pic from '../components/ui/Pic.astro';
 import { renderMd } from '../lib/markdown';
 import { STILLS } from '../lib/stills';
 import awardsSpread from '../assets/awards-spread.jpg';
+import lobby from '../assets/office/lobby.jpg';
+import meetingRoom from '../assets/office/meeting-room.jpg';
+import studio from '../assets/office/studio.jpg';
 import logo from '../assets/logo-stacked-parts.svg?raw';
 import Credentials from '../components/Credentials.astro';
 import QuoteBand from '../components/QuoteBand.astro';
@@ -65,6 +68,12 @@ const plates = blocks.filter((b: any) => b.type === 'image');
 const other = blocks.find((b: any) => b.type !== 'text' && b.type !== 'image');
 if (!statement) throw new Error('About: no text to set as the statement');
 if (other) throw new Error(`About: a "${other.type}" block has no place in the layout`);
+// The office photographs (Achates360_Office.pdf), each captioned with the PDF's own label.
+const office = [
+  { src: lobby, alt: 'The lobby: the Achates 360 logo on the wall, award trophies on a wooden sideboard, patchwork sofas', caption: text('office-lobby') },
+  { src: meetingRoom, alt: 'The meeting room: a glass table, wire chairs in blue and red, a painting and a round curio shelf', caption: text('office-meeting') },
+  { src: studio, alt: 'The studio floor from the mezzanine stairs: desks by tall windows, shelves of work, prints on the walls', caption: text('office-studio') },
+];
 const colophon = (['type', 'paper', 'ink', 'made'] as const).map((k) => ({ k, label: text(`colophon-${k}`), value: text(`colophon-${k}-text`) }));
 // A different quotation from the homepage's, where there is one. Draft quotations are not shown (the
 // band appears once the client supplies real ones, CONTENT-QUERIES 10).
@@ -105,6 +114,14 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
       {visualWords ? <p class="ab-visual-text">{visualWords.map((w, i) => <>{i > 0 && ' '}<span class="w">{w}</span></>)}</p> : <div class="ab-visual-text" set:html={renderMd(visual)} />}
     </section>
   )}
+  {/* Chapter: inside the studio. The office's lobby (its awards on the sideboard), meeting room and studio
+      floor, from Achates360_Office.pdf, captioned with its own labels. */}
+  <section class="wrap ab-office" aria-labelledby="ab-office-title">
+    <RunningHead id="ab-office-title" s={text('intro-eyebrow')} folio="1 Irving Place, #05-02" />
+    <div class="ab-office-plates">
+      {office.map((o) => <figure class="ab-office-plate crop" data-rise><Pic src={o.src} alt={o.alt} crop={4 / 3} widths={[480, 640, 912]} sizes="(max-width: 767px) 100vw, 31vw" /><figcaption><T s={o.caption} /></figcaption></figure>)}
+    </div>
+  </section>
   {/* Chapter: the recognition. The deck's photograph of the award annuals and the Straits Times report on
       'Building Memories', its line as the heading; the awards themselves follow in the imprint below. */}
   <section class="wrap ab-mark" aria-labelledby="ab-mark-title">
@@ -165,6 +182,15 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
     .ab-companion-text { grid-column: 7 / 13; }
     .ab-visual-text { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); }
   }
+  /* Inside the studio: three plates of the office in a row, captioned. */
+  .ab-office { display: grid; gap: var(--s-6); padding-block: var(--section-y) 0; }
+  .ab-office-plates { display: grid; gap: var(--s-6) var(--s-5); }
+  .ab-office-plate { position: relative; margin: 0; display: grid; gap: var(--s-3); }
+  .ab-office-plate :global(img) { display: block; width: 100%; height: auto; }
+  .ab-office-plate figcaption { font-size: var(--fs-small); color: var(--text-2); }
+  @media (max-width: 767px) { .ab-office-plate { --cm-len: 8px; --cm-gap: 4px; } }
+  @media (min-width: 768px) { .ab-office-plates { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
   /* The recognition: the line set large, the photograph across the page in crop marks. */
   .ab-mark { display: grid; gap: var(--s-6); padding-block: var(--section-y) var(--s-8); border-top: 1px solid var(--line); }
   .ab-mark-title { margin: 0; max-width: 18ch; font: 400 clamp(2rem, 1rem + 3.4vw, 4rem)/1.08 var(--font-display); letter-spacing: -.025em; text-wrap: balance; }

@@ -1,4 +1,5 @@
 ---
+import Pic from './ui/Pic.astro';
 /*
  * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
  * submit label come verbatim from home.md; only the styling is the redesign's (direction B: an
@@ -20,7 +21,7 @@ interface Group { name: string; label: string; required: boolean; options: strin
 // (CONTENT-QUERIES 23); the supplied text stays in home.md.
 // direct: the studio's email and phone from the footer, offered beside the form for those who would
 // rather write or call.
-interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString; direct?: { label: UiString; email?: string; phone?: string } }
+interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString; direct?: { label: UiString; email?: string; phone?: string; address?: string[]; find?: { label: UiString; places: { src: ImageMetadata; alt: string; caption: UiString }[] } } }
 const { md, form, heading, direct } = Astro.props;
 const success = md.find((m) => m.startsWith('Thanks for submitting'));
 const intro = md.filter((m) => m !== success);
@@ -44,6 +45,15 @@ const groups = mergeContinuationGroups(form.groups);
           <p class="direct-l"><T s={direct.label} /></p>
           {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
           {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
+          {direct.address?.length && <p class="direct-addr">{direct.address.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
+          {direct.find && (
+            <div class="find">
+              <p class="direct-l"><T s={direct.find.label} /></p>
+              <div class="find-plates">
+                {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={pl.alt} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -168,6 +178,13 @@ const groups = mergeContinuationGroups(form.groups);
   .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
   .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
   .direct a:hover { color: var(--accent-deep); }
+  .direct-addr { margin-top: var(--s-2) !important; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
+  /* Finding us: the building and the directory board, as two small plates (Achates360_Office.pdf). */
+  .find { display: grid; gap: var(--s-2); width: 100%; margin-top: var(--s-5); }
+  .find-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); max-width: 420px; margin-inline: auto; }
+  .find-plate { margin: 0; display: grid; gap: var(--s-1); text-align: left; }
+  .find-plate :global(img) { display: block; width: 100%; height: auto; }
+  .find-plate figcaption { font-size: .8125rem; color: var(--text-2); }
   .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }
   /* Wide screens: the invitation and the direct lines beside the form, staying in view while it is filled in. */
   @media (min-width: 1024px) {
@@ -175,6 +192,7 @@ const groups = mergeContinuationGroups(form.groups);
     .intro { position: sticky; top: calc(var(--header-h) + var(--s-6)); text-align: left; }
     .intro :global(h2) { margin: 0; text-align: left; }
     .direct { justify-items: start; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); }
+    .find-plates { margin-inline: 0; }
   }
   .enquiry { display: grid; gap: var(--s-6); }
   .lines { display: grid; gap: var(--s-5); }

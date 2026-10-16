@@ -12,7 +12,7 @@ import { loadExtras } from '../lib/extras';
 // the pictures simply sit in their spread-out places with the message visible.
 // Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts): a
 // pencilled "Drag me" proof mark points at the first print, picked-up prints lift and settle at a tilt,
-// and "Put them back" returns them.
+// and a Reset button returns them.
 interface Item { thumb: ImageMetadata; title: string; href?: string }
 interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
 const { items, heading, blurb, cta, href } = Astro.props;
@@ -93,9 +93,9 @@ const reset = text('drag-reset');
   .drag-hint-t :global(.draft-tag) { font-style: normal; }
   .scta.was-moved .drag-hint { opacity: 0; }
   @media (hover: none), (pointer: coarse) { .drag-hint { display: none; } }
-  /* Put them back: a small text link under the button, once a print has been moved. */
-  .scta-reset { margin-top: calc(var(--s-2) - var(--s-6)); padding: var(--s-2) var(--s-3); border: 0; background: none; font: 400 var(--fs-small)/1 var(--font-text); color: var(--text-2); text-decoration: underline; text-underline-offset: .25em; cursor: pointer; }
-  .scta-reset:hover { color: var(--ink); }
+  /* Reset: a small hairline button under the main one, once a print has been moved. */
+  .scta-reset { display: inline-flex; align-items: center; gap: .5em; margin-top: calc(var(--s-3) - var(--s-6)); padding: var(--s-2) var(--s-4); border: 1px solid var(--ink); background: var(--paper); font: 400 var(--fs-small)/1 var(--font-text); color: var(--ink); cursor: pointer; transition: background .2s, color .2s; }
+  .scta-reset:hover, .scta-reset:focus-visible { background: var(--ink); color: var(--paper); }
   .pic-link { display: block; color: inherit; text-decoration: none; cursor: grab; user-select: none; -webkit-user-drag: none; }
   .pic.is-dragging .pic-link { cursor: grabbing; }
   /* The project's name under the picture, below the crop marks, on hover or keyboard focus. */

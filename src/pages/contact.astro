@@ -1,4 +1,6 @@
 ---
+import building from '../assets/office/building.jpg';
+import directory from '../assets/office/directory.jpg';
 import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ContactForm from '../components/ContactForm.astro';
@@ -13,7 +15,17 @@ const { text } = await loadExtras();
 const heading = site.menu?.find((m) => m.href === '/#contact' || m.href === '/contact')?.label ?? 'Contact';
 // The direct lines are the footer's own (site.md), verbatim.
 const footerMd = site.footer.filter((b: any) => b.type === 'text').map((b: any) => b.md).join('\n');
-const direct = { label: text('contact-direct'), email: footerMd.match(/mailto:([^)\s]+)/)?.[1], phone: footerMd.match(/\+\d[\d ]{6,}\d/)?.[0] };
+// The address lines too (after the phone, verbatim), and the office PDF's building and directory photographs
+// (Achates360_Office.pdf, captions its own labels) so visitors can find #05-02.
+const contactMd = site.footer.filter((b: any) => b.type === 'text').map((b: any) => b.md).find((m: string) => /Irving/.test(m)) ?? '';
+const address = contactMd.split('\n').map((l: string) => l.replace(/\s+$/, '').trim()).filter((l: string) => l && !/mailto:|^\+\d/.test(l));
+const direct = {
+  label: text('contact-direct'), email: footerMd.match(/mailto:([^)\s]+)/)?.[1], phone: footerMd.match(/\+\d[\d ]{6,}\d/)?.[0], address,
+  find: { label: text('contact-find'), places: [
+    { src: building, alt: 'The Commerze @ Irving, the building on Irving Place', caption: text('office-building') },
+    { src: directory, alt: 'The building directory, a finger on 05-02, Achates 360', caption: text('office-directory') },
+  ] },
+};
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const jsonLd = [aboutPageLd('ContactPage', { url: abs('/contact'), name: heading, homeUrl: abs('/') })];
 ---

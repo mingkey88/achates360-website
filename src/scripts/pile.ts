@@ -6,7 +6,7 @@
  * opens the project. The offset is written as --dx/--dy, added to the picture's left/top: GSAP folds a
  * CSS `translate` into its own transform for the scroll scatter, so the two must stay on separate properties.
  * A dropped picture settles at a slight random tilt; once anything has moved, the stage gets .was-moved
- * (the "Drag me" note fades) and "Put them back" appears, which returns every picture.
+ * (the "Drag me" note fades) and a Reset button appears, which returns every picture.
  */
 export const DRAG_START = 6;
 
@@ -67,7 +67,7 @@ export function pile(): void {
     link.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false; } });
     link.addEventListener('dragstart', (e) => e.preventDefault()); // no native link/image drag ghost
   }
-  // Put them back: every moved print slides home, and the link and its note go.
+  // Reset: every moved print slides home, and the button goes.
   resetBtn?.addEventListener('click', () => {
     root.classList.add('is-resetting');
     resets.forEach((r) => r());
