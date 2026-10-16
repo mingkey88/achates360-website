@@ -64,3 +64,5 @@
 - { id: colophon-made-text, text: Singapore, placeholder: true }
 # Heading over a case study's notes from the portfolio deck (17 Oct 2026). New wording, for approval.
 - { id: case-notes, text: Case notes, placeholder: true }
+# About: the awards chapter's line, from the March 2026 portfolio deck's slide 5 (17 Oct 2026).
+- { id: awards-chapter, text: "Leaving a mark, hand in hand", placeholder: false }
