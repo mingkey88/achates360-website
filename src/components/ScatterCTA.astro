@@ -4,12 +4,15 @@ import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
 import { withBase } from '../lib/paths';
+import { loadExtras } from '../lib/extras';
 // The homepage's closing section (after kitpro-croma): project pictures start as one stacked pile in
 // the middle and spread out to the edges as you scroll, revealing the call to action in the space they
 // leave. A short run (130svh, phones 120): the pile starts already loosened, so no frame is empty paper,
 // and the message arrives early. Motion: scripts/motion/scatter.ts (scrubbed to scroll inside a sticky stage). Without motion
 // the pictures simply sit in their spread-out places with the message visible.
-// Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts).
+// Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts): a
+// pencilled "Drag me" proof mark points at the first print, picked-up prints lift and settle at a tilt,
+// and a Reset button returns them.
 interface Item { thumb: ImageMetadata; title: string; href?: string }
 interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
 const { items, heading, blurb, cta, href } = Astro.props;
@@ -29,6 +32,10 @@ const PLACES = [
   { x: 83, y: 87, w: 14 },
 ];
 const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i] }));
+// The proof-mark note on the first print, and the link that puts moved prints back (pile.ts shows it).
+const { text } = await loadExtras();
+const hint = text('drag-hint');
+const reset = text('drag-reset');
 ---
 <section class="scta" aria-labelledby="scta-title" data-scatter>
   <div class="scta-stage">
@@ -43,6 +50,12 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
           ) : (
             <Pic src={thumb} alt="" crop={4 / 3} widths={[320, 480, 640, 860]} sizes="(max-width: 767px) 28vw, 14vw" />
           )}
+          {i === 0 && (
+            <span class="drag-hint" aria-hidden="true">
+              <svg viewBox="0 0 120 70" focusable="false"><path d="M112 58C96 62 78 58 66 46 56 36 60 22 70 20c10-2 14 10 6 18-10 10-32 14-52 6L8 38" /><path d="M8 38l11-2M8 38l6 9" /></svg>
+              <span class="drag-hint-t"><T s={hint} /></span>
+            </span>
+          )}
         </li>
       ))}
     </ul>
@@ -50,6 +63,7 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
       <h2 id="scta-title"><T s={heading} /></h2>
       <p>{blurb}</p>
       <Pill href={href} variant="fill"><T s={cta} /></Pill>
+      <button class="scta-reset" type="button" data-pile-reset hidden><T s={reset} /> <span aria-hidden="true">↺</span></button>
     </div>
   </div>
 </section>
@@ -66,6 +80,22 @@ const pics = items.slice(0, PLACES.length).map((it, i) => ({ ...it, p: PLACES[i]
     translate: -50% -50%; z-index: var(--z); background: var(--stone); --cm-len: 9px; --cm-gap: 5px;
   }
   .pic:is(:hover, :focus-within) { z-index: 30; }
+  /* Loose prints: a picked-up print lifts off the table (a separate sheet, so it casts a shadow), and a
+     dropped one settles at a slight tilt (--tilt, set by pile.ts). */
+  .pic { rotate: var(--tilt, 0deg); transition: rotate .35s var(--ease-out), scale .25s var(--ease-out), filter .25s; }
+  .pic.is-dragging { scale: 1.05; rotate: calc(var(--tilt, 0deg) - 1.5deg); filter: drop-shadow(0 14px 18px rgb(0 0 0 / .22)); transition: rotate .2s, scale .2s, filter .2s; }
+  .scta.is-resetting .pic { transition: left .7s var(--ease-out), top .7s var(--ease-out), rotate .7s var(--ease-out); }
+  /* The proof-mark note: pencilled in an editor's red beside the first print, pointing at it. Fine
+     pointers only (touch scrolls the page, so its prints are not dragged); gone once anything is moved. */
+  .drag-hint { position: absolute; left: calc(100% + 10px); top: 55%; display: flex; align-items: flex-end; gap: 2px; color: #c4361b; pointer-events: none; transition: opacity .4s; }
+  .drag-hint svg { flex: none; width: 64px; max-width: none; height: auto; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .drag-hint-t { display: inline-block; margin-bottom: 30px; font: italic 500 1rem/1 var(--font-text); letter-spacing: .01em; rotate: -6deg; white-space: nowrap; }
+  .drag-hint-t :global(.draft-tag) { font-style: normal; }
+  .scta.was-moved .drag-hint { opacity: 0; }
+  @media (hover: none), (pointer: coarse) { .drag-hint { display: none; } }
+  /* Reset: a small hairline button under the main one, once a print has been moved. */
+  .scta-reset { display: inline-flex; align-items: center; gap: .5em; margin-top: calc(var(--s-3) - var(--s-6)); padding: var(--s-2) var(--s-4); border: 1px solid var(--ink); background: var(--paper); font: 400 var(--fs-small)/1 var(--font-text); color: var(--ink); cursor: pointer; transition: background .2s, color .2s; }
+  .scta-reset:hover, .scta-reset:focus-visible { background: var(--ink); color: var(--paper); }
   .pic-link { display: block; color: inherit; text-decoration: none; cursor: grab; user-select: none; -webkit-user-drag: none; }
   .pic.is-dragging .pic-link { cursor: grabbing; }
   /* The project's name under the picture, below the crop marks, on hover or keyboard focus. */

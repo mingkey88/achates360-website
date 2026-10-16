@@ -5,6 +5,8 @@
  * that follows is swallowed. Touch is left alone: on phones a swipe must scroll the page and a tap
  * opens the project. The offset is written as --dx/--dy, added to the picture's left/top: GSAP folds a
  * CSS `translate` into its own transform for the scroll scatter, so the two must stay on separate properties.
+ * A dropped picture settles at a slight random tilt; once anything has moved, the stage gets .was-moved
+ * (the "Drag me" note fades) and a Reset button appears, which returns every picture.
  */
 export const DRAG_START = 6;
 
@@ -16,13 +18,17 @@ export function clampOffset(want: number, base: number, centre: number, min: num
 }
 
 export function pile(): void {
-  const stage = document.querySelector<HTMLElement>('[data-scatter] .scta-stage');
-  if (!stage) return;
+  const root = document.querySelector<HTMLElement>('[data-scatter]');
+  const stage = root?.querySelector<HTMLElement>('.scta-stage');
+  if (!root || !stage) return;
+  const resetBtn = root.querySelector<HTMLButtonElement>('[data-pile-reset]');
+  const resets: (() => void)[] = [];
   let top = 100; // the picked-up picture comes to the front, above the rest of the pile
   for (const link of stage.querySelectorAll<HTMLElement>('.pic-link')) {
     const pic = link.closest<HTMLElement>('.pic')!;
     let id: number | null = null, sx = 0, sy = 0, bx = 0, by = 0, dx = 0, dy = 0, moved = false;
     let box = { cx: 0, cy: 0, s: new DOMRect() };
+    resets.push(() => { dx = dy = 0; pic.style.removeProperty('--dx'); pic.style.removeProperty('--dy'); pic.style.removeProperty('--tilt'); });
     link.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'touch' || e.button !== 0) return;
       id = e.pointerId; sx = e.clientX; sy = e.clientY; bx = dx; by = dy; moved = false;
@@ -38,6 +44,8 @@ export function pile(): void {
         link.setPointerCapture(e.pointerId); // keep the picture under the pointer even when it moves fast
         pic.classList.add('is-dragging');
         pic.style.zIndex = String(++top);
+        root.classList.add('was-moved');
+        if (resetBtn) resetBtn.hidden = false;
       }
       dx = clampOffset(bx + mx, bx, box.cx, box.s.left, box.s.right);
       dy = clampOffset(by + my, by, box.cy, box.s.top, box.s.bottom);
@@ -47,6 +55,10 @@ export function pile(): void {
     const end = (e: PointerEvent) => {
       if (e.pointerId !== id) return;
       id = null;
+      if (pic.classList.contains('is-dragging')) {
+        // Dropped like a print on a table: it settles at a slight tilt.
+        pic.style.setProperty('--tilt', `${(Math.random() * 6 - 3).toFixed(1)}deg`);
+      }
       pic.classList.remove('is-dragging');
     };
     link.addEventListener('pointerup', end);
@@ -55,4 +67,12 @@ export function pile(): void {
     link.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false; } });
     link.addEventListener('dragstart', (e) => e.preventDefault()); // no native link/image drag ghost
   }
+  // Reset: every moved print slides home, and the button goes.
+  resetBtn?.addEventListener('click', () => {
+    root.classList.add('is-resetting');
+    resets.forEach((r) => r());
+    resetBtn.hidden = true;
+    root.classList.remove('was-moved');
+    setTimeout(() => root.classList.remove('is-resetting'), 750);
+  });
 }

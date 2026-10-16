@@ -21,7 +21,14 @@ export function press(): void {
     const tl = gsap.timeline({
       defaults: { ease: 'power2.out' },
       scrollTrigger: {
-        trigger: root, start: 'top top', end: () => `+=${Math.round(innerHeight * 1.4)}`, pin: true, scrub: .5, invalidateOnRefresh: true,
+        // A hold of whole grid squares (120px), so the section's own grid (below) meets the page's at both ends.
+        trigger: root, start: 'top top', end: () => `+=${Math.max(1, Math.round((innerHeight * 1.4) / 120)) * 120}`, pin: true, scrub: .5, invalidateOnRefresh: true,
+        // While held, the section carries its own copy of the page's paper and grid (the body's would scroll
+        // behind it), lined up with the body's where the hold starts.
+        onRefresh: (st) => {
+          root.style.setProperty('--grid-y', `${-Math.round(st.start)}px`);
+          root.style.setProperty('--page-w', `${document.documentElement.clientWidth}px`);
+        },
         onUpdate: (st) => {
           const n = Math.min(steps.length, Math.floor(st.progress * steps.length + .35));
           if (n !== shown) { shown = n; stage(n); }

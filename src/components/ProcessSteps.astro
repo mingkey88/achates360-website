@@ -141,6 +141,14 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
     .press-fig { width: 100%; }
     /* Held (motion/press.ts): one screen, the heading over the sheet and the steps; the steps fill the
        right side two by two as they rise in. */
+    /* The held section's own paper and grid across the full page width (it is the narrower .wrap), so
+       the background stands still with it (motion/press.ts sets --grid-y and --page-w). */
+    .process.is-pinned { position: relative; isolation: isolate; }
+    .process.is-pinned::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: calc(50% - var(--page-w, 100vw) / 2); width: var(--page-w, 100vw); z-index: -1;
+      background: var(--paper-tex), var(--grid), var(--paper);
+      background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
+    }
     .process.is-pinned { height: 100svh; padding-block: calc(var(--header-h) + var(--s-5)) var(--s-6); display: grid; grid-template-rows: auto minmax(0, 1fr); }
     .is-pinned .press { min-height: 0; margin-top: var(--s-6); align-items: stretch; }
     .is-pinned .press-fig { display: grid; place-items: start center; min-height: 0; }
