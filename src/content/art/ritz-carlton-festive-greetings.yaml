@@ -2,7 +2,7 @@
 # and links, each used once. Paragraphs: 0 the hotel, 1 subheading, 2 the festive seasons, 3 the brief,
 # 4 the design approach and print, 5 the result. Pictures: 0 flat lay of festive covers, 1 brochure spread,
 # 2 "Blessings in Bloom" cards, 3 Mid-Autumn booklet, 4 brochure fan, 5 "Crafting Festive Joy" in flight,
-# 6 "Crafting Festive Joy" gold-foil close-up. Link: 0 "Back to projects".
+# 6 "Crafting Festive Joy" gold-foil close-up. (Its copied "Back to projects" link is left out by the template.)
 sections:
   - text: [0]
     layout: lead
@@ -17,4 +17,3 @@ sections:
   - text: [5]
     media: [6]
     layout: beside-left
-  - links: [0]
