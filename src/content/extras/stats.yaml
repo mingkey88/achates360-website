@@ -1,5 +1,5 @@
 # Stats (spec §6.3). Only facts the site already states may be placeholder: false.
 - { id: founded, order: 1, value: 2001, label: Founded, placeholder: false }
 - { id: projects, order: 2, value: listed-projects, label: Featured projects, placeholder: false }
-- { id: awards, order: 3, value: 10, suffix: "+", label: Awards, placeholder: true }
+- { id: awards, order: 3, value: 12, label: Awards, placeholder: false } # the deck's Awards slide (17 Oct 2026)
 - { id: clients, order: 4, value: 100, suffix: "+", label: Clients served, placeholder: true }

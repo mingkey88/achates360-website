@@ -15,7 +15,9 @@
 - { id: nav-categories, text: Categories, placeholder: true }
 - { id: category-label, text: Category, placeholder: true }
 - { id: selected-cta, text: View all projects, placeholder: true }
-- { id: awards-line, text: "GDUSA American Graphic Design Award 2016 · A' Design Award 2017 Bronze · Singapore Book Awards 2017 · HOW International Design Awards · The Paperweight Awards 2014", placeholder: true }
+# awards-line: the twelve awards on the March 2026 portfolio deck's "Awards" slide, as its badges read
+# (site builder approved using the deck's wording, 17 Oct 2026; CONTENT-QUERIES 20).
+- { id: awards-line, text: "GDUSA American Graphic Design Award 2016 Winner · 2016 GOV Design Awards Gold · 2016 Hong Kong Design Awards Gold · 2016 New York Design Awards Gold · 2016 London Design Awards Silver · A' Design Award Winner 2017 Bronze · Prime Design Mark · HOW International Design Awards Winner · Singapore Book Awards 2017 Book of the Year · Singapore Book Awards 2017 Finalist, Best Book Cover Design · Singapore Book Awards 2017 Winner, Best Illustrated Non-Fiction Title · The Paperweight Awards 2014", placeholder: false }
 - { id: services-cta, text: All services, placeholder: true }
 - { id: clients-eyebrow, text: Trusted by, placeholder: true }
 - { id: testimonials-eyebrow, text: Client feedback, placeholder: true }
@@ -60,3 +62,7 @@
 - { id: colophon-ink-text, text: "The four process colours and Pantone 1495 U", placeholder: true }
 - { id: colophon-made, text: Made in, placeholder: true }
 - { id: colophon-made-text, text: Singapore, placeholder: true }
+# Heading over a case study's notes from the portfolio deck (17 Oct 2026). New wording, for approval.
+- { id: case-notes, text: Case notes, placeholder: true }
+# About: the awards chapter's line, from the March 2026 portfolio deck's slide 5 (17 Oct 2026).
+- { id: awards-chapter, text: "Leaving a mark, hand in hand", placeholder: false }

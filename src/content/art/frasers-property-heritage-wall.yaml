@@ -1,0 +1,22 @@
+# Art direction for /frasers-property-heritage-wall (src/lib/art.ts). Paragraphs: 0 the objective,
+# 1 Historical Inspiration, 2 Immersive Physical Design, 3 Experiential Storytelling. Pictures: 0 the
+# emblem lit, 1-2 the façade front and side, 3 the standing panels, 4 the emblem close up, 5 the façade
+# by day, 6 the breweries plaque, 7 the tunnel.
+sections:
+  - text: [0]
+    layout: lead
+  - text: [1]
+    media: [0]
+    layout: beside
+  - media: [1, 2]
+    layout: pair
+  - text: [2]
+    media: [3]
+    layout: beside-left
+  - media: [4, 5]
+    layout: pair
+  - text: [3]
+    media: [6]
+    layout: beside
+  - media: [7]
+    layout: full

@@ -8,6 +8,7 @@ import T from '../components/ui/T.astro';
 import Pic from '../components/ui/Pic.astro';
 import { renderMd } from '../lib/markdown';
 import { STILLS } from '../lib/stills';
+import awardsSpread from '../assets/awards-spread.jpg';
 import logo from '../assets/logo-stacked-parts.svg?raw';
 import Credentials from '../components/Credentials.astro';
 import QuoteBand from '../components/QuoteBand.astro';
@@ -104,6 +105,12 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
       {visualWords ? <p class="ab-visual-text">{visualWords.map((w, i) => <>{i > 0 && ' '}<span class="w">{w}</span></>)}</p> : <div class="ab-visual-text" set:html={renderMd(visual)} />}
     </section>
   )}
+  {/* Chapter: the recognition. The deck's photograph of the award annuals and the Straits Times report on
+      'Building Memories', its line as the heading; the awards themselves follow in the imprint below. */}
+  <section class="wrap ab-mark" aria-labelledby="ab-mark-title">
+    <h2 id="ab-mark-title" class="ab-mark-title"><T s={text('awards-chapter')} /></h2>
+    <figure class="ab-mark-plate crop" data-rise><Pic src={awardsSpread} alt="The award annuals the studio's work appears in (Singapore Book Awards 2017, A' Design Award & Competition, HOW, The Paperweight Awards 2014, GDUSA) and The Straits Times report “Book on S'pore's iconic buildings wins big at awards”" widths={[640, 960, 1440, 1920, 2383]} sizes="(max-width: 1023px) 100vw, 92vw" /></figure>
+  </section>
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
   <section class="wrap ab-colophon" aria-labelledby="colophon-title">
@@ -158,6 +165,13 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
     .ab-companion-text { grid-column: 7 / 13; }
     .ab-visual-text { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); }
   }
+  /* The recognition: the line set large, the photograph across the page in crop marks. */
+  .ab-mark { display: grid; gap: var(--s-6); padding-block: var(--section-y) var(--s-8); border-top: 1px solid var(--line); }
+  .ab-mark-title { margin: 0; max-width: 18ch; font: 400 clamp(2rem, 1rem + 3.4vw, 4rem)/1.08 var(--font-display); letter-spacing: -.025em; text-wrap: balance; }
+  .ab-mark-plate { position: relative; margin: 0; }
+  .ab-mark-plate :global(img) { display: block; width: 100%; height: auto; }
+  @media (max-width: 767px) { .ab-mark-plate { --cm-len: 8px; --cm-gap: 4px; } }
+
   /* Colophon: how the site is "printed", as a book's last page sets it. */
   .ab-colophon { padding-block: var(--section-y) var(--s-8); }
   .colo { margin: 0; display: grid; }
