@@ -1,0 +1,53 @@
+---
+import Pic from './ui/Pic.astro';
+import RunningHead from './ui/RunningHead.astro';
+import type { UiString } from '../lib/strings';
+import type { CollectionEntry } from 'astro:content';
+// Case notes after a case study's story (src/content/notes/<slug>.yaml): the figures large on a hairline,
+// then short ruled notes, as a magazine's fact box, in the studio's own words from its portfolio deck.
+interface Props { notes: CollectionEntry<'notes'>['data']; heading: UiString; title: string }
+const { notes, heading, title } = Astro.props;
+---
+<section class="cn" aria-labelledby="cn-title">
+  <RunningHead id="cn-title" s={heading} folio="" />
+  {notes.facts?.length && (
+    <dl class="cn-facts">
+      {notes.facts.map((f) => <div class="cn-fact"><dt>{f.value}</dt><dd>{f.label}</dd></div>)}
+    </dl>
+  )}
+  <div class="cn-sections">
+    {notes.sections.map((s) => (
+      <div class:list={['cn-sec', { wide: s.images?.length }]}>
+        <h3 class="cn-h">{s.heading}</h3>
+        {s.intro && <p class="cn-intro">{s.intro}</p>}
+        {s.items?.length && (
+          <ul class="cn-list">
+            {s.items.map((it) => typeof it === 'string' ? <li>{it}</li> : <li>{it.text}<ul class="cn-sub">{it.items.map((x) => <li>{x}</li>)}</ul></li>)}
+          </ul>
+        )}
+        {s.images?.map((im) => <figure class="cn-img"><Pic src={im.src} alt={im.alt || title} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 70vw" /></figure>)}
+      </div>
+    ))}
+  </div>
+</section>
+<style>
+  .cn { display: grid; gap: var(--s-6); margin-top: var(--s-8); }
+  .cn-facts { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: var(--s-5); }
+  .cn-fact { display: grid; gap: var(--s-2); align-content: start; padding-top: var(--s-3); border-top: 1px solid var(--ink); }
+  .cn-fact dt { font: 400 clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem)/1 var(--font-display); letter-spacing: -.03em; font-variant-numeric: lining-nums tabular-nums; }
+  .cn-fact dd { margin: 0; max-width: 24ch; font-size: var(--fs-small); color: var(--text-2); }
+  .cn-sections { display: grid; gap: var(--s-6); }
+  .cn-sec { display: grid; gap: var(--s-3); align-content: start; padding-top: var(--s-3); border-top: 1px solid var(--line); }
+  .cn-h { margin: 0; font: 400 var(--fs-h3)/1.25 var(--font-display); text-wrap: balance; }
+  .cn-intro { margin: 0; max-width: 60ch; font-size: var(--fs-small); line-height: 1.6; color: var(--text-2); }
+  .cn-list, .cn-sub { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); font-size: var(--fs-small); line-height: 1.5; }
+  .cn-list > li { display: grid; grid-template-columns: 1.2em minmax(0, 1fr); }
+  .cn-list > li::before { content: '—'; color: var(--text-2); }
+  .cn-sub { grid-column: 2; margin-top: var(--s-2); grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); column-gap: var(--s-4); color: var(--text-2); }
+  .cn-img { margin: var(--s-2) 0 0; }
+  .cn-img :global(img) { display: block; width: 100%; height: auto; }
+  @media (min-width: 900px) {
+    .cn-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s-7); }
+    .cn-sec.wide { grid-column: 1 / -1; }
+  }
+</style>

@@ -1,7 +1,14 @@
 /** Slug of a homepage link to a case study ("/notter" -> "notter"); null for anything else. */
+/**
+ * Wix page names that have a cleaner page here. Wix's listings of the Frasers Property heritage wall point
+ * to an unfinished Wix page, "copy-of-international-green-building"; this site has the project at
+ * /frasers-property-heritage-wall (written from the March 2026 portfolio deck).
+ */
+const ALIASES: Record<string, string> = { 'copy-of-international-green-building': 'frasers-property-heritage-wall' };
+
 export function slugOf(href: string | undefined): string | null {
   const m = href?.match(/^\/([a-z0-9-]+)$/i);
-  return m ? m[1] : null;
+  return m ? (ALIASES[m[1]] ?? m[1]) : null;
 }
 
 /**

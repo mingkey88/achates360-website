@@ -188,7 +188,24 @@ const art = defineCollection({
   }).strict(),
 });
 
+// Case notes for a case study (src/content/notes/<slug>.yaml): figures and short notes in the studio's own
+// words from its March 2026 portfolio deck, set after the story (components/CaseNotes.astro). Kept apart
+// from the Wix pages so a re-import never loses them. An item is a line, or a line with sub-points.
+const notes = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/notes' }),
+  schema: ({ image }) => z.object({
+    source: z.string(),
+    facts: z.array(z.object({ value: z.string(), label: z.string() }).strict()).optional(),
+    sections: z.array(z.object({
+      heading: z.string(),
+      intro: z.string().optional(),
+      items: z.array(z.union([z.string(), z.object({ text: z.string(), items: z.array(z.string()) }).strict()])).optional(),
+      images: z.array(z.object({ src: image(), alt: z.string() }).strict()).optional(),
+    }).strict()),
+  }).strict(),
+});
+
 export const collections = {
   projects, cards, basic, home, projectsIndex, site,
-  services, process: processSteps, timeline, stats, clients, testimonials, strings, art,
+  services, process: processSteps, timeline, stats, clients, testimonials, strings, art, notes,
 };

@@ -5,6 +5,7 @@ import HeroMedia from '../components/ui/HeroMedia.astro';
 import Sticker from '../components/ui/Sticker.astro';
 import MetaStrip from '../components/MetaStrip.astro';
 import ArtRows from '../components/ArtRows.astro';
+import CaseNotes from '../components/CaseNotes.astro';
 import { autoArt } from '../lib/art';
 import { mediaRatio } from '../lib/media-ratio';
 import NextProject from '../components/NextProject.astro';
@@ -31,6 +32,8 @@ const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('
 // already ends with its own link back, so it would show twice.
 const body = visibleBlocks(d.blocks, d.pageBackground).filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
 const art = (await getEntry('art', id))?.data ?? autoArt(body, mediaRatio);
+// Case notes from the studio's portfolio deck, where the project has them (src/content/notes/<slug>.yaml).
+const notes = (await getEntry('notes', id))?.data;
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
 // Share picture and structured data: the project's own hero, the case study, and where it sits
 // (Projects › its first category › the project).
@@ -55,7 +58,7 @@ const jsonLd = [
       facts sit in a narrow column that stays in view, the story and pictures fill the rest. */}
   <div class="wrap p-layout">
     <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} /></aside>
-    <article class="p-body"><ArtRows blocks={body} art={art} pageTitle={d.title} slug={id} /></article>
+    <article class="p-body"><ArtRows blocks={body} art={art} pageTitle={d.title} slug={id} />{notes && <CaseNotes notes={notes} heading={text('case-notes')} title={d.title} />}</article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
