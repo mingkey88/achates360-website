@@ -4,11 +4,11 @@ import { embedSrc } from '../lib/embed';
 // nears the screen), so the provider's end screen ("More from Achates 360") never appears; the player's
 // own controls pause it or turn the sound on. Under reduced motion it is swapped, before it loads, for
 // the plain player that waits for the play button.
-interface Props { provider: 'vimeo' | 'youtube'; id: string; title?: string }
-const { provider, id, title = 'Video' } = Astro.props;
+interface Props { provider: 'vimeo' | 'youtube'; id: string; hash?: string; title?: string }
+const { provider, id, hash, title = 'Video' } = Astro.props;
 ---
 <div class="embed">
-  <iframe src={embedSrc(provider, id, true)} data-still={embedSrc(provider, id, false)} title={title} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+  <iframe src={embedSrc(provider, id, true, hash)} data-still={embedSrc(provider, id, false, hash)} title={title} loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 </div>
 <script>
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {

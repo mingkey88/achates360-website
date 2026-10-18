@@ -23,8 +23,9 @@ export const videoIdFromPoster = (file) => file.replace(/f\d{3}\.jpg$/, '');
 export function parseEmbed(src) {
   const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]+)/);
   if (yt) return { provider: 'youtube', id: yt[1] };
-  const vm = src.match(/player\.vimeo\.com\/video\/(\d+)/);
-  if (vm) return { provider: 'vimeo', id: vm[1] };
+  // An unlisted Vimeo film plays only with its private key (?h=…), so it is kept.
+  const vm = src.match(/player\.vimeo\.com\/video\/(\d+)(?:\?(?:[^#]*?&(?:amp;)?)?h=([0-9a-f]+))?/);
+  if (vm) return vm[2] ? { provider: 'vimeo', id: vm[1], hash: vm[2] } : { provider: 'vimeo', id: vm[1] };
   return null;
 }
 

@@ -23,3 +23,10 @@ describe('embedSrc', () => {
     expect(params(embedSrc('youtube', 'x', false)).rel).toBe('0');
   });
 });
+
+describe('embedSrc with an unlisted Vimeo film', () => {
+  it('puts the private key first in the player link', () => {
+    expect(embedSrc('vimeo', '1232919536', false, '5f308451cb')).toMatch(/^https:\/\/player\.vimeo\.com\/video\/1232919536\?h=5f308451cb&title=0/);
+    expect(embedSrc('vimeo', '766942392', false)).not.toContain('h=');
+  });
+});

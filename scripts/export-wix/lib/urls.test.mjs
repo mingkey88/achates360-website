@@ -40,6 +40,9 @@ describe('parseEmbed', () => {
   it('reads YouTube and Vimeo player URLs', () => {
     expect(parseEmbed('https://www.youtube.com/embed/J-LCPzZ9T4g?autoplay=1')).toEqual({ provider: 'youtube', id: 'J-LCPzZ9T4g' });
     expect(parseEmbed('https://player.vimeo.com/video/766942392?title=0')).toEqual({ provider: 'vimeo', id: '766942392' });
+    // An unlisted film keeps its private key, wherever it sits in the query (Wix writes &amp;).
+    expect(parseEmbed('https://player.vimeo.com/video/1232919536?h=5f308451cb&amp;title=0')).toEqual({ provider: 'vimeo', id: '1232919536', hash: '5f308451cb' });
+    expect(parseEmbed('https://player.vimeo.com/video/1?title=0&amp;h=abc123')).toEqual({ provider: 'vimeo', id: '1', hash: 'abc123' });
   });
   it('returns null for anything else', () => {
     expect(parseEmbed('https://example.com/embed/x')).toBeNull();

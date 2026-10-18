@@ -34,7 +34,8 @@ const block = (image: ImageFunction) => z.discriminatedUnion('type', [
   z.object({ type: z.literal('image'), src: image(), alt: z.string(), href: z.string().optional(), ...layout }).strict(),
   z.object({ type: z.literal('gallery'), items: z.array(galleryItem(image)), ...layout }).strict(),
   z.object({ type: z.literal('video'), src: z.string(), poster: image(), controls: z.boolean().optional(), ...layout }).strict(),
-  z.object({ type: z.literal('embed'), provider: z.enum(['vimeo', 'youtube']), id: z.string(), ...layout }).strict(),
+  // hash: an unlisted Vimeo film's private key (?h=…); without it Vimeo refuses to play the film.
+  z.object({ type: z.literal('embed'), provider: z.enum(['vimeo', 'youtube']), id: z.string(), hash: z.string().regex(/^[0-9a-f]+$/).optional(), ...layout }).strict(),
   z.object({ type: z.literal('link'), href: z.string(), label: z.string(), ...layout }).strict(),
 ]);
 
