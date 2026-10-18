@@ -33,6 +33,7 @@ blocks:
   - type: embed
     provider: vimeo
     id: "1232919536"
+    hash: 5f308451cb
     box:
       x: 239
       y: 1172

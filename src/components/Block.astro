@@ -29,7 +29,7 @@ const label = pageTitle ? `${pageTitle} video` : undefined;
 {b.type === 'video' && (b.controls
   ? <Player src={b.src} poster={b.poster} label={label} />
   : <BgVideo src={b.src} poster={b.poster} class="block-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />)}
-{b.type === 'embed' && <Embed provider={b.provider} id={b.id} title={label} />}
+{b.type === 'embed' && <Embed provider={b.provider} id={b.id} hash={b.hash} title={label} />}
 <style>
   .back-link { display: inline-flex; align-items: center; gap: .4em; min-height: 44px; font-size: var(--fs-small); color: inherit; text-underline-offset: 4px; }
 </style>

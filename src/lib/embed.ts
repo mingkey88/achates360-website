@@ -4,13 +4,14 @@
  * suggested videos on YouTube). Without autoplay (reduced motion) it waits for the play button, and
  * YouTube keeps its end suggestions to the same channel (rel=0).
  */
-export function embedSrc(provider: 'vimeo' | 'youtube', id: string, autoplay: boolean): string {
+export function embedSrc(provider: 'vimeo' | 'youtube', id: string, autoplay: boolean, hash?: string): string {
   if (provider === 'youtube') {
     const q = new URLSearchParams({ rel: '0', playsinline: '1' });
     if (autoplay) { q.set('autoplay', '1'); q.set('mute', '1'); q.set('loop', '1'); q.set('playlist', id); }
     return `https://www.youtube-nocookie.com/embed/${id}?${q}`;
   }
-  const q = new URLSearchParams({ title: '0', byline: '0', portrait: '0', autopause: '0', dnt: '1' });
+  // An unlisted film's private key comes first, as Vimeo writes it.
+  const q = new URLSearchParams({ ...(hash ? { h: hash } : {}), title: '0', byline: '0', portrait: '0', autopause: '0', dnt: '1' });
   if (autoplay) { q.set('autoplay', '1'); q.set('muted', '1'); q.set('loop', '1'); }
   return `https://player.vimeo.com/video/${id}?${q}`;
 }

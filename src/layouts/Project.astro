@@ -8,6 +8,7 @@ import ArtRows from '../components/ArtRows.astro';
 import CaseNotes from '../components/CaseNotes.astro';
 import { autoArt } from '../lib/art';
 import { mediaRatio } from '../lib/media-ratio';
+import { isUnavailableFilm } from '../lib/unavailable-films';
 import NextProject from '../components/NextProject.astro';
 import { loadExtras } from '../lib/extras';
 import { backLinkHref, withBase } from '../lib/paths';
@@ -30,7 +31,8 @@ const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('
 // films by their poster, embedded players 16:9).
 // A "Back to projects" link copied into a page's own content (one Wix page had it) is left out: the page
 // already ends with its own link back, so it would show twice.
-const body = visibleBlocks(d.blocks, d.pageBackground).filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))));
+// A film the provider no longer serves (lib/unavailable-films.ts) is left out too, rather than a grey error box.
+const body = visibleBlocks(d.blocks, d.pageBackground).filter((b: any) => !(b.type === 'link' && /back to projects/i.test(String(b.label))) && !isUnavailableFilm(b));
 const art = (await getEntry('art', id))?.data ?? autoArt(body, mediaRatio);
 // Case notes from the studio's portfolio deck, where the project has them (src/content/notes/<slug>.yaml).
 const notes = (await getEntry('notes', id))?.data;
