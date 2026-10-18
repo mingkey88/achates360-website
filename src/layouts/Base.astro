@@ -55,6 +55,8 @@ const [icon32, icon192, icon180] = await Promise.all([icon(32), icon(192), icon(
 const projectsIndex = (await getEntry('projectsIndex', 'projects'))!.data;
 const categories = projectCategories(projectsIndex.sections).map((c) => ({ label: c.heading, href: c.href }));
 const menu = withContactPage(withCategories(withServices(site.menu ?? [], text('menu-services').text), categories));
+// The main pages (menu labels, verbatim) for the footer: the homepage's signoff row, and every other page's.
+const pageLinks = menu.filter((m) => m.href !== '/').map((m) => ({ label: m.label, href: m.href }));
 ---
 <!doctype html>
 <html lang="en">
@@ -92,6 +94,6 @@ const menu = withContactPage(withCategories(withServices(site.menu ?? [], text('
     <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
     <main id="main"><slot /></main>
     {/* The homepage closes with the footer's own intro line (ScatterCTA), so the footer skips it there. */}
-    <Footer blocks={site.footer} hideIntro={page === 'home'} signoff={page === 'home' ? { line: text('hero-tagline').text, links: menu.filter((m) => m.href !== '/').map((m) => ({ label: m.label, href: m.href })) } : undefined} />
+    <Footer blocks={site.footer} hideIntro={page === 'home'} signoff={page === 'home' ? { line: text('hero-tagline').text, links: pageLinks } : undefined} links={pageLinks} top={text('back-to-top')} />
   </body>
 </html>

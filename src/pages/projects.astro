@@ -8,6 +8,7 @@ import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { itemListLd } from '../lib/seo';
+import { categoryCount } from '../lib/service-counts';
 // The projects overview (direction B): a die-cut cover over the top, then every listed project in the homepage
 // list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
 // category pages (/projects/<slug>) stay, reached from the header's Projects menu.
@@ -20,6 +21,10 @@ const cats = projectCategories(d.sections);
 const home = (await getEntry('home', 'home'))!.data;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const entries = catalogueOf(home.allProjects.items, projects);
+// The kinds of work, as a contents line under the heading: each category (its name verbatim) with the
+// number of listed projects in it, opening its page.
+const listed = new Set(entries.map((e) => e.slug));
+const kinds = cats.map((c) => ({ heading: c.heading, href: c.href, count: categoryCount(c.heading, d.sections, listed) })).filter((k) => k.count > 0);
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 // Structured data: every listed case study, in the homepage list's order.
 const jsonLd = [itemListLd('Projects', entries.map((e) => ({ name: projects.get(e.slug)!.title, url: abs(e.href) })))];
@@ -36,6 +41,9 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
       <h1 class="display h1 sc" data-split>{heading}</h1>
       <span class="pi-total" aria-hidden="true">{entries.length}</span>
     </header>
+    <nav class="wrap pi-kinds" aria-label={text('nav-categories').text}>
+      <ul>{kinds.map((k) => <li><a href={withBase(k.href)}><span>{k.heading}</span><span class="pi-n">{k.count}</span></a></li>)}</ul>
+    </nav>
     <section class="wrap pi-body" aria-labelledby="pi-title">
       <h2 id="pi-title" class="sr-only">{text('next-fallback').text}</h2>
       <ProjectCards items={entries} />
@@ -49,6 +57,18 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   /* The count sits up by the heading like a folio. */
   .pi-total { padding-top: .4em; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
   .pi-body { padding-block: var(--s-7) var(--section-y); }
+  /* The kinds of work: on phones a wrapping line of names with their counts set small, like an index's
+     run-on entries. */
+  .pi-kinds ul { list-style: none; margin: 0; padding: var(--s-4) 0; display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-5); border-bottom: 1px solid var(--line); }
+  .pi-kinds a { display: inline-flex; align-items: baseline; gap: 6px; padding-block: 6px; color: inherit; text-decoration: none; font-size: var(--fs-small); }
+  .pi-kinds a:hover span:first-child { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+  .pi-n { font-size: .6875rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  /* Wider screens: a three-column index, each name with its count at the right on a hairline. */
+  @media (min-width: 768px) {
+    .pi-kinds ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--s-6); padding-block: var(--s-3) 0; border-bottom: 0; }
+    .pi-kinds li { border-bottom: 1px solid var(--line); }
+    .pi-kinds a { display: flex; justify-content: space-between; padding-block: 10px; }
+  }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

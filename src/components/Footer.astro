@@ -3,10 +3,16 @@ import { renderMd } from '../lib/markdown';
 import { withBase, linkAttrs } from '../lib/paths';
 import Logo from './ui/Logo.astro';
 import SocialIcon from './ui/SocialIcon.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
 // signoff: shown in the intro's place where the page has already said the intro line (the homepage
 // closes with it): the studio's tagline, large, and the main pages as a row of links (menu labels).
-interface Props { blocks: any[]; hideIntro?: boolean; signoff?: { line: string; links: { label: string; href: string }[] } }
-const { blocks, hideIntro = false, signoff } = Astro.props;
+// links: the same row of main pages under the intro on every other page. top: the imprint line's
+// "Back to top" (the imprint closes the footer as a book's last page does: the legal lines, the
+// printer's colour bar with the spot ink, and a way back to the start).
+type Link = { label: string; href: string };
+interface Props { blocks: any[]; hideIntro?: boolean; signoff?: { line: string; links: Link[] }; links?: Link[]; top?: UiString }
+const { blocks, hideIntro = false, signoff, links = [], top } = Astro.props;
 // site.md footer blocks, verbatim: the intro line, then the legal lines; each "###### Label" text
 // block (Contact, Social) opens a column. Social icons become text links named by their alt text.
 const isLabel = (b: any) => b.type === 'text' && /^#{6}\s/.test(b.md);
@@ -23,7 +29,12 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
 <footer class="site-footer">
   <div class="wrap grid">
     {/* Hidden intro keeps its (empty) grid cell so the columns stay where they are. */}
-    {intro && !hideIntro && <div class="intro" set:html={md(intro.md)} />}
+    {intro && !hideIntro && (
+      <div class="intro">
+        <div set:html={md(intro.md)} />
+        {links.length > 0 && <ul class="so-links">{links.map((l) => <li><a href={withBase(l.href)}><span class="sc">{l.label}</span></a></li>)}</ul>}
+      </div>
+    )}
     {intro && hideIntro && (
       <div class="intro signoff">
         {signoff && <p class="so-line">{signoff.line}</p>}
@@ -44,7 +55,11 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
         )}
       </div>
     ))}
-    <div class="legal">{legal.map((b) => <div class="md" set:html={md(b.md)} />)}</div>
+    <div class="imprint">
+      <div class="legal">{legal.map((b) => <div class="md" set:html={md(b.md)} />)}</div>
+      <p class="bar" aria-hidden="true"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span style="--c: var(--accent)"></span><span class="bar-l">1495 U</span></p>
+      {top && <a class="to-top" href="#main"><T s={top} /> <span aria-hidden="true">↑</span></a>}
+    </div>
   </div>
   <div class="mega-mark"><Logo /></div>
 </footer>
@@ -69,7 +84,16 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .social :global(.social-icon) { flex: none; width: 40px; height: 40px; padding: 10px; border: 1px solid rgb(255 254 242 / .45); fill: currentColor; transition: background-color .25s, color .25s; }
   .social a:hover :global(.social-icon) { background: var(--on-dark); color: var(--teal-ink); }
   .social a:hover .social-name { text-decoration: underline; text-underline-offset: 3px; }
+  .intro { display: grid; align-content: start; gap: var(--s-6); }
   .legal { font-size: var(--fs-label); color: var(--on-dark-2); }
+  /* The imprint: legal lines, colour bar, back to top, on one hairline. */
+  .imprint { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s-4) var(--s-6); padding-top: var(--s-5); border-top: 1px solid rgb(255 254 242 / .2); }
+  .bar { display: flex; align-items: center; gap: 3px; margin: 0 0 0 auto; }
+  .bar span:not(.bar-l) { width: 10px; height: 10px; background: var(--c); box-shadow: 0 0 0 1px rgb(255 254 242 / .25); }
+  .bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; color: var(--on-dark-2); }
+  .to-top { display: inline-block; padding-block: 6px; font-size: var(--fs-small); color: var(--on-dark); text-decoration: none; }
+  .to-top:hover { text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 559px) { .bar { margin-left: 0; } }
   .mega-mark {
     margin: var(--s-8) auto 0; padding-inline: var(--gutter); max-width: 560px; color: var(--on-dark); opacity: .9;
     -webkit-mask-image: linear-gradient(180deg, #000 10%, transparent 95%); mask-image: linear-gradient(180deg, #000 10%, transparent 95%);
@@ -77,6 +101,6 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .mega-mark :global(.logo) { display: block; width: 100%; height: auto; margin-bottom: -2%; }
   @media (min-width: 768px) {
     .grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(160px, 1fr)); }
-    .legal { grid-column: 1 / -1; }
+    .imprint { grid-column: 1 / -1; }
   }
 </style>

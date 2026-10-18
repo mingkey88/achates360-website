@@ -77,3 +77,5 @@
 - { id: office-meeting, text: Meeting Room, placeholder: false }
 - { id: office-studio, text: Studio, placeholder: false }
 - { id: contact-find, text: Finding us, placeholder: true }
+- { id: back-to-top, text: Back to top, placeholder: true }
+- { id: service-more, text: More in this service, placeholder: true }
