@@ -1,0 +1,7 @@
+---
+// A name with its ampersand set in orange, as a two-tone heading's accent (the words unchanged). The
+// ampersand holds on to the word after it (a no-break space), so a line never ends on it.
+interface Props { text: string }
+const parts = Astro.props.text.split('&');
+---
+{parts.map((p, i) => <>{i > 0 ? p.replace(/^ /, ' ') : p}{i < parts.length - 1 && <span class="hl">&amp;</span>}</>)}

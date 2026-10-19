@@ -115,7 +115,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
     <RunningHead as="p" s={text('intro-eyebrow')} folio="03" />
-    <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="key">{introKey}</span>}{introAfter}</h2>
+    <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
@@ -132,7 +132,6 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   @media (min-width: 1024px) { .two-tone { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } .h-intro :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
   .h-intro > :global(.rh) { justify-self: stretch; }
   /* Print touch: the orange plate printed a hair off register, a lighter orange peeking out below right. */
-  .two-tone .key { color: var(--accent-deep); text-shadow: .05em .04em 0 rgb(255 144 21 / .45); }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

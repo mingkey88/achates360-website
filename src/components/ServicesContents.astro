@@ -1,6 +1,7 @@
 ---
 import Pic from './ui/Pic.astro';
 import T from './ui/T.astro';
+import Amp from './ui/Amp.astro';
 import type { UiString } from '../lib/strings';
 // The Services page's opening (direction B): a book's contents page. Each service is a numbered line,
 // its name set large, a dotted leader running to the number of projects it covers, and a link down to
@@ -23,7 +24,7 @@ const no = (i: number) => String(i + 1).padStart(2, '0');
       <li>
         <a href={`#${s.id}`} data-toc-item={i} data-placeholder={s.placeholder ? '' : undefined}>
           <span class="toc-no">{no(i)}</span>
-          <span class="toc-title">{s.title}</span>
+          <span class="toc-title"><Amp text={s.title} /></span>
           <span class="toc-dots" aria-hidden="true"></span>
           <span class="toc-n">{s.count}<span class="sr-only"> {countLabel.text.toLowerCase()}</span></span>
         </a>

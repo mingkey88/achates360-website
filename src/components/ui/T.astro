@@ -1,7 +1,10 @@
 ---
 import DraftTag from './DraftTag.astro';
+import { ACCENTS, splitAccent } from '../../lib/accents';
 import type { UiString } from '../../lib/strings';
+// A UI string, verbatim, with its Draft mark; a two-tone heading's phrase (lib/accents.ts) in orange.
 interface Props { s: UiString }
 const { s } = Astro.props;
+const parts = splitAccent(s.text, ACCENTS[s.id]);
 ---
-<span data-placeholder={s.placeholder ? '' : undefined}>{s.text}<DraftTag when={s.placeholder} /></span>
+<span data-placeholder={s.placeholder ? '' : undefined}>{parts ? <>{parts[0]}<span class="hl">{parts[1]}</span>{parts[2]}</> : s.text}<DraftTag when={s.placeholder} /></span>

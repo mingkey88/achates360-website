@@ -2,6 +2,7 @@
 import Pic from './ui/Pic.astro';
 import DraftTag from './ui/DraftTag.astro';
 import T from './ui/T.astro';
+import Amp from './ui/Amp.astro';
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 // One service as an open book's spread (direction B, Services page). The left page carries the words:
@@ -26,7 +27,7 @@ const no = (n: number) => String(n).padStart(2, '0');
   <div class="sp-pages">
     <div class="sp-left">
       <p class="sp-no" aria-hidden="true">{no(index + 1)}</p>
-      <h2 class="sp-title" id={`${service.id}-t`} data-placeholder={service.placeholder ? '' : undefined}>{service.title}</h2>
+      <h2 class="sp-title" id={`${service.id}-t`} data-placeholder={service.placeholder ? '' : undefined}><Amp text={service.title} /></h2>
       <p class="sp-body" data-placeholder={service.placeholder ? '' : undefined}>{service.body}<DraftTag when={service.placeholder} /></p>
       <div class="sp-covers">
         <p class="sp-label"><T s={coversLabel} /></p>
