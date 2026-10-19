@@ -58,5 +58,9 @@ html:not(.js) .bgvideo video[data-src] { display: none; }
     var(--h) var(--L) 100% / 1px var(--cm-len) no-repeat, var(--h) calc(100% - var(--L)) 100% / 1px var(--cm-len) no-repeat;
 }
 
-/* Two-tone headings (direction B, after nationalgallery.sg): the accent phrase in the brand orange, plain. */
-.hl { color: var(--accent); }
+/* Two-tone headings (direction B, after nationalgallery.sg): the accent phrase in the text orange, a weight
+   heavier so it holds on the paper; on dark grounds, the brand orange. In a small running head the word
+   stays in the head's grey (the orange bar under it carries the colour). */
+.hl { color: var(--accent-text); font-weight: 500; }
+:is(.on-dark, .site-footer) .hl { color: var(--accent); }
+.rh-name .hl { color: inherit; font-weight: inherit; }

@@ -3,7 +3,7 @@ import { withBase } from '../lib/paths';
 // The projects' categories as a row of tabs (direction B, after nationalgallery.sg's exhibition tabs), on
 // /projects and every category page: "All projects" then each category (its name verbatim) with the number
 // of projects on its page. The page you are on is marked as a selected tab: a thick bar of the brand
-// orange on its top edge, over the row's hairline, and its name in orange. Tabs are divided by hairlines.
+// orange on its top edge, over the row's hairline, and its name set heavier (in ink, for legibility). Tabs are divided by hairlines.
 // Wide screens set them as two rows of five; narrower screens as one row that scrolls sideways, opened
 // with the current tab in view.
 interface Tab { label: string; href: string; count: number }
@@ -58,10 +58,10 @@ const { tabs, path, label } = Astro.props;
   .ct-n { font-size: .75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .ctabs a:hover .ct-name { text-decoration: underline; text-underline-offset: .25em; text-decoration-thickness: 1px; }
   .ctabs a:hover::before { transform: scaleX(1); background: var(--line); }
-  .ctabs a[aria-current] { color: var(--accent); font-weight: 500; }
+  .ctabs a[aria-current] { color: var(--ink); font-weight: 500; }
   .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
   .ctabs a[aria-current] .ct-name { text-decoration: none; }
-  .ctabs a[aria-current] .ct-n { color: var(--accent); }
+  .ctabs a[aria-current] .ct-n { color: var(--ink); }
   /* Wide screens: every tab in view, two rows of five, each row on its own hairline. */
   @media (min-width: 1024px) {
     .ctabs ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; border-top: 0; -webkit-mask-image: none; mask-image: none; }
