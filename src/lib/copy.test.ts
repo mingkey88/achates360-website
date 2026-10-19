@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sentenceStarting, splitRoleHeading, titleFromSeo, splitLastWord } from './copy';
+import { sentenceStarting, splitRoleHeading, titleFromSeo, splitLastWord, isStub } from './copy';
 
 const about = 'We are an integrated creative agency.  \n \n\nThe name Achates 360 reflects our company philosophy of being a faithful companion and trusted friend to our clients. Relationships are central to our company\'s ethos.  \n​\n\nBelieving that design is thinking made visual.';
 
@@ -35,5 +35,16 @@ describe('splitLastWord', () => {
   });
   it('leaves a single word whole', () => {
     expect(splitLastWord('Nokia')).toEqual(['', 'Nokia']);
+  });
+});
+
+describe('isStub', () => {
+  it('flags [Draft] instructions and empty text, not real copy', () => {
+    expect(isStub('[Draft] Two lines on what this service covers.')).toBe(true);
+    expect(isStub('  [draft] lower case')).toBe(true);
+    expect(isStub('')).toBe(true);
+    expect(isStub(undefined)).toBe(true);
+    expect(isStub('Strategic brand identities for banks and hotels.')).toBe(false);
+    expect(isStub('A draft of the annual report')).toBe(false);
   });
 });

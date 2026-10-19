@@ -31,3 +31,9 @@ export function splitLastWord(t: string): [string, string] {
   const i = t.lastIndexOf(' ');
   return [t.slice(0, i + 1), t.slice(i + 1)];
 }
+
+/**
+ * A placeholder sentence that is an instruction rather than copy ("[Draft] Two lines on what this service
+ * covers…"): not shown to visitors until the real words arrive.
+ */
+export const isStub = (text: string | undefined): boolean => !text || /^\s*\[Draft\]/i.test(text);
