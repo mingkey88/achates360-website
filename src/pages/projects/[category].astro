@@ -2,7 +2,6 @@
 import { catalogueOf } from '../../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import ProjectsCover from '../../components/ProjectsCover.astro';
 import ProjectCards from '../../components/ProjectCards.astro';
 import CategoryTabs from '../../components/CategoryTabs.astro';
 import { loadExtras } from '../../lib/extras';
@@ -11,8 +10,7 @@ import { cardsFor } from '../../lib/project-index';
 import { breadcrumbLd } from '../../lib/seo';
 import { withBase } from '../../lib/paths';
 // One page per project category (direction B): the supplied section heading and its gallery, verbatim,
-// with the category tabs to move between them (its own tab selected). It opens like /projects, with the paper cover, the
-// category's name cut through it; the hold is shorter, as visitors hop between categories. Its cards are
+// with the category tabs to move between them (its own tab selected). It opens straight on its heading. Its cards are
 // the same as /projects (one title, client and link per project, wherever it appears), listed projects
 // only, each once (cardsFor).
 export async function getStaticPaths() {
@@ -32,8 +30,7 @@ const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const tabs = [{ label: text('next-fallback').text, href: '/projects', count: catalogue.length }, ...cats.map((c) => ({ label: c.heading, href: c.href, count: cardsFor(c.items, catalogue).length })).filter((t) => t.count > 0)];
 ---
 <Base title={`${cat.heading} | Achates 360`} description={d.seo.description} ogImage={cards[0]?.thumb} ogAlt={cat.heading} jsonLd={[breadcrumbLd([['Projects', abs('/projects')], [cat.heading, abs(cat.href)]])]} page="projects">
-  <div class="cat" data-pin-container>
-    <ProjectsCover title={cat.heading} count={cards.length} hold={.5} />
+  <div class="cat">
     <header class="wrap cat-head">
       <h1 class="display h1" data-split>{cat.heading}</h1>
     </header>
@@ -54,6 +51,5 @@ const tabs = [{ label: text('next-fallback').text, href: '/projects', count: cat
   import { run } from '../../scripts/motion/index';
   import { reveal } from '../../scripts/motion/reveal';
   import { tilt } from '../../scripts/motion/tilt';
-  import { cover } from '../../scripts/motion/cover';
-  run(cover, reveal, tilt);
+  run(reveal, tilt);
 </script>

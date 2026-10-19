@@ -2,16 +2,21 @@
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
-// The end of a case study: the next project, large, and beside it the way to start one like this.
-interface Props { href: string; title: string | UiString; label: UiString; discuss?: { label: UiString; href: string } }
-const { href, title, label, discuss } = Astro.props;
+import PaperCut from './ui/PaperCut.astro';
+// The end of a case study: "Next project" cut through a sheet of paper (ui/PaperCut), the next project's
+// picture lying under it and showing through the letters; under the sheet, the project's name, and beside
+// it the way to start one like this. The whole sheet is the link; the picture drifts larger on hover.
+interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; discuss?: { label: UiString; href: string } }
+const { href, title, label, image, position, discuss } = Astro.props;
 ---
 <section class="next-project">
   <div class="np-band wrap">
     <a class="np" href={withBase(href)}>
-      <span class="label"><T s={label} /></span>
-      <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />}</span>
-      <span class="np-arrow" aria-hidden="true">→</span>
+      <PaperCut text={label.text} image={image} position={position} />
+      <span class="np-meta">
+        <span class="label"><T s={label} /></span>
+        <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />} <span class="np-arrow" aria-hidden="true">→</span></span>
+      </span>
     </a>
     {discuss && (
       <a class="np-discuss" href={withBase(discuss.href)}><T s={discuss.label} /> <span aria-hidden="true">→</span></a>
@@ -19,19 +24,28 @@ const { href, title, label, discuss } = Astro.props;
   </div>
 </section>
 <style>
-  /* A stone band ending on a hairline, so it no longer runs into the charcoal footer. */
+  /* A stone band ending on a hairline, so it no longer runs into the charcoal footer; the paper sheet lies
+     on it a shade lighter. */
   .next-project { background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
   .np-band { display: grid; gap: var(--s-6); padding-block: var(--section-y); }
-  .np { display: grid; gap: var(--s-3); text-decoration: none; }
-  .np-title { font: 400 var(--fs-h2)/var(--lh-display) var(--font-display); color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
-  .np-arrow { font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent-deep); transition: transform .3s var(--ease-out); }
+  .np { display: grid; gap: var(--s-5); text-decoration: none; color: inherit; }
+  .np-meta { display: grid; gap: var(--s-2); }
+  .label { font-size: var(--fs-small); color: var(--text-2); }
+  .np-title { font: 400 var(--fs-h3)/1.2 var(--font-display); color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
+  .np-arrow { display: inline-block; color: var(--accent-deep); transition: transform .3s var(--ease-out); }
   .np:hover .np-arrow { transform: translateX(12px); }
+    .np:hover :global(.pcut-pic img) { scale: 1.06; }
   /* The second action: a framed link, like the header's Contact. */
   .np-discuss {
-    justify-self: start; align-self: end; display: inline-flex; gap: 10px; padding: 12px 20px; border: 1px solid var(--ink);
+    justify-self: start; display: inline-flex; gap: 10px; padding: 12px 20px; border: 1px solid var(--ink);
     color: var(--ink); font-size: var(--fs-small); text-decoration: none; transition: background-color .25s, color .25s;
   }
   .np-discuss:hover { background: var(--ink); color: var(--paper); }
-  @media (min-width: 900px) { .np-band { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--s-8); } }
+  /* Wide screens: the second action at the right, on the name's line. */
+  @media (min-width: 900px) {
+    .np-band { position: relative; }
+    .np-meta { padding-right: 320px; }
+    .np-discuss { position: absolute; right: 0; bottom: var(--section-y); }
+  }
   @media (prefers-reduced-motion: reduce) { .np-arrow, .np-discuss { transition: none; } }
 </style>

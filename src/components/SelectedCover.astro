@@ -14,10 +14,10 @@ type Media = CollectionEntry<'home'>['data']['slides'][number]['media'];
 // logo's five figures cut out beside them like an alpha mask, so the project's film shows through the
 // letters; below the sheet's stepped edge the film runs plain. The film stays put (sticky) while the
 // sheet scrolls up and away, uncovering it whole; the project's card overlaps its lower corner.
-// The sheet is the same press sheet as the /projects cover: its lower edge die-cut in square steps, and
+// The sheet is a press sheet: its lower edge die-cut in square steps, and
 // the catalogue range and colour bar printed in its top corner (PressMarks).
-// With motion the cover holds still and the sheet slides away to the left instead (motion/cover.ts), as
-// the /projects cover does; without motion it is pure CSS scrolling, so it works under reduced motion. The heading is a visually
+// With motion the cover holds still and the sheet slides away to the left instead (motion/cover.ts);
+// without motion it is pure CSS scrolling, so it works under reduced motion. The heading is a visually
 // hidden h2 (the capitals are display only); the paper SVG is decorative; the video keeps its pause button.
 interface Props {
   id: string; heading: UiString; media: Media; count: number;
@@ -89,8 +89,8 @@ const B = 4000;
   .cover-film { position: sticky; top: 0; height: var(--v); overflow: hidden; background: var(--ink); }
   .cover-film :global(.cover-media) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cover-film :global(.bgvideo video) { width: 100%; height: 100%; object-fit: cover; }
-  /* The sheet's lower edge is die-cut in square steps, rising to the left, as the /projects cover's
-     outline (two steps of --st; the lettering keeps clear of both). The drop shadow follows the cut
+  /* The sheet's lower edge is die-cut in square steps, rising to the left, like the
+     buildings on 'Building Memories' (two steps of --st; the lettering keeps clear of both). The drop shadow follows the cut
      because it is drawn after the clip. */
   .cover-paper { position: relative; z-index: 1; height: var(--ph); margin-bottom: calc(var(--v) - var(--ph)); margin-top: calc(var(--v) * -1); pointer-events: none; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .28)); }
   .paper-cut {

@@ -5,7 +5,7 @@ export type MotionModule = 'reveal' | 'hero' | 'stack' | 'counters' | 'tilt' | '
 export const MOTION: Record<PageKind, MotionModule[]> = {
   home: ['reveal', 'hero', 'counters', 'scatter', 'cover'],
   project: ['reveal'],
-  projects: ['cover', 'reveal', 'tilt'],
+  projects: ['reveal', 'tilt'],
   categories: ['reveal', 'tilt'],
   services: ['reveal', 'tilt', 'press'],
   about: ['reveal', 'counters', 'story'],

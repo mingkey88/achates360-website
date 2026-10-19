@@ -2,7 +2,6 @@
 import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import ProjectsCover from '../components/ProjectsCover.astro';
 import ProjectCards from '../components/ProjectCards.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
@@ -10,8 +9,9 @@ import { withBase } from '../lib/paths';
 import { itemListLd } from '../lib/seo';
 import CategoryTabs from '../components/CategoryTabs.astro';
 import { cardsFor } from '../lib/project-index';
-// The projects overview (direction B): a die-cut cover over the top, then every listed project in the homepage
-// list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
+// The projects overview (direction B): the heading and the category tabs, then every listed project in the
+// homepage list's order, as one grid (the die-cut cover that lay over the top was removed, client, 19 Oct
+// 2026: it held the cards back on every visit). Titles, clients and pictures are the homepage gallery's, verbatim. The
 // category pages (/projects/<slug>) stay, reached from the header's Projects menu.
 const d = (await getEntry('projectsIndex', 'projects'))!.data;
 const site = (await getEntry('site', 'site'))!.data;
@@ -35,8 +35,7 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   <script is:inline define:vars={{ redirects }}>
     { const to = redirects[location.hash.slice(1)]; if (to) location.replace(to); }
   </script>
-  <div class="pi" data-pin-container>
-    <ProjectsCover title={heading} count={entries.length} />
+  <div class="pi">
     <header class="wrap pi-head">
       <h1 class="display h1 sc" data-split>{heading}</h1>
       <span class="pi-total" aria-hidden="true">{entries.length}</span>
@@ -60,6 +59,5 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { tilt } from '../scripts/motion/tilt';
-  import { cover } from '../scripts/motion/cover';
-  run(cover, reveal, tilt);
+  run(reveal, tilt);
 </script>
