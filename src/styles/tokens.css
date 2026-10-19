@@ -1,9 +1,10 @@
 /* Design tokens (spec §3). Light only: the site has no dark theme. */
 :root {
   /* Corporate colours (brand/BRAND-NOTES.md): orange Pantone 1495 U, turquoise 324 U, lime green 373 U.
-     All three are light, so they are grounds for ink text; text in brand colour uses the -deep/-ink shades. */
+     All three are light, so they are grounds for ink text. Words and marks in orange use the brand orange
+     itself (client, 19 Oct 2026: the deeper shade read brown), so orange text is kept to display sizes and
+     accents; anything that must be read at small sizes stays in ink. */
   --accent: #ff9015;      /* brand orange: fills, pills, stickers, accents on dark grounds */
-  --accent-deep: #9c4f00; /* orange for text and marks on light grounds; 4.35:1 or better on every tint */
   --turquoise: #99d9d9;   /* brand turquoise: light bands, text on teal-ink */
   --lime: #cbe880;        /* brand lime green: used sparingly (clients band, text selection) */
   --teal-ink: #252525;    /* direction B: charcoal for dark bands and the footer (after Aesop) */

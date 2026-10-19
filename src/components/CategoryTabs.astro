@@ -58,10 +58,10 @@ const { tabs, path, label } = Astro.props;
   .ct-n { font-size: .75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .ctabs a:hover .ct-name { text-decoration: underline; text-underline-offset: .25em; text-decoration-thickness: 1px; }
   .ctabs a:hover::before { transform: scaleX(1); background: var(--line); }
-  .ctabs a[aria-current] { color: var(--accent-deep); font-weight: 500; }
+  .ctabs a[aria-current] { color: var(--accent); font-weight: 500; }
   .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
   .ctabs a[aria-current] .ct-name { text-decoration: none; }
-  .ctabs a[aria-current] .ct-n { color: var(--accent-deep); }
+  .ctabs a[aria-current] .ct-n { color: var(--accent); }
   /* Wide screens: every tab in view, two rows of five, each row on its own hairline. */
   @media (min-width: 1024px) {
     .ctabs ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; border-top: 0; -webkit-mask-image: none; mask-image: none; }

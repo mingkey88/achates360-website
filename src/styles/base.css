@@ -58,8 +58,5 @@ html:not(.js) .bgvideo video[data-src] { display: none; }
     var(--h) var(--L) 100% / 1px var(--cm-len) no-repeat, var(--h) calc(100% - var(--L)) 100% / 1px var(--cm-len) no-repeat;
 }
 
-/* Two-tone headings (direction B, after nationalgallery.sg): the accent phrase in the deeper orange, with
-   a slightly off-register orange impression behind it, as the homepage's studio sentence. On dark grounds,
-   the brand orange itself. */
-.hl { color: var(--accent-deep); text-shadow: .05em .04em 0 rgb(255 144 21 / .45); }
-:is(.on-dark, .site-footer) .hl { color: var(--accent); text-shadow: none; }
+/* Two-tone headings (direction B, after nationalgallery.sg): the accent phrase in the brand orange, plain. */
+.hl { color: var(--accent); }

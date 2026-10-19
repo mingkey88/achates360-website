@@ -15,8 +15,8 @@
 .prose :is(h1, h2, h3, h4, h5, h6) { font: 400 var(--fs-h3) / 1.15 var(--font-display); margin: 1.2em 0 .4em; text-wrap: balance; }
 /* Exported headings are sometimes wrapped in bold and sometimes not: one regular style for all. */
 .prose :is(h1, h2, h3, h4, h5, h6) :is(strong, b) { font-weight: inherit; }
-.prose a { text-decoration-color: var(--accent-deep); text-underline-offset: 3px; }
-.prose li::marker { color: var(--accent-deep); }
+.prose a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.prose li::marker { color: var(--accent); }
 /* Direction B: Cormorant's default old-style figures dip below the line; headlines use lining figures.
    A component rule that sets the `font` shorthand resets this, so those rules repeat it. */
 .display, :is(h1, h2, h3) { font-variant-numeric: lining-nums; }
