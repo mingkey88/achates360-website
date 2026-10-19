@@ -1,8 +1,8 @@
 /**
  * Award seals shown beside a project where the homepage features it (SelectedWork's lead plate). The
  * badges are the project page's own (its Wix gallery), named as the page names them; count is the number
- * of awards the page lists. Seals: the round medallions (shown in a circle); badges: the rest. All are
- * shown at one visual weight, in one grid.
+ * of awards the page lists. Seals: the round medallions, shown large; badges: the rest, named in text (their
+ * pictures are too small to read at that size), in the page's own words.
  */
 import sbpaYear from '../assets/wix/e9d9c2_138a012b672543c6be29449f97ae4b83.jpg';
 import sbpaWinner from '../assets/wix/e9d9c2_874f4fa961624d00b7cb519ddf23048e.jpg';
@@ -27,9 +27,9 @@ export const PROJECT_AWARDS: Record<string, ProjectAwards> = {
       { src: sbpaFinalist, alt: 'Singapore Book Awards 2017: Finalist, Best Book Cover Design' },
     ],
     badges: [
-      { src: how, alt: 'HOW International Design Awards Winner 2017' },
-      { src: gdusa, alt: 'American Graphic Design Award 2016 Winner' },
-      { src: aDesign, alt: "A' Design Award 2017 Bronze Winner" },
+      { src: how, alt: 'HOW: International Design Awards Winner 2017' },
+      { src: gdusa, alt: 'American Graphic Design Award 2016' },
+      { src: aDesign, alt: 'A’Design Award 2017 Bronze Winner' },
       { src: gov, alt: 'GOV: The Design 100 Gold Winner 2016' },
       { src: hkg, alt: 'HKG: The Design 100 Gold Winner 2016' },
       { src: nyc, alt: 'NYC: The Design 100 Gold Winner 2016' },

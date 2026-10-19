@@ -18,7 +18,7 @@ type Project = CollectionEntry<'projects'>['data'];
 // on /projects) as its folio; then client · discipline · year and the title, linked.
 // Videos play on hover (MediaCard). poster: a replacement still for a slide's film (by link).
 // Beside the lead plate, where its project has them (lib/project-awards.ts), its awards: the count in
-// orange, then every seal and badge in one even grid, each sized to the same visual weight; they link to it.
+// orange, its round seals large in a row, the other awards named in a ruled list; they link to it.
 interface Props { items: { slide: Slide; project?: Project; no?: number; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number; awardsLabel: UiString }
 const { items, eyebrow, cta, total, awardsLabel } = Astro.props;
 const all = items.map(({ slide, project, no, poster }) => ({
@@ -34,13 +34,6 @@ const all = items.map(({ slide, project, no, poster }) => ({
   awards: slide.cta?.href ? PROJECT_AWARDS[slide.cta.href.replace(/^\//, '')] : undefined,
 }));
 const [cover, ...rows] = all;
-// One visual weight per badge: the same area in its cell (a round seal a circle, a tall badge narrow and
-// taller), no wider than 90% of the cell or taller than its height. Width as a share of the cell's width.
-// A round seal fills only π/4 of its square, so it is drawn a little wider to carry the same area.
-const badgeWidth = (r: number, round = false) => round ? Math.min(Math.sqrt(.5 / (Math.PI / 4)), .9) : Math.min(Math.sqrt(.5 * r), .9, 1.0 * r);
-const badges = (a: NonNullable<(typeof all)[number]['awards']>) => [
-  ...a.seals.map((b) => ({ ...b, round: true })), ...a.badges.map((b) => ({ ...b, round: false })),
-].map((b) => ({ ...b, r: b.src.width / b.src.height }));
 ---
 <section class="sw" aria-labelledby="sw-title">
   {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} count={total} />}
@@ -52,11 +45,10 @@ const badges = (a: NonNullable<(typeof all)[number]['awards']>) => [
           <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="4 / 3" sizes={i === 0 ? '(max-width: 767px) calc(100vw - 32px), 56vw' : '(max-width: 767px) calc(100vw - 32px), 31vw'} widths={[480, 720, 960, 1280, 1600]} duplicateLink={!!r.title} reveal={false} />
         </div>
         {i === 0 && r.awards && r.href && (
-          <a class="sw-medals" href={withBase(r.href)} aria-label={`${r.title}: ${r.awards.count} ${awardsLabel.text}`}>
-            <span class="sw-tally" aria-hidden="true"><span class="sw-tally-n">{r.awards.count}</span><T s={awardsLabel} /></span>
-            <span class="sw-badges">{badges(r.awards).map((b) => (
-              <span class="sw-cell"><span class:list={['sw-badge', { round: b.round }]} style={`--w: ${(badgeWidth(b.r, b.round) * 100).toFixed(1)}%; --ar: ${b.round ? 1 : b.r.toFixed(3)}`}><Pic src={b.src} alt="" widths={[160, 240]} sizes="96px" /></span></span>
-            ))}</span>
+          <a class="sw-medals" href={withBase(r.href)}>
+            <span class="sw-tally"><span class="sw-tally-n">{r.awards.count}</span><T s={awardsLabel} /></span>
+            <span class="sw-seals">{r.awards.seals.map((b) => <span class="sw-seal"><Pic src={b.src} alt={b.alt} widths={[216]} sizes="130px" /></span>)}</span>
+            <span class="sw-also">{r.awards.badges.map((b) => <span>{b.alt}</span>)}</span>
           </a>
         )}
         <div class="sw-text">
@@ -104,25 +96,28 @@ const badges = (a: NonNullable<(typeof all)[number]['awards']>) => [
     .sw-lead { grid-column: 1 / -1; }
     .sw-item:not(.sw-lead) .sw-title { font-size: var(--fs-lead); }
   }
-  /* The lead plate's awards: the count, then every seal and badge in an even grid, five to a row, each the
-     same visual weight (badgeWidth), with clear space between; they lift a touch on hover. */
+  /* The lead plate's awards: the count, the round seals large in a row with clear space between (all
+     one size), then the other awards named in a ruled list, small, like the awards list in the imprint.
+     The seals lift a touch on hover. */
   .sw-medals { display: grid; justify-items: start; gap: var(--s-5); width: 100%; color: inherit; text-decoration: none; }
   .sw-tally { display: flex; align-items: baseline; gap: .5em; font-size: var(--fs-small); color: var(--text-2); }
   .sw-tally-n { font: 500 clamp(2.75rem, 2rem + 2.6vw, 4.5rem)/.9 var(--font-display); letter-spacing: -.03em; color: var(--accent-text); }
-  .sw-badges { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s-4); width: 100%; max-width: 480px; }
-  .sw-cell { display: grid; place-items: center; aspect-ratio: 1; }
-  .sw-badge { display: block; width: var(--w); aspect-ratio: var(--ar); transition: translate .4s var(--ease-out); }
-  .sw-badge.round { border-radius: 50%; overflow: hidden; }
-  .sw-badge :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .sw-medals:hover .sw-badge { translate: 0 -3px; }
-  @media (prefers-reduced-motion: reduce) { .sw-badge { transition: none; } }
+  .sw-seals { display: grid; grid-template-columns: repeat(3, minmax(0, 130px)); gap: var(--s-5); width: 100%; }
+  .sw-seal { display: block; aspect-ratio: 1; border-radius: 50%; overflow: hidden; box-shadow: 0 8px 16px -8px rgb(0 0 0 / .35); transition: translate .4s var(--ease-out); }
+  .sw-seal :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .sw-medals:hover .sw-seal { translate: 0 -4px; }
+  .sw-also { display: grid; width: 100%; font-size: var(--fs-small); line-height: 1.4; color: var(--text-2); border-top: 1px solid var(--line); }
+  .sw-also span { padding-block: 6px; border-bottom: 1px solid var(--line); }
+  .sw-also span:last-child { border-bottom: 0; } /* the caption's rule closes the list */
+  @media (prefers-reduced-motion: reduce) { .sw-seal { transition: none; } }
   @media (max-width: 1023px) {
     .sw-lead .sw-medals { order: 3; margin-top: var(--s-4); }
   }
   @media (max-width: 767px) {
     .sw-lead .sw-medals { justify-items: center; }
     .sw-tally { justify-content: center; }
-    .sw-badges { gap: var(--s-3); }
+    .sw-seals { justify-content: center; gap: var(--s-4); }
+    .sw-also { text-align: center; }
   }
   @media (min-width: 1024px) {
     .sw-lead { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: end; }
