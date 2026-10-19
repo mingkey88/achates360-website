@@ -5,6 +5,7 @@ import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
 import { withBase } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
+import { FOOTER_ACCENT, splitAccent } from '../lib/accents';
 // The homepage's closing section (after kitpro-croma): project pictures start as one stacked pile in
 // the middle and spread out to the edges as you scroll, revealing the call to action in the space they
 // leave. A short run (130svh, phones 120): the pile starts already loosened, so no frame is empty paper,
@@ -16,6 +17,8 @@ import { loadExtras } from '../lib/extras';
 interface Item { thumb: ImageMetadata; title: string; href?: string }
 interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
 const { items, heading, blurb, cta, href } = Astro.props;
+// The blurb is the footer's intro line: the same orange phrase as in the footer.
+const blurbParts = splitAccent(blurb, FOOTER_ACCENT);
 // Spread-out places: x / y = centre in % of the stage, w = width in vw (desktop); m* the same for phones,
 // where only the first six are used, above and below the message.
 // The middle (about 30-70% across, 26-76% down) stays clear for the message; the pictures sit small
@@ -61,7 +64,7 @@ const reset = text('drag-reset');
     </ul>
     <div class="scta-msg" data-scatter-msg>
       <h2 id="scta-title"><T s={heading} /></h2>
-      <p>{blurb}</p>
+      <p>{blurbParts ? <>{blurbParts[0]}<span class="hl">{blurbParts[1]}</span>{blurbParts[2]}</> : blurb}</p>
       <Pill href={href} variant="fill"><T s={cta} /></Pill>
       <button class="scta-reset" type="button" data-pile-reset hidden><T s={reset} /> <span aria-hidden="true">↺</span></button>
     </div>

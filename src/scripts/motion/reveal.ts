@@ -6,7 +6,7 @@ import { gsap, SplitText } from './index';
  * blocks fade up.
  */
 export function reveal(): void {
-  // A trigger inside a page that another ScrollTrigger pins (the projects cover) must allow for the pin.
+  // A trigger inside a page that another ScrollTrigger pins (a held cover) must allow for the pin.
   const pinned = (el: Element) => el.closest<HTMLElement>('[data-pin-container]') ?? undefined;
   for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
     if (el.closest('[data-hero]')) continue;

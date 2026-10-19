@@ -9,10 +9,10 @@ import Sticker from './Sticker.astro';
 // duplicateLink: the same page is linked by a named title next to the card, so the picture link stays
 // clickable but is left out of the tab order and the accessibility tree (no unnamed repeat stop).
 interface Props {
-  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string; position?: string;
+  image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string; position?: string; folio?: string;
   previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, tag, position, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, tag, position, folio, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
 // A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
 const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
 const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
@@ -26,7 +26,8 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
   </div>
   {(title || subtitle) && (
-    <div class="mc-text">
+    <div class:list={['mc-text', { 'has-folio': folio }]}>
+      {folio && <p class="mc-folio" aria-hidden="true">{folio}</p>}
       {title && <p class="mc-title">{title}</p>}
       {subtitle && <p class="mc-sub">{subtitle}</p>}
       {tag && <p class="mc-tag">{tag}</p>}
@@ -86,6 +87,10 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   a.media-card:hover .mc-media :global(img) { transform: scale(1.04); }
   .mc-media :global(.mc-sticker) { position: absolute; top: var(--s-3); right: var(--s-3); }
   .mc-text { padding-top: var(--s-3); }
+  /* folio: the card's catalogue number, set small at the caption's right, as a plate's number. */
+  .mc-text.has-folio { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--s-4); align-items: baseline; }
+  .mc-text.has-folio > :not(.mc-folio) { grid-column: 1; }
+  .mc-folio { grid-column: 2; grid-row: 1; margin: 0; font-size: .6875rem; letter-spacing: .04em; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
   /* A small label under the caption (an award the gallery notes): ink in a hairline box, like a stamp. */

@@ -11,6 +11,8 @@ import { withBase } from '../lib/paths';
 import { servicesLd } from '../lib/seo';
 import { projectCategories, withLinks } from '../lib/categories';
 import { serviceCount, categoryCount } from '../lib/service-counts';
+import { catalogueOf } from '../lib/catalogue';
+import { cardsFor, type IndexEntry } from '../lib/project-index';
 import showreelPoster from '../assets/showreel-poster.jpg';
 // The Services page (direction B), read like a book: a contents page, the studio's showreel, one spread
 // per service (words first, one picture), how the studio works, and the way to get in touch.
@@ -19,6 +21,8 @@ const { text } = x;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
 const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
+const home = (await getEntry('home', 'home'))!.data;
+const catalogue = catalogueOf(home.allProjects.items, projects);
 const cats = new Map(projectCategories(sections).map((c) => [c.heading, c]));
 const services = x.services.map((s: any) => {
   const p = projects.get(s.project);
@@ -29,7 +33,19 @@ const services = x.services.map((s: any) => {
     if (!c) throw new Error(`services/${s.id}: "${h}" is not a project category`);
     return { heading: h, href: c.href, count: categoryCount(h, sections, listed) };
   });
-  return { ...s, image, covers, count: serviceCount(s.tags, sections, listed), plate: { image, title: p.title, client: p.client, href: `/${s.project}` } };
+  // More in this service: three more of its projects as small plates on the words page, taken from its
+  // categories in turn (each category's in catalogue order), so each kind of work it covers shows;
+  // never the plate's project, and no project twice.
+  const lists: IndexEntry[][] = s.tags.map((h: string) => cardsFor(sections.find((x) => x.heading === h)!.items, catalogue).sort((a, b) => a.no - b.no));
+  const seen = new Set<string>([s.project]);
+  const more: IndexEntry[] = [];
+  for (let round = 0; more.length < 3 && lists.some((l) => l.length > round); round++) {
+    for (const l of lists) {
+      const e = l[round];
+      if (e && !seen.has(e.slug) && more.length < 3) { seen.add(e.slug); more.push(e); }
+    }
+  }
+  return { ...s, image, covers, more, count: serviceCount(s.tags, sections, listed), plate: { image, title: p.title, client: p.client, href: `/${s.project}` } };
 });
 const heading = text('services-heading');
 const reel = text('showreel-label');
@@ -38,7 +54,7 @@ const jsonLd = servicesLd(new URL(withBase('/'), Astro.site).href, x.services.ma
 <Base title={`${heading.text} | Achates 360`} description={x.services.map((s: any) => s.title).join(', ')} jsonLd={jsonLd} page="services">
   <ServicesContents heading={heading} countLabel={text('contents-count')} services={services} />
   <Showreel label={reel.text} draft={reel.placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="2:00" />
-  {services.map((s: any, i: number) => <ServiceSpread index={i} total={services.length} coversLabel={text('service-covers')} service={s} covers={s.covers} plate={s.plate} />)}
+  {services.map((s: any, i: number) => <ServiceSpread index={i} total={services.length} coversLabel={text('service-covers')} moreLabel={text('service-more')} more={s.more} service={s} covers={s.covers} plate={s.plate} />)}
   <ProcessSteps steps={x.process} heading={text('process-heading')} stepLabel={text('process-step')} />
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>

@@ -114,6 +114,8 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease-out);
   }
   .primary > ul > li > a:is(:hover, :focus-visible, [data-current])::after { transform: scaleX(1); transform-origin: left; }
+  /* The current section: a thick bar of the brand orange, as a selected tab's marker (after nationalgallery.sg). */
+  .primary > ul > li > a[data-current]::after { height: 3px; bottom: 1px; background: var(--accent); }
 
   .actions { display: flex; align-items: center; gap: var(--s-3); }
   /* Contact: the one framed action, a hairline box like the site's buttons. */

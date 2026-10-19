@@ -2,6 +2,7 @@
 import Pic from './ui/Pic.astro';
 import DraftTag from './ui/DraftTag.astro';
 import T from './ui/T.astro';
+import Amp from './ui/Amp.astro';
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 // One service as an open book's spread (direction B, Services page). The left page carries the words:
@@ -10,21 +11,23 @@ import type { UiString } from '../lib/strings';
 // it, captioned like a plate. A hairline down the middle is the fold. Spreads alternate as a book's
 // pages do: every second one (a verso) mirrors, the picture on the left page and the words on the
 // right; pictures sit against the page's outer edge, and the folio at the outer corner.
-// Words lead and the work supports: the full work lives on the Projects pages.
+// Under the categories, three more of its projects as small plates (more). Words lead and the work
+// supports: the full work lives on the Projects pages.
 interface Props {
-  index: number; total: number; coversLabel: UiString;
+  index: number; total: number; coversLabel: UiString; moreLabel: UiString;
+  more: { no: number; title: string; href: string; thumb: ImageMetadata; position?: string }[];
   service: { id: string; title: string; body: string; placeholder: boolean };
   covers: { heading: string; href: string; count: number }[];
   plate: { image: ImageMetadata; title: string; client: string; href: string };
 }
-const { index, total, coversLabel, service, covers, plate } = Astro.props;
+const { index, total, coversLabel, moreLabel, more, service, covers, plate } = Astro.props;
 const no = (n: number) => String(n).padStart(2, '0');
 ---
 <section class:list={['spread', 'wrap', { verso: index % 2 === 1 }]} id={service.id} aria-labelledby={`${service.id}-t`}>
   <div class="sp-pages">
     <div class="sp-left">
       <p class="sp-no" aria-hidden="true">{no(index + 1)}</p>
-      <h2 class="sp-title" id={`${service.id}-t`} data-placeholder={service.placeholder ? '' : undefined}>{service.title}</h2>
+      <h2 class="sp-title" id={`${service.id}-t`} data-placeholder={service.placeholder ? '' : undefined}><Amp text={service.title} /></h2>
       <p class="sp-body" data-placeholder={service.placeholder ? '' : undefined}>{service.body}<DraftTag when={service.placeholder} /></p>
       <div class="sp-covers">
         <p class="sp-label"><T s={coversLabel} /></p>
@@ -32,6 +35,20 @@ const no = (n: number) => String(n).padStart(2, '0');
           {covers.map((c) => <li><a href={withBase(c.href)}><span>{c.heading}</span><span class="sp-n">{c.count}</span></a></li>)}
         </ul>
       </div>
+      {more.length > 0 && (
+        <div class="sp-more">
+          <p class="sp-label"><T s={moreLabel} /></p>
+          <ul>
+            {more.map((m) => (
+              <li><a href={withBase(m.href)}>
+                <span class="sp-thumb"><Pic src={m.thumb} alt="" crop={4 / 3} widths={[240, 360, 480]} sizes="(max-width: 899px) 30vw, 12vw" position={m.position} loading="lazy" /></span>
+                <span class="sp-mt">{m.title.trim()}</span>
+                <span class="sp-mn" aria-hidden="true">№ {String(m.no).padStart(3, '0')}</span>
+              </a></li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
     <figure class="sp-right">
       <a class="sp-pic" href={withBase(plate.href)} tabindex="-1" aria-hidden="true"><Pic src={plate.image} alt="" crop={4 / 5} mobileCrop={4 / 3} widths={[480, 720, 960, 1280]} mobileWidths={[400, 600, 800]} sizes="40vw" mobileSizes="calc(100vw - 32px)" /></a>
@@ -47,11 +64,21 @@ const no = (n: number) => String(n).padStart(2, '0');
   .sp-title { margin: 0 0 var(--s-4); font: 400 var(--fs-h1)/1.1 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
   .sp-body { margin: 0 0 var(--s-6); max-width: 38ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); }
   .sp-label { margin: 0 0 var(--s-2); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
-  .sp-covers ul { list-style: none; margin: 0; padding: 0; max-width: 420px; border-top: 1px solid var(--line); }
+  .sp-covers ul { list-style: none; margin: 0; padding: 0; max-width: 480px; border-top: 1px solid var(--line); }
   .sp-covers a { display: flex; justify-content: space-between; gap: var(--s-4); padding-block: 10px; border-bottom: 1px solid var(--line); color: inherit; text-decoration: none; transition: padding-left .3s var(--ease-out); }
   .sp-covers a:hover { padding-left: 6px; }
   .sp-covers a:hover span:first-child { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
   .sp-n { font-size: var(--fs-small); color: var(--text-2); font-variant-numeric: tabular-nums; }
+  /* More in this service: three small plates in a row, each with its title and catalogue number. */
+  .sp-more { margin-top: var(--s-7); max-width: 480px; }
+  .sp-more ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); }
+  .sp-more a { display: grid; gap: var(--s-2); color: inherit; text-decoration: none; }
+  .sp-thumb { display: block; overflow: hidden; background: var(--stone); }
+  .sp-thumb :global(img) { display: block; width: 100%; height: auto; transition: scale 1.2s var(--ease-out); }
+  .sp-more a:hover :global(img) { scale: 1.04; }
+  .sp-mt { font-size: .8125rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .sp-more a:hover .sp-mt { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+  .sp-mn { font-size: .6875rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .sp-right { margin: 0; }
   .sp-pic { display: block; overflow: hidden; background: var(--stone); }
   .sp-pic :global(img) { display: block; width: 100%; height: auto; transition: scale 1.2s var(--ease-out); }
@@ -74,5 +101,5 @@ const no = (n: number) => String(n).padStart(2, '0');
     .verso .sp-right { grid-column: 1; justify-self: start; }
     .verso .sp-folio { text-align: left; }
   }
-  @media (prefers-reduced-motion: reduce) { .sp-pic :global(img), .sp-covers a { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .sp-pic :global(img), .sp-thumb :global(img), .sp-covers a { transition: none; } }
 </style>

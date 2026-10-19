@@ -2,14 +2,16 @@
 import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import ProjectsCover from '../components/ProjectsCover.astro';
 import ProjectCards from '../components/ProjectCards.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { itemListLd } from '../lib/seo';
-// The projects overview (direction B): a die-cut cover over the top, then every listed project in the homepage
-// list's order, as one grid. Titles, clients and pictures are the homepage gallery's, verbatim. The
+import CategoryTabs from '../components/CategoryTabs.astro';
+import { cardsFor } from '../lib/project-index';
+// The projects overview (direction B): the heading and the category tabs, then every listed project in the
+// homepage list's order, as one grid (the die-cut cover that lay over the top was removed, client, 19 Oct
+// 2026: it held the cards back on every visit). Titles, clients and pictures are the homepage gallery's, verbatim. The
 // category pages (/projects/<slug>) stay, reached from the header's Projects menu.
 const d = (await getEntry('projectsIndex', 'projects'))!.data;
 const site = (await getEntry('site', 'site'))!.data;
@@ -20,6 +22,9 @@ const cats = projectCategories(d.sections);
 const home = (await getEntry('home', 'home'))!.data;
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const entries = catalogueOf(home.allProjects.items, projects);
+// The category tabs under the heading: all projects (this page, selected), then each category with the
+// number of cards on its page.
+const tabs = [{ label: text('next-fallback').text, href: '/projects', count: entries.length }, ...cats.map((c) => ({ label: c.heading, href: c.href, count: cardsFor(c.items, entries).length })).filter((t) => t.count > 0)];
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 // Structured data: every listed case study, in the homepage list's order.
 const jsonLd = [itemListLd('Projects', entries.map((e) => ({ name: projects.get(e.slug)!.title, url: abs(e.href) })))];
@@ -30,12 +35,12 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   <script is:inline define:vars={{ redirects }}>
     { const to = redirects[location.hash.slice(1)]; if (to) location.replace(to); }
   </script>
-  <div class="pi" data-pin-container>
-    <ProjectsCover title={heading} count={entries.length} />
+  <div class="pi">
     <header class="wrap pi-head">
       <h1 class="display h1 sc" data-split>{heading}</h1>
       <span class="pi-total" aria-hidden="true">{entries.length}</span>
     </header>
+    <CategoryTabs tabs={tabs} path="/projects" label={text('nav-categories').text} />
     <section class="wrap pi-body" aria-labelledby="pi-title">
       <h2 id="pi-title" class="sr-only">{text('next-fallback').text}</h2>
       <ProjectCards items={entries} />
@@ -44,7 +49,7 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
 </Base>
 <style>
   .pi { position: relative; z-index: 1; }
-  .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); border-bottom: 1px solid var(--line); }
+  .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); }
   .pi-head h1 { margin: 0; }
   /* The count sits up by the heading like a folio. */
   .pi-total { padding-top: .4em; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
@@ -54,6 +59,5 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
   import { tilt } from '../scripts/motion/tilt';
-  import { cover } from '../scripts/motion/cover';
-  run(cover, reveal, tilt);
+  run(reveal, tilt);
 </script>

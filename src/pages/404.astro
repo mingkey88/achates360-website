@@ -5,6 +5,9 @@ import T from '../components/ui/T.astro';
 import { loadExtras } from '../lib/extras';
 import { projectCategories } from '../lib/categories';
 import { withBase } from '../lib/paths';
+import { getCollection } from 'astro:content';
+import { catalogueOf } from '../lib/catalogue';
+import PaperCut from '../components/ui/PaperCut.astro';
 // Not found (GitHub Pages serves this for any missing path under the site). Before showing it, an
 // inline script sends two kinds of old address on: a trailing slash ("/about/" → "/about", which Wix
 // redirects too) and Wix addresses that moved (/joseph → the card built at /joseph-chan).
@@ -16,6 +19,11 @@ const cats = projectCategories(projectsIndex.sections);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const moved: Record<string, string> = { '/joseph': '/joseph-chan' };
 const title = text('notfound-title');
+// "404" cut through a sheet of paper (ui/PaperCut), a project's picture under it: 'Nothing is Impossible'
+// (its comic-book burst suits a page that went missing), or the first card if that one is ever unlisted.
+const home = (await getEntry('home', 'home'))!.data;
+const catalogue = catalogueOf(home.allProjects.items, new Map((await getCollection('projects')).map((e) => [e.id, e.data])));
+const plate = catalogue.find((e) => /nothing is impossible/i.test(e.title)) ?? catalogue[0];
 ---
 <Base title={`${title.text} | Achates 360`} page="page" noindex>
   <script is:inline define:vars={{ base, moved }}>
@@ -29,6 +37,7 @@ const title = text('notfound-title');
     })();
   </script>
   <section class="wrap nf">
+    <PaperCut text="404" image={plate.thumb} position={plate.position} class="nf-cut" scale={1.5} />
     <h1 class="display h1"><T s={title} /></h1>
     <p class="nf-body"><T s={text('notfound-body')} /></p>
     <ul class="nf-links">
@@ -42,6 +51,7 @@ const title = text('notfound-title');
 <style>
   .nf { padding-block: var(--s-9) var(--section-y); display: grid; gap: var(--s-5); }
   .nf h1 { margin: 0; }
+  .nf > :global(.nf-cut) { max-width: 760px; margin-bottom: var(--s-4); }
   .nf-body { margin: 0; max-width: 52ch; font-size: var(--fs-lead); color: var(--text-2); }
   .nf-links { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: grid; gap: 0; max-width: 560px; border-top: 1px solid var(--line); }
   .nf-links li { border-bottom: 1px solid var(--line); }
