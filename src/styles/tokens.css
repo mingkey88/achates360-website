@@ -24,11 +24,11 @@
      stock); --grain is a neutral film grain overlaid on photographs. Both are still: paper doesn't move. */
   --paper-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   /* Direction B: a draughtsman's grid under the paper fibre, like engineering or blueprint paper. Minor
-     lines every 24px and a stronger line every fifth (120px), in a faint blueprint blue; centred on the
+     lines every 24px and a stronger line every fifth (120px), in a faint blueprint blue (made about 40% lighter, client, 19 Oct 2026); centred on the
      page so the columns sit symmetrically. Only the page's own paper shows it: bands, panels and
      pictures cover it. */
-  --grid-minor: rgb(52 98 138 / .04);
-  --grid-major: rgb(52 98 138 / .075);
+  --grid-minor: rgb(52 98 138 / .025);
+  --grid-major: rgb(52 98 138 / .045);
   --grid:
     linear-gradient(var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
     linear-gradient(90deg, var(--grid-major) 1px, transparent 1px) 50% 0 / 120px 120px,
