@@ -6,6 +6,8 @@ import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import { withBase } from '../lib/paths';
 import { firstYear } from '../lib/meta';
+import Pic from './ui/Pic.astro';
+import { PROJECT_AWARDS } from '../lib/project-awards';
 import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
@@ -15,8 +17,10 @@ type Project = CollectionEntry<'projects'>['data'];
 // other three in a row on one baseline. Each picture sits in crop marks with its catalogue number (№, as
 // on /projects) as its folio; then client · discipline · year and the title, linked.
 // Videos play on hover (MediaCard). poster: a replacement still for a slide's film (by link).
-interface Props { items: { slide: Slide; project?: Project; no?: number; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number }
-const { items, eyebrow, cta, total } = Astro.props;
+// Beside the lead plate, where its project has them (lib/project-awards.ts), its award seals: the count in
+// orange, the round medallions pinned slightly askew, the other badges as a ribbon bar; they link to it.
+interface Props { items: { slide: Slide; project?: Project; no?: number; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number; awardsLabel: UiString }
+const { items, eyebrow, cta, total, awardsLabel } = Astro.props;
 const all = items.map(({ slide, project, no, poster }) => ({
   no,
   image: poster ?? (slide.media.type === 'video' ? slide.media.poster : slide.media.src),
@@ -27,6 +31,7 @@ const all = items.map(({ slide, project, no, poster }) => ({
   title: project?.title,
   meta: [project?.client, project?.categories[0], firstYear(project?.copyright)].filter(Boolean).join(' · '),
   media: slide.media,
+  awards: slide.cta?.href ? PROJECT_AWARDS[slide.cta.href.replace(/^\//, '')] : undefined,
 }));
 const [cover, ...rows] = all;
 ---
@@ -39,6 +44,13 @@ const [cover, ...rows] = all;
           {r.no && <span class="sw-folio" aria-hidden="true">№ {String(r.no).padStart(3, '0')}</span>}
           <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="4 / 3" sizes={i === 0 ? '(max-width: 767px) calc(100vw - 32px), 56vw' : '(max-width: 767px) calc(100vw - 32px), 31vw'} widths={[480, 720, 960, 1280, 1600]} duplicateLink={!!r.title} reveal={false} />
         </div>
+        {i === 0 && r.awards && r.href && (
+          <a class="sw-medals" href={withBase(r.href)} aria-label={`${r.title}: ${r.awards.count} ${awardsLabel.text}`}>
+            <span class="sw-tally" aria-hidden="true"><span class="sw-tally-n">{r.awards.count}</span><T s={awardsLabel} /></span>
+            <span class="sw-seals">{r.awards.seals.map((b, k) => <span class="sw-seal" style={`--k: ${k}`}><Pic src={b.src} alt="" widths={[200, 320, 432]} sizes="180px" /></span>)}</span>
+            <span class="sw-ribbon">{r.awards.badges.map((b) => <span class="sw-badge"><Pic src={b.src} alt="" widths={[120, 200, 300]} sizes="64px" /></span>)}</span>
+          </a>
+        )}
         <div class="sw-text">
           {r.meta && <p class="sw-meta">{r.meta}</p>}
           {r.title && <h3 class="sw-title">{r.href ? <a href={withBase(r.href)}>{r.title}</a> : r.title}</h3>}
@@ -84,10 +96,38 @@ const [cover, ...rows] = all;
     .sw-lead { grid-column: 1 / -1; }
     .sw-item:not(.sw-lead) .sw-title { font-size: var(--fs-lead); }
   }
+  /* The lead plate's award seals: the count, then the three medallions overlapping, slightly askew as if
+     pinned on, the Book of the Year largest; then the other badges in a row. They straighten on hover. */
+  .sw-medals { display: grid; justify-items: start; gap: var(--s-5); color: inherit; text-decoration: none; }
+  .sw-tally { display: flex; align-items: baseline; gap: .5em; font-size: var(--fs-small); color: var(--text-2); }
+  .sw-tally-n { font: 500 clamp(2.75rem, 2rem + 2.6vw, 4.5rem)/.9 var(--font-display); letter-spacing: -.03em; color: var(--accent-text); }
+  .sw-seals { display: flex; align-items: center; padding-left: 4px; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .22)); }
+  .sw-seal {
+    --r: calc((var(--k) * 7deg) - 6deg); position: relative; z-index: calc(3 - var(--k)); flex: none;
+    width: clamp(92px, 8vw, 128px); aspect-ratio: 1; margin-left: -16px; clip-path: circle(49%);
+    rotate: var(--r); transition: rotate .5s var(--ease-out), translate .5s var(--ease-out);
+  }
+  .sw-seal:first-child { width: clamp(118px, 10.5vw, 168px); margin-left: 0; }
+  .sw-seal :global(img), .sw-badge :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .sw-medals:hover .sw-seal { rotate: 0deg; translate: 0 -6px; }
+  .sw-ribbon { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+  .sw-badge { display: block; height: 52px; }
+  .sw-badge :global(img) { width: auto; height: 52px; }
+  @media (prefers-reduced-motion: reduce) { .sw-seal { transition: none; } }
+  @media (max-width: 1023px) {
+    .sw-lead .sw-medals { order: 3; margin-top: var(--s-4); }
+  }
+  @media (max-width: 767px) {
+    .sw-lead .sw-medals { justify-items: center; }
+    .sw-tally { justify-content: center; }
+    .sw-ribbon { justify-content: center; }
+    .sw-badge, .sw-badge :global(img) { height: 44px; }
+  }
   @media (min-width: 1024px) {
     .sw-lead { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: end; }
-    .sw-lead .sw-media { grid-column: 1 / 8; }
-    .sw-lead .sw-text { grid-column: 9 / 13; }
+    .sw-lead .sw-media { grid-column: 1 / 8; grid-row: 1 / 3; }
+    .sw-lead .sw-medals { grid-column: 9 / 13; grid-row: 1; align-self: center; }
+    .sw-lead .sw-text { grid-column: 9 / 13; grid-row: 2; }
     .sw-lead .sw-title { font-size: var(--fs-h2); }
   }
 </style>

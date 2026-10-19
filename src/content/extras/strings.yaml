@@ -78,3 +78,4 @@
 - { id: contact-find, text: Finding us, placeholder: true }
 - { id: back-to-top, text: Back to top, placeholder: true }
 - { id: service-more, text: More in this service, placeholder: true }
+- { id: lead-awards, text: awards, placeholder: true }
