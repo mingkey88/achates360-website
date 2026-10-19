@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { ACCENTS, FOOTER_ACCENT, splitAccent } from './accents';
+import { ACCENTS, ABOUT_ACCENTS, FOOTER_ACCENT, splitAccent } from './accents';
 
 describe('splitAccent', () => {
   it('splits at a whole-word match', () => {
@@ -26,6 +26,10 @@ describe('ACCENTS', () => {
       expect(splitAccent(s!.text, phrase)).not.toBeNull();
     });
   }
+  it("the About accents are in the About text", () => {
+    const about = readFileSync('src/content/basic/about.md', 'utf8');
+    for (const phrase of Object.values(ABOUT_ACCENTS)) expect(about, phrase).toContain(phrase);
+  });
   it("the footer's accent is in its intro line", () => {
     const site = readFileSync('src/content/site/site.md', 'utf8');
     expect(site).toContain(FOOTER_ACCENT);

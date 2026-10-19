@@ -76,7 +76,7 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   .is-story .chron-text { grid-column: 1; grid-row: 2; align-self: start; padding-top: var(--s-5); border-top: 1px solid var(--ink); margin-top: var(--s-5); }
   .is-story .chron-title { font-size: var(--fs-h2); }
   .is-story .chron-body { font-size: var(--fs-body, 1rem); }
-  .is-story .chron-more { display: block; font-size: var(--fs-lead); }
+  .is-story .chron-more { display: block; font-size: var(--fs-lead); color: var(--accent-text); }
   .is-story .chron-plate { grid-column: 2; grid-row: 1 / 3; width: 100%; max-width: 760px; justify-self: end; align-self: center; --cm-len: 10px; --cm-gap: 6px; }
   /* Each milestone's parts arrive in turn: the year rolls up into place, the line follows, the plate
      settles; the one before leaves upwards. */
@@ -89,8 +89,8 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   .is-story .is-past .chron-plate { transform: translateY(-4%) scale(.97); }
   .is-story .chron-ruler { display: flex; justify-content: space-between; gap: var(--s-3); margin: 0; padding: var(--s-3) 0 0; list-style: none; border-top: 1px solid var(--line); }
   .is-story .chron-ruler li { position: relative; flex: 1; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); transition: color .3s; }
-  .is-story .chron-ruler li::before { content: ''; position: absolute; left: 0; top: calc(-1 * var(--s-3) - 1px); width: 100%; height: 2px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease-out); }
+  .is-story .chron-ruler li::before { content: ''; position: absolute; left: 0; top: calc(-1 * var(--s-3) - 1px); width: 100%; height: 3px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease-out); }
   .is-story .chron-ruler li.is-done::before, .is-story .chron-ruler li.is-on::before { transform: scaleX(1); }
-  .is-story .chron-ruler li.is-on { color: var(--ink); }
+  .is-story .chron-ruler li.is-on { color: var(--accent-text); font-weight: 500; }
   @media (prefers-reduced-motion: reduce) { .is-story * { transition: none !important; } }
 </style>
