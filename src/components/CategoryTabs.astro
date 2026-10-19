@@ -1,0 +1,76 @@
+---
+import { withBase } from '../lib/paths';
+// The projects' categories as a row of tabs (direction B, after nationalgallery.sg's exhibition tabs), on
+// /projects and every category page: "All projects" then each category (its name verbatim) with the number
+// of projects on its page. The page you are on is marked as a selected tab: a thick bar of the brand
+// orange on its top edge, over the row's hairline, and its name in orange. Tabs are divided by hairlines.
+// Wide screens set them as two rows of five; narrower screens as one row that scrolls sideways, opened
+// with the current tab in view.
+interface Tab { label: string; href: string; count: number }
+interface Props { tabs: Tab[]; path: string; label: string }
+const { tabs, path, label } = Astro.props;
+---
+<nav class="ctabs wrap" aria-label={label} data-ctabs>
+  <ul>
+    {tabs.map((t) => (
+      <li><a href={withBase(t.href)} aria-current={t.href === path ? 'page' : undefined}><span class="ct-name">{t.label}</span><span class="ct-n">{t.count}</span></a></li>
+    ))}
+  </ul>
+</nav>
+<script>
+  // The scrolling row opens with the current tab in view (centred where it can be), without moving the page.
+  // Again once the page has loaded: the cover's pinning re-inserts the page, which resets the row's scroll.
+  const centre = () => {
+    for (const nav of document.querySelectorAll<HTMLElement>('[data-ctabs]')) {
+      const list = nav.querySelector('ul')!;
+      const cur = list.querySelector<HTMLElement>('[aria-current]');
+      if (!cur || list.scrollWidth <= list.clientWidth) continue;
+      const l = list.getBoundingClientRect(), c = cur.getBoundingClientRect();
+      list.scrollLeft += c.left - l.left - (l.width - c.width) / 2;
+    }
+  };
+  centre();
+  if (document.readyState === 'complete') requestAnimationFrame(centre);
+  else window.addEventListener('load', () => requestAnimationFrame(centre), { once: true });
+</script>
+<style>
+  .ctabs ul {
+    list-style: none; margin: 0; padding: 0; display: flex; border-top: 1px solid var(--line);
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    /* A soft fade at the right edge says there is more to scroll. */
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent);
+  }
+  .ctabs ul::-webkit-scrollbar { display: none; }
+  .ctabs li { flex: none; position: relative; }
+  .ctabs li + li { border-left: 1px solid var(--line); }
+  .ctabs a {
+    position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3);
+    padding: var(--s-4) var(--s-5); white-space: nowrap; color: inherit; text-decoration: none;
+    font: 400 clamp(.9375rem, .9rem + .2vw, 1.0625rem)/1.3 var(--font-text);
+  }
+  .ctabs li:first-child a { padding-left: 0; }
+  /* The marker: a bar on the tab's top edge, over the row's hairline. */
+  .ctabs a::before {
+    content: ''; position: absolute; left: 0; right: 0; top: -1px; height: 4px; background: var(--accent);
+    transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease-out);
+  }
+  .ctabs li:first-child a::before { left: 0; }
+  .ct-n { font-size: .75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .ctabs a:hover .ct-name { text-decoration: underline; text-underline-offset: .25em; text-decoration-thickness: 1px; }
+  .ctabs a:hover::before { transform: scaleX(1); background: var(--line); }
+  .ctabs a[aria-current] { color: var(--accent-deep); font-weight: 500; }
+  .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
+  .ctabs a[aria-current] .ct-name { text-decoration: none; }
+  .ctabs a[aria-current] .ct-n { color: var(--accent-deep); }
+  /* Wide screens: every tab in view, two rows of five, each row on its own hairline. */
+  @media (min-width: 1024px) {
+    .ctabs ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; border-top: 0; -webkit-mask-image: none; mask-image: none; }
+    .ctabs li { border-top: 1px solid var(--line); }
+    .ctabs li + li { border-left: 0; }
+    .ctabs li:not(:nth-child(5n + 1)) { border-left: 1px solid var(--line); }
+    .ctabs li:nth-child(5n + 1) a { padding-left: 0; }
+    .ctabs li:first-child a { padding-left: 0; }
+    .ctabs a { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ctabs a::before { transition: none; } }
+</style>

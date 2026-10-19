@@ -13,7 +13,6 @@
 - { id: services-eyebrow, text: What we do, placeholder: true }
 - { id: contact-heading, text: Write to us., placeholder: true }
 - { id: nav-categories, text: Categories, placeholder: true }
-- { id: category-label, text: Category, placeholder: true }
 - { id: selected-cta, text: View all projects, placeholder: true }
 # awards-line: the twelve awards on the March 2026 portfolio deck's "Awards" slide, as its badges read
 # (site builder approved using the deck's wording, 17 Oct 2026; CONTENT-QUERIES 20).
