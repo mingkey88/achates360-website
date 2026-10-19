@@ -71,7 +71,7 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 400 var(--fs-lead)/1.5 var(--font-display); max-width: 30ch; }
   .signoff { display: grid; align-content: start; gap: var(--s-6); }
   .so-line { margin: 0; max-width: 16ch; font: 400 clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem)/1.1 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
-  .so-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-5); font-size: var(--fs-small); }
+  .so-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-4); font-size: var(--fs-small); }
   .so-links a { display: inline-block; padding-block: 10px; color: var(--on-dark); text-decoration: none; }
   .so-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
@@ -100,8 +100,15 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
     -webkit-mask-image: linear-gradient(180deg, #000 10%, transparent 95%); mask-image: linear-gradient(180deg, #000 10%, transparent 95%);
   }
   .mega-mark :global(.logo) { display: block; width: 100%; height: auto; margin-bottom: -2%; }
-  @media (min-width: 768px) {
+  /* Tablets: the intro and its page links across the top, Contact and Social side by side beneath. */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .intro { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1024px) {
     .grid { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(160px, 1fr)); }
+  }
+  @media (min-width: 768px) {
     .imprint { grid-column: 1 / -1; }
   }
 </style>
