@@ -36,9 +36,11 @@ describe('references to real content', () => {
     const categories = new Set(projects.flatMap((p) => p.categories ?? []));
     for (const s of extras('services')) for (const t of s.tags) expect(categories.has(t), t).toBe(true);
   });
-  it('client names match a project client field exactly', () => {
-    const names = new Set(projects.map((p) => p.client).filter(Boolean));
-    for (const c of extras('clients')) expect(names.has(c.name), c.name).toBe(true);
+  // The client wall is the studio's logo set (not the projects' client fields): each client has its logo.
+  it('every client has its logo file in public/clients, and each logo is used once', () => {
+    const logos = extras('clients').map((c) => c.logo);
+    for (const l of logos) expect(existsSync(new URL(`../../public/clients/${l}`, import.meta.url)), l).toBe(true);
+    expect(new Set(logos).size).toBe(logos.length);
   });
 });
 

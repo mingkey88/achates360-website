@@ -177,7 +177,7 @@ const groups = mergeContinuationGroups(form.groups);
   .direct p { margin: 0; }
   .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
   .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
-  .direct a:hover { color: var(--accent-deep); }
+  .direct a:hover { color: var(--accent-text); }
   .direct-addr { margin-top: var(--s-2) !important; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
   /* Finding us: the building and the directory board, as two small plates (Achates360_Office.pdf). */
   .find { display: grid; gap: var(--s-2); width: 100%; margin-top: var(--s-5); }
@@ -207,7 +207,7 @@ const groups = mergeContinuationGroups(form.groups);
   .field :is(input, textarea):hover { border-color: var(--ink); }
   .field :is(input, textarea):focus { outline: 2px solid var(--ink); outline-offset: 0; border-color: var(--ink); }
   .field textarea::placeholder { color: var(--text-2); opacity: 1; }
-  .tried .field :is(input, textarea):invalid { border-color: var(--accent-deep); box-shadow: inset 0 0 0 1px var(--accent-deep); }
+  .tried .field :is(input, textarea):invalid { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 
   .group { margin: 0; padding: 0; border: 0; min-width: 0; }
   .group legend { margin-bottom: var(--s-3); }
@@ -219,10 +219,10 @@ const groups = mergeContinuationGroups(form.groups);
   .option input:checked + .box { background: var(--ink); }
   .option input:checked + .box::after { opacity: 1; }
   .option input:focus-visible + .box { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .group.invalid .box { border-color: var(--accent-deep); }
-  .field-error { font-size: var(--fs-small); color: var(--accent-deep); }
+  .group.invalid .box { border-color: var(--accent); }
+  .field-error { font-size: var(--fs-small); color: var(--ink); }
   .field-error:empty { display: none; }
-  .group-error { margin: var(--s-3) 0 0; font-size: var(--fs-small); color: var(--accent-deep); }
+  .group-error { margin: var(--s-3) 0 0; font-size: var(--fs-small); color: var(--ink); }
   .group-error:empty { display: none; }
 
   .send-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }

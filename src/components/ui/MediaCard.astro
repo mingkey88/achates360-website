@@ -94,7 +94,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   .mc-title { margin: 0; font: 500 clamp(1rem, .95rem + .25vw, 1.1875rem)/1.25 var(--font-title); letter-spacing: -.01em; overflow-wrap: anywhere; }
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
   /* A small label under the caption (an award the gallery notes): ink in a hairline box, like a stamp. */
-  .mc-tag { display: inline-block; margin: var(--s-2) 0 0; padding: 2px 7px; border: 1px solid currentColor; font: 500 .6875rem/1.4 var(--font-text); letter-spacing: .06em; text-transform: uppercase; color: var(--accent-deep); }
+  .mc-tag { display: inline-block; justify-self: start; margin: var(--s-2) 0 0; padding: 2px 7px; border: 1px solid var(--accent); font: 500 .6875rem/1.4 var(--font-text); letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
   /* A small hairline circle with an arrow that replaces the pointer over linked cards: centred on the
      pointer, following it closely; the browser's hand is hidden there so only one shows. */
   :global(.mc-cursor) {
