@@ -20,6 +20,7 @@ import { loadExtras } from '../lib/extras';
 import { firstYear } from '../lib/meta';
 import { withBase } from '../lib/paths';
 import { aboutPageLd } from '../lib/seo';
+import { ABOUT_ACCENTS } from '../lib/accents';
 // /about in direction B, set as a book's front matter: the About text verbatim, its first sentence as
 // the page's statement in display type and the rest as the foreword in two columns, the studio's photo
 // as a plate; then the numbers, clients and awards; the story as a chronology (one ruled row per
@@ -58,11 +59,17 @@ const companion = pick(/Achates 360 reflects/);
 const visual = pick(/^Believing/);
 const since = foreword.filter((x) => x !== companion && x !== visual);
 const founded = x.stats.find((s: any) => s.id === 'founded')?.value;
-// The companion sentence's key phrase in brand orange, as on the homepage (display only, words unchanged).
-const KEY = 'faithful companion and trusted friend';
-const keyed = (md: string) => renderMd(md).replace(KEY, `<span class="key">${KEY}</span>`);
-// "Thinking made visual" word by word, so each word can ink in (plain text only; Markdown keeps its form).
+// Each chapter's key phrase in orange (lib/accents.ts; display only, the words unchanged).
+const keyed = (md: string, phrase: string) => renderMd(md).replace(phrase, `<span class="hl">${phrase}</span>`);
+// "Thinking made visual" word by word, so each word can ink in (plain text only; Markdown keeps its form);
+// the words of its key phrase ink in orange.
 const visualWords = visual && !/[*_\[\]#`<>]/.test(visual) ? visual.split(/\s+/) : null;
+const keyStart = visualWords ? visualWords.join(' ').indexOf(ABOUT_ACCENTS.visual) : -1;
+const keyWord = (i: number) => {
+  if (!visualWords || keyStart < 0) return false;
+  const at = visualWords.slice(0, i).join(' ').length + (i > 0 ? 1 : 0);
+  return at >= keyStart && at < keyStart + ABOUT_ACCENTS.visual.length;
+};
 const figs = [...(logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '').matchAll(/<g class="lg-fig"[^>]*>(.*?)<\/g>/g)].map((m) => m[1]);
 const plates = blocks.filter((b: any) => b.type === 'image');
 const other = blocks.find((b: any) => b.type !== 'text' && b.type !== 'image');
@@ -88,7 +95,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
       <h1 class="ab-h1 sc">{heading}</h1>
       <PressMarks count={listedCount} />
     </header>
-    <div class="ab-statement" set:html={renderMd(statement)} />
+    <div class="ab-statement" set:html={keyed(statement, ABOUT_ACCENTS.statement)} />
   </section>
   {/* Chapter: since the founding year. */}
   <section class="wrap ab-since">
@@ -105,13 +112,13 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
       <svg class="ab-figs" viewBox="44 -8 106 113" aria-hidden="true" focusable="false">
         {figs.map((f, i) => <g class="st-fig" style={`--i: ${i}`} set:html={f} />)}
       </svg>
-      <div class="ab-companion-text" set:html={keyed(companion)} />
+      <div class="ab-companion-text" set:html={keyed(companion, ABOUT_ACCENTS.companion)} />
     </section>
   )}
   {/* Chapter: thinking made visual. The sentence starts in pencil outline and inks in word by word. */}
   {visual && (
     <section class="wrap ab-visual" data-ink>
-      {visualWords ? <p class="ab-visual-text">{visualWords.map((w, i) => <>{i > 0 && ' '}<span class="w">{w}</span></>)}</p> : <div class="ab-visual-text" set:html={renderMd(visual)} />}
+      {visualWords ? <p class="ab-visual-text">{visualWords.map((w, i) => <>{i > 0 && ' '}<span class:list={['w', { o: keyWord(i) }]}>{w}</span></>)}</p> : <div class="ab-visual-text" set:html={renderMd(visual)} />}
     </section>
   )}
   {/* Chapter: inside the studio. The office's lobby (its awards on the sideboard), meeting room and studio
@@ -128,7 +135,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
     <h2 id="ab-mark-title" class="ab-mark-title"><T s={text('awards-chapter')} /></h2>
     <figure class="ab-mark-plate crop" data-rise><Pic src={awardsSpread} alt="The award annuals the studio's work appears in (Singapore Book Awards 2017, A' Design Award & Competition, HOW, The Paperweight Awards 2014, GDUSA) and The Straits Times report “Book on S'pore's iconic buildings wins big at awards”" widths={[640, 960, 1440, 1920, 2383]} sizes="(max-width: 1023px) 100vw, 92vw" /></figure>
   </section>
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} />
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} orangeFigures />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
   <section class="wrap ab-colophon" aria-labelledby="colophon-title">
     <RunningHead id="colophon-title" s={text('colophon-heading')} folio={`№ 001 – ${String(listedCount).padStart(3, '0')}`} />
@@ -147,13 +154,16 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   /* A narrative in chapters (motion/story.ts adds the movement; without it every chapter simply reads). */
   .ab-intro { display: grid; gap: var(--s-7); padding-block: var(--s-7) var(--section-y); }
   .ab-head { display: flex; align-items: start; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-3); border-bottom: 1px solid var(--ink); }
-  .ab-h1 { margin: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
+  .ab-h1 { position: relative; align-self: stretch; margin: 0; font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
+  /* The page's name marked as the running heads are: a thick orange bar on the hairline under it. */
+  .ab-h1::after { content: ''; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--s-3) - 1px); height: 4px; background: var(--accent); }
+  .ab-statement :global(.hl) { font-weight: inherit; }
   .ab-statement :global(p) { margin: 0; max-width: 24ch; font: 400 clamp(2rem, 1rem + 4vw, 4.5rem)/1.06 var(--font-display); letter-spacing: -.03em; text-wrap: balance; }
   .ab-p :global(p) { margin: 0; }
 
   /* Since: the founding year drawn large in outline, the paragraph over it, the studio as a plate. */
   .ab-since { position: relative; display: grid; gap: var(--s-7); padding-block: var(--s-8) var(--section-y); }
-  .ab-year { margin: 0; font: 800 clamp(7rem, 3rem + 18vw, 20rem)/.8 var(--font-display); letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+  .ab-year { margin: 0; font: 800 clamp(7rem, 3rem + 18vw, 20rem)/.8 var(--font-display); letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 2px var(--accent); }
   .ab-since-text { display: grid; gap: var(--s-4); max-width: 46ch; font-size: var(--fs-lead); line-height: 1.6; }
   .ab-plate { position: relative; margin: 0; }
   .ab-plate :global(img) { display: block; width: 100%; height: auto; }
@@ -163,12 +173,13 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   .ab-companion { display: grid; gap: var(--s-7); align-items: center; padding-block: var(--section-y); border-top: 1px solid var(--line); }
   .ab-figs { width: min(100%, 440px); justify-self: center; overflow: visible; fill: var(--ink); }
   .ab-companion-text :global(p) { margin: 0; max-width: 30ch; font: 400 clamp(1.5rem, 1rem + 1.8vw, 2.5rem)/1.3 var(--font-display); letter-spacing: -.015em; text-wrap: pretty; }
-  .ab-companion-text :global(.key) { color: var(--accent-text); font-weight: 500; }
 
   /* Thinking made visual: the sentence in display type; --k inks each word (1 = inked, the default). */
   .ab-visual { padding-block: var(--section-y); border-top: 1px solid var(--line); }
   .ab-visual-text { margin: 0; max-width: 26ch; font: 400 clamp(2rem, 1rem + 3.4vw, 4rem)/1.12 var(--font-display); letter-spacing: -.025em; }
-  .ab-visual-text .w { --k: 1; color: color-mix(in srgb, var(--ink) calc(var(--k) * 100%), transparent); -webkit-text-stroke: 1px color-mix(in srgb, var(--text-2) calc((1 - var(--k)) * 70%), transparent); }
+  .ab-visual-text .w { --k: 1; --c: var(--ink); color: color-mix(in srgb, var(--c) calc(var(--k) * 100%), transparent); -webkit-text-stroke: 1px color-mix(in srgb, var(--text-2) calc((1 - var(--k)) * 70%), transparent); }
+  .ab-visual-text .w.o { --c: var(--accent-text); font-weight: 500; }
+
 
   @media (min-width: 1024px) {
     .ab-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); row-gap: var(--s-8); }

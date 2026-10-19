@@ -108,7 +108,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </script>
   <HeroArc items={lens} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
 
-  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} />
+  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} awardsLabel={text('lead-awards')} />
 
   {/* Folios: the homepage's sections numbered as a book's, Selected work (its cover) being the first. */}
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} folio="02" />

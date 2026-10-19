@@ -13,6 +13,13 @@ export const ACCENTS: Record<string, string> = {
   'notfound-title': 'not found',    // Page not found
 };
 
+/** The About text's accent phrases (basic/about.md, verbatim), one per chapter. */
+export const ABOUT_ACCENTS = {
+  statement: 'creative, thoughtful and impactful solutions',
+  companion: 'faithful companion and trusted friend',
+  visual: 'thinking made visual',
+} as const;
+
 /** The footer's intro line (site.md, verbatim) and its accent phrase. */
 export const FOOTER_ACCENT = 'intelligent creative solutions';
 
