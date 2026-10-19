@@ -3,6 +3,7 @@ import Pic from './ui/Pic.astro';
 import RunningHead from './ui/RunningHead.astro';
 import DraftTag from './ui/DraftTag.astro';
 import { withBase } from '../lib/paths';
+import { isStub } from '../lib/copy';
 import type { UiString } from '../lib/strings';
 // The studio's story on /about. Without motion (and on phones) a book's chronology: one ruled row per
 // milestone, the year set large, the project and its line, a small plate; each row opens the case study.
@@ -25,7 +26,7 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
           <span class="chron-year">{it.year}</span>
           <span class="chron-text">
             <span class="chron-title">{it.label}</span>
-            <span class="chron-body">{it.body}<DraftTag when={it.placeholder} /></span>
+            {!isStub(it.body) && <span class="chron-body">{it.body}<DraftTag when={it.placeholder} /></span>}
             <span class="chron-more" aria-hidden="true">→</span>
           </span>
           <span class="chron-plate crop" aria-hidden="true"><Pic src={it.image} alt="" crop={4 / 3} widths={[240, 480, 720, 960]} sizes="(max-width: 767px) 30vw, (max-width: 1023px) 200px, 40vw" loading="lazy" /></span>

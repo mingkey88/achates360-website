@@ -3,6 +3,7 @@ import Pic from './ui/Pic.astro';
 import DraftTag from './ui/DraftTag.astro';
 import T from './ui/T.astro';
 import Amp from './ui/Amp.astro';
+import { isStub } from '../lib/copy';
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 // One service as an open book's spread (direction B, Services page). The left page carries the words:
@@ -28,7 +29,7 @@ const no = (n: number) => String(n).padStart(2, '0');
     <div class="sp-left">
       <p class="sp-no" aria-hidden="true">{no(index + 1)}</p>
       <h2 class="sp-title" id={`${service.id}-t`} data-placeholder={service.placeholder ? '' : undefined}><Amp text={service.title} /></h2>
-      <p class="sp-body" data-placeholder={service.placeholder ? '' : undefined}>{service.body}<DraftTag when={service.placeholder} /></p>
+      {!isStub(service.body) && <p class="sp-body" data-placeholder={service.placeholder ? '' : undefined}>{service.body}<DraftTag when={service.placeholder} /></p>}
       <div class="sp-covers">
         <p class="sp-label"><T s={coversLabel} /></p>
         <ul>
@@ -63,6 +64,7 @@ const no = (n: number) => String(n).padStart(2, '0');
   .sp-no { margin: 0 0 var(--s-4); font: 400 clamp(3rem, 2rem + 4vw, 6.5rem)/.9 var(--font-display); letter-spacing: -.04em; color: var(--accent-text); font-variant-numeric: tabular-nums; }
   .sp-title { margin: 0 0 var(--s-4); font: 400 var(--fs-h1)/1.1 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
   .sp-body { margin: 0 0 var(--s-6); max-width: 38ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); }
+  .sp-title + .sp-covers { margin-top: var(--s-6); } /* no description yet */
   .sp-label { margin: 0 0 var(--s-2); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
   .sp-covers ul { list-style: none; margin: 0; padding: 0; max-width: 480px; border-top: 1px solid var(--line); }
   .sp-covers a { display: flex; justify-content: space-between; gap: var(--s-4); padding-block: 10px; border-bottom: 1px solid var(--line); color: inherit; text-decoration: none; transition: padding-left .3s var(--ease-out); }
