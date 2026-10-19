@@ -17,8 +17,8 @@ type Project = CollectionEntry<'projects'>['data'];
 // other three in a row on one baseline. Each picture sits in crop marks with its catalogue number (№, as
 // on /projects) as its folio; then client · discipline · year and the title, linked.
 // Videos play on hover (MediaCard). poster: a replacement still for a slide's film (by link).
-// Beside the lead plate, where its project has them (lib/project-awards.ts), its award seals: the count in
-// orange, the round medallions pinned slightly askew, the other badges as a ribbon bar; they link to it.
+// Beside the lead plate, where its project has them (lib/project-awards.ts), its awards: the count in
+// orange, then every seal and badge in one even grid, each sized to the same visual weight; they link to it.
 interface Props { items: { slide: Slide; project?: Project; no?: number; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number; awardsLabel: UiString }
 const { items, eyebrow, cta, total, awardsLabel } = Astro.props;
 const all = items.map(({ slide, project, no, poster }) => ({
@@ -34,6 +34,13 @@ const all = items.map(({ slide, project, no, poster }) => ({
   awards: slide.cta?.href ? PROJECT_AWARDS[slide.cta.href.replace(/^\//, '')] : undefined,
 }));
 const [cover, ...rows] = all;
+// One visual weight per badge: the same area in its cell (a round seal a circle, a tall badge narrow and
+// taller), no wider than 90% of the cell or taller than its height. Width as a share of the cell's width.
+// A round seal fills only π/4 of its square, so it is drawn a little wider to carry the same area.
+const badgeWidth = (r: number, round = false) => round ? Math.min(Math.sqrt(.5 / (Math.PI / 4)), .9) : Math.min(Math.sqrt(.5 * r), .9, 1.0 * r);
+const badges = (a: NonNullable<(typeof all)[number]['awards']>) => [
+  ...a.seals.map((b) => ({ ...b, round: true })), ...a.badges.map((b) => ({ ...b, round: false })),
+].map((b) => ({ ...b, r: b.src.width / b.src.height }));
 ---
 <section class="sw" aria-labelledby="sw-title">
   {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} count={total} />}
@@ -47,8 +54,9 @@ const [cover, ...rows] = all;
         {i === 0 && r.awards && r.href && (
           <a class="sw-medals" href={withBase(r.href)} aria-label={`${r.title}: ${r.awards.count} ${awardsLabel.text}`}>
             <span class="sw-tally" aria-hidden="true"><span class="sw-tally-n">{r.awards.count}</span><T s={awardsLabel} /></span>
-            <span class="sw-seals">{r.awards.seals.map((b, k) => <span class="sw-seal" style={`--k: ${k}`}><Pic src={b.src} alt="" widths={[200, 320, 432]} sizes="180px" /></span>)}</span>
-            <span class="sw-ribbon">{r.awards.badges.map((b) => <span class="sw-badge"><Pic src={b.src} alt="" widths={[120, 200, 300]} sizes="64px" /></span>)}</span>
+            <span class="sw-badges">{badges(r.awards).map((b) => (
+              <span class="sw-cell"><span class:list={['sw-badge', { round: b.round }]} style={`--w: ${(badgeWidth(b.r, b.round) * 100).toFixed(1)}%; --ar: ${b.round ? 1 : b.r.toFixed(3)}`}><Pic src={b.src} alt="" widths={[160, 240]} sizes="96px" /></span></span>
+            ))}</span>
           </a>
         )}
         <div class="sw-text">
@@ -96,32 +104,25 @@ const [cover, ...rows] = all;
     .sw-lead { grid-column: 1 / -1; }
     .sw-item:not(.sw-lead) .sw-title { font-size: var(--fs-lead); }
   }
-  /* The lead plate's award seals: the count, then the three medallions overlapping, slightly askew as if
-     pinned on, the Book of the Year largest; then the other badges in a row. They straighten on hover. */
-  .sw-medals { display: grid; justify-items: start; gap: var(--s-5); color: inherit; text-decoration: none; }
+  /* The lead plate's awards: the count, then every seal and badge in an even grid, five to a row, each the
+     same visual weight (badgeWidth), with clear space between; they lift a touch on hover. */
+  .sw-medals { display: grid; justify-items: start; gap: var(--s-5); width: 100%; color: inherit; text-decoration: none; }
   .sw-tally { display: flex; align-items: baseline; gap: .5em; font-size: var(--fs-small); color: var(--text-2); }
   .sw-tally-n { font: 500 clamp(2.75rem, 2rem + 2.6vw, 4.5rem)/.9 var(--font-display); letter-spacing: -.03em; color: var(--accent-text); }
-  .sw-seals { display: flex; align-items: center; padding-left: 4px; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .22)); }
-  .sw-seal {
-    --r: calc((var(--k) * 7deg) - 6deg); position: relative; z-index: calc(3 - var(--k)); flex: none;
-    width: clamp(92px, 8vw, 128px); aspect-ratio: 1; margin-left: -16px; clip-path: circle(49%);
-    rotate: var(--r); transition: rotate .5s var(--ease-out), translate .5s var(--ease-out);
-  }
-  .sw-seal:first-child { width: clamp(118px, 10.5vw, 168px); margin-left: 0; }
-  .sw-seal :global(img), .sw-badge :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .sw-medals:hover .sw-seal { rotate: 0deg; translate: 0 -6px; }
-  .sw-ribbon { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
-  .sw-badge { display: block; height: 52px; }
-  .sw-badge :global(img) { width: auto; height: 52px; }
-  @media (prefers-reduced-motion: reduce) { .sw-seal { transition: none; } }
+  .sw-badges { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s-4); width: 100%; max-width: 480px; }
+  .sw-cell { display: grid; place-items: center; aspect-ratio: 1; }
+  .sw-badge { display: block; width: var(--w); aspect-ratio: var(--ar); transition: translate .4s var(--ease-out); }
+  .sw-badge.round { border-radius: 50%; overflow: hidden; }
+  .sw-badge :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .sw-medals:hover .sw-badge { translate: 0 -3px; }
+  @media (prefers-reduced-motion: reduce) { .sw-badge { transition: none; } }
   @media (max-width: 1023px) {
     .sw-lead .sw-medals { order: 3; margin-top: var(--s-4); }
   }
   @media (max-width: 767px) {
     .sw-lead .sw-medals { justify-items: center; }
     .sw-tally { justify-content: center; }
-    .sw-ribbon { justify-content: center; }
-    .sw-badge, .sw-badge :global(img) { height: 44px; }
+    .sw-badges { gap: var(--s-3); }
   }
   @media (min-width: 1024px) {
     .sw-lead { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); align-items: end; }

@@ -1,7 +1,8 @@
 /**
  * Award seals shown beside a project where the homepage features it (SelectedWork's lead plate). The
  * badges are the project page's own (its Wix gallery), named as the page names them; count is the number
- * of awards the page lists. Seals: the round medallions, set large; badges: the rest, as a ribbon bar.
+ * of awards the page lists. Seals: the round medallions (shown in a circle); badges: the rest. All are
+ * shown at one visual weight, in one grid.
  */
 import sbpaYear from '../assets/wix/e9d9c2_138a012b672543c6be29449f97ae4b83.jpg';
 import sbpaWinner from '../assets/wix/e9d9c2_874f4fa961624d00b7cb519ddf23048e.jpg';
