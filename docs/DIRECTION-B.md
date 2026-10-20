@@ -1,5 +1,9 @@
 # Direction B: "Croma" (quiet, editorial)
 
+> **This is the dated decision log.** The current design direction, stated as rules, is
+> [../DESIGN.md](../DESIGN.md). Entries below record what was decided when and why; later entries
+> override earlier ones (for example the serif/sans mix and the projects covers no longer apply).
+
 An alternative visual direction for management to compare with direction A (the current
 `feature/hero-film` look). Branch `direction/croma`, built from A so content, pages, motion
 and checks are identical; only the presentation differs. Inspired by the Kitpro "Croma" Webflow

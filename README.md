@@ -6,7 +6,8 @@ stage 2 redesign (see "Redesign" below).
 **Maintaining the site:** [docs/BLUEPRINT.md](docs/BLUEPRINT.md) maps every page, where its words and pictures live,
 common changes and what to check when something breaks. How the site is organised for visitors (sitemap,
 navigation, categories, journeys): [docs/INFORMATION-ARCHITECTURE.md](docs/INFORMATION-ARCHITECTURE.md).
-Design decisions: [docs/DIRECTION-B.md](docs/DIRECTION-B.md).
+Design direction (colour, type, print devices, orange accents, motion): [DESIGN.md](DESIGN.md); the dated decision
+log behind it: [docs/DIRECTION-B.md](docs/DIRECTION-B.md).
 
 > **Staging.** Every page is `noindex, nofollow` and `robots.txt` disallows everything.
 > **Every push to `main` publishes** to https://mingkey88.github.io/achates360-website/.
