@@ -67,5 +67,5 @@
   --r-pill: 999px;
   --ease-out: cubic-bezier(.22, 1, .36, 1);
 }
-/* Direction B: the desktop header is two rows (logo, then menu). */
+/* Direction B: the desktop header is one 88px masthead row (sections, logo, Contact). */
 @media (min-width: 1024px) { :root { --header-h: 88px; } }

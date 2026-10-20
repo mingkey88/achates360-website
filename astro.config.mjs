@@ -49,6 +49,10 @@ export default defineConfig({
         values: ['staging', 'production'], default: 'staging',
       }),
       PUBLIC_FORM_ENDPOINT: envField.string({ context: 'client', access: 'public', optional: true }),
+      // Cloudflare Web Analytics site token (Cloudflare dashboard → Web Analytics → Add a site). Unset =
+      // no beacon. Leave unset once the site is on Cloudflare Pages with analytics switched on there
+      // (Cloudflare injects the beacon itself; setting both counts every visit twice).
+      PUBLIC_CF_ANALYTICS_TOKEN: envField.string({ context: 'server', access: 'public', optional: true }),
     },
   },
 });

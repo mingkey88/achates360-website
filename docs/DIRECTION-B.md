@@ -1,5 +1,9 @@
 # Direction B: "Croma" (quiet, editorial)
 
+> **This is the dated decision log.** The current design direction, stated as rules, is
+> [../DESIGN.md](../DESIGN.md). Entries below record what was decided when and why; later entries
+> override earlier ones (for example the serif/sans mix and the projects covers no longer apply).
+
 An alternative visual direction for management to compare with direction A (the current
 `feature/hero-film` look). Branch `direction/croma`, built from A so content, pages, motion
 and checks are identical; only the presentation differs. Inspired by the Kitpro "Croma" Webflow
@@ -145,3 +149,4 @@ Closing section (after kitpro-croma): the contact form moves to its own page, /c
 - **Award seals, evened out (19 Oct 2026, client: "dont overlap the awards, give them spaces. and every icon should have equal weight"):** no overlap and no tilt: all ten awards in one grid, five to a row, with clear space between; each sized to the same visual weight (the same area in its cell; a round seal drawn a little wider, as a circle fills only π/4 of its square; capped at 90% of the cell). They lift a touch on hover; the cluster still links to the project.
 - **Award seals, legible (19 Oct 2026, client: "the awards look too small and not legible"):** the badge pictures are the small Wix copies (about 215px), so ten of them could not be read. Now the three Singapore Book Awards 2017 seals are shown large (one size, 130px, in a row with clear space between, lifting a touch on hover) and the other seven awards are named in text in a small ruled list, in the project page's own words. The cluster is one link to the project; its text (count, seal names, list) is what screen readers hear.
 - **No Draft marks on the site (19 Oct 2026, client: "able to remove the draft word from all around the website?"):** the small DRAFT tags are no longer shown anywhere (ui/DraftTag.astro renders nothing); which copy is still Draft stays recorded in the content files (placeholder: true) and CONTENT-QUERIES, and production builds still stop while any remains (assertPublishable). Placeholder sentences that are instructions, not copy ("[Draft] Two lines on what this service covers…" on the four services, "[Draft] What this milestone meant for the studio." on the eight milestones), are hidden until the real words arrive (lib/copy.ts isStub); the spreads and milestones read without them.
+- **Cloudflare Web Analytics wired, off until a token is set (20 Oct 2026, client: "can we add the cloudflare analytics now?"):** chosen over GA4 for launch: cookieless (no consent banner), light, and enough to see visits, top projects, referrers and page speed; GA4 can be added later for enquiry tracking or ads. Every page loads Cloudflare's beacon only when the build has `PUBLIC_CF_ANALYTICS_TOKEN` (GitHub repository variable `CF_ANALYTICS_TOKEN`); until the studio's Cloudflare account exists and the token is added, nothing loads. Steps in BLUEPRINT §7.

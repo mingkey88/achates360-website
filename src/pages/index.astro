@@ -21,6 +21,7 @@ import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
 import { STILLS } from '../lib/stills';
 import { serviceCount } from '../lib/service-counts';
+import { ABOUT_ACCENTS } from '../lib/accents';
 
 const d = (await getEntry('home', 'home'))!.data;
 const about = (await getEntry('basic', 'about'))!.data;
@@ -29,8 +30,9 @@ const { text } = x;
 const aboutMd = about.blocks.filter((b) => b.type === 'text').map((b: any) => b.md).join('\n\n');
 const intro = sentenceStarting(aboutMd, 'The name Achates 360');
 if (!intro) throw new Error('Homepage intro: no About paragraph starts with "The name Achates 360" (spec §4.1)');
-// After nationalgallery.sg: the sentence in ink with its key phrase in brand orange (display only).
-const KEY = 'faithful companion and trusted friend';
+// After nationalgallery.sg: the sentence in ink with its key phrase in orange (display only; the phrase
+// is About's, lib/accents.ts).
+const KEY = ABOUT_ACCENTS.companion;
 const at = intro.indexOf(KEY);
 const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.slice(0, at), KEY, intro.slice(at + KEY.length)];
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
