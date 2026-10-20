@@ -79,3 +79,8 @@
 - { id: back-to-top, text: Back to top, placeholder: true }
 - { id: service-more, text: More in this service, placeholder: true }
 - { id: lead-awards, text: awards, placeholder: true }
+# Share links on case studies (20 Oct 2026). New wording, for the studio to approve.
+- { id: share-label, text: Share, placeholder: true }
+- { id: share-on, text: Share on, placeholder: true }
+- { id: share-copy, text: Copy link, placeholder: true }
+- { id: share-copied, text: Link copied, placeholder: true }

@@ -164,7 +164,7 @@ marked `placeholder: true` (Draft) until the client approves it, and logged in C
 |---|---|---|
 | Case-study pictures | `src/assets/wix/…`, `src/assets/<project>/` | referenced from the project file's `blocks`; resized automatically |
 | Office photos | `src/assets/office/` | |
-| Brand and share images | `src/assets/og-default.jpg`, `logo-*.svg` | |
+| Brand and share images | `src/assets/og-default.jpg` (drawn by `node scripts/make-og.mjs`), `logo-*.svg` | Case studies share their own hero picture |
 | Films (showreel) | `public/media/video/` | served as-is; keep each file under 25 MB |
 | Embedded films | YouTube/Vimeo IDs in project files | `npm run check:films` tests they still play |
 | Client logos | `public/clients/` | white artwork, trimmed; recoloured on the page |
@@ -229,6 +229,14 @@ fills on `--accent`.
 
 **Connect the contact form:** set `PUBLIC_FORM_ENDPOINT` (a form service's address) as a build
 setting; `components/ContactForm.astro` posts to it. Until then it says "Form not connected on staging".
+
+**Change the default share picture** (what WhatsApp, LinkedIn and Facebook show for pages without
+their own picture): `node scripts/make-og.mjs <picture>` redraws `src/assets/og-default.jpg` with
+"360" cut over that picture. Networks keep an old preview for a while; LinkedIn's Post Inspector and
+Facebook's Sharing Debugger refresh it.
+
+**Share links on case studies:** `components/ui/ShareLinks.astro` (LinkedIn, Facebook, WhatsApp,
+Copy link), shown as the last column of the project's details. Labels: strings `share-*`.
 
 **Turn on Cloudflare Web Analytics:** in Cloudflare, Web Analytics → Add a site → enter the site's
 address, and copy the token from the snippet it shows. In GitHub: Settings → Secrets and variables →

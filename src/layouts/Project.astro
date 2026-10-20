@@ -15,7 +15,7 @@ import { backLinkHref, withBase } from '../lib/paths';
 import { nextProject, slugOf } from '../lib/next-project';
 import { catalogueOf } from '../lib/catalogue';
 import { categorySlug } from '../lib/categories';
-import { creativeWorkLd, breadcrumbLd } from '../lib/seo';
+import { creativeWorkLd, breadcrumbLd, canonicalUrl } from '../lib/seo';
 import { firstYear } from '../lib/meta';
 import { visibleBlocks } from '../lib/visibility';
 import { HELD_FROM_SEARCH } from '../lib/seo';
@@ -42,6 +42,7 @@ const art = (await getEntry('art', id))?.data ?? autoArt(body, mediaRatio);
 // Case notes from the studio's portfolio deck, where the project has them (src/content/notes/<slug>.yaml).
 const notes = (await getEntry('notes', id))?.data;
 const labels = { client: text('meta-client'), year: text('meta-year'), services: text('meta-services'), recognition: text('meta-recognition') };
+const share = { label: text('share-label'), url: canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL), title: d.title, on: text('share-on'), copy: text('share-copy'), copied: text('share-copied') };
 // Share picture and structured data: the project's own hero, the case study, and where it sits
 // (Projects › its first category › the project).
 const shareImage = d.hero ? (d.hero.type === 'image' ? d.hero.src : d.hero.poster) : undefined;
@@ -64,7 +65,7 @@ const jsonLd = [
   {/* Editorial layout (after Aesop and nationalgallery.sg articles): on wide screens the project's
       facts sit in a narrow column that stays in view, the story and pictures fill the rest. */}
   <div class="wrap p-layout">
-    <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} /></aside>
+    <aside class="p-meta"><MetaStrip client={d.client} copyright={d.copyright} categories={d.categories} badges={d.badges} labels={labels} share={share} /></aside>
     <article class="p-body"><ArtRows blocks={body} art={art} pageTitle={d.title} slug={id} />{notes && <CaseNotes notes={notes} heading={text('case-notes')} title={d.title} />}</article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}

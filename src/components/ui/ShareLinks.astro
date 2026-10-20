@@ -1,0 +1,51 @@
+---
+import SocialIcon from './SocialIcon.astro';
+import type { UiString } from '../../lib/strings';
+// Share links for a case study (client, 20 Oct 2026): LinkedIn, Facebook and WhatsApp open each
+// network's own share page in a new tab (no scripts or trackers from them load here); "Copy link"
+// copies the page's address. url: the page's canonical address. title: the project's name, sent with
+// the link to WhatsApp.
+interface Props { url: string; title: string; on: UiString; copy: UiString; copied: UiString }
+const { url, title, on, copy, copied } = Astro.props;
+const u = encodeURIComponent(url);
+const networks = [
+  { name: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+  { name: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
+  { name: 'WhatsApp', href: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}` },
+];
+---
+<div class="share">
+  <ul class="share-list">
+    {networks.map((n) => (
+      <li><a class="share-btn" href={n.href} target="_blank" rel="noopener" aria-label={`${on.text} ${n.name}`} title={`${on.text} ${n.name}`}><SocialIcon name={n.name} /></a></li>
+    ))}
+    <li>
+      <button class="share-btn share-copy" type="button" data-url={url} data-copied={copied.text} aria-label={copy.text} title={copy.text}>
+        {/* Link mark after Feather's "link" (MIT). */}
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+      </button>
+    </li>
+  </ul>
+  <p class="share-status" role="status"></p>
+</div>
+<style>
+  .share-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .share-btn { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer; transition: background-color .25s, color .25s, border-color .25s; }
+  .share-btn :global(svg) { width: 18px; height: 18px; }
+  .share-btn :global(.social-icon) { fill: currentColor; }
+  .share-copy svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .share-btn:hover, .share-btn:focus-visible { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .share-status { min-height: 1.4em; margin: var(--s-2) 0 0; font-size: var(--fs-small); color: var(--text-2); }
+</style>
+<script>
+  // Copy the address; where the clipboard is refused, show it so it can be copied by hand.
+  document.querySelectorAll<HTMLButtonElement>('.share-copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const status = btn.closest('.share')?.querySelector('.share-status');
+      const url = btn.dataset.url ?? location.href;
+      try { await navigator.clipboard.writeText(url); if (status) status.textContent = btn.dataset.copied ?? ''; }
+      catch { if (status) status.textContent = url; }
+      if (status) setTimeout(() => { status.textContent = ''; }, 4000);
+    });
+  });
+</script>
