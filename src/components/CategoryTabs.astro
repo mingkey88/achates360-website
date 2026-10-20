@@ -62,9 +62,10 @@ const { tabs, path, label } = Astro.props;
   .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
   .ctabs a[aria-current] .ct-name { text-decoration: none; }
   .ctabs a[aria-current] .ct-n { color: var(--ink); }
-  /* Wide screens: every tab in view, two rows of five, each row on its own hairline. */
+  /* Wide screens: every tab in view, two rows of five, each row on its own hairline, the rows set apart
+     so a second-row tab's bar can't read as the underline of the tab above it (audit, 20 Oct 2026). */
   @media (min-width: 1024px) {
-    .ctabs ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; border-top: 0; -webkit-mask-image: none; mask-image: none; }
+    .ctabs ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); row-gap: var(--s-5); overflow: visible; border-top: 0; -webkit-mask-image: none; mask-image: none; }
     .ctabs li { border-top: 1px solid var(--line); }
     .ctabs li + li { border-left: 0; }
     .ctabs li:not(:nth-child(5n + 1)) { border-left: 1px solid var(--line); }

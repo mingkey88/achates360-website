@@ -167,6 +167,8 @@ const groups = mergeContinuationGroups(form.groups);
   }
 </script>
 <style>
+  /* Tap area of 44px on the e-mail and phone (inline padding: the lines don't move). */
+  .direct p > a { padding-block: 11px; }
   /* Direction B (after Aesop): one centred column. Boxed fields with small labels above, the service
      choices as an even grid of square checkboxes, a proper message box and one solid button. */
   .contact { position: relative; isolation: isolate; overflow: clip; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }

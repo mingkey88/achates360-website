@@ -72,13 +72,13 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .signoff { display: grid; align-content: start; gap: var(--s-6); }
   .so-line { margin: 0; max-width: 16ch; font: 400 clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem)/1.1 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
   .so-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-4); font-size: var(--fs-small); }
-  .so-links a { display: inline-block; padding-block: 10px; color: var(--on-dark); text-decoration: none; }
+  .so-links a { display: inline-block; padding-block: 11px; margin-block: -1px; color: var(--on-dark); text-decoration: none; }
   .so-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .col { display: grid; gap: var(--s-3); align-content: start; font-size: var(--fs-small); }
   .md :global(.fh6) { margin: 0 0 var(--s-3); padding-bottom: var(--s-3); border-bottom: 1px solid rgb(255 254 242 / .35); font: 400 var(--fs-small)/1 var(--font-text); color: var(--on-dark); }
   .md :global(.fh5) { margin: 0; font: 400 var(--fs-small)/1.6 var(--font-text); }
   .md :global(p) { margin: 0; }
-  .md :global(a), .social a { display: inline-block; padding-block: 6px; text-decoration-color: rgb(255 254 242 / .45); text-underline-offset: 3px; }
+  .md :global(a), .social a { display: inline-block; padding-block: 11px; margin-block: -5px; text-decoration-color: rgb(255 254 242 / .45); text-underline-offset: 3px; }
   /* After nationalgallery.sg: square outlined marks, the network's name beside each. */
   .social { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
   .social a { display: inline-flex; align-items: center; gap: var(--s-3); padding-block: 4px; text-decoration: none; }
@@ -92,7 +92,7 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
   .bar { display: flex; align-items: center; gap: 3px; margin: 0 0 0 auto; }
   .bar span:not(.bar-l) { width: 10px; height: 10px; background: var(--c); box-shadow: 0 0 0 1px rgb(255 254 242 / .25); }
   .bar-l { margin-left: 6px; font-size: .6875rem; letter-spacing: .06em; color: var(--on-dark-2); }
-  .to-top { display: inline-block; padding-block: 6px; font-size: var(--fs-small); color: var(--on-dark); text-decoration: none; }
+  .to-top { display: inline-block; padding-block: 11px; margin-block: -5px; font-size: var(--fs-small); color: var(--on-dark); text-decoration: none; }
   .to-top:hover { text-decoration: underline; text-underline-offset: 3px; }
   @media (max-width: 559px) { .bar { margin-left: 0; } }
   .mega-mark {

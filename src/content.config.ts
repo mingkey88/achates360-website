@@ -3,6 +3,10 @@ import { z } from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 import type { SchemaContext } from 'astro:content';
 
+// Link addresses: the Wix export stored some HTML-escaped ("&amp;" in a query), which broke them once
+// the page escaped them again. Unescaped once here, so every link reaches its page.
+const url = () => z.string().transform((s) => s.replaceAll('&amp;', '&'));
+
 type ImageFunction = SchemaContext['image'];
 
 const seo = (image: ImageFunction) => z.object({
@@ -14,14 +18,14 @@ const seo = (image: ImageFunction) => z.object({
 const galleryItem = (image: ImageFunction) => z.object({
   title: z.string(),
   description: z.string(),
-  href: z.string().optional(),
+  href: url().optional(),
   thumb: image(),
   alt: z.string(),
   video: z.string().optional(),
 }).strict();
 
 const linkedImage = (image: ImageFunction) => z.object({
-  src: image(), alt: z.string(), href: z.string().optional(),
+  src: image(), alt: z.string(), href: url().optional(),
 }).strict();
 
 // A component's rendered box on the live Wix site (CSS px, document coordinates): `box` at the
@@ -31,12 +35,12 @@ const layout = { box: box.optional(), mbox: box.optional() };
 
 const block = (image: ImageFunction) => z.discriminatedUnion('type', [
   z.object({ type: z.literal('text'), md: z.string(), color: z.string().optional(), ...layout }).strict(),
-  z.object({ type: z.literal('image'), src: image(), alt: z.string(), href: z.string().optional(), ...layout }).strict(),
+  z.object({ type: z.literal('image'), src: image(), alt: z.string(), href: url().optional(), ...layout }).strict(),
   z.object({ type: z.literal('gallery'), items: z.array(galleryItem(image)), ...layout }).strict(),
   z.object({ type: z.literal('video'), src: z.string(), poster: image(), controls: z.boolean().optional(), ...layout }).strict(),
   // hash: an unlisted Vimeo film's private key (?h=…); without it Vimeo refuses to play the film.
   z.object({ type: z.literal('embed'), provider: z.enum(['vimeo', 'youtube']), id: z.string(), hash: z.string().regex(/^[0-9a-f]+$/).optional(), ...layout }).strict(),
-  z.object({ type: z.literal('link'), href: z.string(), label: z.string(), ...layout }).strict(),
+  z.object({ type: z.literal('link'), href: url(), label: z.string(), ...layout }).strict(),
 ]);
 
 const media = (image: ImageFunction) => z.discriminatedUnion('type', [
@@ -57,8 +61,8 @@ const projects = defineCollection({
     listed: z.boolean(),
     order: z.number().optional(),
     hero: media(image).optional(),
-    badges: z.array(z.object({ src: image(), alt: z.string(), href: z.string().optional(), box: box.optional() }).strict()),
-    backLink: z.object({ label: z.string(), href: z.string() }).strict().optional(),
+    badges: z.array(z.object({ src: image(), alt: z.string(), href: url().optional(), box: box.optional() }).strict()),
+    backLink: z.object({ label: z.string(), href: url() }).strict().optional(),
     pageBackground: z.string().optional(),
     seo: seo(image),
     blocks: z.array(block(image)),
@@ -73,10 +77,10 @@ const cards = defineCollection({
     role: z.string(),
     qr: linkedImage(image),
     photo: linkedImage(image),
-    links: z.array(z.object({ label: z.string(), href: z.string() }).strict()),
-    phone: z.object({ display: z.string(), href: z.string() }).strict(),
-    email: z.object({ display: z.string(), href: z.string() }).strict(),
-    vcard: z.object({ label: z.string(), href: z.string() }).strict(),
+    links: z.array(z.object({ label: z.string(), href: url() }).strict()),
+    phone: z.object({ display: z.string(), href: url() }).strict(),
+    email: z.object({ display: z.string(), href: url() }).strict(),
+    vcard: z.object({ label: z.string(), href: url() }).strict(),
     seo: seo(image),
   }).strict(),
 });
@@ -105,7 +109,7 @@ const home = defineCollection({
       media: media(image),
       badges: z.array(linkedImage(image)),
       md: z.string().optional(),
-      cta: z.object({ label: z.string(), href: z.string() }).strict().optional(),
+      cta: z.object({ label: z.string(), href: url() }).strict().optional(),
     }).strict()),
     allProjects: z.object({ md: z.string(), items: z.array(galleryItem(image)) }).strict(),
     contact: z.object({ md: z.array(z.string()), form: formSchema }).strict(),
@@ -125,17 +129,17 @@ const projectsIndex = defineCollection({
 
 // Site menus (scripts/export-wix/chrome.mjs): Wix's desktop lightbox menu and its mobile menu,
 // each a list of links with optional sub-menus.
-const navLink = z.object({ label: z.string(), href: z.string() }).strict();
+const navLink = z.object({ label: z.string(), href: url() }).strict();
 const navItem = navLink.extend({ items: z.array(navLink).optional() }).strict();
 
 const site = defineCollection({
   loader: glob({ pattern: 'site.md', base: './src/content/site' }),
   schema: ({ image }) => z.object({
-    logo: z.object({ src: image(), alt: z.string(), href: z.string() }).strict(),
+    logo: z.object({ src: image(), alt: z.string(), href: url() }).strict(),
     footer: z.array(block(image)),
     menu: z.array(navItem).optional(),
     mobileMenu: z.array(navItem).optional(),
-    menuSocial: z.array(z.object({ src: image(), alt: z.string(), href: z.string() }).strict()).optional(),
+    menuSocial: z.array(z.object({ src: image(), alt: z.string(), href: url() }).strict()).optional(),
     // The site icon Wix links in <head> (one file for every size).
     favicon: z.object({ src: image() }).strict().optional(),
   }).strict(),
