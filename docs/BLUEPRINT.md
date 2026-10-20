@@ -1,6 +1,8 @@
 # Achates 360 website — blueprint
 
 Where everything lives, how a page is put together, and where to look when something breaks.
+For how the site is organised for visitors (sitemap, navigation, categories, journeys), see
+[INFORMATION-ARCHITECTURE.md](INFORMATION-ARCHITECTURE.md).
 Last checked against the code: 19 Oct 2026. Design decisions and their reasons are in
 [DIRECTION-B.md](DIRECTION-B.md); open questions for the client are in [../CONTENT-QUERIES.md](../CONTENT-QUERIES.md).
 
