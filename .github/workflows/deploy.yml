@@ -17,6 +17,8 @@ jobs:
       cancel-in-progress: true
     env:
       SITE_ENV: staging
+      # Repository variable (Settings → Secrets and variables → Actions → Variables). Unset = no analytics.
+      PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

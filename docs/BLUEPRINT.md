@@ -230,6 +230,14 @@ fills on `--accent`.
 **Connect the contact form:** set `PUBLIC_FORM_ENDPOINT` (a form service's address) as a build
 setting; `components/ContactForm.astro` posts to it. Until then it says "Form not connected on staging".
 
+**Turn on Cloudflare Web Analytics:** in Cloudflare, Web Analytics → Add a site → enter the site's
+address, and copy the token from the snippet it shows. In GitHub: Settings → Secrets and variables →
+Actions → Variables → New repository variable `CF_ANALYTICS_TOKEN` with that token, then publish. The
+next build adds Cloudflare's beacon to every page (`layouts/Base.astro`); no variable, no beacon.
+Cookieless, so no consent banner. Once the site is hosted on Cloudflare Pages with analytics switched
+on in the Pages project, delete the variable: Cloudflare then adds the beacon itself, and both would
+count every visit twice.
+
 ---
 
 ## 8. Checks (run before publishing)

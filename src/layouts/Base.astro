@@ -1,7 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
-import { SITE_ENV } from 'astro:env/server';
+import { SITE_ENV, PUBLIC_CF_ANALYTICS_TOKEN } from 'astro:env/server';
 import { robotsMeta, canonicalUrl, CANONICAL_ALIASES, tidy, ldJson } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
 import { meta } from '../lib/img';
@@ -87,6 +87,8 @@ const pageLinks = menu.filter((m) => m.href !== '/').map((m) => ({ label: m.labe
     {/* `js` gates hidden-until-revealed styles; motion-ready lifts them. If the motion bundle never
         arrives, the timeout lifts them after 3s so nothing stays invisible (Review Focus 1). */}
     <script is:inline>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('motion-ready')},3000);</script>
+    {/* Cloudflare Web Analytics: cookieless page counts, only when a token is set at build time. */}
+    {PUBLIC_CF_ANALYTICS_TOKEN && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: PUBLIC_CF_ANALYTICS_TOKEN })}></script>}
   </head>
   <body data-page={page} data-over-hero={overHero ? '' : undefined}>
     <a class="skip-link" href="#main" data-placeholder={text('skip-link').placeholder ? '' : undefined}>{text('skip-link').text}</a>
