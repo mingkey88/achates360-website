@@ -30,7 +30,7 @@ print-led image, so those devices were removed and the elegance kept.)
 
 **References** (their feel, not their code or images): Aesop (one quiet grotesk, cream and earthy
 tints, sentence case, calm) · National Gallery Singapore (orange marker bars, two-tone headings, selected
-tabs, leader lines) · Kitpro "Croma" (the curved lens of projects, the closing scatter).
+tabs, leader lines) · Kitpro "Croma" (the closing scatter) · Aesop (the homepage hero: a film full-screen, the words centred at its foot).
 
 ---
 
@@ -205,7 +205,7 @@ Motion is scrubbed by scrolling, eased (`--ease-out`), and never required to rea
 
 | Moment | What moves |
 |---|---|
-| Home hero | the curved lens of ten projects drifts; cards can be dragged and clicked |
+| Home hero | the showreel loops silently full-screen behind the header (pause control; holds on its poster under reduced motion); Play with sound opens the full film |
 | Home close | printed pieces spread from a pile; they can be picked up, dragged and reset |
 | Services, How we work | one artboard goes through the four steps: brief, concept, the logo's layers sliding into place, the finished lockup |
 | About | the chronology held as one stage while milestones turn; the logo's figures join hands; a sentence inks in |
@@ -258,5 +258,5 @@ Worth knowing so they are not retried by accident: the whole print/publication s
 projects cover; an orange projects cover (too bright); paper-cut covers holding /projects and the
 category pages (in the way: replaced by the Next project and 404 paper cuts); National Gallery's heavy
 black headline face; a deeper "brown" orange and an off-register shadow behind orange words; overlapping,
-tilted award medallions; visible DRAFT tags; a hover-stop on the hero lens; category filter chips and a
+tilted award medallions; visible DRAFT tags; a hover-stop on the hero lens, then the lens itself (replaced by the background film); category filter chips and a
 catalogue view on /projects (replaced by the tabs).

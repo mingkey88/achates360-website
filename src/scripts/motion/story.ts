@@ -54,7 +54,7 @@ function gather(): void {
   const figs = root ? gsap.utils.toArray<SVGGElement>(root.querySelectorAll('.st-fig')) : [];
   if (!root || !figs.length) return;
   const tl = gsap.timeline({ scrollTrigger: { trigger: root, start: 'top 85%', end: 'center 55%', scrub: .6 } });
-  // Each figure arrives in a corporate colour and settles to ink as they join hands (as in the hero).
+  // Each figure arrives in a corporate colour and settles to ink as they join hands (as the logo’s figures).
   const ARRIVAL = ['#ff9015', '#99d9d9', '#cbe880', '#99d9d9', '#ff9015'];
   figs.forEach((f, i) => {
     const a = (i / figs.length) * Math.PI * 2 + .6;

@@ -146,7 +146,7 @@ pictures, films) · case notes for three projects.
 
 | Type | Pages | Built from |
 |---|---|---|
-| Home | 1 | hero, showreel, imprint (clients, awards, figures), studio sentence, services, closing call |
+| Home | 1 | hero (the showreel, full-screen), imprint (clients, awards, figures), studio sentence, services, closing call |
 | Index | Projects + 9 categories | heading, category tabs, cards |
 | Case study | 61 | hero, details (client · year · categories), story, case notes, Next project |
 | Service book | Services | contents, showreel, one spread per service, How we work, close |
@@ -173,7 +173,7 @@ the redesign (for example "Write to us.", "How we work", "More in this service",
 ```mermaid
 flowchart LR
   subgraph J1 ["1. Browsing the work"]
-    a1["Home"] --> a2["Hero lens /<br/>View all projects"] --> a3["Case study"] --> a4["Next project…"]
+    a1["Home"] --> a2["Hero film /<br/>View all projects"] --> a3["Case study"] --> a4["Next project…"]
     a3 --> a5["Discuss a similar project"] --> a6["Contact"]
   end
   subgraph J2 ["2. Looking for a kind of work"]

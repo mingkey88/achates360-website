@@ -2,11 +2,10 @@
 import { catalogueOf } from '../lib/catalogue';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import HeroArc from '../components/HeroArc.astro';
+import VideoHero from '../components/VideoHero.astro';
 import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
-import Showreel from '../components/Showreel.astro';
 import showreelPoster from '../assets/showreel-poster.jpg';
 import ServiceIndex from '../components/ServiceIndex.astro';
 import Credentials from '../components/Credentials.astro';
@@ -36,25 +35,20 @@ const at = intro.indexOf(KEY);
 const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.slice(0, at), KEY, intro.slice(at + KEY.length)];
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
-// The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
-// study. Unlisted gallery items (no case study to open) are skipped.
 const catalogue = catalogueOf(d.allProjects.items, projects);
-const lens = catalogue.slice(0, 10);
-if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
-// end on, none of them already in the lens. The first six are the ones phones show.
+// end on. The first six are the ones phones show.
 const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
 const scatter = SCATTER.map((slug) => {
   const it = catalogue.find((e) => e.slug === slug);
   if (!it) throw new Error(`Homepage scatter: "${slug}" is not a listed project in the gallery`);
-  if (lens.some((e) => e.slug === slug)) throw new Error(`Homepage scatter: "${slug}" is already in the hero lens`);
   return it;
 });
-// The homepage: hero (the lens of projects), the studio's showreel full-width with the way to all the
-// work, the imprint (clients, awards, figures), the point of view, the service index, one testimonial
+// The homepage: hero (the studio's showreel full-screen, with the way to all the work and the film
+// with sound; after aesop.com, client 21 Oct 2026), the imprint (clients, awards, figures), the point of view, the service index, one testimonial
 // (only once the client has supplied a real one), contact. The full project list lives on /projects.
-// (Selected work, five featured projects with a film cover, was replaced by the showreel: client,
-// 21 Oct 2026, the hero already shows the work.)
+// (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
+// of project cards by the showreel as the hero: client, 21 Oct 2026. The lens is tag lens-hero-v1.)
 // The service contents: each service's number of listed projects, counted as on /services.
 const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
 const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
@@ -76,14 +70,12 @@ const description = sentenceStarting(aboutMd, 'We are an integrated creative age
 const knowsAbout = [...new Set([...projects.values()].filter((p) => p.listed).flatMap((p) => p.categories))].sort();
 const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, description, knowsAbout }), websiteLd(homeUrl)];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home">
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home" overHero>
   <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);
   </script>
-  <HeroArc items={lens} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
-
-  <Showreel bleed label={text('showreel-label').text} draft={text('showreel-label').placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="2:00" cta={{ label: text('selected-cta'), href: '/projects', count: listedCount }} />
+  <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} cta={text('selected-cta')} count={listedCount} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} />
 
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
 
@@ -109,8 +101,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
 <script>
   import { run } from '../scripts/motion/index';
   import { reveal } from '../scripts/motion/reveal';
-  import { hero } from '../scripts/motion/hero';
   import { counters } from '../scripts/motion/counters';
   import { scatter } from '../scripts/motion/scatter';
-  run(hero, reveal, counters, scatter);
+  run(reveal, counters, scatter);
 </script>

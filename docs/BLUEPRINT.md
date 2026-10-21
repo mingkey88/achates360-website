@@ -62,7 +62,7 @@ achates360-website/
 
 | URL | Page file | Template | Main sections | Words and pictures from |
 |---|---|---|---|---|
-| `/` | `src/pages/index.astro` | Base | HeroArc → Showreel → Credentials → studio sentence → ServiceIndex → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence) |
+| `/` | `src/pages/index.astro` | Base | VideoHero (the showreel, full-screen) → Credentials → studio sentence → ServiceIndex → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence) |
 | `/projects` | `src/pages/projects.astro` | Base | heading, CategoryTabs, ProjectCards | homepage gallery list in `home.md` (`allProjects`), `content/projects/*` |
 | `/projects/<category>` | `src/pages/projects/[category].astro` | Base | heading, CategoryTabs, ProjectCards | `content/projectsIndex/projects.md` (categories) |
 | `/<project>` (61 case studies) | `src/pages/[slug].astro` | Project | hero, MetaStrip, ArtRows, CaseNotes, NextProject | `content/projects/<slug>.md`, layout in `content/art/<slug>.yaml`, notes in `content/notes/<slug>.yaml` |
@@ -188,7 +188,6 @@ matches each page's script). Visitors who ask for reduced motion get every secti
 
 | Effect | File | Where |
 |---|---|---|
-| Hero ring of projects | `hero.ts` | homepage |
 | Counting figures | `counters.ts` | homepage, About |
 | Draggable printed pieces + Reset | `scatter.ts`, `src/scripts/pile.ts` | homepage end |
 | Chronology held stage, figures joining, sentence inking in | `story.ts` | About |

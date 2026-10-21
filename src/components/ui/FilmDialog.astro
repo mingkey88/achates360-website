@@ -1,0 +1,38 @@
+---
+import { getImage } from 'astro:assets';
+import { mediaUrl } from '../../lib/paths';
+// A film with sound in a dark full-screen dialog, with the browser's own controls. Any button with
+// data-film={id} opens it; the film loads on the first open only.
+interface Props { id: string; label: string; closeLabel: string; src: string; poster: ImageMetadata }
+const { id, label, closeLabel, src, poster } = Astro.props;
+const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
+---
+<dialog class="film" id={id} aria-label={label}>
+  <button class="film-close" type="button"><span class="sr-only">{closeLabel}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg></button>
+  <video data-src={mediaUrl(src)} poster={posterUrl} controls playsinline preload="none"></video>
+</dialog>
+<script>
+  for (const dialog of document.querySelectorAll<HTMLDialogElement>('dialog.film')) {
+    const video = dialog.querySelector('video')!;
+    for (const btn of document.querySelectorAll<HTMLElement>(`[data-film="${dialog.id}"]`)) {
+      btn.addEventListener('click', () => {
+        if (!video.src) video.src = video.dataset.src!;
+        dialog.showModal();
+        void video.play().catch(() => {});
+      });
+    }
+    dialog.querySelector('.film-close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('close', () => video.pause());
+  }
+</script>
+<style>
+  .film { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #0d0d0d; }
+  .film::backdrop { background: #0d0d0d; }
+  .film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .film-close {
+    position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; z-index: 1; width: 44px; height: 44px; display: grid; place-items: center;
+    border: 1px solid rgb(255 255 255 / .5); border-radius: 50%; background: rgb(13 13 13 / .5); color: #fff; cursor: pointer;
+  }
+  .film-close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; }
+</style>
