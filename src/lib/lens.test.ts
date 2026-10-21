@@ -27,8 +27,9 @@ describe('lens strip curve', () => {
     expect(d).toBeLessThanOrEqual(D.card + D.gap + 1e-9);
   });
   it('shows the cards on screen and hides the ones that have left it', () => {
-    for (const u of [0, 1, 2]) expect(lensOpacity(lensPose(u, D), D)).toBe(1);
-    expect(lensOpacity(lensPose(4, D), D)).toBe(0);
+    // Wide screens: the cards fill the first screen, so the centre card and one each side are in view.
+    for (const u of [0, 1]) expect(lensOpacity(lensPose(u, D), D)).toBe(1);
+    expect(lensOpacity(lensPose(3, D), D)).toBe(0);
     expect(lensOpacity(lensPose(0, M), M)).toBe(1);
     expect(lensOpacity(lensPose(3, M), M)).toBe(0);
   });

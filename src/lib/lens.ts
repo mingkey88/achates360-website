@@ -14,8 +14,8 @@ export interface LensOpts { card: number; gap: number; max: number; reach: numbe
 export interface LensPose { x: number; z: number; ry: number }
 
 // P must match HeroArc.astro's --P for the same breakpoint.
-export const LENS_DESKTOP: LensOpts = { card: 24, gap: .6, max: 68, reach: 1.5, power: 2.2, P: 72 };
-export const LENS_PHONE: LensOpts = { card: 40.8, gap: .8, max: 70, reach: 1.2, power: 2, P: 74.4 };
+export const LENS_DESKTOP: LensOpts = { card: 42, gap: 1.05, max: 68, reach: 1.5, power: 2.2, P: 126 };
+export const LENS_PHONE: LensOpts = { card: 72, gap: 1.4, max: 70, reach: 1.2, power: 2, P: 131 };
 
 const DS = .25; // integration step, vw
 
