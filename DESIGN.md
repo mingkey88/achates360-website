@@ -205,7 +205,7 @@ Motion is scrubbed by scrolling, eased (`--ease-out`), and never required to rea
 
 | Moment | What moves |
 |---|---|
-| Home hero | the showreel loops silently full-screen behind the header (pause control; holds on its poster under reduced motion); Play with sound opens the full film |
+| Home hero | the showreel loops silently behind the header, filling the first screen above a slim band with the tagline and buttons (pause control; holds on its poster under reduced motion); Play with sound opens the full film |
 | Home close | printed pieces spread from a pile; they can be picked up, dragged and reset |
 | Services, How we work | one artboard goes through the four steps: brief, concept, the logo's layers sliding into place, the finished lockup |
 | About | the chronology held as one stage while milestones turn; the logo's figures join hands; a sentence inks in |
