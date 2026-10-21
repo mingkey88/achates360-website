@@ -6,20 +6,19 @@ import HeroArc from '../components/HeroArc.astro';
 import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
-import SelectedWork from '../components/SelectedWork.astro';
+import Showreel from '../components/Showreel.astro';
+import showreelPoster from '../assets/showreel-poster.jpg';
 import ServiceIndex from '../components/ServiceIndex.astro';
 import Credentials from '../components/Credentials.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
-import { slugOf } from '../lib/next-project';
 import { withLinks } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
-import { STILLS } from '../lib/stills';
 import { serviceCount } from '../lib/service-counts';
 import { ABOUT_ACCENTS } from '../lib/accents';
 
@@ -36,7 +35,6 @@ const KEY = ABOUT_ACCENTS.companion;
 const at = intro.indexOf(KEY);
 const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.slice(0, at), KEY, intro.slice(at + KEY.length)];
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
-const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
 // study. Unlisted gallery items (no case study to open) are skipped.
@@ -44,7 +42,7 @@ const catalogue = catalogueOf(d.allProjects.items, projects);
 const lens = catalogue.slice(0, 10);
 if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
-// end on, none of them already in the lens or Selected work. The first six are the ones phones show.
+// end on, none of them already in the lens. The first six are the ones phones show.
 const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
 const scatter = SCATTER.map((slug) => {
   const it = catalogue.find((e) => e.slug === slug);
@@ -52,34 +50,11 @@ const scatter = SCATTER.map((slug) => {
   if (lens.some((e) => e.slug === slug)) throw new Error(`Homepage scatter: "${slug}" is already in the hero lens`);
   return it;
 });
-// Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a full-bleed film cover), the
-// imprint (clients, awards, figures) straight after the work, then the point of view, the service index, one
-// testimonial (only once the client has supplied a real one), contact. The full project list lives on /projects.
-// Star Wars Luzerne (homepage slide 5) leads as the cover, then the first four slides.
-// A featured slide whose project is unlisted (hidden from the project list) is swapped for a listed one,
-// shown with that project's hero and the slide's own link label. DBS Discretionary Portfolio Management
-// is unlisted, so St Regis TeaRoom & Patisserie (2025, branding) takes its place (14 Oct 2026,
-// CONTENT-QUERIES 50).
-const SWAP: Record<string, string> = { 'dbs-discretionary-portfolio-management': 'st-regis-tearoom-patisserie' };
-const swapped = featured.map((f) => {
-  const to = SWAP[slugOf(f.slide.cta?.href) ?? ''];
-  const project = to ? projects.get(to) : undefined;
-  if (!to) return f;
-  if (!project?.listed || !project.hero) throw new Error(`Selected work: swap target "${to}" is unlisted or has no hero`);
-  return { slide: { ...f.slide, media: project.hero, cta: { label: f.slide.cta!.label, href: `/${to}` } }, project };
-});
-// DXV's film gets a still where its title has formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
-// The lead plate after the cover is 'Building Memories', the studio's own art book and this direction's
-// source (15 Oct 2026, CONTENT-QUERIES 51); the other three keep the homepage's slide order.
-const LEAD = 'building-memories-artbook';
-const numbered = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
-  const slug = slugOf(f.slide.cta?.href) ?? '';
-  return { ...f, slug, poster: STILLS[slug] };
-});
-const lead = numbered.findIndex((f, i) => i > 0 && f.slug === LEAD);
-if (lead < 0) throw new Error(`Selected work: the lead "${LEAD}" is not among the selected projects`);
-const selected = [numbered[0], numbered[lead], ...numbered.filter((_, i) => i > 0 && i !== lead)];
-if (SCATTER.some((slug) => selected.some((f) => slugOf(f.slide.cta?.href) === slug))) throw new Error('Homepage scatter repeats a selected project');
+// The homepage: hero (the lens of projects), the studio's showreel full-width with the way to all the
+// work, the imprint (clients, awards, figures), the point of view, the service index, one testimonial
+// (only once the client has supplied a real one), contact. The full project list lives on /projects.
+// (Selected work, five featured projects with a film cover, was replaced by the showreel: client,
+// 21 Oct 2026, the hero already shows the work.)
 // The service contents: each service's number of listed projects, counted as on /services.
 const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
 const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
@@ -108,7 +83,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </script>
   <HeroArc items={lens} name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} />
 
-  <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} awardsLabel={text('lead-awards')} />
+  <Showreel bleed label={text('showreel-label').text} draft={text('showreel-label').placeholder} playLabel={text('showreel-play').text} closeLabel={text('showreel-close').text} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} duration="2:00" cta={{ label: text('selected-cta'), href: '/projects', count: listedCount }} />
 
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
 

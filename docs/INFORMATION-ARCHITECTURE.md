@@ -89,7 +89,7 @@ The current section is marked in the header and menu with an orange bar.
 ### Local (within a section)
 | Page | Ways onward |
 |---|---|
-| Home | Hero ring of 10 projects · Selected work (cover + 4) · "View all projects" · Building Memories' awards · client logos · services list (→ each service on /services) · closing "Get in touch" |
+| Home | Hero ring of 10 projects · Showreel · "View all projects" · client logos · services list (→ each service on /services) · closing "Get in touch" |
 | Projects / category | **Category tabs** (All + 9, with counts, current one marked) · 53 cards |
 | Case study | Its categories (→ category pages) · ← Back to projects · **Next project** (in catalogue order) · **Discuss a similar project** (→ Contact) |
 | Services | Contents (→ each service) · each service's categories (→ category pages) · "More in this service" (3 projects) · Write to us (→ Contact) |
@@ -146,7 +146,7 @@ pictures, films) · case notes for three projects.
 
 | Type | Pages | Built from |
 |---|---|---|
-| Home | 1 | hero, selected work, imprint (clients, awards, figures), studio sentence, services, closing call |
+| Home | 1 | hero, showreel, imprint (clients, awards, figures), studio sentence, services, closing call |
 | Index | Projects + 9 categories | heading, category tabs, cards |
 | Case study | 61 | hero, details (client · year · categories), story, case notes, Next project |
 | Service book | Services | contents, showreel, one spread per service, How we work, close |
@@ -173,7 +173,7 @@ the redesign (for example "Write to us.", "How we work", "More in this service",
 ```mermaid
 flowchart LR
   subgraph J1 ["1. Browsing the work"]
-    a1["Home"] --> a2["Selected work /<br/>View all projects"] --> a3["Case study"] --> a4["Next project…"]
+    a1["Home"] --> a2["Hero lens /<br/>View all projects"] --> a3["Case study"] --> a4["Next project…"]
     a3 --> a5["Discuss a similar project"] --> a6["Contact"]
   end
   subgraph J2 ["2. Looking for a kind of work"]

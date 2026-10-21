@@ -42,7 +42,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
   <div class="ha-arc" data-arc aria-hidden="true">
     {items.map((it, i) => (
       <a class="ha-card" href={withBase(it.href)} style={pose(i - mid)} {...off(i - mid)} tabindex="-1" draggable="false">
-        <Pic src={it.thumb} alt="" position={it.position} crop={4 / 3} mobileCrop={3 / 4} widths={[320, 480, 640, 960]} mobileWidths={[240, 360, 480, 640]} sizes="24vw" mobileSizes="41vw" loading={Math.abs(i - mid) <= 1 ? 'eager' : 'lazy'} fetchpriority={i === mid ? 'high' : 'low'} draggable="false" />
+        <Pic src={it.thumb} alt="" position={it.position} crop={4 / 3} mobileCrop={3 / 4} widths={[320, 480, 640, 960, 1280]} mobileWidths={[240, 360, 480, 640]} sizes="24vw" mobileSizes="41vw" loading={Math.abs(i - mid) <= 1 ? 'eager' : 'lazy'} fetchpriority={i === mid ? 'high' : 'low'} draggable="false" />
         <span class="ha-cap"><span class="ha-cap-t">{it.title}</span><span class="ha-cap-d">{it.description}</span></span>
       </a>
     ))}
@@ -68,7 +68,7 @@ const mark = logo.replace('<svg ', `<svg class="ha-mark-svg" role="img" aria-lab
      perspective) exaggerates the turn, so the outer cards' outer sides stand tall. Each card is placed
      at its curve point (--cx, --cz in vw) and turned to it (--cry degrees). The strip spans the full
      width: two places out a card is already near the screen's edge. */
-  .ha { --card-w: 16vw; --card-ratio: 4 / 3; --P: 48vw; } /* --P matches lib/lens.ts */
+  .ha { --card-w: 24vw; --card-ratio: 4 / 3; --P: 72vw; } /* --card-w and --P match lib/lens.ts (cards made half as large again, client 21 Oct 2026: "the hero is not loud enough") */
   .ha-arc {
     position: relative; min-height: 0; perspective: var(--P); perspective-origin: 50% 50%;
     cursor: grab; touch-action: pan-y; user-select: none;

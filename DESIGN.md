@@ -138,7 +138,7 @@ appears in one place only: a quotation set alone.
 | **Section heads** (`RunningHead`) | the section's name on an ink hairline with a 4px orange bar under it; an optional fact at the right (the studio's address, the years a story spans) | Home sections, About chapters, Credentials, case notes |
 | **Captions beneath** | picture whole, caption under it (title in ink, client in grey) | everywhere work is shown |
 | **Ruled lists** | rows on hairlines with a count at the right | Services list, homepage services, categories |
-| **Film cover** | the first selected project's film full-bleed, its card over the lower corner | Home, Selected work |
+| **Showreel** | the studio's reel looping silently, Play with sound opens the full film | Home (full-width, with View all projects beneath), Services (within the margins) |
 | **Leader line** | a line from the page's edge into "Write to us.", ending in an orange bar | the close of inner pages |
 | **Paper cut** | words cut through a sheet with a picture showing through: kept as a single small signature | the 404 page only |
 

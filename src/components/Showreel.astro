@@ -3,27 +3,32 @@ import { getImage } from 'astro:assets';
 import BgVideo from './BgVideo.astro';
 import { mediaUrl } from '../lib/paths';
 import { loadExtras } from '../lib/extras';
-// The studio's showreel on the Services page (direction B): set on the page like a print proof, framed
-// by crop marks, with a silent cut (24 s of the film, no sound) looping in place while it is on screen.
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import type { UiString } from '../lib/strings';
+// The studio's showreel: a silent cut (24 s of the film, no sound) looping in place while it is on
+// screen, on the Services page within the page's margins and on the homepage full-width (bleed), with
+// the way to all the work beneath (cta).
 // "Play with sound" opens the full film (1:30) in a dark full-screen dialog with the browser's own
 // controls. Swap the files in public/media/video to update the reel; the poster is a still from it.
-interface Props { label: string; playLabel: string; closeLabel: string; draft: boolean; src: string; preview: string; poster: ImageMetadata; duration: string }
-const { label, playLabel, closeLabel, draft, src, preview, poster, duration } = Astro.props;
+interface Props { label: string; playLabel: string; closeLabel: string; draft: boolean; src: string; preview: string; poster: ImageMetadata; duration: string; bleed?: boolean; cta?: { label: UiString; href: string; count?: number } }
+const { label, playLabel, closeLabel, draft, src, preview, poster, duration, bleed = false, cta } = Astro.props;
 const { text: t } = await loadExtras();
 const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
 ---
-<section class="sr wrap" aria-label={label} data-showreel>
-  <div class="sr-head">
+<section class:list={['sr', bleed ? 'sr-bleed' : 'wrap']} aria-label={label} data-showreel>
+  <div class:list={['sr-head', { wrap: bleed }]}>
     <p class="sr-label" data-placeholder={draft ? '' : undefined}>{label}</p>
     <p class="sr-dur">{duration}</p>
   </div>
-  <div class="sr-frame crop">
+  <div class="sr-frame">
     <BgVideo src={preview} poster={poster} class="sr-loop" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
     <button class="sr-play" type="button" data-placeholder={draft ? '' : undefined}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg>
       <span>{playLabel}</span>
     </button>
   </div>
+  {cta && <div class="sr-cta wrap"><Pill href={cta.href} variant="fill"><T s={cta.label} />{cta.count !== undefined && <span class="sr-count"> ({cta.count})</span>}</Pill></div>}
   <dialog class="sr-dialog" aria-label={label}>
     <button class="sr-close" type="button"><span class="sr-only">{closeLabel}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg></button>
     <video data-src={mediaUrl(src)} poster={posterUrl} controls playsinline preload="none"></video>
@@ -45,6 +50,13 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
 </script>
 <style>
   .sr { padding-block: 0 var(--s-8); }
+  /* Homepage: the reel runs the full width, as tall as a screen allows; its label and the way to all the
+     work keep to the page's margins. */
+  .sr-bleed { padding-block: var(--section-y); }
+  .sr-bleed .sr-head { border-bottom: 0; margin-bottom: var(--s-4); }
+  .sr-bleed .sr-frame { aspect-ratio: auto; height: min(56.25vw, 92svh); }
+  .sr-cta { display: flex; justify-content: center; margin-top: var(--s-7); }
+  .sr-count { font-variant-numeric: tabular-nums; }
   .sr-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: var(--s-3); margin-bottom: var(--s-5); border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
   .sr-head p { margin: 0; }
   .sr-dur { color: var(--text-2); font-variant-numeric: tabular-nums; }
