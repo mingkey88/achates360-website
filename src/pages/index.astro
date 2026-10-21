@@ -8,6 +8,7 @@ import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
 import showreelPoster from '../assets/showreel-poster.jpg';
 import ServiceIndex from '../components/ServiceIndex.astro';
+import WorkStack from '../components/WorkStack.astro';
 import Credentials from '../components/Credentials.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
@@ -36,6 +37,9 @@ const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.sl
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 const catalogue = catalogueOf(d.allProjects.items, projects);
+// The work after the hero (WorkStack, after wearecollins.com): seven projects across the disciplines,
+// films first: packaging, campaign content, branding, advertising, campaigns, brand and packaging, events.
+const WORK = ['starwars-luzerne', 'samsung-connected-home', 'idm-venture-capital', 'dxv', 'grohe-quarterly-campaigns', 'notter', 'alstom-r151-last-train-handover'];
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
 // end on. The first six are the ones phones show.
 const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
@@ -45,7 +49,8 @@ const scatter = SCATTER.map((slug) => {
   return it;
 });
 // The homepage: hero (the studio's showreel full-screen, with the way to all the work and the film
-// with sound; after aesop.com, client 21 Oct 2026), the imprint (clients, awards, figures), the point of view, the service index, one testimonial
+// with sound; after aesop.com, client 21 Oct 2026), the work (seven projects as large moving tiles), the
+// point of view, the service index, the imprint (clients, awards, figures), one testimonial
 // (only once the client has supplied a real one), contact. The full project list lives on /projects.
 // (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
 // of project cards by the showreel as the hero: client, 21 Oct 2026. The lens is tag lens-hero-v1.)
@@ -77,7 +82,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </script>
   <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} cta={text('selected-cta')} count={listedCount} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} />
 
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
+  <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
     <RunningHead as="p" s={text('intro-eyebrow')} />
@@ -86,6 +91,8 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </section>
 
   <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} countLabel={text('contents-count')} />
+
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
