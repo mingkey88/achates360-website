@@ -1,0 +1,74 @@
+---
+import BgVideo from './BgVideo.astro';
+import FilmDialog from './ui/FilmDialog.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import { loadExtras } from '../lib/extras';
+import type { UiString } from '../lib/strings';
+// The homepage hero, after aesop.com (client, 21 Oct 2026): the studio's showreel, a silent loop, fills
+// most of the first screen behind the transparent header, with nothing written over it (client: "the
+// words preferably don't overlap the video… keep it small at the bottom"). A slim band beneath, on the
+// paper, closes the first screen: the tagline (the page's h1, named with the studio), the studio's
+// description, the full film with sound and the way to all the work. A scrim darkens the film's top
+// for the header. Under reduced motion the loop holds on its poster with a Play button (BgVideo).
+interface Props {
+  name: UiString; tagline: UiString; blurb: string; label: UiString; playLabel: UiString; closeLabel: string;
+  cta: UiString; count: number; src: string; preview: string; poster: ImageMetadata;
+}
+const { name, tagline, blurb, label, playLabel, closeLabel, cta, count, src, preview, poster } = Astro.props;
+const { text: t } = await loadExtras();
+---
+<section class="vh" aria-labelledby="vh-title">
+  <div class="vh-stage">
+    <BgVideo src={preview} poster={poster} class="vh-video" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
+  </div>
+  <div class="vh-bar">
+    <h1 id="vh-title" class="vh-tagline"><span class="sr-only">{name.text}: </span>{tagline.text.replace(/ •/g, ' •')}</h1>
+    <p class="vh-blurb">{blurb}</p>
+    <div class="vh-actions">
+      <button class="vh-play" type="button" data-film="hero-film">
+        <span class="vh-ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg></span>
+        <T s={playLabel} />
+      </button>
+      <Pill href="/projects"><T s={cta} /><span class="vh-count">({count})</span></Pill>
+    </div>
+  </div>
+  <FilmDialog id="hero-film" label={label.text} closeLabel={closeLabel} src={src} poster={poster} />
+</section>
+<style>
+  /* The film and the band together fill the first screen; the film takes whatever the band leaves. */
+  .vh { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: max(100svh, 560px); }
+  .vh-stage { position: relative; min-height: 320px; background: var(--ink); overflow: clip; }
+  .vh-stage :global(.vh-video) { position: absolute; inset: 0; }
+  .vh-stage :global(.vh-video video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .vh-stage::after {
+    content: ''; position: absolute; inset: 0 0 auto; height: 30%; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgb(13 13 13 / .45), rgb(13 13 13 / 0));
+  }
+  .vh-stage :global(.bv-toggle) { z-index: 2; }
+
+  .vh-bar {
+    display: grid; gap: var(--s-3) var(--s-6); align-items: center;
+    padding: var(--s-5) var(--gutter); border-bottom: 1px solid var(--line);
+  }
+  .vh-tagline { margin: 0; font: 400 clamp(1.25rem, 1rem + .8vw, 1.75rem)/1.15 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  .vh-blurb { margin: 0; max-width: 62ch; min-width: 0; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
+  .vh-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
+  .vh-count { font-variant-numeric: tabular-nums; }
+  .vh-play {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0;
+    background: none; color: inherit; cursor: pointer; font: 400 var(--fs-small)/1 var(--font-text);
+  }
+  .vh-ring {
+    display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid currentColor; border-radius: 50%;
+    transition: background-color .3s, color .3s;
+  }
+  .vh-ring svg { width: 12px; height: 12px; margin-left: 2px; fill: currentColor; }
+  .vh-play:is(:hover, :focus-visible) .vh-ring { background: var(--ink); color: var(--paper); }
+  /* Wide screens: one row, tagline | description | actions. */
+  @media (min-width: 1024px) {
+    .vh-bar { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .vh-tagline { max-width: 14ch; }
+  }
+  @media (prefers-reduced-motion: reduce) { .vh-ring { transition: none; } }
+</style>

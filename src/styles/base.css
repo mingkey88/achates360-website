@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
 body {
-  margin: 0; background: var(--paper-tex), var(--grid), var(--paper); color: var(--ink);
+  margin: 0; background: var(--paper); color: var(--ink);
   font: 400 var(--fs-body) / var(--lh-body) var(--font-text);
   overflow-x: clip;
 }
@@ -43,20 +43,9 @@ html:not(.js) .bgvideo video[data-src] { display: none; }
 
 ::selection { background: var(--lime); color: var(--ink); }
 
-/* Direction B print touch: printer's crop marks instead of a drop shadow. Eight hairline ticks drawn
-   just outside the element's corners, stopping --cm-gap short of the trim, like marks on a press
-   proof. The element must not clip (no overflow: hidden) since the marks sit outside it. */
-.crop { position: relative; --cm-len: 12px; --cm-gap: 6px; --cm-c: rgb(51 51 51 / .5); }
-.crop::before {
-  --L: calc(var(--cm-len) + var(--cm-gap));
-  --h: linear-gradient(var(--cm-c), var(--cm-c));
-  content: ''; position: absolute; inset: calc(var(--L) * -1); pointer-events: none;
-  background:
-    var(--h) 0 var(--L) / var(--cm-len) 1px no-repeat, var(--h) 100% var(--L) / var(--cm-len) 1px no-repeat,
-    var(--h) 0 calc(100% - var(--L)) / var(--cm-len) 1px no-repeat, var(--h) 100% calc(100% - var(--L)) / var(--cm-len) 1px no-repeat,
-    var(--h) var(--L) 0 / 1px var(--cm-len) no-repeat, var(--h) calc(100% - var(--L)) 0 / 1px var(--cm-len) no-repeat,
-    var(--h) var(--L) 100% / 1px var(--cm-len) no-repeat, var(--h) calc(100% - var(--L)) 100% / 1px var(--cm-len) no-repeat;
-}
+/* Framed pictures and panels: a positioning hook (the printer's crop marks drawn here were removed with
+   the other print devices, 21 Oct 2026). */
+.crop { position: relative; }
 
 /* Two-tone headings (direction B, after nationalgallery.sg): the accent phrase in the text orange, a weight
    heavier so it holds on the paper; on dark grounds, the brand orange. In a small running head the word

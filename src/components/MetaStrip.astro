@@ -6,14 +6,17 @@ import type { UiString } from '../lib/strings';
 import Chip from './ui/Chip.astro';
 import { categorySlug } from '../lib/categories';
 import T from './ui/T.astro';
+import ShareLinks from './ui/ShareLinks.astro';
 interface Props {
   client?: string; copyright?: string; categories: string[];
   badges: { src: ImageMetadata; alt: string; href?: string }[]; labels: Record<MetaKey, UiString>;
+  // share: a last column of share links (case studies).
+  share?: { label: UiString; url: string; title: string; on: UiString; copy: UiString; copied: UiString };
 }
-const { client, copyright, categories, badges, labels } = Astro.props;
+const { client, copyright, categories, badges, labels, share } = Astro.props;
 const cols = metaColumns({ client, copyright, categories, badges });
 ---
-{cols.length > 0 && (
+{(cols.length > 0 || share) && (
   <dl class="meta wrap">
     {cols.map((k) => (
       <div class="meta-col">
@@ -33,6 +36,12 @@ const cols = metaColumns({ client, copyright, categories, badges });
         </dd>
       </div>
     ))}
+    {share && (
+      <div class="meta-col">
+        <dt class="label"><T s={share.label} /></dt>
+        <dd><ShareLinks url={share.url} title={share.title} on={share.on} copy={share.copy} copied={share.copied} /></dd>
+      </div>
+    )}
   </dl>
 )}
 <style>

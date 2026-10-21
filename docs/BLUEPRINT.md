@@ -44,7 +44,7 @@ achates360-website/
 │  ├─ content.config.ts ← the rules each content file must follow (a broken file stops the build)
 │  ├─ pages/            ← one file per page or URL pattern
 │  ├─ layouts/          ← page templates (Base wraps every page; Project = case studies; About; …)
-│  ├─ components/       ← page sections (hero, selected work, footer, …); ui/ = small parts
+│  ├─ components/       ← page sections (hero, showreel, footer, …); ui/ = small parts
 │  ├─ lib/              ← logic: lists, counts, SEO, accents, layouts of case studies, …
 │  ├─ scripts/motion/   ← scroll animations (GSAP), one file per effect
 │  ├─ styles/           ← tokens.css (colours, type sizes, spacing), base.css, type.css
@@ -62,7 +62,7 @@ achates360-website/
 
 | URL | Page file | Template | Main sections | Words and pictures from |
 |---|---|---|---|---|
-| `/` | `src/pages/index.astro` | Base | HeroArc → SelectedWork → Credentials → studio sentence → ServiceIndex → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence), `lib/project-awards.ts` |
+| `/` | `src/pages/index.astro` | Base | VideoHero (the showreel, full-screen) → Credentials → studio sentence → ServiceIndex → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence) |
 | `/projects` | `src/pages/projects.astro` | Base | heading, CategoryTabs, ProjectCards | homepage gallery list in `home.md` (`allProjects`), `content/projects/*` |
 | `/projects/<category>` | `src/pages/projects/[category].astro` | Base | heading, CategoryTabs, ProjectCards | `content/projectsIndex/projects.md` (categories) |
 | `/<project>` (61 case studies) | `src/pages/[slug].astro` | Project | hero, MetaStrip, ArtRows, CaseNotes, NextProject | `content/projects/<slug>.md`, layout in `content/art/<slug>.yaml`, notes in `content/notes/<slug>.yaml` |
@@ -115,8 +115,7 @@ marked `placeholder: true` (Draft) until the client approves it, and logged in C
 |---|---|---|
 | Hero tagline "faithful friend • thoughtful design" | `strings.yaml` | `hero-tagline` |
 | Hero ring of ten projects | `home.md` `allProjects` | first ten listed projects, in that order |
-| Selected work (cover + 4 plates) | `home.md` `slides` | cover = slide 5; lead = `LEAD` in `index.astro`; a swap list `SWAP` replaces unlisted projects |
-| "10 awards" beside Building Memories | `src/lib/project-awards.ts` | seals, badge names, count |
+| Homepage showreel | `public/media/video/achates360-showreel*.mp4`, poster `src/assets/showreel-poster.jpg` | label and buttons: strings `showreel-*`, `selected-cta` |
 | Studio sentence ("The name Achates 360 reflects…") | `content/basic/about.md` | taken from the About text |
 | Trusted by: client logos | `content/extras/clients.yaml` + `public/clients/*.svg|png` | one line per client: `name`, `logo`, `ratio` |
 | Awards list | `strings.yaml` | `awards-line` (awards separated by " · ") |
@@ -164,11 +163,10 @@ marked `placeholder: true` (Draft) until the client approves it, and logged in C
 |---|---|---|
 | Case-study pictures | `src/assets/wix/…`, `src/assets/<project>/` | referenced from the project file's `blocks`; resized automatically |
 | Office photos | `src/assets/office/` | |
-| Brand and share images | `src/assets/og-default.jpg`, `logo-*.svg` | |
+| Brand and share images | `src/assets/og-default.jpg` (drawn by `node scripts/make-og.mjs`), `logo-*.svg` | Case studies share their own hero picture |
 | Films (showreel) | `public/media/video/` | served as-is; keep each file under 25 MB |
 | Embedded films | YouTube/Vimeo IDs in project files | `npm run check:films` tests they still play |
 | Client logos | `public/clients/` | white artwork, trimmed; recoloured on the page |
-| Award badges | `src/assets/wix/` (Building Memories' page) | listed in `lib/project-awards.ts` |
 
 **Size budget:** the built site must stay under 800 MB (`npm run verify`); today about 690 MB.
 Pictures are served at up to 2560px wide, in AVIF and WebP; a larger original is fine.
@@ -190,8 +188,6 @@ matches each page's script). Visitors who ask for reduced motion get every secti
 
 | Effect | File | Where |
 |---|---|---|
-| Hero ring of projects | `hero.ts` | homepage |
-| Selected work cover slides away | `cover.ts` | homepage |
 | Counting figures | `counters.ts` | homepage, About |
 | Draggable printed pieces + Reset | `scatter.ts`, `src/scripts/pile.ts` | homepage end |
 | Chronology held stage, figures joining, sentence inking in | `story.ts` | About |
@@ -229,6 +225,14 @@ fills on `--accent`.
 
 **Connect the contact form:** set `PUBLIC_FORM_ENDPOINT` (a form service's address) as a build
 setting; `components/ContactForm.astro` posts to it. Until then it says "Form not connected on staging".
+
+**Change the default share picture** (what WhatsApp, LinkedIn and Facebook show for pages without
+their own picture): `node scripts/make-og.mjs <picture>` redraws `src/assets/og-default.jpg` with
+"360" cut over that picture. Networks keep an old preview for a while; LinkedIn's Post Inspector and
+Facebook's Sharing Debugger refresh it.
+
+**Share links on case studies:** `components/ui/ShareLinks.astro` (LinkedIn, Facebook, WhatsApp,
+Copy link), shown as the last column of the project's details. Labels: strings `share-*`.
 
 **Turn on Cloudflare Web Analytics:** in Cloudflare, Web Analytics → Add a site → enter the site's
 address, and copy the token from the snippet it shows. In GitHub: Settings → Secrets and variables →

@@ -11,7 +11,7 @@ const { items } = Astro.props;
 ---
 <ul class="cards">
   {items.map((e, i) => (
-    <li><MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} tag={e.award} position={e.position} folio={e.no ? `№ ${String(e.no).padStart(3, '0')}` : undefined} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt eager={i < 3} reveal={false} /></li>
+    <li><MediaCard image={e.thumb} alt={isFileNameAlt(e.alt) ? '' : e.alt} href={e.href} title={e.title.trim()} subtitle={e.description} tag={e.award} position={e.position} previewVideo={e.video} ratio="4 / 3" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1023px) 50vw, 33vw" tilt eager={i < 3} reveal={false} /></li>
   ))}
 </ul>
 <style>

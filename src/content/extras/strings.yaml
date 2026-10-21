@@ -7,7 +7,6 @@
 - { id: video-pause, text: Pause video, placeholder: true }
 - { id: video-play, text: Play video, placeholder: true }
 - { id: hero-tagline, text: faithful friend • thoughtful design, placeholder: false }
-- { id: featured-eyebrow, text: Selected work, placeholder: true }
 - { id: intro-eyebrow, text: Inside the studio, placeholder: true }
 - { id: intro-cta, text: Learn more, placeholder: true }
 - { id: services-eyebrow, text: What we do, placeholder: true }
@@ -51,16 +50,6 @@
 - { id: scroll-cue, text: Scroll, placeholder: true }
 - { id: discuss-cta, text: Discuss a similar project, placeholder: true }
 - { id: contact-direct, text: Or write to us directly, placeholder: true }
-# About page colophon (15 Oct 2026): how the site is "printed". New wording, for the studio to approve.
-- { id: colophon-heading, text: Colophon, placeholder: true }
-- { id: colophon-type, text: Typefaces, placeholder: true }
-- { id: colophon-type-text, text: "Hanken Grotesk throughout; Cormorant Garamond for quotations", placeholder: true }
-- { id: colophon-paper, text: Paper, placeholder: true }
-- { id: colophon-paper-text, text: "Ivory stock over a draughtsman's grid", placeholder: true }
-- { id: colophon-ink, text: Inks, placeholder: true }
-- { id: colophon-ink-text, text: "The four process colours and Pantone 1495 U", placeholder: true }
-- { id: colophon-made, text: Made in, placeholder: true }
-- { id: colophon-made-text, text: Singapore, placeholder: true }
 # Heading over a case study's notes from the portfolio deck (17 Oct 2026). New wording, for approval.
 - { id: case-notes, text: Case notes, placeholder: true }
 # About: the awards chapter's line, from the March 2026 portfolio deck's slide 5 (17 Oct 2026).
@@ -78,4 +67,8 @@
 - { id: contact-find, text: Finding us, placeholder: true }
 - { id: back-to-top, text: Back to top, placeholder: true }
 - { id: service-more, text: More in this service, placeholder: true }
-- { id: lead-awards, text: awards, placeholder: true }
+# Share links on case studies (20 Oct 2026). New wording, for the studio to approve.
+- { id: share-label, text: Share, placeholder: true }
+- { id: share-on, text: Share on, placeholder: true }
+- { id: share-copy, text: Copy link, placeholder: true }
+- { id: share-copied, text: Link copied, placeholder: true }

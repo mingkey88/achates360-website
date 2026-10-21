@@ -4,15 +4,15 @@ import DraftTag from './ui/DraftTag.astro';
 import logo from '../assets/logo-stacked-parts.svg?raw';
 import { loadExtras } from '../lib/extras';
 import type { UiString } from '../lib/strings';
-// How we work (direction B), as a press run: one sheet goes through the studio's four steps.
-//   1 Brief    a blank sheet in its crop marks, the job's lines ruled in;
-//   2 Concept  the pencil layout: column guides and an empty picture frame;
-//   3 Design   the proof: black keyline, registration targets and colour bar, and three plates sliding in
-//              from off register to land in register, each printing some of the logo's figures in a brand
-//              colour (1495 orange, turquoise, lime);
-//   4 Deliver  trimmed: everything outside the trim (marks, targets, colour bar) and the working lines are
-//              cut away, the figures settle into the full logo lockup with its tagline (the corporate
-//              sheet's, as in the hero), and the sheet lies on a stack of the run.
+// How we work: one artboard goes through the studio's four steps.
+//   1 Brief    a blank artboard, the job's lines ruled in;
+//   2 Concept  the layout sketch: column guides and an empty picture frame;
+//   3 Design   the keyline, and three layers sliding into place, each carrying some of the logo's figures
+//              in a brand colour (1495 orange, turquoise, lime);
+//   4 Deliver  the working lines fall away and the figures settle into the full logo lockup with its
+//              tagline (the corporate sheet's, as in the hero).
+// (The crop marks, registration targets, colour bar and the stack of printed copies were removed with
+// the print devices, 21 Oct 2026.)
 // Wide screens with motion (motion/press.ts): the section holds still, the sheet at the left, while the
 // steps rise in one by one to fill the right side, two by two; the sheet takes each step's stage as it
 // arrives. Phones, reduced motion and no JS: the finished sheet, then the steps in a column.
@@ -27,7 +27,7 @@ const PLATES = [
   { k: 'teal', c: '#7fcfcf', figs: [1, 3], dx: 0, dy: -18 },
   { k: 'lime', c: '#c3e070', figs: [2], dx: 18, dy: 0 },
 ];
-// The picture frame on the proof, and the figures' place in it (logo units → sheet units).
+// The picture frame on the artboard, and the figures' place in it (logo units → sheet units).
 const F = { x: 78, y: 150, w: 244, h: 190 };
 const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) translate(-50 3)`;
 ---
@@ -36,13 +36,7 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
   <div class="press">
     <figure class="press-fig" aria-hidden="true">
       <svg class="pr" viewBox="0 0 400 500" data-s1 data-s2 data-s3 data-s4 focusable="false">
-        {/* The rest of the run, stacked under the sheet once it is delivered. */}
-        <g class="l-stack">
-          <rect x="56" y="54" width="320" height="420" class="sheet-under" transform="rotate(1.2 216 264)" />
-          <rect x="48" y="47" width="320" height="420" class="sheet-under" transform="rotate(-.8 208 257)" />
-        </g>
         <rect class="sheet" x="40" y="40" width="320" height="420" />
-        <g class="l-crop"><path d="M40 22v12M22 40h12M360 22v12M378 40h-12M40 478v-12M22 460h12M360 478v-12M378 460h-12" /></g>
         {/* 1 Brief: the job's lines, ruled in. */}
         <g class="l-brief">
           <rect x="78" y="78" width="120" height="7" /><rect x="78" y="94" width="186" height="3" /><rect x="78" y="103" width="162" height="3" /><rect x="78" y="112" width="174" height="3" />
@@ -57,12 +51,9 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
         <g class="l-lines">
           <rect x="78" y="362" width="104" height="3" /><rect x="78" y="371" width="96" height="3" /><rect x="218" y="362" width="104" height="3" /><rect x="218" y="371" width="88" height="3" />
         </g>
-        {/* 3 Design: the proof's keyline, registration targets and colour bar (outside the finished piece). */}
+        {/* 3 Design: the keyline round the picture frame. */}
         <g class="l-key">
           <rect x={F.x} y={F.y} width={F.w} height={F.h} class="keyline" />
-          <circle cx="58" cy={F.y + F.h / 2} r="6" class="reg" /><path class="reg" d={`M50 ${F.y + F.h / 2}h16M58 ${F.y + F.h / 2 - 8}v16`} />
-          <circle cx="342" cy={F.y + F.h / 2} r="6" class="reg" /><path class="reg" d={`M334 ${F.y + F.h / 2}h16M342 ${F.y + F.h / 2 - 8}v16`} />
-          <rect x="78" y="414" width="12" height="12" style="fill: #00a0e3" /><rect x="92" y="414" width="12" height="12" style="fill: #e5007e" /><rect x="106" y="414" width="12" height="12" style="fill: #ffed00" /><rect x="120" y="414" width="12" height="12" style="fill: #1d1d1b" /><rect x="134" y="414" width="12" height="12" style="fill: var(--accent)" />
         </g>
         {/* The artwork: the plates and (delivered) the logo's wordmark under them; on delivery the whole
             lockup settles smaller and centred on the trimmed sheet. */}
@@ -102,14 +93,11 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
   .pr { display: block; width: 100%; height: auto; overflow: visible; }
   /* The sheet is a separate piece of paper, so it casts a shadow (photos printed on the page do not). */
   .sheet { fill: #fffef6; filter: drop-shadow(0 6px 10px rgb(0 0 0 / .14)); }
-  .sheet-under { fill: #fbf9ee; stroke: rgb(51 51 51 / .12); stroke-width: 1; }
-  .l-crop path { fill: none; stroke: var(--ink); stroke-width: 1; }
   .l-brief rect, .l-lines rect { fill: rgb(51 51 51 / .2); }
   .l-brief .ticket { fill: none; stroke: rgb(51 51 51 / .4); stroke-width: 1; }
   .l-sketch .guide { fill: none; stroke: #7aa2c9; stroke-width: .8; stroke-dasharray: 3 4; opacity: .6; }
   .l-sketch .frame { fill: none; stroke: rgb(51 51 51 / .45); stroke-width: 1; stroke-dasharray: 5 4; }
   .l-key .keyline { fill: none; stroke: var(--ink); stroke-width: 1.4; }
-  .l-key .reg { fill: none; stroke: var(--ink); stroke-width: .9; }
   .plate { mix-blend-mode: multiply; }
   .l-word { fill: var(--ink); }
   .l-final .rule { fill: none; stroke: var(--ink); stroke-width: .8; }
@@ -119,12 +107,12 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
   .pr[data-s4] .artwork { transform: matrix(.708, 0, 0, .708, 63.45, 35.29); }
 
   /* Each layer belongs to its stages (attributes on the svg). Without JS all are set: the finished sheet. */
-  .l-brief, .l-sketch, .l-lines, .l-key, .plate, .l-word, .l-final, .l-stack { opacity: 0; }
+  .l-brief, .l-sketch, .l-lines, .l-key, .plate, .l-word, .l-final { opacity: 0; }
   .pr[data-s1] .l-brief, .pr[data-s2] .l-sketch, .pr[data-s2] .l-lines, .pr[data-s3] .l-key, .pr[data-s3] .plate { opacity: 1; }
   .pr[data-s3] .l-sketch { opacity: 0; }
   /* Delivered: trimmed, so whatever lay outside the finished piece goes; the lockup and tagline stay. */
-  .pr[data-s4] :is(.l-brief, .l-sketch, .l-lines, .l-key, .l-crop) { opacity: 0; }
-  .pr[data-s4] :is(.l-word, .l-final, .l-stack) { opacity: 1; }
+  .pr[data-s4] :is(.l-brief, .l-sketch, .l-lines, .l-key) { opacity: 0; }
+  .pr[data-s4] :is(.l-word, .l-final) { opacity: 1; }
 
   .steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
   .step { display: grid; gap: var(--s-3); align-content: start; padding: var(--s-6) 0; border-bottom: 1px solid var(--line); }
@@ -146,7 +134,7 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
     .process.is-pinned { position: relative; isolation: isolate; }
     .process.is-pinned::before {
       content: ''; position: absolute; top: 0; bottom: 0; left: calc(50% - var(--page-w, 100vw) / 2); width: var(--page-w, 100vw); z-index: -1;
-      background: var(--paper-tex), var(--grid), var(--paper);
+      background: var(--paper);
       background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
     }
     .process.is-pinned { height: 100svh; padding-block: calc(var(--header-h) + var(--s-5)) var(--s-6); display: grid; grid-template-rows: auto minmax(0, 1fr); }
@@ -158,8 +146,8 @@ const fig = `translate(${F.x + 40} ${F.y + 12}) scale(${(F.h - 24) / 103}) trans
     .is-pinned .step-title { font-size: var(--fs-h3); }
     .is-pinned .step p { font-size: var(--fs-small); }
     .is-pinned .points { font-size: .8125rem; gap: var(--s-1) var(--s-4); }
-    /* The plates arrive one after another from off register and land; the lockup settles on delivery. */
-    .is-pinned .pr :is(.l-stack, .l-crop, .l-brief, .l-sketch, .l-lines, .l-key, .l-word, .l-final) { transition: opacity .6s var(--ease-out); }
+    /* The layers slide in one after another and land; the lockup settles on delivery. */
+    .is-pinned .pr :is(.l-brief, .l-sketch, .l-lines, .l-key, .l-word, .l-final) { transition: opacity .6s var(--ease-out); }
     .is-pinned .plate { transform: translate(var(--dx), var(--dy)); transition: opacity .5s var(--ease-out) calc(var(--i) * .18s), transform .9s var(--ease-out) calc(var(--i) * .18s); }
     .is-pinned .pr[data-s3] .plate { transform: none; }
     .is-pinned .artwork { transition: transform 1s var(--ease-out); }

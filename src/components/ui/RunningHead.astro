@@ -1,16 +1,18 @@
 ---
 import T from './T.astro';
 import type { UiString } from '../../lib/strings';
-// A book's running head over a homepage section: the section's name at the left (its heading, or a
-// label when the section's heading is something else), its folio at the right, on a hairline. Under the
+// A section head: the section's name at the left (its heading, or a label when the section's heading is
+// something else), on a hairline; aside: a short fact at the right where one belongs (the studio's
+// address, the years a story spans). (Page-number folios were removed with the print devices,
+// 21 Oct 2026.) Under the
 // name, a thick bar of the brand orange sits on the hairline, as a selected tab's marker (after
 // nationalgallery.sg); where the browser supports scroll-driven animation it draws in as the head arrives.
-interface Props { s: UiString; folio: string; as?: 'h2' | 'p'; id?: string }
-const { s, folio, as: Tag = 'h2', id } = Astro.props;
+interface Props { s: UiString; aside?: string; as?: 'h2' | 'p'; id?: string }
+const { s, aside, as: Tag = 'h2', id } = Astro.props;
 ---
 <div class="rh">
   <Tag class="rh-name" id={id}><T s={s} /></Tag>
-  <span class="rh-folio" aria-hidden="true">{folio}</span>
+  {aside && <span class="rh-aside">{aside}</span>}
 </div>
 <style>
   .rh { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-3); border-bottom: 1px solid var(--ink); }
@@ -22,5 +24,5 @@ const { s, folio, as: Tag = 'h2', id } = Astro.props;
     }
   }
   @keyframes rh-draw { from { transform: scaleX(0); } }
-  .rh-folio { font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--text-2); }
+  .rh-aside { font-size: var(--fs-small); font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--text-2); }
 </style>

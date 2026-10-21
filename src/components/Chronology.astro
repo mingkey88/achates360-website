@@ -18,7 +18,7 @@ const years = items.map((i) => i.year).sort();
 const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
 ---
 <section class="chron wrap section" aria-labelledby="chron-title" data-chron>
-  <RunningHead id="chron-title" s={heading} folio={span} />
+  <RunningHead id="chron-title" s={heading} aside={span} />
   <ol class="chron-list">
     {items.map((it, i) => (
       <li class="chron-item" data-i={i} data-placeholder={it.placeholder ? '' : undefined}>
@@ -50,7 +50,7 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   .chron-title { font: 400 var(--fs-h3)/1.25 var(--font-display); text-wrap: balance; }
   .chron-body { font-size: var(--fs-small); line-height: 1.55; color: var(--text-2); max-width: 46ch; }
   .chron-more { display: none; }
-  .chron-plate { position: relative; display: block; --cm-len: 8px; --cm-gap: 4px; }
+  .chron-plate { position: relative; display: block; }
   .chron-plate :global(img) { display: block; width: 100%; height: auto; }
   .chron-row:hover .chron-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
   .chron-ruler { display: none; }
@@ -65,7 +65,7 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   .chron.is-story { position: relative; isolation: isolate; }
   .chron.is-story::before {
     content: ''; position: absolute; top: 0; bottom: 0; left: calc(50% - var(--page-w, 100vw) / 2); width: var(--page-w, 100vw); z-index: -1;
-    background: var(--paper-tex), var(--grid), var(--paper);
+    background: var(--paper);
     background-position: 0 var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0), 50% var(--grid-y, 0);
   }
   .chron.is-story { height: 100svh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding-block: calc(var(--header-h) + var(--s-5)) var(--s-6); }
@@ -78,7 +78,7 @@ const span = years.length ? `${years[0]} – ${years[years.length - 1]}` : '';
   .is-story .chron-title { font-size: var(--fs-h2); }
   .is-story .chron-body { font-size: var(--fs-body, 1rem); }
   .is-story .chron-more { display: block; font-size: var(--fs-lead); color: var(--accent-text); }
-  .is-story .chron-plate { grid-column: 2; grid-row: 1 / 3; width: 100%; max-width: 760px; justify-self: end; align-self: center; --cm-len: 10px; --cm-gap: 6px; }
+  .is-story .chron-plate { grid-column: 2; grid-row: 1 / 3; width: 100%; max-width: 760px; justify-self: end; align-self: center; }
   /* Each milestone's parts arrive in turn: the year rolls up into place, the line follows, the plate
      settles; the one before leaves upwards. */
   .is-story :is(.chron-year, .chron-text, .chron-plate) { opacity: 0; transform: translateY(18%); transition: opacity .5s var(--ease-out), transform .7s var(--ease-out); }

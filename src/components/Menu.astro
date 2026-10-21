@@ -1,4 +1,5 @@
 ---
+import SocialIcon from './ui/SocialIcon.astro';
 import { withBase, linkAttrs, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 interface Link { label: string; href: string }
@@ -34,7 +35,7 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
       </ul>
     </nav>
     {social.length > 0 && (
-      <ul class="social">{social.map((s) => <li><a href={withBase(s.href)} {...linkAttrs(s.href)}>{s.alt}</a></li>)}</ul>
+      <ul class="social">{social.map((s) => <li><a href={withBase(s.href)} {...linkAttrs(s.href)} aria-label={s.alt} title={s.alt}><SocialIcon name={s.alt} /></a></li>)}</ul>
     )}
   </div>
 </dialog>
@@ -89,6 +90,9 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
   .sub a { display: block; padding-block: 12px; text-decoration: none; opacity: .85; }
   .sub a:hover, .sub a[aria-current] { opacity: 1; text-decoration: underline; }
   .sub a[aria-current] { text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 5px; }
-  .social { display: flex; flex-wrap: wrap; column-gap: var(--s-5); font-size: var(--fs-small); letter-spacing: 0; }
-  .social a { display: inline-block; padding-block: 12px; }
+  /* Follow links as framed marks, as in the footer; each named for screen readers. */
+  .social { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .social a { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid currentColor; color: inherit; transition: background-color .25s, color .25s; }
+  .social a:hover, .social a:focus-visible { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+  .social :global(.social-icon) { width: 18px; height: 18px; fill: currentColor; }
 </style>

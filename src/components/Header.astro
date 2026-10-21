@@ -91,7 +91,7 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     color: var(--ink); transition: transform .35s var(--ease-out), background-color .25s, color .25s, box-shadow .25s;
   }
   .site-header[data-over-hero]:not(.is-solid) { color: var(--white); }
-  .site-header.is-solid { background: var(--paper) var(--paper-tex); box-shadow: 0 1px 0 var(--line); }
+  .site-header.is-solid { background: var(--paper); box-shadow: 0 1px 0 var(--line); }
   .site-header.is-hidden { transform: translateY(-100%); }
   .bar { display: flex; align-items: center; gap: var(--s-5); height: var(--header-h); padding-inline: var(--gutter); transition: height .4s var(--ease-out); }
   .wordmark { flex: none; margin-right: auto; display: flex; padding-block: 4px; }
@@ -153,7 +153,7 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   .sub {
     position: absolute; left: 0; top: calc(100% + 10px); z-index: 2; min-width: 280px; max-height: min(70vh, 560px); overflow-y: auto;
     margin: 0; padding: var(--s-3) 0; list-style: none;
-    background: var(--paper) var(--paper-tex); border: 1px solid var(--line); color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line); color: var(--ink);
     opacity: 0; visibility: hidden; translate: 0 -4px; transition: opacity .25s, translate .35s var(--ease-out), visibility 0s .25s;
   }
   /* Bridges the gap between the label and the sheet so hovering across it keeps the menu open. */
