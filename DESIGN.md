@@ -5,39 +5,39 @@ site keeps it one coherent thing. Present tense: this is how the site **is** des
 The dated record of every decision and why it was made is [docs/DIRECTION-B.md](docs/DIRECTION-B.md).
 How the site is organised: [docs/INFORMATION-ARCHITECTURE.md](docs/INFORMATION-ARCHITECTURE.md).
 How it is built: [docs/BLUEPRINT.md](docs/BLUEPRINT.md).
-Last updated 20 Oct 2026.
+Last updated 21 Oct 2026 (print devices removed; the version before is git tag `print-v1`).
 
 ---
 
-## 1. The idea: the website is a publication
+## 1. The idea: a calm, crafted studio across every medium
 
-Achates 360 is a print-literate design studio: books, annual reports, packaging, campaigns. Its own
-art book, *Building Memories*, is the source of the direction. The site is set like a well-made
-publication (a catalogue, a monograph) rather than like a website template:
+Achates 360 is an integrated creative studio: branding, campaigns, digital and social, film and
+content, events, packaging and publications. The site presents that range with the quiet confidence of
+a well-made thing, without leaning on any one medium. (Until 21 Oct 2026 the site was set as a printed
+publication, with crop marks, folios, catalogue numbers and a colour bar; the studio moved away from a
+print-led image, so those devices were removed and the elegance kept.)
 
-- **Quiet paper, one ink, one accent.** Warm cream stock with a faint fibre and a draughtsman's grid,
-  dark grey ink, and the brand's orange (Pantone 1495 U) used sparingly and on purpose.
-- **The devices of print, used honestly.** Crop marks round plates, folios and catalogue numbers,
-  running heads, a printer's colour bar, spreads, a colophon, paper cut through like a die-cut cover.
-- **Words lead, the work proves.** Calm type, generous space, pictures shown whole and captioned like
-  plates, never covered with text.
-- **Movement is a print process.** Sheets slide, plates come into register, ink fills in. Never
-  decoration for its own sake.
+- **Calm ground, one ink, one accent.** A plain warm off-white, dark grey ink, and the brand's orange
+  (Pantone 1495 U) used sparingly and on purpose.
+- **Words lead, the work proves.** Calm type, generous space, pictures and films shown whole and
+  captioned beneath, never covered with text.
+- **Accents with intent.** Orange marker bars, one orange phrase in a heading, selected tabs, a leader
+  line into the close (after National Gallery Singapore).
+- **Movement that serves the story.** Scrubbed by scrolling, eased, never decoration for its own sake.
 
 **Personality:** quiet, assured, crafted, warm. A faithful friend and a thoughtful designer
 (the studio's own line: *faithful friend • thoughtful design*).
 
-**References** (their feel, not their code or images): *Building Memories* (die-cut paper, stepped
-edges) · Aesop (one quiet grotesk, cream and earthy tints, sentence case, calm) · National Gallery
-Singapore (orange marker bars, two-tone headings, selected tabs, leader lines) · Kitpro "Croma"
-(the curved lens of projects, the closing scatter).
+**References** (their feel, not their code or images): Aesop (one quiet grotesk, cream and earthy
+tints, sentence case, calm) · National Gallery Singapore (orange marker bars, two-tone headings, selected
+tabs, leader lines) · Kitpro "Croma" (the curved lens of projects, the closing scatter).
 
 ---
 
 ## 2. Principles
 
-1. **One publication.** Every page uses the same devices; a visitor should feel they are turning pages
-   of one book, not visiting different sites.
+1. **One studio.** Every page uses the same few devices (the orange bars, hairlines, captions); a
+   visitor should feel one hand behind every page.
 2. **The client's words, unchanged.** Copy is used verbatim. Design may choose which words are orange,
    how a sentence is set and where it sits; it never rewrites them. New wording is marked Draft until
    approved.
@@ -61,7 +61,7 @@ Defined in `src/styles/tokens.css`. Light theme only.
 
 | Token | Value | Role |
 |---|---|---|
-| `--paper` | `#fffef2` | the page: warm cream stock |
+| `--paper` | `#fffef2` | the page: a plain warm off-white |
 | `--ink` | `#333333` | all text and line work |
 | `--text-2` | `#5f5f5a` | secondary text, captions, labels |
 | `--muted` | `#8a8a84` | large text only, on paper or stone |
@@ -111,7 +111,7 @@ appears in one place only: a quotation set alone.
 - **Sentence case.** Labels the Wix content supplies in capitals (menu, "VIEW PROJECT") display in
   sentence case (`.sc`); the stored copy is unchanged. No tracked capitals.
 - **Hierarchy by space, not size.** Headings stay moderate; white space and hairlines do the work.
-- **Figures:** lining figures in headings; tabular figures for counts, numbers and catalogue №.
+- **Figures:** lining figures in headings; tabular figures for counts and numbers.
 - **Measure:** text up to about 68 characters (`.prose`); statements up to 24–30 characters per line,
   `text-wrap: balance` for headings.
 
@@ -123,30 +123,30 @@ appears in one place only: a quotation set alone.
   (`--gutter`).
 - **Rhythm:** sections breathe at 64 → 160px (`--section-y`); spacing steps 4, 8, 12, 16, 24, 32, 48,
   64, 96, 128, 192px (`--s-1` … `--s-11`).
-- **The paper:** every page ground carries the fibre (`--paper-tex`) and a faint blueprint grid
-  (`--grid`: fine lines every 24px, stronger every 120px, centred). Bands, panels and pictures sit on
-  it like sheets laid on graph paper. A held (pinned) section carries its own copy of the grid so the
-  background never slides.
+- **The ground:** plain `--paper`, no texture or grid (the paper fibre and draughtsman's grid were
+  removed on 21 Oct 2026). Bands and panels sit on it in the section tints.
 - **Corners are square** (cards, buttons, panels); only the award seals and the pointer disc are round.
 - **Breakpoints in use:** 360 · 640 · 768 · 900 · 1024 · 1200 · 1280px. Phones are designed, not
   shrunk: one column, captions centred, larger cut lettering, scrolling tab rows.
 
 ---
 
-## 6. The print devices (the signature system)
+## 6. Signature details
 
-| Device | What it is | Where |
+| Detail | What it is | Where |
 |---|---|---|
-| **Crop marks** (`.crop`) | eight hairline ticks outside a plate's corners, instead of drop shadows | plates on Home, About, Services, paper cuts |
-| **Catalogue numbers** | № 001 – 053, in the homepage gallery's order; a project keeps its number everywhere | cards, plates, "More in this service" |
-| **Press marks** | "№ 001 – 053" and a printer's colour bar (CMYK + 1495 U) | homepage cover, About head, footer imprint |
-| **Running heads** | section name left, folio right, on an ink hairline, a 4px orange bar under the name | Home sections, About chapters, Credentials |
-| **Folios** | small page numbers (02, 03 …, 01 / 04) | running heads, service spreads |
-| **Spreads** | two pages with a fold; every second one mirrored (verso) | Services |
-| **Plates with captions** | picture whole, caption beneath (title in ink, client in grey) | everywhere work is shown |
-| **Dot leaders** | contents-page dots to a count | Services contents, homepage services |
-| **Paper cut** | words in heavy capitals cut through a sheet, a picture showing through, the cut casting a shadow | homepage Selected work cover; "NEXT PROJECT" at the end of each case study; 404 |
-| **Colophon and imprint** | how the site is "printed"; legal lines with the colour bar | About; footer |
+| **Section heads** (`RunningHead`) | the section's name on an ink hairline with a 4px orange bar under it; an optional fact at the right (the studio's address, the years a story spans) | Home sections, About chapters, Credentials, case notes |
+| **Captions beneath** | picture whole, caption under it (title in ink, client in grey) | everywhere work is shown |
+| **Ruled lists** | rows on hairlines with a count at the right | Services list, homepage services, categories |
+| **Film cover** | the first selected project's film full-bleed, its card over the lower corner | Home, Selected work |
+| **Leader line** | a line from the page's edge into "Write to us.", ending in an orange bar | the close of inner pages |
+| **Paper cut** | words cut through a sheet with a picture showing through: kept as a single small signature | the 404 page only |
+
+**Removed 21 Oct 2026 (do not reintroduce):** crop marks, catalogue numbers (№ 001 – 053), the
+printer's colour bar and press marks, page-number folios, book spreads with a fold, contents-page dot
+leaders, the colophon, the paper fibre and draughtsman's grid, the die-cut sheet over the homepage film
+and the "NEXT PROJECT" paper cut. The site's code still orders projects by the homepage gallery
+(`lib/catalogue.ts`); the numbers are simply not shown.
 
 ---
 
@@ -173,7 +173,7 @@ appears in one place only: a quotation set alone.
 - **The work is the imagery.** Project photography and films only; no stock, no illustration added.
 - **Shown whole.** Pictures keep their shape where it matters (case studies are arranged by picture
   shape); cards crop to 4:3; nothing is written over a picture.
-- **Texture:** a light film grain on photographs; crop marks instead of shadows.
+- **Texture:** a light film grain on photographs; clean edges, no shadows or frames.
 - **Films** play muted and looping when on screen, stop when a visitor pauses them, never play under
   reduced motion; sound only when the visitor asks.
 - **Client logos:** one ink colour (82%), each trimmed to its artwork and sized for equal visual weight,
@@ -189,11 +189,11 @@ appears in one place only: a quotation set alone.
 |---|---|
 | **Header (masthead)** | one row: sections left, logo centred, Contact right as the one framed action; condenses on scroll; current section marked orange |
 | **Menu (phones)** | main pages first, categories folded under Projects; current page with a thick orange underline |
-| **Footer** | charcoal; intro line (orange phrase), page links, contact, social marks (square, outlined), imprint line with the colour bar and Back to top |
+| **Footer** | charcoal; intro line (orange phrase), page links, contact, social marks (square, outlined), closing line with the legal lines and Back to top |
 | **Buttons** | rectangular with square corners, hairline-framed or filled ink, with an arrow |
-| **Cards** | 4:3 picture, title, client, catalogue № at the right; award tag as ink text in an orange frame; a small paper disc follows the pointer over linked cards |
+| **Cards** | 4:3 picture, title, client; award tag as ink text in an orange frame; a small paper disc follows the pointer over linked cards |
 | **Category tabs** | All + 9 categories with counts; selected tab: orange bar on top, name heavier in ink; two rows of five on wide screens, one scrolling row on phones |
-| **Case study** | hero, details (client · year · categories), the story arranged by picture shape (or a hand layout), case notes, the paper-cut Next project, Discuss a similar project |
+| **Case study** | hero, details (client · year · categories), the story arranged by picture shape (or a hand layout), case notes, Next project (its picture wide, the name beneath), Discuss a similar project |
 | **Close** | "Write to us." with its orange leader line and one button, at the end of inner pages |
 | **Logo wall, awards list, figures** | the "imprint" (Credentials) on sage |
 
@@ -201,17 +201,15 @@ appears in one place only: a quotation set alone.
 
 ## 10. Motion
 
-Motion imitates what happens to paper and ink. It is scrubbed by scrolling, eased (`--ease-out`), and
-never required to read the page.
+Motion is scrubbed by scrolling, eased (`--ease-out`), and never required to read the page.
 
 | Moment | What moves |
 |---|---|
 | Home hero | the curved lens of ten projects drifts; cards can be dragged and clicked |
-| Home Selected work | a paper sheet with "SELECTED WORK" cut through it slides away from the film |
 | Home close | printed pieces spread from a pile; they can be picked up, dragged and reset |
-| Services, How we work | one sheet goes through the press: brief, concept, plates coming into register, the finished, trimmed sheet |
+| Services, How we work | one artboard goes through the four steps: brief, concept, the logo's layers sliding into place, the finished lockup |
 | About | the chronology held as one stage while milestones turn; the logo's figures join hands; a sentence inks in |
-| Everywhere | headings rise into place; plates are unveiled; running-head bars draw in |
+| Everywhere | headings rise into place; pictures are unveiled; section-head bars draw in |
 
 **Rules:** holds (pinned sections) only for storytelling, never on index pages; the background never
 slides during a hold; a press becomes a drag only after 6px so clicks still work; reduced motion and
@@ -242,7 +240,8 @@ text; logos and seals named; reduced motion respected everywhere; no sideways sc
 
 | Do | Don't |
 |---|---|
-| Use the print devices consistently | Add drop shadows, rounded cards or gradients |
+| Use the signature details consistently | Add drop shadows, rounded cards or gradients |
+| Keep the site medium-neutral | Bring back print devices (crop marks, folios, catalogue numbers, colour bars) |
 | Keep one orange phrase per heading | Set body text or small labels in orange |
 | Show work whole, captioned beneath | Write over pictures |
 | Let space and hairlines make hierarchy | Make headings huge to make them important |
@@ -254,7 +253,8 @@ text; logos and seals named; reduced motion respected everywhere; no sideways sc
 
 ## 14. Tried and set aside
 
-Worth knowing so they are not retried by accident: a torn paper edge; a book-cover swing for the
+Worth knowing so they are not retried by accident: the whole print/publication system (removed
+21 Oct 2026, see §6; tag `print-v1`); a torn paper edge; a book-cover swing for the
 projects cover; an orange projects cover (too bright); paper-cut covers holding /projects and the
 category pages (in the way: replaced by the Next project and 404 paper cuts); National Gallery's heavy
 black headline face; a deeper "brown" orange and an off-register shadow behind orange words; overlapping,

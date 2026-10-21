@@ -3,9 +3,9 @@ import Pic from './ui/Pic.astro';
 import T from './ui/T.astro';
 import Amp from './ui/Amp.astro';
 import type { UiString } from '../lib/strings';
-// The Services page's opening (direction B): a book's contents page. Each service is a numbered line,
-// its name set large, a dotted leader running to the number of projects it covers, and a link down to
-// its spread. On fine pointers a picture from that service's work follows the pointer over its line.
+// The Services page's opening: the list of services. Each service is a numbered, ruled line, its name
+// set large and the number of projects it covers at the right, linking down to its section. (The
+// contents page's dot leaders were removed with the print devices, 21 Oct 2026.) On fine pointers a picture from that service's work follows the pointer over its line.
 // Service names are the draft titles (services.yaml) until the studio supplies its own.
 interface Props {
   heading: UiString; countLabel: UiString;
@@ -67,7 +67,7 @@ const no = (i: number) => String(i + 1).padStart(2, '0');
   .toc { padding-block: var(--s-8) var(--s-7); }
   .toc-head { display: flex; align-items: end; justify-content: space-between; gap: var(--s-5); padding-bottom: var(--s-4); border-bottom: 1px solid var(--ink); }
   .toc-head h1 { margin: 0; }
-  .toc-col { margin: 0; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+  .toc-col { margin: 0; font-size: var(--fs-small); color: var(--text-2); }
   .toc-list { list-style: none; margin: 0; padding: 0; }
   .toc-list a {
     display: grid; grid-template-columns: 3.5rem auto minmax(2rem, 1fr) 3rem; align-items: baseline; column-gap: var(--s-3);
@@ -76,7 +76,7 @@ const no = (i: number) => String(i + 1).padStart(2, '0');
   .toc-no { font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
   .toc-title { font: 400 clamp(1.75rem, 1rem + 3vw, 4rem)/1.05 var(--font-display); letter-spacing: -.025em; transition: translate .4s var(--ease-out); }
   /* Dot leaders, as on a contents page. */
-  .toc-dots { align-self: end; height: 1px; margin-bottom: .55em; background: radial-gradient(circle, var(--text-2) .9px, transparent 1.1px) 0 50% / 8px 2px repeat-x; opacity: .7; }
+  .toc-dots { align-self: end; } /* the space between the name and its count */
   .toc-n { justify-self: end; font: 400 var(--fs-lead)/1 var(--font-display); font-variant-numeric: tabular-nums; }
   .toc-list a:hover .toc-title, .toc-list a:focus-visible .toc-title { translate: 10px 0; }
   .toc-list a:hover .toc-n { color: var(--accent-text); }

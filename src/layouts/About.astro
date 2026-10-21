@@ -3,7 +3,6 @@ import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
 import Chronology from '../components/Chronology.astro';
 import RunningHead from '../components/ui/RunningHead.astro';
-import PressMarks from '../components/ui/PressMarks.astro';
 import T from '../components/ui/T.astro';
 import Pic from '../components/ui/Pic.astro';
 import { renderMd } from '../lib/markdown';
@@ -21,11 +20,11 @@ import { firstYear } from '../lib/meta';
 import { withBase } from '../lib/paths';
 import { aboutPageLd } from '../lib/seo';
 import { ABOUT_ACCENTS } from '../lib/accents';
-// /about in direction B, set as a book's front matter: the About text verbatim, its first sentence as
+// /about: the About text verbatim, its first sentence as
 // the page's statement in display type and the rest as the foreword in two columns, the studio's photo
 // as a plate; then the numbers, clients and awards; the story as a chronology (one ruled row per
-// milestone); one quotation once the client supplies it; a colophon (how the site is "printed"); the
-// quiet close to the contact page.
+// milestone); one quotation once the client supplies it; the quiet close to the contact page. (The
+// catalogue range, colour bar and colophon were removed with the print devices, 21 Oct 2026.)
 interface Props { entry: CollectionEntry<'basic'> }
 const d = Astro.props.entry.data;
 const x = await loadExtras();
@@ -81,7 +80,6 @@ const office = [
   { src: meetingRoom, alt: 'The meeting room: a glass table, wire chairs in blue and red, a painting and a round curio shelf', caption: text('office-meeting') },
   { src: studio, alt: 'The studio floor from the mezzanine stairs: desks by tall windows, shelves of work, prints on the walls', caption: text('office-studio') },
 ];
-const colophon = (['type', 'paper', 'ink', 'made'] as const).map((k) => ({ k, label: text(`colophon-${k}`), value: text(`colophon-${k}-text`) }));
 // A different quotation from the homepage's, where there is one. Draft quotations are not shown (the
 // band appears once the client supplies real ones, CONTENT-QUERIES 10).
 const quotes = x.testimonials.filter((t: any) => !t.placeholder);
@@ -93,7 +91,6 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   <section class="wrap ab-intro">
     <header class="ab-head">
       <h1 class="ab-h1 sc">{heading}</h1>
-      <PressMarks count={listedCount} />
     </header>
     <div class="ab-statement" set:html={keyed(statement, ABOUT_ACCENTS.statement)} />
   </section>
@@ -124,7 +121,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   {/* Chapter: inside the studio. The office's lobby (its awards on the sideboard), meeting room and studio
       floor, from Achates360_Office.pdf, captioned with its own labels. */}
   <section class="wrap ab-office" aria-labelledby="ab-office-title">
-    <RunningHead id="ab-office-title" s={text('intro-eyebrow')} folio="1 Irving Place, #05-02" />
+    <RunningHead id="ab-office-title" s={text('intro-eyebrow')} aside="1 Irving Place, #05-02" />
     <div class="ab-office-plates">
       {office.map((o) => <figure class="ab-office-plate crop" data-rise><Pic src={o.src} alt={o.alt} crop={4 / 3} widths={[480, 640, 912]} sizes="(max-width: 767px) 100vw, 31vw" /><figcaption><T s={o.caption} /></figcaption></figure>)}
     </div>
@@ -137,17 +134,6 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   </section>
   <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('about-stats-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} clientsLabel={text('clients-eyebrow')} orangeFigures />
   {quote && <QuoteBand id="ab-quote" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
-  <section class="wrap ab-colophon" aria-labelledby="colophon-title">
-    <RunningHead id="colophon-title" s={text('colophon-heading')} folio={`№ 001 – ${String(listedCount).padStart(3, '0')}`} />
-    <dl class="colo">
-      {colophon.map((c) => (
-        <div class="colo-row">
-          <dt><T s={c.label} /></dt>
-          <dd><T s={c.value} />{c.k === 'ink' && <span class="colo-bar" aria-hidden="true"><span style="--c: #00a0e3"></span><span style="--c: #e5007e"></span><span style="--c: #ffed00"></span><span style="--c: #1d1d1b"></span><span style="--c: var(--accent)"></span></span>}</dd>
-        </div>
-      ))}
-    </dl>
-  </section>
   <CloseCTA heading={text('contact-heading')} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
@@ -167,7 +153,6 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   .ab-since-text { display: grid; gap: var(--s-4); max-width: 46ch; font-size: var(--fs-lead); line-height: 1.6; }
   .ab-plate { position: relative; margin: 0; }
   .ab-plate :global(img) { display: block; width: 100%; height: auto; }
-  @media (max-width: 767px) { .ab-plate { --cm-len: 8px; --cm-gap: 4px; } }
 
   /* The name: the five figures large, the sentence beside them. */
   .ab-companion { display: grid; gap: var(--s-7); align-items: center; padding-block: var(--section-y); border-top: 1px solid var(--line); }
@@ -199,7 +184,6 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   .ab-office-plate { position: relative; margin: 0; display: grid; gap: var(--s-3); }
   .ab-office-plate :global(img) { display: block; width: 100%; height: auto; }
   .ab-office-plate figcaption { font-size: var(--fs-small); color: var(--text-2); }
-  @media (max-width: 767px) { .ab-office-plate { --cm-len: 8px; --cm-gap: 4px; } }
   @media (min-width: 768px) { .ab-office-plates { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
   /* The recognition: the line set large, the photograph across the page in crop marks. */
@@ -207,17 +191,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   .ab-mark-title { margin: 0; max-width: 18ch; font: 400 clamp(2rem, 1rem + 3.4vw, 4rem)/1.08 var(--font-display); letter-spacing: -.025em; text-wrap: balance; }
   .ab-mark-plate { position: relative; margin: 0; }
   .ab-mark-plate :global(img) { display: block; width: 100%; height: auto; }
-  @media (max-width: 767px) { .ab-mark-plate { --cm-len: 8px; --cm-gap: 4px; } }
 
-  /* Colophon: how the site is "printed", as a book's last page sets it. */
-  .ab-colophon { padding-block: var(--section-y) var(--s-8); }
-  .colo { margin: 0; display: grid; }
-  .colo-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--s-5); padding-block: var(--s-3); border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
-  .colo dt { color: var(--text-2); }
-  .colo dd { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
-  .colo-bar { display: inline-flex; gap: 3px; }
-  .colo-bar span { width: 12px; height: 12px; background: var(--c); }
-  @media (min-width: 1024px) { .colo-row { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--s-5); } .colo dt { grid-column: 1 / 4; } .colo dd { grid-column: 4 / 13; } }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

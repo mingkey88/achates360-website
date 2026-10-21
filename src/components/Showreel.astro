@@ -48,7 +48,7 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
   .sr-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: var(--s-3); margin-bottom: var(--s-5); border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
   .sr-head p { margin: 0; }
   .sr-dur { color: var(--text-2); font-variant-numeric: tabular-nums; }
-  .sr-frame { position: relative; aspect-ratio: 16 / 9; background: var(--ink); --cm-c: rgb(51 51 51 / .55); }
+  .sr-frame { position: relative; aspect-ratio: 16 / 9; background: var(--ink); }
   .sr-frame :global(.sr-loop), .sr-frame :global(.sr-loop video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .sr-frame :global(.bv-toggle) { z-index: 2; top: auto; bottom: var(--s-5); right: var(--s-5); }
   .sr-play {
@@ -67,7 +67,6 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
   }
   .sr-close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; }
   @media (max-width: 767px) {
-    .sr-frame { --cm-len: 8px; --cm-gap: 4px; } /* crop marks inside the 16px gutter */
     .sr-play { left: var(--s-3); bottom: var(--s-3); min-height: 44px; padding: 10px 14px 10px 12px; }
     .sr-frame :global(.bv-toggle) { bottom: var(--s-3); right: var(--s-3); }
   }

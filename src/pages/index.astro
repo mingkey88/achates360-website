@@ -39,10 +39,9 @@ const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.d
 const featured = d.slides.map((slide) => ({ slide, project: projects.get(slugOf(slide.cta?.href) ?? '') }));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 // The hero lens: the first ten listed projects in the homepage gallery's order, each a link to its case
-// study with its /projects catalogue number. Unlisted gallery items (no case study to open) are skipped.
+// study. Unlisted gallery items (no case study to open) are skipped.
 const catalogue = catalogueOf(d.allProjects.items, projects);
 const lens = catalogue.slice(0, 10);
-const numberOf = new Map(catalogue.map((e) => [e.slug, e.no]));
 if (lens.length < 10) throw new Error(`Homepage hero: only ${lens.length} listed projects for the lens (needs 10)`);
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
 // end on, none of them already in the lens or Selected work. The first six are the ones phones show.
@@ -53,7 +52,7 @@ const scatter = SCATTER.map((slug) => {
   if (lens.some((e) => e.slug === slug)) throw new Error(`Homepage scatter: "${slug}" is already in the hero lens`);
   return it;
 });
-// Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a paper-cut cover), the
+// Direction B homepage (docs/DIRECTION-B.md): hero, five selected projects (the first as a full-bleed film cover), the
 // imprint (clients, awards, figures) straight after the work, then the point of view, the service index, one
 // testimonial (only once the client has supplied a real one), contact. The full project list lives on /projects.
 // Star Wars Luzerne (homepage slide 5) leads as the cover, then the first four slides.
@@ -69,14 +68,13 @@ const swapped = featured.map((f) => {
   if (!project?.listed || !project.hero) throw new Error(`Selected work: swap target "${to}" is unlisted or has no hero`);
   return { slide: { ...f.slide, media: project.hero, cta: { label: f.slide.cta!.label, href: `/${to}` } }, project };
 });
-// Each selected project carries its catalogue number; DXV's film gets a still where its title has
-// formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
+// DXV's film gets a still where its title has formed ("THE LUXURY OF TIME", 3s in): the export's first frame catches the letters mid-animation.
 // The lead plate after the cover is 'Building Memories', the studio's own art book and this direction's
 // source (15 Oct 2026, CONTENT-QUERIES 51); the other three keep the homepage's slide order.
 const LEAD = 'building-memories-artbook';
 const numbered = [swapped[4], ...swapped.slice(0, 4)].filter(Boolean).map((f) => {
   const slug = slugOf(f.slide.cta?.href) ?? '';
-  return { ...f, slug, no: numberOf.get(slug), poster: STILLS[slug] };
+  return { ...f, slug, poster: STILLS[slug] };
 });
 const lead = numbered.findIndex((f, i) => i > 0 && f.slug === LEAD);
 if (lead < 0) throw new Error(`Selected work: the lead "${LEAD}" is not among the selected projects`);
@@ -112,16 +110,15 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
 
   <SelectedWork items={selected} eyebrow={text('featured-eyebrow')} cta={text('selected-cta')} total={listedCount} awardsLabel={text('lead-awards')} />
 
-  {/* Folios: the homepage's sections numbered as a book's, Selected work (its cover) being the first. */}
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} folio="02" />
+  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
 
   <section class="h-intro wrap section" aria-labelledby="intro-title">
-    <RunningHead as="p" s={text('intro-eyebrow')} folio="03" />
+    <RunningHead as="p" s={text('intro-eyebrow')} />
     <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
     <Pill href="/about"><T s={text('intro-cta')} /></Pill>
   </section>
 
-  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} countLabel={text('contents-count')} folio="04" />
+  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} countLabel={text('contents-count')} />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
@@ -133,7 +130,6 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   .two-tone { max-width: 30ch; margin-block: var(--s-7) var(--s-6); font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.75rem); line-height: 1.25; text-wrap: pretty; }
   @media (min-width: 1024px) { .two-tone { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } .h-intro :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
   .h-intro > :global(.rh) { justify-self: stretch; }
-  /* Print touch: the orange plate printed a hair off register, a lighter orange peeking out below right. */
 </style>
 <script>
   import { run } from '../scripts/motion/index';
@@ -141,6 +137,5 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   import { hero } from '../scripts/motion/hero';
   import { counters } from '../scripts/motion/counters';
   import { scatter } from '../scripts/motion/scatter';
-  import { cover } from '../scripts/motion/cover';
-  run(hero, cover, reveal, counters, scatter);
+  run(hero, reveal, counters, scatter);
 </script>

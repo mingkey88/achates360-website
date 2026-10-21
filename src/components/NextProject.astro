@@ -2,17 +2,18 @@
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
-import PaperCut from './ui/PaperCut.astro';
-// The end of a case study: "Next project" cut through a sheet of paper (ui/PaperCut), the next project's
-// picture lying under it and showing through the letters; under the sheet, the project's name, and beside
-// it the way to start one like this. The whole sheet is the link; the picture drifts larger on hover.
+import Pic from './ui/Pic.astro';
+// The end of a case study: the next project's picture, wide, with "Next project" and its name beneath,
+// and beside them the way to start one like this. The picture and name are one link; the picture drifts
+// larger on hover. (The paper-cut lettering over the picture was removed with the print devices,
+// 21 Oct 2026; the paper cut stays only on the 404 page.)
 interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; discuss?: { label: UiString; href: string } }
 const { href, title, label, image, position, discuss } = Astro.props;
 ---
 <section class="next-project">
   <div class="np-band wrap">
     <a class="np" href={withBase(href)}>
-      <PaperCut text={label.text} image={image} position={position} />
+      <span class="np-pic"><Pic src={image} alt="" crop={21 / 9} mobileCrop={4 / 3} widths={[640, 960, 1280, 1920]} mobileWidths={[400, 600, 800]} sizes="(max-width: 767px) calc(100vw - 32px), min(1320px, 100vw - 120px)" mobileSizes="calc(100vw - 32px)" position={position} loading="lazy" /></span>
       <span class="np-meta">
         <span class="label"><T s={label} /></span>
         <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />} <span class="np-arrow" aria-hidden="true">→</span></span>
@@ -24,8 +25,7 @@ const { href, title, label, image, position, discuss } = Astro.props;
   </div>
 </section>
 <style>
-  /* A stone band ending on a hairline, so it no longer runs into the charcoal footer; the paper sheet lies
-     on it a shade lighter. */
+  /* A stone band ending on a hairline, so it no longer runs into the charcoal footer. */
   .next-project { background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
   .np-band { display: grid; gap: var(--s-6); padding-block: var(--section-y); }
   .np { display: grid; gap: var(--s-5); text-decoration: none; color: inherit; }
@@ -34,7 +34,9 @@ const { href, title, label, image, position, discuss } = Astro.props;
   .np-title { font: 400 var(--fs-h3)/1.2 var(--font-display); color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; }
   .np-arrow { display: inline-block; color: var(--accent-text); transition: transform .3s var(--ease-out); }
   .np:hover .np-arrow { transform: translateX(12px); }
-    .np:hover :global(.pcut-pic img) { scale: 1.06; }
+  .np-pic { display: block; overflow: hidden; background: var(--paper); }
+  .np-pic :global(img) { display: block; width: 100%; height: auto; transition: scale 1.4s var(--ease-out); }
+  .np:hover .np-pic :global(img) { scale: 1.04; }
   /* The second action: a framed link, like the header's Contact. */
   .np-discuss {
     justify-self: start; display: inline-flex; gap: 10px; padding: 12px 20px; border: 1px solid var(--ink);
@@ -47,5 +49,5 @@ const { href, title, label, image, position, discuss } = Astro.props;
     .np-meta { padding-right: 320px; }
     .np-discuss { position: absolute; right: 0; bottom: var(--section-y); }
   }
-  @media (prefers-reduced-motion: reduce) { .np-arrow, .np-discuss { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .np-arrow, .np-discuss, .np-pic :global(img) { transition: none; } }
 </style>

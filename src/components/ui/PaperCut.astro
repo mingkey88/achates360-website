@@ -54,7 +54,7 @@ const uid = `pcut-${[...text].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 
   .pcut-paper { fill: var(--paper); }
   .pcut-n { display: none; }
   @media (max-width: 767px) {
-    .pcut { aspect-ratio: var(--ar-n); --cm-len: 8px; --cm-gap: 4px; }
+    .pcut { aspect-ratio: var(--ar-n); }
     .pcut-w { display: none; }
     .pcut-n { display: block; }
   }

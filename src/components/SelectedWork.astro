@@ -11,18 +11,17 @@ import { PROJECT_AWARDS } from '../lib/project-awards';
 import type { UiString } from '../lib/strings';
 type Slide = CollectionEntry<'home'>['data']['slides'][number];
 type Project = CollectionEntry<'projects'>['data'];
-// Direction B homepage: the first selected project is the cover (SelectedCover: paper-cut heading over
-// its film); the other four follow as a magazine sets plates, changing scale: the first as a lead plate
-// ('Building Memories': picture across seven columns, its caption beside it on the right, aligned to the picture's foot), the
-// other three in a row on one baseline. Each picture sits in crop marks with its catalogue number (№, as
-// on /projects) as its folio; then client · discipline · year and the title, linked.
+// The homepage's Selected work: the first selected project is the cover (SelectedCover: its film
+// full-bleed, the project's card over its corner); the other four follow, changing scale: the first as
+// the lead ('Building Memories': picture across seven columns, its caption beside it on the right,
+// aligned to the picture's foot), the other three in a row on one baseline. Under each picture: client ·
+// discipline · year and the title, linked.
 // Videos play on hover (MediaCard). poster: a replacement still for a slide's film (by link).
 // Beside the lead plate, where its project has them (lib/project-awards.ts), its awards: the count in
 // orange, its round seals large in a row, the other awards named in a ruled list; they link to it.
-interface Props { items: { slide: Slide; project?: Project; no?: number; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number; awardsLabel: UiString }
+interface Props { items: { slide: Slide; project?: Project; poster?: ImageMetadata }[]; eyebrow: UiString; cta: UiString; total: number; awardsLabel: UiString }
 const { items, eyebrow, cta, total, awardsLabel } = Astro.props;
-const all = items.map(({ slide, project, no, poster }) => ({
-  no,
+const all = items.map(({ slide, project, poster }) => ({
   image: poster ?? (slide.media.type === 'video' ? slide.media.poster : slide.media.src),
   alt: slide.media.type === 'image' ? slide.media.alt : '',
   video: slide.media.type === 'video' ? slide.media.src : undefined,
@@ -36,12 +35,11 @@ const all = items.map(({ slide, project, no, poster }) => ({
 const [cover, ...rows] = all;
 ---
 <section class="sw" aria-labelledby="sw-title">
-  {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} count={total} />}
+  {cover && <SelectedCover id="sw-title" heading={eyebrow} media={cover.media} project={cover} />}
   <ol class="sw-list">
     {rows.map((r, i) => (
       <li class:list={['sw-item', { 'sw-lead': i === 0 }]}>
         <div class="sw-media crop">
-          {r.no && <span class="sw-folio" aria-hidden="true">№ {String(r.no).padStart(3, '0')}</span>}
           <MediaCard image={r.image} alt={r.alt} href={r.href} previewVideo={r.video} ratio="4 / 3" sizes={i === 0 ? '(max-width: 767px) calc(100vw - 32px), 56vw' : '(max-width: 767px) calc(100vw - 32px), 31vw'} widths={[480, 720, 960, 1280, 1600]} duplicateLink={!!r.title} reveal={false} />
         </div>
         {i === 0 && r.awards && r.href && (
@@ -78,13 +76,7 @@ const [cover, ...rows] = all;
   .sw-more:hover { text-decoration: underline; text-underline-offset: .2em; }
   .sw-foot { display: flex; justify-content: center; margin-top: var(--s-8); }
   .sw-count { font-variant-numeric: tabular-nums; }
-  /* Folio: the project's catalogue number, set above the picture's crop marks at the right. */
-  .sw-folio {
-    position: absolute; bottom: 100%; right: 0; margin-bottom: calc(var(--cm-len) + var(--cm-gap) + 4px);
-    font: 500 var(--fs-small)/1 var(--font-text); font-variant-numeric: tabular-nums; letter-spacing: .08em; color: var(--text-2);
-  }
   @media (max-width: 767px) {
-    .sw-media { --cm-len: 8px; --cm-gap: 4px; }
     /* Phones: one project per row, its caption centred under the picture. */
     .sw-text { justify-items: center; text-align: center; }
     .sw-title { margin-inline: auto; }

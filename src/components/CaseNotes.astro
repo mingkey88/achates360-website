@@ -9,7 +9,7 @@ interface Props { notes: CollectionEntry<'notes'>['data']; heading: UiString; ti
 const { notes, heading, title } = Astro.props;
 ---
 <section class="cn" aria-labelledby="cn-title">
-  <RunningHead id="cn-title" s={heading} folio="" />
+  <RunningHead id="cn-title" s={heading} />
   {notes.facts?.length && (
     <dl class="cn-facts">
       {notes.facts.map((f) => <div class="cn-fact"><dt>{f.value}</dt><dd>{f.label}</dd></div>)}

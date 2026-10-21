@@ -80,7 +80,7 @@ const reset = text('drag-reset');
   .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
   .pic {
     position: absolute; left: calc(var(--x) * 1% + var(--dx, 0px)); top: calc(var(--y) * 1% + var(--dy, 0px)); width: calc(var(--w) * 1vw);
-    translate: -50% -50%; z-index: var(--z); background: var(--stone); --cm-len: 9px; --cm-gap: 5px;
+    translate: -50% -50%; z-index: var(--z); background: var(--stone);
   }
   .pic:is(:hover, :focus-within) { z-index: 30; }
   /* Loose prints: a picked-up print lifts off the table (a separate sheet, so it casts a shadow), and a
@@ -103,7 +103,7 @@ const reset = text('drag-reset');
   .pic.is-dragging .pic-link { cursor: grabbing; }
   /* The project's name under the picture, below the crop marks, on hover or keyboard focus. */
   .pic-cap {
-    position: absolute; top: calc(100% + var(--cm-len) + var(--cm-gap) + 6px); left: 0; width: max-content; max-width: 22ch;
+    position: absolute; top: calc(100% + 8px); left: 0; width: max-content; max-width: 22ch;
     font: 500 var(--fs-small)/1.35 var(--font-text); color: var(--ink); opacity: 0; translate: 0 -4px; transition: opacity .25s, translate .25s var(--ease-out);
   }
   .cap-end .pic-cap { left: auto; right: 0; text-align: right; }

@@ -3,142 +3,64 @@ import Pic from './ui/Pic.astro';
 import type { CollectionEntry } from 'astro:content';
 import BgVideo from './BgVideo.astro';
 import Pill from './ui/Pill.astro';
-import PressMarks from './ui/PressMarks.astro';
-import logo from '../assets/logo-stacked-parts.svg?raw';
 import { loadExtras } from '../lib/extras';
 import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
+import T from './ui/T.astro';
 type Media = CollectionEntry<'home'>['data']['slides'][number]['media'];
-// The first selected project as a cover, after nationalgallery.sg's home ("EXPERIENCE ART YOUR WAY"):
-// the top of the screen is a sheet of the page's paper, its heading cut out in heavy capitals and the
-// logo's five figures cut out beside them like an alpha mask, so the project's film shows through the
-// letters; below the sheet's stepped edge the film runs plain. The film stays put (sticky) while the
-// sheet scrolls up and away, uncovering it whole; the project's card overlaps its lower corner.
-// The sheet is a press sheet: its lower edge die-cut in square steps, and
-// the catalogue range and colour bar printed in its top corner (PressMarks).
-// With motion the cover holds still and the sheet slides away to the left instead (motion/cover.ts);
-// without motion it is pure CSS scrolling, so it works under reduced motion. The heading is a visually
-// hidden h2 (the capitals are display only); the paper SVG is decorative; the video keeps its pause button.
+// The first selected project as a cover, after nationalgallery.sg's home: its film runs full-bleed and
+// the project's card overlaps the film's lower corner, carrying the section's heading. (The die-cut
+// paper sheet that lay over the film, with the catalogue range and a printer's colour bar, was removed
+// with the other print devices, 21 Oct 2026.) The film keeps its pause button.
 interface Props {
-  id: string; heading: UiString; media: Media; count: number;
-  project: { title?: string; meta?: string; href?: string; label?: string; no?: number };
+  id: string; heading: UiString; media: Media;
+  project: { title?: string; meta?: string; href?: string; label?: string };
 }
-const { id, heading, media, count, project } = Astro.props;
+const { id, heading, media, project } = Astro.props;
 const { text: t } = await loadExtras();
-const words = heading.text.toUpperCase().split(' ');
 const poster = media.type === 'video' ? media.poster : media.src;
 // Phones get a portrait cut of the cover film when one has been made next to it ("<name>-phone.mp4",
 // 540x960, no sound): about a third of the desktop file, so the film plays on phones as well.
 const PHONE_CUTS = new Set(['media/video/9766c0_dc0766bd21f24857af77b62c8b872cab.mp4']);
 const phoneVideo = (src: string) => (PHONE_CUTS.has(src) ? src.replace(/\.mp4$/, '-phone.mp4') : undefined);
-// The logo's figures (viewBox region 50 -3 94 103 of the stacked logo), cut out of the sheet.
-const figures = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
-const FIG = { x: 50, y: -3, w: 94, h: 103 };
-// Two compositions, drawn far larger than the view ("meet" fits them; the extra paper covers any
-// letterbox): wide screens set the words on two lines, the second right-aligned with the figures
-// before it; phones stack them. Coordinates are the sheet's own units.
-interface Sheet { k: string; w: number; h: number; size: number; lines: { t: string; x: number; y: number; anchor: 'start' | 'end' }[]; fig: { x: number; y: number; h: number } }
-const first = words.slice(0, Math.ceil(words.length / 2)).join(' ');
-const second = words.slice(Math.ceil(words.length / 2)).join(' ');
-// Both lines are set tight and right-aligned on one edge (as the gallery sets its three), the figures
-// in the space before the shorter second line.
-const sheets: Sheet[] = [
-  { k: 'w', w: 1600, h: 600, size: 300, lines: [{ t: first, x: 1540, y: 262, anchor: 'end' }, { t: second, x: 1540, y: 556, anchor: 'end' }], fig: { x: 250, y: 318, h: 250 } },
-  { k: 'n', w: 800, h: 330, size: 158, lines: [{ t: first, x: 770, y: 140, anchor: 'end' }, { t: second, x: 770, y: 305, anchor: 'end' }], fig: { x: 60, y: 180, h: 130 } },
-];
-const B = 4000;
 ---
-<div class="cover" data-scover data-placeholder={heading.placeholder ? '' : undefined}>
-  <h2 id={id} class="sr-only">{heading.text}</h2>
+<div class="cover">
   <div class="cover-film" data-bgvideo-viewport>
     <Pic class="cover-media" src={poster} alt="" widths={[640, 1280, 1920, 2560]} sizes="100vw" mobileCrop={9 / 16} mobileWidths={[360, 480, 640, 768]} mobileSizes="100vw" />
     {media.type === 'video' && <BgVideo src={media.src} poster={media.poster} desktopOnly phoneSrc={phoneVideo(media.src)} class="cover-media" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />}
-    <div class="cover-card">
-      {project.meta && <p class="cc-meta">{project.no && <span class="cc-no">№ {String(project.no).padStart(3, '0')}</span>}{project.meta}</p>}
-      {project.title && <h3 class="cc-title">{project.href ? <a href={withBase(project.href)}>{project.title}</a> : project.title}</h3>}
-      {project.href && project.label && <Pill href={project.href}><span class="sc">{project.label}</span></Pill>}
-    </div>
   </div>
-  <div class="cover-paper">
-    <div class="paper-cut">
-      {sheets.map((s) => (
-        <svg class={`paper paper-${s.k}`} viewBox={`0 0 ${s.w} ${s.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
-          <defs>
-            <mask id={`${id}-${s.k}-m`} maskUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
-              <rect x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} fill="#fff" />
-              {s.lines.map((l) => <text x={l.x} y={l.y} text-anchor={l.anchor} font-size={s.size}>{l.t}</text>)}
-              <g transform={`translate(${s.fig.x} ${s.fig.y}) scale(${s.fig.h / FIG.h}) translate(${-FIG.x} ${-FIG.y})`} set:html={figures} />
-            </mask>
-            <filter id={`${id}-${s.k}-f`} filterUnits="userSpaceOnUse" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B}>
-              <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000" flood-opacity=".5" />
-            </filter>
-          </defs>
-          <rect class="paper-sheet" x={-B} y={-B} width={s.w + 2 * B} height={s.h + 2 * B} mask={`url(#${id}-${s.k}-m)`} filter={`url(#${id}-${s.k}-f)`} />
-        </svg>
-      ))}
-      <span class="paper-grain" aria-hidden="true"></span>
-    </div>
-    <PressMarks class="cover-marks" count={count} draft={heading.placeholder} />
+  <div class="cover-card">
+    <h2 id={id} class="cc-heading"><T s={heading} /></h2>
+    {project.meta && <p class="cc-meta">{project.meta}</p>}
+    {project.title && <h3 class="cc-title">{project.href ? <a href={withBase(project.href)}>{project.title}</a> : project.title}</h3>}
+    {project.href && project.label && <Pill href={project.href}><span class="sc">{project.label}</span></Pill>}
   </div>
-  <div class="cover-run" aria-hidden="true"></div>
 </div>
 <style>
-  /* Flow: film (100svh, sticky) → paper (--ph tall, pulled up over the film's top) → run-out. The film
-     stays stuck while the paper scrolls off it, then lingers 10svh uncovered before moving on. */
-  .cover { --v: 100svh; --ph: 64svh; --step-h: 7svh; --st: calc(var(--step-h) / 2); position: relative; }
-  .cover-film { position: sticky; top: 0; height: var(--v); overflow: hidden; background: var(--ink); }
+  .cover { position: relative; }
+  .cover-film { position: relative; height: 92svh; min-height: 480px; overflow: hidden; background: var(--ink); }
   .cover-film :global(.cover-media) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cover-film :global(.bgvideo video) { width: 100%; height: 100%; object-fit: cover; }
-  /* The sheet's lower edge is die-cut in square steps, rising to the left, like the
-     buildings on 'Building Memories' (two steps of --st; the lettering keeps clear of both). The drop shadow follows the cut
-     because it is drawn after the clip. */
-  .cover-paper { position: relative; z-index: 1; height: var(--ph); margin-bottom: calc(var(--v) - var(--ph)); margin-top: calc(var(--v) * -1); pointer-events: none; filter: drop-shadow(0 10px 14px rgb(0 0 0 / .28)); }
-  .paper-cut {
-    position: absolute; inset: 0; overflow: hidden;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 66% 100%, 66% calc(100% - var(--st)), 38% calc(100% - var(--st)), 38% calc(100% - var(--step-h)), 0 calc(100% - var(--step-h)));
-  }
-  /* The small print sits below the header's height (the header shows again on scrolling up), left of
-     the lettering. */
-  .cover-paper :global(.cover-marks) { position: absolute; left: var(--gutter); top: calc(var(--header-h) + var(--s-3)); }
-  .cover-run { height: calc(var(--ph) + var(--v) * .1); }
-  /* With motion (motion/cover.ts): the cover is pinned for a stretch and the sheet slides off to the left
-     over the film instead of scrolling up; the film is one plain screen, the sheet laid over its top. */
-  .cover.is-slide { overflow: clip; }
-  .cover.is-slide .cover-film { position: relative; }
-  .cover.is-slide .cover-paper { position: absolute; top: 0; left: 0; right: 0; margin: 0; will-change: transform; }
-  .cover.is-slide .cover-run { display: none; }
-  /* The letters sit clear of the stepped edge. (The header hides while scrolling down, so the sheet
-     needs only a margin at the top, not the header's height.) */
-  .paper { position: absolute; left: var(--gutter); right: var(--gutter); top: var(--s-7); height: calc(100% - var(--s-7) - var(--step-h) - var(--s-5)); width: calc(100% - 2 * var(--gutter)); }
-  .paper text { font-family: var(--font-display); font-weight: 800; letter-spacing: -.035em; }
-  .paper-sheet { fill: var(--paper); }
-  /* The paper rect is far larger than the lettering's box; the sheet's clip-path trims it. */
-  .paper { overflow: visible; }
-  .paper-n { display: none; }
-  .paper-grain { position: absolute; inset: 0; background: var(--paper-tex); }
-  /* The project's card overlaps the film's lower-left corner, as nationalgallery.sg's visit bar does. */
+  /* The project's card overlaps the film's lower-left corner, as nationalgallery.sg's visit bar does;
+     its heading carries the brand orange bar the running heads use. */
   .cover-card {
     position: absolute; left: 0; bottom: 0; z-index: 1; display: grid; justify-items: start; gap: var(--s-3);
-    width: min(100%, 560px); padding: var(--s-6) var(--gutter); background: var(--stone); color: var(--ink);
+    width: min(100%, 560px); padding: var(--s-6) var(--gutter); background: var(--paper); color: var(--ink);
   }
+  .cc-heading { position: relative; margin: 0 0 var(--s-2); padding-bottom: var(--s-2); font: 400 var(--fs-small)/1.3 var(--font-text); color: var(--text-2); }
+  .cc-heading::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 40px; height: 4px; background: var(--accent); }
   .cc-meta { margin: 0; font-size: var(--fs-small); color: var(--text-2); }
-  .cc-no { margin-right: .8em; font-variant-numeric: tabular-nums; color: var(--ink); }
   .cc-title { margin: 0; font: 400 var(--fs-h2)/1.2 var(--font-display); text-wrap: balance; }
   .cc-title a { color: inherit; text-decoration: none; }
   .cc-title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
   .cover-card :global(.pill) { margin-top: var(--s-2); }
   .cover :global(.bv-toggle) { z-index: 2; top: auto; bottom: var(--s-5); right: var(--gutter); }
   @media (max-width: 767px) {
-    .cover { --ph: 38svh; --step-h: 4svh; }
-    .paper-cut { clip-path: polygon(0 0, 100% 0, 100% 100%, 54% 100%, 54% calc(100% - var(--step-h)), 0 calc(100% - var(--step-h))); }
-    /* Phones: the lettering fills the top and the figures the left, so the small print sits at the foot
-       of the sheet's lower right part, under WORK. */
-    .cover-paper :global(.cover-marks) { top: auto; left: auto; right: var(--gutter); bottom: var(--s-3); justify-items: end; }
-    .paper-w { display: none; }
-    .paper-n { display: block; }
-    /* Phones: the card runs the full width, so its words sit centred; the pause button moves to the
-       film's top corner, clear of the card's button. */
-    .cover-card { justify-items: center; text-align: center; }
+    .cover-film { height: 78svh; }
+    /* Phones: the card runs the full width under the film, its words centred; the pause button moves
+       to the film's top corner, clear of the card. */
+    .cover-card { position: relative; width: 100%; justify-items: center; text-align: center; }
+    .cc-heading::after { left: 50%; translate: -50% 0; }
     .cover :global(.bv-toggle) { top: var(--s-4); bottom: auto; }
   }
 </style>
