@@ -6,7 +6,7 @@ import VideoHero from '../components/VideoHero.astro';
 import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
-import showreelPoster from '../assets/showreel-poster.jpg';
+import reelPoster from '../assets/showreel-v5-poster.jpg';
 import ServiceIndex from '../components/ServiceIndex.astro';
 import WorkStack from '../components/WorkStack.astro';
 import Credentials from '../components/Credentials.astro';
@@ -75,12 +75,12 @@ const description = sentenceStarting(aboutMd, 'We are an integrated creative age
 const knowsAbout = [...new Set([...projects.values()].filter((p) => p.listed).flatMap((p) => p.categories))].sort();
 const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, description, knowsAbout }), websiteLd(homeUrl)];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home" overHero>
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home">
   <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);
   </script>
-  <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} cta={text('selected-cta')} count={listedCount} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-showreel-preview.mp4" poster={showreelPoster} />
+  <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} cta={text('selected-cta')} count={listedCount} src="media/video/achates360-showreel-v5.mp4" preview="media/video/achates360-showreel-v5-loop.mp4" phonePreview="media/video/achates360-showreel-v5-loop-phone.mp4" poster={reelPoster} />
 
   <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 

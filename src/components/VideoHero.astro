@@ -6,21 +6,23 @@ import T from './ui/T.astro';
 import { loadExtras } from '../lib/extras';
 import type { UiString } from '../lib/strings';
 // The homepage hero, after aesop.com (client, 21 Oct 2026): the studio's showreel, a silent loop, fills
-// most of the first screen behind the transparent header, with nothing written over it (client: "the
-// words preferably don't overlap the video… keep it small at the bottom"). A slim band beneath, on the
-// paper, closes the first screen: the tagline (the page's h1, named with the studio), the studio's
-// description, the full film with sound and the way to all the work. A scrim darkens the film's top
-// for the header. Under reduced motion the loop holds on its poster with a Play button (BgVideo).
+// the first screen under the header, with nothing written over it (client: "the words preferably don't
+// overlap the video… keep it small at the bottom"). A slim band beneath, on the paper, closes the first
+// screen: the tagline (the page's h1, named with the studio), the studio's description, the full film
+// with sound and the way to all the work. The reel (v5, 23 Oct 2026) is set on the site's own cream with
+// its own captions, so it is shown whole (contain) on the paper, never cropped, and the header stays
+// solid above it. Phones load a smaller cut (phonePreview). Under reduced motion the loop holds on its
+// poster with a Play button (BgVideo).
 interface Props {
   name: UiString; tagline: UiString; blurb: string; label: UiString; playLabel: UiString; closeLabel: string;
-  cta: UiString; count: number; src: string; preview: string; poster: ImageMetadata;
+  cta: UiString; count: number; src: string; preview: string; phonePreview: string; poster: ImageMetadata;
 }
-const { name, tagline, blurb, label, playLabel, closeLabel, cta, count, src, preview, poster } = Astro.props;
+const { name, tagline, blurb, label, playLabel, closeLabel, cta, count, src, preview, phonePreview, poster } = Astro.props;
 const { text: t } = await loadExtras();
 ---
 <section class="vh" aria-labelledby="vh-title">
   <div class="vh-stage">
-    <BgVideo src={preview} poster={poster} class="vh-video" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
+    <BgVideo src={preview} phoneSrc={phonePreview} desktopOnly poster={poster} class="vh-video" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
   </div>
   <div class="vh-bar">
     <h1 id="vh-title" class="vh-tagline"><span class="sr-only">{name.text}: </span>{tagline.text.replace(/ •/g, ' •')}</h1>
@@ -36,16 +38,18 @@ const { text: t } = await loadExtras();
   <FilmDialog id="hero-film" label={label.text} closeLabel={closeLabel} src={src} poster={poster} />
 </section>
 <style>
-  /* The film and the band together fill the first screen; the film takes whatever the band leaves. */
-  .vh { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: max(100svh, 560px); }
-  .vh-stage { position: relative; min-height: 320px; background: var(--ink); overflow: clip; }
+  /* Wide screens: the film and the band together fill the first screen under the header; the film takes
+     whatever the band leaves, shown whole on the paper (its cream is the paper's). Phones: the film at
+     its own 16:9, the band beneath. */
+  .vh { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: max(calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)), 520px); }
+  .vh-stage { position: relative; min-height: 320px; background: var(--paper); overflow: clip; }
   .vh-stage :global(.vh-video) { position: absolute; inset: 0; }
-  .vh-stage :global(.vh-video video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .vh-stage::after {
-    content: ''; position: absolute; inset: 0 0 auto; height: 30%; z-index: 1; pointer-events: none;
-    background: linear-gradient(180deg, rgb(13 13 13 / .45), rgb(13 13 13 / 0));
-  }
+  .vh-stage :global(.vh-video :is(video, .bv-noscript)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
   .vh-stage :global(.bv-toggle) { z-index: 2; }
+  @media (max-width: 767px) {
+    .vh { min-height: 0; }
+    .vh-stage { min-height: 0; aspect-ratio: 16 / 9; }
+  }
 
   .vh-bar {
     display: grid; gap: var(--s-3) var(--s-6); align-items: center;
