@@ -71,6 +71,8 @@ export function pile(): void {
   resetBtn?.addEventListener('click', () => {
     root.classList.add('is-resetting');
     resets.forEach((r) => r());
+    // Focus moves to the message's link before the button goes, so keyboard users are not sent back to the top.
+    if (document.activeElement === resetBtn) root.querySelector<HTMLElement>('.scta-msg a')?.focus();
     resetBtn.hidden = true;
     root.classList.remove('was-moved');
     setTimeout(() => root.classList.remove('is-resetting'), 750);

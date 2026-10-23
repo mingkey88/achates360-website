@@ -65,7 +65,7 @@ const md = (s: string, opts?: any) => renderMd(s, undefined, opts).replace(/<(\/
 </footer>
 <style>
   .site-footer { background: var(--teal-ink); color: var(--on-dark); padding-top: var(--section-y); overflow: hidden; }
-  .site-footer :focus-visible { outline-color: var(--turquoise); }
+  .site-footer :global(:focus-visible) { outline-color: var(--turquoise); }
   .grid { display: grid; gap: var(--s-7); grid-template-columns: minmax(0, 1fr); }
   .intro :global(:is(h1, h2, h3, h4, h5, h6, .fh5, .fh6)) { margin: 0; font: 400 var(--fs-lead)/1.5 var(--font-display); max-width: 30ch; }
   .signoff { display: grid; align-content: start; gap: var(--s-6); }

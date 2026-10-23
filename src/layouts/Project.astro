@@ -82,7 +82,7 @@ const jsonLd = [
   /* A soft shade behind the words themselves, wherever they fall in the hero (on short screens a long
      title lifts the small category label into the photo's clear middle): white text at 4.5:1 or more on
      any picture (review, 24 Oct 2026). */
-  .p-hero:not(.p-hero-plain) .p-hero-text::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(-1 * var(--gutter)); background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .55) var(--s-9)); pointer-events: none; }
+  .p-hero:not(.p-hero-plain) .p-hero-text::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(50% - 50vw); background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .55) var(--s-9)); pointer-events: none; }
   .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--on-dark); }
   .p-hero-plain::after { display: none; }
   .p-layout { display: grid; gap: 0; }

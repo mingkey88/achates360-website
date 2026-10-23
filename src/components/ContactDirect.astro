@@ -34,8 +34,9 @@ const { direct, class: cls } = Astro.props;
   .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
   /* Hover: a heavier orange underline (orange text at this size would fall under 4.5:1). */
   .direct a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
-  /* Tap area of 44px on the e-mail and phone (inline padding: the lines don't move). */
-  .direct p > a { padding-block: 11px; }
+  /* Tap area of 44px on the e-mail and phone: each line really takes 44px, so focus rings do not cross
+     the neighbouring lines. */
+  .direct p > a { display: inline-flex; align-items: center; min-height: 44px; }
   .direct-addr { margin-top: var(--s-2) !important; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
   /* Finding us: the building and the directory board, as two small plates. */
   .find { display: grid; gap: var(--s-2); width: 100%; margin-top: var(--s-5); }

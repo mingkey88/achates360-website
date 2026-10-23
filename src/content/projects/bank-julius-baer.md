@@ -11,7 +11,7 @@ hero:
   src: ../../assets/wix/9766c0_07ddb36fa3a84ad9859f8ef5b8f1033b.jpg
   alt: Achates360_BankJuliusBaer_ChineseNewYear.jpg
 badges:
-  - src: ../../assets/wix/9766c0_6036348ee2774bd19c7a70d777430f5b.png
+  - src: ../../assets/wix/9766c0_b7d0b95a8ea9480faa0aca1df8207fc9.png
     alt: AW_W.png
     box:
       x: 1080

@@ -2,6 +2,8 @@
 /* The hidden attribute always hides, even where a component sets its own display (the pile's Reset kept
    showing; review, 24 Oct 2026). */
 [hidden] { display: none !important; }
+/* Whatever keyboard focus scrolls into view keeps room for its ring at the screen's edge. */
+:focus-visible { scroll-margin-block: 24px; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
 body {
   margin: 0; background: var(--paper); color: var(--ink);

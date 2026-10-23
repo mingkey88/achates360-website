@@ -123,6 +123,9 @@ const reset = text('drag-reset');
   /* :global, because the Pill's root carries its own scope: the scoped rule never reached it, so "Get in
      touch" took no clicks or taps (review, 24 Oct 2026). */
   .scta-msg > :global(*) { pointer-events: auto; }
+  /* While it is still fading in (scatter.ts sets .is-pending) the message takes no clicks: an invisible
+     "Get in touch" sat over the pictures and caught their clicks. Keyboard focus still reaches it. */
+  .scta-msg.is-pending > :global(*) { pointer-events: none; }
   /* The message rises in with the pile (opacity only, so it stays in the accessibility tree); anything in it
      that takes keyboard focus shows at once (and scatter.ts spreads the pile first). Opacity only: GSAP
      holds the message's centring in its transform. */
