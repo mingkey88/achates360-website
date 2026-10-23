@@ -35,7 +35,7 @@ const tiles = await Promise.all(slugs.map(async (slug) => {
   if (!still) throw new Error(`Work stack: "${slug}" has no film or hero picture`);
   return {
     slug, title: p.title, client: p.client, categories: p.categories, still,
-    alt: p.hero?.type === 'image' ? p.hero.alt : '', video: film?.src,
+    video: film?.src,
     phoneVideo: film && PHONE_CUTS[film.src],
   };
 }));
@@ -49,7 +49,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
     {tiles.map((t, i) => (
       <li class:list={['ws-item', wide(i) ? 'is-wide' : 'is-pair']}>
         <div class:list={['ws-media', { 'still-on-phones': t.video && !t.phoneVideo }]} data-bgvideo-viewport>
-          <Image class="ws-still" src={t.still} alt={t.alt} widths={[480, 960, 1440, 1920]} sizes={wide(i) ? '(max-width: 1440px) 92vw, 1320px' : '(max-width: 767px) 92vw, 46vw'} />
+          <Image class="ws-still" src={t.still} alt="" widths={[480, 960, 1440, 1920]} sizes={wide(i) ? '(max-width: 1440px) 92vw, 1320px' : '(max-width: 767px) 92vw, 46vw'} />
           {t.video && <BgVideo src={t.video} phoneSrc={t.phoneVideo} poster={t.still} desktopOnly class="ws-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={videoDraft} />}
         </div>
         <div class="ws-cap">
@@ -70,7 +70,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   .ws-media :global(.ws-video video) { width: 100%; height: 100%; object-fit: cover; }
   .ws-still, .ws-media :global(.ws-video) { transition: transform 1.2s var(--ease-out); }
   .ws-item:hover :is(.ws-still, :global(.ws-video)) { transform: scale(1.025); }
-  .ws-media :global(.bv-toggle) { z-index: 3; width: 40px; height: 40px; right: var(--s-3); bottom: var(--s-3); }
+  .ws-media :global(.bv-toggle) { z-index: 3; right: var(--s-3); bottom: var(--s-3); }
   .ws-cap { display: grid; gap: 4px; }
   .ws-title { margin: 0; font: 400 clamp(1.125rem, 1rem + .5vw, 1.5rem)/1.2 var(--font-display); letter-spacing: -.01em; }
   .ws-link { color: inherit; text-decoration: none; }

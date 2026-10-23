@@ -2,36 +2,38 @@
 # (the four DBS logos shown as one). Logos are white artwork trimmed to their outline, recoloured on the page;
 # files in public/clients; ratio: the artwork's width over height. name: the brand as the logo reads (the
 # image's accessible name). Placeholder until the MD confirms each client may be listed.
-- { id: advisors-clique, name: "Advisors' Clique", logo: advisors-clique.svg, ratio: 1.287, placeholder: true }
-- { id: aeroviation, name: "Aeroviation", logo: aeroviation.png, ratio: 4.667, placeholder: true }
-- { id: boc-aviation, name: "BOC Aviation", logo: boc-aviation.svg, ratio: 5.575, placeholder: true }
-- { id: bowers-wilkins, name: "Bowers & Wilkins", logo: bowers-wilkins.svg, ratio: 9.196, placeholder: true }
-- { id: changi-airport, name: "Changi Airport Group", logo: changi-airport.svg, ratio: 1.599, placeholder: true }
-- { id: charles-monat, name: "Charles Monat", logo: charles-monat.svg, ratio: 8.871, placeholder: true }
-- { id: citibank, name: "Citibank", logo: citibank.svg, ratio: 3.747, placeholder: true }
-- { id: comfortdelgro, name: "ComfortDelGro", logo: comfortdelgro.svg, ratio: 6.037, placeholder: true }
+# Order (23 Oct 2026, after two outside reviews): the best-known brands first, since visitors scan a logo wall
+# in a moment (was alphabetical).
 - { id: dbs, name: "DBS", logo: dbs.svg, ratio: 3.4, placeholder: true }
-- { id: dxv, name: "DXV", logo: dxv.svg, ratio: 1.391, placeholder: true }
-- { id: electrolux, name: "Electrolux", logo: electrolux.svg, ratio: 4.242, placeholder: true }
+- { id: samsung, name: "Samsung", logo: samsung.svg, ratio: 6.249, placeholder: true }
+- { id: changi-airport, name: "Changi Airport Group", logo: changi-airport.svg, ratio: 1.599, placeholder: true }
+- { id: singtel, name: "Singtel", logo: singtel.svg, ratio: 1.867, placeholder: true }
+- { id: uob, name: "UOB", logo: uob.svg, ratio: 3.449, placeholder: true }
 - { id: grab, name: "Grab", logo: grab.svg, ratio: 2.565, placeholder: true }
-- { id: grohe, name: "GROHE", logo: grohe.svg, ratio: 2.324, placeholder: true }
-- { id: iah-games, name: "IAH Games", logo: iah-games.png, ratio: 4.906, placeholder: true }
+- { id: citibank, name: "Citibank", logo: citibank.svg, ratio: 3.747, placeholder: true }
+- { id: ritz-carlton, name: "The Ritz-Carlton", logo: ritz-carlton.svg, ratio: 1.944, placeholder: true }
+- { id: st-regis, name: "The St. Regis Singapore", logo: st-regis.svg, ratio: 1.238, placeholder: true }
 - { id: julius-baer, name: "Julius Bär", logo: julius-baer.svg, ratio: 4.923, placeholder: true }
-- { id: konica-minolta, name: "Konica Minolta", logo: konica-minolta.svg, ratio: 7.058, placeholder: true }
-- { id: lixil, name: "LIXIL", logo: lixil.svg, ratio: 2.887, placeholder: true }
-- { id: luzerne, name: "Luzerne", logo: luzerne.svg, ratio: 3.675, placeholder: true }
-- { id: mann-hummel, name: "MANN+HUMMEL", logo: mann-hummel.svg, ratio: 2.723, placeholder: true }
+- { id: prudential, name: "Prudential", logo: prudential.svg, ratio: 5.496, placeholder: true }
 - { id: manulife, name: "Manulife", logo: manulife.svg, ratio: 3.512, placeholder: true }
 - { id: maybank, name: "Maybank", logo: maybank.svg, ratio: 4.971, placeholder: true }
+- { id: lixil, name: "LIXIL", logo: lixil.svg, ratio: 2.887, placeholder: true }
+- { id: grohe, name: "GROHE", logo: grohe.svg, ratio: 2.324, placeholder: true }
 - { id: nbcuniversal, name: "NBCUniversal", logo: nbcuniversal.png, ratio: 10.171, placeholder: true }
-- { id: neals-yard-remedies, name: "Neal's Yard Remedies", logo: neals-yard-remedies.png, ratio: 1.0, placeholder: true }
+- { id: bowers-wilkins, name: "Bowers & Wilkins", logo: bowers-wilkins.svg, ratio: 9.196, placeholder: true }
+- { id: electrolux, name: "Electrolux", logo: electrolux.svg, ratio: 4.242, placeholder: true }
 - { id: nokia, name: "Nokia", logo: nokia.svg, ratio: 4.145, placeholder: true }
-- { id: nyb, name: "NYB", logo: nyb.svg, ratio: 1.756, placeholder: true }
+- { id: comfortdelgro, name: "ComfortDelGro", logo: comfortdelgro.svg, ratio: 6.037, placeholder: true }
+- { id: boc-aviation, name: "BOC Aviation", logo: boc-aviation.svg, ratio: 5.575, placeholder: true }
 - { id: parkway-hospitals, name: "Parkway Hospitals Singapore", logo: parkway-hospitals.png, ratio: 6.484, placeholder: true }
-- { id: prudential, name: "Prudential", logo: prudential.svg, ratio: 5.496, placeholder: true }
-- { id: ritz-carlton, name: "The Ritz-Carlton", logo: ritz-carlton.svg, ratio: 1.944, placeholder: true }
-- { id: samsung, name: "Samsung", logo: samsung.svg, ratio: 6.249, placeholder: true }
-- { id: singtel, name: "Singtel", logo: singtel.svg, ratio: 1.867, placeholder: true }
-- { id: st-regis, name: "The St. Regis Singapore", logo: st-regis.svg, ratio: 1.238, placeholder: true }
+- { id: konica-minolta, name: "Konica Minolta", logo: konica-minolta.svg, ratio: 7.058, placeholder: true }
+- { id: mann-hummel, name: "MANN+HUMMEL", logo: mann-hummel.svg, ratio: 2.723, placeholder: true }
+- { id: luzerne, name: "Luzerne", logo: luzerne.svg, ratio: 3.675, placeholder: true }
+- { id: charles-monat, name: "Charles Monat", logo: charles-monat.svg, ratio: 8.871, placeholder: true }
+- { id: dxv, name: "DXV", logo: dxv.svg, ratio: 1.391, placeholder: true }
+- { id: neals-yard-remedies, name: "Neal's Yard Remedies", logo: neals-yard-remedies.png, ratio: 1.0, placeholder: true }
+- { id: nyb, name: "NYB", logo: nyb.svg, ratio: 1.756, placeholder: true }
 - { id: the-star, name: "The Star", logo: the-star.svg, ratio: 1.071, placeholder: true }
-- { id: uob, name: "UOB", logo: uob.svg, ratio: 3.449, placeholder: true }
+- { id: iah-games, name: "IAH Games", logo: iah-games.png, ratio: 4.906, placeholder: true }
+- { id: aeroviation, name: "Aeroviation", logo: aeroviation.png, ratio: 4.667, placeholder: true }
+- { id: advisors-clique, name: "Advisors' Clique", logo: advisors-clique.svg, ratio: 1.287, placeholder: true }

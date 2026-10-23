@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import Pic from './ui/Pic.astro';
 /*
  * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
@@ -15,6 +16,7 @@ import T from './ui/T.astro';
 import LogoSketch from './LogoSketch.astro';
 import type { UiString } from '../lib/strings';
 import { mergeContinuationGroups } from '../lib/form';
+import { loadExtras } from '../lib/extras';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }
 interface Group { name: string; label: string; required: boolean; options: string[] }
 // heading: a draft replacement for the supplied intro ("Drop us a message…"), pending approval
@@ -34,6 +36,9 @@ const autocomplete = (f: Field) => ({ name: 'name', company: 'organization', ema
 const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : 'field');
 // Wix's second "Selection 2" group is the overflow of the services list: shown as one list.
 const groups = mergeContinuationGroups(form.groups);
+// Wix's message box has no label, only a placeholder (verbatim) that disappears while typing; it gets a
+// persistent visible label (new wording, Draft; review 23 Oct 2026).
+const messageLabel = (await loadExtras()).text('form-message');
 ---
 <section id="contact" class="contact">
   <LogoSketch id="contact-sketch" class="c-sketch" />
@@ -50,7 +55,7 @@ const groups = mergeContinuationGroups(form.groups);
             <div class="find">
               <p class="direct-l"><T s={direct.find.label} /></p>
               <div class="find-plates">
-                {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={pl.alt} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
+                {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={altOr(pl.alt, '')} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
               </div>
             </div>
           )}
@@ -82,8 +87,7 @@ const groups = mergeContinuationGroups(form.groups);
       {boxes.map((f) => (
         f.label
           ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
-          /* Wix's message box has no label: its placeholder (verbatim) shows in the box and names it for screen readers. */
-          : <div class="field"><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</div>
+          : <label class="field"><span class="flabel"><T s={messageLabel} />{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
       ))}
       <div class="send-row">
         <button type="submit" class="send">{form.submitLabel}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>

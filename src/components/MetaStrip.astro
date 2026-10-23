@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import { Image } from 'astro:assets';
 import { withBase, linkAttrs } from '../lib/paths';
 import { metaColumns, type MetaKey } from '../lib/meta';
@@ -28,7 +29,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
           {k === 'recognition' && (
             <ul class="badges">
               {badges.map((b) => {
-                const img = <Image src={b.src} alt={b.alt} height={72} densities={[1, 2, 3]} />;
+                const img = <Image src={b.src} alt={altOr(b.alt, labels.recognition.text)} height={72} densities={[1, 2, 3]} />;
                 return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
               })}
             </ul>

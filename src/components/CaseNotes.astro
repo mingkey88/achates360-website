@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import Pic from './ui/Pic.astro';
 import RunningHead from './ui/RunningHead.astro';
 import type { UiString } from '../lib/strings';
@@ -25,7 +26,7 @@ const { notes, heading, title } = Astro.props;
             {s.items.map((it) => typeof it === 'string' ? <li>{it}</li> : <li>{it.text}<ul class="cn-sub">{it.items.map((x) => <li>{x}</li>)}</ul></li>)}
           </ul>
         )}
-        {s.images?.map((im) => <figure class="cn-img"><Pic src={im.src} alt={im.alt || title} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 70vw" /></figure>)}
+        {s.images?.map((im) => <figure class="cn-img"><Pic src={im.src} alt={altOr(im.alt, title)} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 70vw" /></figure>)}
       </div>
     ))}
   </div>

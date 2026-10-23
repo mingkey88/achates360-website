@@ -6,16 +6,18 @@ import { mediaUrl } from '../lib/paths';
 // desktopOnly: loads only at >=768px once within half a screen of the viewport; with phoneSrc, phones
 // load that (smaller, portrait) file instead, so the film plays there too. pauseLabel/playLabel:
 // render a pause/play button (required for any looping video a visitor sees for >5s).
+// eager (with desktopOnly): the poster is in the markup from the start, so a first-screen film shows its
+// still at once (the browser can find it before any script runs); the film itself still loads by script.
 // A [data-bgvideo-hold] viewport keeps its video paused (the featured deck holds the cards that are
 // waiting behind the front one); dispatch 'bgvideo:refresh' on document after changing it.
-interface Props { src: string; poster: ImageMetadata; class?: string; desktopOnly?: boolean; phoneSrc?: string; pauseLabel?: string; playLabel?: string; draft?: boolean }
-const { src, poster, class: cls, desktopOnly = false, phoneSrc, pauseLabel, playLabel, draft = false } = Astro.props;
+interface Props { src: string; poster: ImageMetadata; class?: string; desktopOnly?: boolean; eager?: boolean; phoneSrc?: string; pauseLabel?: string; playLabel?: string; draft?: boolean }
+const { src, poster, class: cls, desktopOnly = false, eager = false, phoneSrc, pauseLabel, playLabel, draft = false } = Astro.props;
 const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' })).src;
 const toggle = pauseLabel && playLabel;
 ---
 <div class:list={['bgvideo', cls]}>
   {desktopOnly
-    ? <video data-src={mediaUrl(src)} data-src-phone={phoneSrc ? mediaUrl(phoneSrc) : undefined} data-poster={posterUrl} muted loop playsinline preload="none" aria-hidden="true"></video>
+    ? <video data-src={mediaUrl(src)} data-src-phone={phoneSrc ? mediaUrl(phoneSrc) : undefined} data-poster={posterUrl} poster={eager ? posterUrl : undefined} muted loop playsinline preload="none" aria-hidden="true"></video>
     : <video src={mediaUrl(src)} poster={posterUrl} muted loop playsinline preload="metadata" aria-hidden="true"></video>}
   {desktopOnly && <noscript><img class="bv-noscript" src={posterUrl} alt="" /></noscript>}
   {toggle && (

@@ -18,7 +18,7 @@ import CloseCTA from '../components/CloseCTA.astro';
 import { loadExtras } from '../lib/extras';
 import { firstYear } from '../lib/meta';
 import { withBase } from '../lib/paths';
-import { aboutPageLd } from '../lib/seo';
+import { aboutPageLd, altOr } from '../lib/seo';
 import { ABOUT_ACCENTS } from '../lib/accents';
 // /about: the About text verbatim, its first sentence as
 // the page's statement in display type and the rest as the foreword in two columns, the studio's photo
@@ -99,7 +99,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
     {founded && <p class="ab-year" aria-hidden="true">{founded}</p>}
     <div class="ab-since-text">{since.map((p) => <div class="ab-p" set:html={renderMd(p)} />)}</div>
     {plates.map((b: any) => (
-      <figure class="ab-plate crop" data-rise><Pic src={b.src} alt={b.alt ?? ''} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 50vw" /></figure>
+      <figure class="ab-plate crop" data-rise><Pic src={b.src} alt={altOr(b.alt, '')} widths={[640, 960, 1440, 1920]} sizes="(max-width: 1023px) 100vw, 50vw" /></figure>
     ))}
   </section>
   <Chronology items={timeline} heading={text('timeline-heading')} />
@@ -123,7 +123,7 @@ const jsonLd = [aboutPageLd('AboutPage', { url: abs('/about'), name: heading, ho
   <section class="wrap ab-office" aria-labelledby="ab-office-title">
     <RunningHead id="ab-office-title" s={text('intro-eyebrow')} aside="1 Irving Place, #05-02" />
     <div class="ab-office-plates">
-      {office.map((o) => <figure class="ab-office-plate crop" data-rise><Pic src={o.src} alt={o.alt} crop={4 / 3} widths={[480, 640, 912]} sizes="(max-width: 767px) 100vw, 31vw" /><figcaption><T s={o.caption} /></figcaption></figure>)}
+      {office.map((o) => <figure class="ab-office-plate crop" data-rise><Pic src={o.src} alt={altOr(o.alt, '')} crop={4 / 3} widths={[480, 640, 912]} sizes="(max-width: 767px) 100vw, 31vw" /><figcaption><T s={o.caption} /></figcaption></figure>)}
     </div>
   </section>
   {/* Chapter: the recognition. The deck's photograph of the award annuals and the Straits Times report on

@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from './Base.astro';
@@ -15,7 +16,7 @@ const mailIcon = icon('mailto:');
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="card">
   <section class="card-section">
     <div class="card">
-      <Image class="photo" src={d.photo.src} alt={d.photo.alt} widths={[180, 360, 540]} sizes="(max-width: 767px) 41vw, 179px" loading="eager" />
+      <Image class="photo" src={d.photo.src} alt={altOr(d.photo.alt, d.name)} widths={[180, 360, 540]} sizes="(max-width: 767px) 41vw, 179px" loading="eager" />
       <h1 class="name">{d.name}</h1>
       <p class="role">{d.role}</p>
       <p class="blurb">{d.blurb}</p>
@@ -42,7 +43,7 @@ const mailIcon = icon('mailto:');
         {/* Wix's "+" button icon (copied from the rendered page) */}
         <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M145 96h-41V55h-8v41H55v8h41v41h8v-41h41v-8z" /></svg>
       </a>
-      <Image class="qr" src={d.qr.src} alt={d.qr.alt} widths={[148, 296, 444]} sizes="(max-width: 767px) 56vw, 148px" />
+      <Image class="qr" src={d.qr.src} alt={altOr(d.qr.alt, `QR code: ${d.name}`)} widths={[148, 296, 444]} sizes="(max-width: 767px) 56vw, 148px" />
     </div>
   </section>
 </Base>

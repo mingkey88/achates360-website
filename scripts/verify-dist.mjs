@@ -87,6 +87,8 @@ export function pageChecks(pages, { production, base }) {
     if (html.includes('data-page="project"') && !html.includes('class="next-project"')) add('case study without .next-project band');
     if (production && html.includes('data-placeholder')) add('placeholder copy in a production build');
     if (/data-(split|reveal)/.test(html) && !html.includes('motion-ready')) add('reveal hooks without the 3s motion fallback script');
+    // Wix exported file names as image descriptions; screen readers would read them aloud (lib/seo altOr).
+    for (const m of html.matchAll(/\salt="([^"]*\.(?:jpe?g|png|gif|webp|avif|svg|tiff?|heic))\s*"/gi)) add(`file name as image description: ${m[1]}`);
   }
   return out;
 }

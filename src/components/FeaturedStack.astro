@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import { Image, getImage } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BgVideo from './BgVideo.astro';
@@ -36,7 +37,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
               <noscript><img class="sc-still" src={stills[i]} alt="" /></noscript>
             </>
           ) : (
-            <Image class="sc-image" src={slide.media.src} alt={slide.media.alt} widths={[480, 960, 1440, 1920]} sizes="(max-width: 1440px) 92vw, 1320px" />
+            <Image class="sc-image" src={slide.media.src} alt={altOr(slide.media.alt, '')} widths={[480, 960, 1440, 1920]} sizes="(max-width: 1440px) 92vw, 1320px" />
           )}
         </div>
         <div class="sc-text">
@@ -47,7 +48,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
           {slide.badges.length > 0 && (
             <ul class="sc-badges">
               {slide.badges.map((b) => {
-                const img = <Image src={b.src} alt={b.alt} widths={[80, 160]} sizes="80px" />;
+                const img = <Image src={b.src} alt={altOr(b.alt, '')} widths={[80, 160]} sizes="80px" />;
                 return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
               })}
             </ul>

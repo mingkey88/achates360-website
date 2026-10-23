@@ -80,7 +80,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);
   </script>
-  <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} cta={text('selected-cta')} count={listedCount} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-hero-loop.mp4" phonePreview="media/video/achates360-hero-loop-phone.mp4" poster={heroPoster} />
+  <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} contact={text('hero-contact-cta')} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-hero-loop.mp4" phonePreview="media/video/achates360-hero-loop-phone.mp4" poster={heroPoster} />
 
   <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 
