@@ -84,6 +84,7 @@ const no = (n: number) => String(n).padStart(2, '0');
   /* When title and client do not fit on one line, the client drops beneath instead of both breaking. */
   figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--s-4); padding-top: var(--s-2); font-size: var(--fs-small); }
   figcaption a { color: inherit; text-decoration: none; }
+  figcaption span { margin-left: auto; }
   figcaption a:hover { text-decoration: underline; text-underline-offset: .2em; }
   figcaption span { color: var(--text-2); text-align: right; }
   /* Tablets (one column): the picture held to a modest size, not the full width. */

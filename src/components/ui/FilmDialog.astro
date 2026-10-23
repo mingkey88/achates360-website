@@ -22,7 +22,6 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
       });
     }
     dialog.querySelector('.film-close')!.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
     dialog.addEventListener('close', () => video.pause());
   }
 </script>
@@ -36,5 +35,6 @@ const posterUrl = (await getImage({ src: poster, width: 1920, format: 'webp' }))
   }
   .film-close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; }
   /* Over the dark dialog: a white ring inside the key, on a solid face. */
+  .film video:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
   .film-close:focus-visible { outline: 2px solid #fff; outline-offset: -6px; background: #0d0d0d; }
 </style>

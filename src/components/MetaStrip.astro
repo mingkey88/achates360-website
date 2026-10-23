@@ -1,5 +1,6 @@
 ---
 import { altOr } from '../lib/seo';
+import { loadExtras } from '../lib/extras';
 import { Image } from 'astro:assets';
 import { withBase, linkAttrs } from '../lib/paths';
 import { metaColumns, type MetaKey } from '../lib/meta';
@@ -15,6 +16,9 @@ interface Props {
   share?: { label: UiString; url: string; title: string; on: UiString; copy: UiString; copied: UiString };
 }
 const { client, copyright, categories, badges, labels, share } = Astro.props;
+// Award seals exported with file names for descriptions: described by the seal's own words, "Award
+// winning" (Draft), so screen readers hear what sighted visitors read under Recognition.
+const sealAlt = (await loadExtras()).text('award-seal-alt');
 const cols = metaColumns({ client, copyright, categories, badges });
 ---
 {(cols.length > 0 || share) && (
@@ -29,7 +33,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
           {k === 'recognition' && (
             <ul class="badges">
               {badges.map((b) => {
-                const img = <Image src={b.src} alt={altOr(b.alt, b.href ? labels.recognition.text : '')} height={72} densities={[1, 2, 3]} />;
+                const img = <Image src={b.src} alt={altOr(b.alt, sealAlt.text)} height={72} densities={[1, 2, 3]} />;
                 return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
               })}
             </ul>

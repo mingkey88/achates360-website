@@ -39,6 +39,14 @@ export function scatter(): void {
     // On phones the pictures pass close to the message, so it comes a little later there.
     const at = ctx.conditions?.phone ? .35 : .2;
     if (msg) tl.from(msg, { opacity: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
+    // Keyboard focus reaching the message before the pile has spread: scroll to the spread's end, so the
+    // words never sit over the pictures.
+    const onFocus = (e: Event) => {
+      const st = tl.scrollTrigger;
+      if (st && st.progress < 1 && (e.target as HTMLElement).matches(':focus-visible')) window.scrollTo({ top: st.end, behavior: 'instant' });
+    };
+    msg?.addEventListener('focusin', onFocus);
+    return () => msg?.removeEventListener('focusin', onFocus);
   });
 }
 
