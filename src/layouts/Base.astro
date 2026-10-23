@@ -93,7 +93,7 @@ const pageLinks = menu.filter((m) => m.href !== '/').map((m) => ({ label: m.labe
   <body data-page={page} data-over-hero={overHero ? '' : undefined}>
     <a class="skip-link" href="#main" data-placeholder={text('skip-link').placeholder ? '' : undefined}>{text('skip-link').text}</a>
     <Header menu={menu} path={path} overHero={overHero} wordmark={text('wordmark')} menuLabel={text('menu-open')} navLabel={text('nav-label')} subLabel={text('nav-categories')} />
-    <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} />
+    <Menu menu={menu} social={site.menuSocial ?? []} path={path} menuLabel={text('menu-open')} closeLabel={text('menu-close')} navLabel={text('nav-label')} subLabel={text('nav-categories')} />
     <main id="main"><slot /></main>
     {/* The homepage closes with the footer's own intro line (ScatterCTA), so the footer skips it there. */}
     <Footer blocks={site.footer} hideIntro={page === 'home'} signoff={page === 'home' ? { line: text('hero-tagline').text, links: pageLinks } : undefined} links={pageLinks} top={text('back-to-top')} />

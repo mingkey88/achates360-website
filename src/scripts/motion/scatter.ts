@@ -34,10 +34,11 @@ export function scatter(): void {
         rotation: (i % 2 ? 1 : -1) * (3 + (i % 4) * 2), scale: .62, duration: .5,
       }, i * .035);
     });
-    // autoAlpha: while hidden the message (and its button) is visibility:hidden, so not focusable.
+    // Opacity only (not autoAlpha): the message stays in the accessibility tree and the tab order while it
+    // waits, and shows at once when it takes focus (.scta-msg:focus-within, ScatterCTA.astro).
     // On phones the pictures pass close to the message, so it comes a little later there.
     const at = ctx.conditions?.phone ? .35 : .2;
-    if (msg) tl.from(msg, { autoAlpha: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
+    if (msg) tl.from(msg, { opacity: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
   });
 }
 

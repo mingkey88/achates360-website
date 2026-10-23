@@ -29,7 +29,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
           {k === 'recognition' && (
             <ul class="badges">
               {badges.map((b) => {
-                const img = <Image src={b.src} alt={altOr(b.alt, labels.recognition.text)} height={72} densities={[1, 2, 3]} />;
+                const img = <Image src={b.src} alt={altOr(b.alt, b.href ? labels.recognition.text : '')} height={72} densities={[1, 2, 3]} />;
                 return <li>{b.href ? <a href={withBase(b.href)} {...linkAttrs(b.href)}>{img}</a> : img}</li>;
               })}
             </ul>
@@ -51,5 +51,7 @@ const cols = metaColumns({ client, copyright, categories, badges });
   dt { margin-bottom: var(--s-2); color: var(--text-2); }
   dd { margin: 0; overflow-wrap: anywhere; }
   .chips, .badges { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  /* Rows of chips sit far enough apart on touch screens that their 44px tap areas do not overlap. */
+  @media (pointer: coarse) { .chips { row-gap: 18px; } }
   .badges :global(img) { height: 72px; width: auto; }
 </style>

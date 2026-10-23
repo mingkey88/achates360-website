@@ -6,7 +6,7 @@
      was too faint), set a weight heavier, at display sizes only; small labels stay in ink with an orange
      mark beside them. */
   --accent: #ff9015;      /* brand orange: bars, fills, pills, stickers, marks; words on dark grounds */
-  --accent-text: #e06c00; /* orange for words on light grounds: the same hue, a little deeper (3:1 on the paper, enough for large text) */
+  --accent-text: #d66700; /* orange for words on light grounds: the same hue, a little deeper; at least 3:1 on the paper (3.6), blush (3.1) and stone (3.3), enough for large text only. Was #e06c00, which fell under 3:1 on blush and stone (review, 24 Oct 2026). */
   --turquoise: #99d9d9;   /* brand turquoise: light bands, text on teal-ink */
   --lime: #cbe880;        /* brand lime green: used sparingly (clients band, text selection) */
   --teal-ink: #252525;    /* direction B: charcoal for dark bands and the footer (after Aesop) */

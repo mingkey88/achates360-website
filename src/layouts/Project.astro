@@ -1,4 +1,5 @@
 ---
+import { STILLS } from '../lib/stills';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
 import HeroMedia from '../components/ui/HeroMedia.astro';
@@ -45,7 +46,9 @@ const labels = { client: text('meta-client'), year: text('meta-year'), services:
 const share = { label: text('share-label'), url: canonicalUrl(Astro.url.pathname, Astro.site!, import.meta.env.BASE_URL), title: d.title, on: text('share-on'), copy: text('share-copy'), copied: text('share-copied') };
 // Share picture and structured data: the project's own hero, the case study, and where it sits
 // (Projects › its first category › the project).
-const shareImage = d.hero ? (d.hero.type === 'image' ? d.hero.src : d.hero.poster) : undefined;
+// A film's hand-picked still (lib/stills) replaces its exported first frame where that frame is poor.
+const hero = d.hero?.type === 'video' && STILLS[id] ? { ...d.hero, poster: STILLS[id] } : d.hero;
+const shareImage = hero ? (hero.type === 'image' ? hero.src : hero.poster) : undefined;
 const abs = (p: string) => new URL(withBase(p), Astro.site).href;
 const cat = d.categories[0];
 const jsonLd = [
@@ -55,7 +58,7 @@ const jsonLd = [
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" noindex={HELD_FROM_SEARCH.has(`/${id}`)} overHero={!!d.hero}>
   <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
-    {d.hero && <HeroMedia media={d.hero} fallbackAlt={d.title} />}
+    {hero && <HeroMedia media={hero} fallbackAlt={d.title} />}
     <div class="p-hero-text wrap">
       {d.categories[0] && <Sticker>{d.categories[0]}</Sticker>}
       <h1 class="display h1" data-split>{d.title}</h1>
@@ -74,7 +77,7 @@ const jsonLd = [
 <style>
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
   /* A darker shade at the top keeps the white header legible over light photographs. */
-  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .55), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / .6)); pointer-events: none; }
+  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .55), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6) 65%, rgb(0 0 0 / .85)); pointer-events: none; } /* the foot holds the small white category label at 4.5:1 on every hero (all 53 checked, 24 Oct 2026) */
   .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
   .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--on-dark); }
   .p-hero-plain::after { display: none; }

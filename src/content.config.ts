@@ -166,7 +166,7 @@ const stats = defineCollection({
 });
 const clients = defineCollection({
   loader: file('src/content/extras/clients.yaml'),
-  schema: z.object({ ...flagged, name: z.string(), logo: z.string().regex(/^[a-z0-9-]+\.(svg|png)$/), ratio: z.number().positive() }).strict(),
+  schema: z.object({ ...flagged, order: z.number(), name: z.string(), logo: z.string().regex(/^[a-z0-9-]+\.(svg|png)$/), ratio: z.number().positive() }).strict(),
 });
 const testimonials = defineCollection({
   loader: file('src/content/extras/testimonials.yaml'),

@@ -43,9 +43,11 @@ const { text: t } = await loadExtras();
   .vh-stage { position: relative; min-height: 320px; background: var(--ink); overflow: clip; }
   .vh-stage :global(.vh-video) { position: absolute; inset: 0; }
   .vh-stage :global(.vh-video :is(video, .bv-noscript)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* A flat .6 band as tall as the header keeps its white links at 4.5:1 over the film's lightest frames,
+     then fades out (review, 24 Oct 2026: .45 fading at once let them drop below on some frames). */
   .vh-stage::after {
-    content: ''; position: absolute; inset: 0 0 auto; height: 30%; z-index: 1; pointer-events: none;
-    background: linear-gradient(180deg, rgb(13 13 13 / .45), rgb(13 13 13 / 0));
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgb(13 13 13 / .6) 0, rgb(13 13 13 / .6) calc(var(--header-h) + env(safe-area-inset-top, 0px)), rgb(13 13 13 / 0) 30%);
   }
   .vh-stage :global(.bv-toggle) { z-index: 2; }
 

@@ -39,35 +39,21 @@ const groups = mergeContinuationGroups(form.groups);
 // Wix's message box has no label, only a placeholder (verbatim) that disappears while typing; it gets a
 // persistent visible label (new wording, Draft; review 23 Oct 2026).
 const messageLabel = (await loadExtras()).text('form-message');
+// Each control is named by its label text alone (aria-labelledby): the error line sits inside the <label>,
+// and would otherwise be read as part of the name as well as through aria-describedby (review, 24 Oct 2026).
 ---
 <section id="contact" class="contact">
   <LogoSketch id="contact-sketch" class="c-sketch" />
   <div class="inner">
     <div class="intro">
       {heading ? <h2><T s={heading} /></h2> : intro.map((m) => <div set:html={renderMd(m)} />)}
-      {direct && (direct.email || direct.phone) && (
-        <div class="direct">
-          <p class="direct-l"><T s={direct.label} /></p>
-          {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
-          {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
-          {direct.address?.length && <p class="direct-addr">{direct.address.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
-          {direct.find && (
-            <div class="find">
-              <p class="direct-l"><T s={direct.find.label} /></p>
-              <div class="find-plates">
-                {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={altOr(pl.alt, '')} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
     <form class="enquiry" novalidate>
       <div class="lines">
         {lines.map((f) => (
           <label class:list={['field', { wide: f.type === 'email' }]}>
-            <span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
-            <input type={inputType(f)} name={fieldName(f)} required={f.required} autocomplete={autocomplete(f)} aria-describedby={f.required ? `err-${fieldName(f)}` : undefined} />
+            <span class="flabel" id={`lbl-${fieldName(f)}`}>{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
+            <input type={inputType(f)} name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} autocomplete={autocomplete(f)} aria-describedby={f.required ? `err-${fieldName(f)}` : undefined} />
             {f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}
           </label>
         ))}
@@ -86,8 +72,8 @@ const messageLabel = (await loadExtras()).text('form-message');
       ))}
       {boxes.map((f) => (
         f.label
-          ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
-          : <label class="field"><span class="flabel"><T s={messageLabel} />{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
+          ? <label class="field"><span class="flabel" id={`lbl-${fieldName(f)}`}>{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
+          : <label class="field"><span class="flabel" id={`lbl-${fieldName(f)}`}><T s={messageLabel} />{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
       ))}
       <div class="send-row">
         <button type="submit" class="send">{form.submitLabel}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>
@@ -95,6 +81,24 @@ const messageLabel = (await loadExtras()).text('form-message');
       </div>
       {success && <div class="success" hidden set:html={renderMd(success)} />}
     </form>
+    {/* After the form in reading order, so "Or write to us directly" follows the form it offers an
+        alternative to (on phones it came first; review, 24 Oct 2026). Wide screens set it in the left column. */}
+    {direct && (direct.email || direct.phone) && (
+      <div class="direct">
+        <p class="direct-l"><T s={direct.label} /></p>
+        {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
+        {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
+        {direct.address?.length && <p class="direct-addr">{direct.address.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
+        {direct.find && (
+          <div class="find">
+            <p class="direct-l"><T s={direct.find.label} /></p>
+            <div class="find-plates">
+              {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={altOr(pl.alt, '')} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
+            </div>
+          </div>
+        )}
+      </div>
+    )}
   </div>
 </section>
 <script>
@@ -179,7 +183,7 @@ const messageLabel = (await loadExtras()).text('form-message');
   .contact > :global(.c-sketch) { position: absolute; z-index: -1; left: -6vw; bottom: -4vw; width: clamp(220px, 30vw, 460px); color: rgb(51 51 51 / .12); }
   .inner { max-width: 760px; margin-inline: auto; display: grid; gap: var(--s-7); }
   .intro { text-align: center; display: grid; gap: var(--s-5); align-content: start; }
-  .direct { display: grid; gap: 4px; justify-items: center; font-size: var(--fs-lead); }
+  .direct { display: grid; gap: 4px; justify-items: center; text-align: center; font-size: var(--fs-lead); }
   .direct p { margin: 0; }
   .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
   .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
@@ -194,10 +198,12 @@ const messageLabel = (await loadExtras()).text('form-message');
   .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }
   /* Wide screens: the invitation and the direct lines beside the form, staying in view while it is filled in. */
   @media (min-width: 1024px) {
-    .inner { max-width: 1180px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); column-gap: var(--s-9); align-items: start; }
-    .intro { position: sticky; top: calc(var(--header-h) + var(--s-6)); text-align: left; }
+    .inner { max-width: 1180px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); grid-template-rows: auto 1fr; column-gap: var(--s-9); align-items: start; }
+    .intro { grid-column: 1; grid-row: 1; text-align: left; }
     .intro :global(h2) { margin: 0; text-align: left; }
-    .direct { justify-items: start; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); }
+    .enquiry { grid-column: 2; grid-row: 1 / span 2; }
+    /* The direct lines stay in view while the form is filled in. */
+    .direct { grid-column: 1; grid-row: 2; position: sticky; top: calc(var(--header-h) + var(--s-6)); justify-items: start; text-align: left; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); }
     .find-plates { margin-inline: 0; }
   }
   .enquiry { display: grid; gap: var(--s-6); }

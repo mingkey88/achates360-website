@@ -11,5 +11,7 @@ const { href } = Astro.props;
     font: 500 var(--fs-label)/1.2 var(--font-text); letter-spacing: 0; text-decoration: none; transition: background-color .2s;
   }
   a.chip:hover { background: var(--stone); }
+  /* Touch screens: the link's tap area reaches 44px tall without the chip itself growing. */
+  @media (pointer: coarse) { a.chip { position: relative; } a.chip::after { content: ''; position: absolute; inset: -9px 0; } }
   @media (prefers-reduced-motion: reduce) { .chip { transition: none; } }
 </style>

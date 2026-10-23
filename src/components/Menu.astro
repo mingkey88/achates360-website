@@ -3,8 +3,8 @@ import SocialIcon from './ui/SocialIcon.astro';
 import { withBase, linkAttrs, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 interface Link { label: string; href: string }
-interface Props { menu: (Link & { items?: Link[] })[]; social: { alt: string; href: string }[]; path: string; menuLabel: UiString; closeLabel: UiString; navLabel: UiString }
-const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
+interface Props { menu: (Link & { items?: Link[] })[]; social: { alt: string; href: string }[]; path: string; menuLabel: UiString; closeLabel: UiString; navLabel: UiString; subLabel: UiString }
+const { menu, social, path, menuLabel, closeLabel, navLabel, subLabel } = Astro.props;
 ---
 <dialog id="site-menu" class="site-menu on-dark" aria-label={menuLabel.text}>
   <div class="inner wrap">
@@ -20,7 +20,8 @@ const { menu, social, path, menuLabel, closeLabel, navLabel } = Astro.props;
               <a class="big" href={withBase(it.href)} aria-current={menuCurrent(it, path) === 'page' ? 'page' : undefined}>{it.label}</a>
               {it.items && it.items.length > 0 && (
                 <button class="more" type="button" aria-expanded="false" aria-controls={`menu-sub-${i}`}>
-                  <span class="sr-only">{it.label}</span>
+                  {/* Named apart from the link beside it, as the header's toggle is ("Categories: Projects"). */}
+                  <span class="sr-only">{subLabel.text}: {it.label}</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" /></svg>
                 </button>
               )}

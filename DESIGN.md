@@ -72,7 +72,7 @@ Defined in `src/styles/tokens.css`. Light theme only.
 | `--on-dark` / `--on-dark-2` | `#fffef2` / `#bdbcb2` | text on charcoal |
 | `--line` | ink at 16% | hairlines |
 | **`--accent`** | **`#ff9015`** | **brand orange 1495 U:** bars, marks, fills, the colour bar; orange words on dark grounds |
-| **`--accent-text`** | **`#e06c00`** | **text orange:** orange words on light grounds |
+| **`--accent-text`** | **`#d66700`** | **text orange:** orange words on light grounds, large type only (3:1 or more on paper, blush and stone; was #e06c00, 24 Oct 2026) |
 | `--turquoise`, `--lime` | `#99d9d9`, `#cbe880` | corporate colours, used rarely (the figures of the logo in motion) |
 
 ### Orange rules
