@@ -1,0 +1,47 @@
+---
+import Pic from './ui/Pic.astro';
+import T from './ui/T.astro';
+import { altOr } from '../lib/seo';
+import type { UiString } from '../lib/strings';
+// The studio's email, phone and address, and two small plates for finding the office (Achates360_Office
+// .pdf), offered as the other way to get in touch. ContactForm places it twice, one shown per layout, so
+// reading and focus order match the screen in both: beside the form's top on wide screens, after the
+// form on narrower ones ("Or write to us directly" follows the form it is the alternative to).
+interface Props {
+  direct: { label: UiString; email?: string; phone?: string; address?: string[]; find?: { label: UiString; places: { src: ImageMetadata; alt: string; caption: UiString }[] } };
+  class?: string;
+}
+const { direct, class: cls } = Astro.props;
+---
+<div class:list={['direct', cls]}>
+  <p class="direct-l"><T s={direct.label} /></p>
+  {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
+  {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
+  {direct.address?.length && <p class="direct-addr">{direct.address.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
+  {direct.find && (
+    <div class="find">
+      <p class="direct-l"><T s={direct.find.label} /></p>
+      <div class="find-plates">
+        {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={altOr(pl.alt, '')} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
+      </div>
+    </div>
+  )}
+</div>
+<style>
+  .direct { display: grid; gap: 4px; justify-items: start; text-align: left; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); font-size: var(--fs-lead); }
+  .direct p { margin: 0; }
+  .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
+  .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
+  /* Hover: a heavier orange underline (orange text at this size would fall under 4.5:1). */
+  .direct a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+  /* Tap area of 44px on the e-mail and phone: each line really takes 44px, so focus rings do not cross
+     the neighbouring lines. */
+  .direct p > a { display: inline-flex; align-items: center; min-height: 44px; }
+  .direct-addr { margin-top: var(--s-2) !important; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
+  /* Finding us: the building and the directory board, as two small plates. */
+  .find { display: grid; gap: var(--s-2); width: 100%; margin-top: var(--s-5); }
+  .find-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); max-width: 420px; }
+  .find-plate { margin: 0; display: grid; gap: var(--s-1); text-align: left; }
+  .find-plate :global(img) { display: block; width: 100%; height: auto; }
+  .find-plate figcaption { font-size: .8125rem; color: var(--text-2); }
+</style>

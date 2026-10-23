@@ -6,6 +6,7 @@ import RunningHead from './ui/RunningHead.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import { withBase } from '../lib/paths';
+import { STILLS } from '../lib/stills';
 import { loadExtras } from '../lib/extras';
 import type { UiString } from '../lib/strings';
 // The homepage's work, after wearecollins.com (direction "quiet frame, moving work", 21 Oct 2026): a
@@ -18,11 +19,6 @@ import type { UiString } from '../lib/strings';
 interface Props { slugs: string[]; eyebrow: UiString; cta: UiString; count: number }
 const { slugs, eyebrow, cta, count } = Astro.props;
 const { text } = await loadExtras();
-// Films with a smaller portrait cut for phones (made for the old Selected work cover); others show
-// their still on phones.
-const PHONE_CUTS: Record<string, string> = {
-  'media/video/9766c0_dc0766bd21f24857af77b62c8b872cab.mp4': 'media/video/9766c0_dc0766bd21f24857af77b62c8b872cab-phone.mp4',
-};
 const home = (await getEntry('home', 'home'))!.data;
 const tiles = await Promise.all(slugs.map(async (slug) => {
   const entry = await getEntry('projects', slug);
@@ -31,12 +27,12 @@ const tiles = await Promise.all(slugs.map(async (slug) => {
   const slide = home.slides.find((s) => s.cta?.href === `/${slug}` && s.media.type === 'video');
   const block = p.blocks.find((b) => b.type === 'video');
   const film = slide?.media.type === 'video' ? slide.media : p.hero?.type === 'video' ? p.hero : block?.type === 'video' ? block : undefined;
-  const still = film?.poster ?? (p.hero?.type === 'image' ? p.hero.src : undefined);
+  // A hand-picked still first (lib/stills: DXV's exported frame catches its title mid-animation).
+  const still = STILLS[slug] ?? film?.poster ?? (p.hero?.type === 'image' ? p.hero.src : undefined);
   if (!still) throw new Error(`Work stack: "${slug}" has no film or hero picture`);
   return {
     slug, title: p.title, client: p.client, categories: p.categories, still,
-    alt: p.hero?.type === 'image' ? p.hero.alt : '', video: film?.src,
-    phoneVideo: film && PHONE_CUTS[film.src],
+    video: film?.src,
   };
 }));
 // 1, 2, 1, 2, 1: a full-width tile, then a pair, alternating.
@@ -48,9 +44,9 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   <ul class="ws-grid wrap">
     {tiles.map((t, i) => (
       <li class:list={['ws-item', wide(i) ? 'is-wide' : 'is-pair']}>
-        <div class:list={['ws-media', { 'still-on-phones': t.video && !t.phoneVideo }]} data-bgvideo-viewport>
-          <Image class="ws-still" src={t.still} alt={t.alt} widths={[480, 960, 1440, 1920]} sizes={wide(i) ? '(max-width: 1440px) 92vw, 1320px' : '(max-width: 767px) 92vw, 46vw'} />
-          {t.video && <BgVideo src={t.video} phoneSrc={t.phoneVideo} poster={t.still} desktopOnly class="ws-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={videoDraft} />}
+        <div class="ws-media" data-bgvideo-viewport>
+          <Image class="ws-still" src={t.still} alt="" widths={[480, 960, 1440, 1920]} sizes={wide(i) ? '(max-width: 1440px) 92vw, 1320px' : '(max-width: 767px) 92vw, 46vw'} />
+          {t.video && <BgVideo src={t.video} poster={t.still} desktopOnly posterless class="ws-video" pauseLabel={`${text('video-pause').text}: ${t.title}`} playLabel={`${text('video-play').text}: ${t.title}`} draft={videoDraft} />}
         </div>
         <div class="ws-cap">
           <h3 class="ws-title"><a class="ws-link" href={withBase(`/${t.slug}`)}>{t.title}</a></h3>
@@ -70,7 +66,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   .ws-media :global(.ws-video video) { width: 100%; height: 100%; object-fit: cover; }
   .ws-still, .ws-media :global(.ws-video) { transition: transform 1.2s var(--ease-out); }
   .ws-item:hover :is(.ws-still, :global(.ws-video)) { transform: scale(1.025); }
-  .ws-media :global(.bv-toggle) { z-index: 3; width: 40px; height: 40px; right: var(--s-3); bottom: var(--s-3); }
+  .ws-media :global(.bv-toggle) { z-index: 3; right: var(--s-3); bottom: var(--s-3); }
   .ws-cap { display: grid; gap: 4px; }
   .ws-title { margin: 0; font: 400 clamp(1.125rem, 1rem + .5vw, 1.5rem)/1.2 var(--font-display); letter-spacing: -.01em; }
   .ws-link { color: inherit; text-decoration: none; }
@@ -82,8 +78,8 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   .ws-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-4); font-size: var(--fs-small); color: var(--text-2); }
   .ws-cta { display: flex; justify-content: center; }
   .ws-count { font-variant-numeric: tabular-nums; }
-  /* Phones show only the still where there is no phone cut, so no pause key there. */
-  @media (max-width: 767px) { .still-on-phones :global(.bv-toggle) { display: none; } }
+  /* Phones show only the still (the films load on wide screens), so no pause key there. */
+  @media (max-width: 767px) { .ws-media :global(.bv-toggle) { display: none; } }
   @media (min-width: 768px) {
     .ws-grid { grid-template-columns: 1fr 1fr; }
     .is-wide { grid-column: 1 / -1; }

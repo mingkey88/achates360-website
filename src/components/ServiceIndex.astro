@@ -46,7 +46,7 @@ const { services, eyebrow, cta, countLabel } = Astro.props;
   .si-dots { align-self: end; } /* the space between the name and its count */
   .si-n { justify-self: end; font: 400 var(--fs-lead)/1 var(--font-display); font-variant-numeric: tabular-nums; }
   .si-link:hover .si-title, .si-link:focus-visible .si-title { translate: 10px 0; }
-  .si-link:hover .si-n { color: var(--accent-text); }
+  .si-link:hover .si-n { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
   @media (max-width: 767px) {
     .si-link { grid-template-columns: 2rem minmax(0, 1fr) 2.5rem; }
     .si-dots { display: none; }

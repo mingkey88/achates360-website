@@ -1,5 +1,4 @@
 ---
-import Pic from './ui/Pic.astro';
 /*
  * The home page enquiry section. The intro text, field labels, placeholders, checkbox groups and
  * submit label come verbatim from home.md; only the styling is the redesign's (direction B: an
@@ -15,11 +14,13 @@ import T from './ui/T.astro';
 import LogoSketch from './LogoSketch.astro';
 import type { UiString } from '../lib/strings';
 import { mergeContinuationGroups } from '../lib/form';
+import { loadExtras } from '../lib/extras';
+import ContactDirect from './ContactDirect.astro';
 interface Field { name: string; type: string; label: string; required: boolean; placeholder?: string }
 interface Group { name: string; label: string; required: boolean; options: string[] }
 // heading: a draft replacement for the supplied intro ("Drop us a message…"), pending approval
 // (CONTENT-QUERIES 23); the supplied text stays in home.md.
-// direct: the studio's email and phone from the footer, offered beside the form for those who would
+// direct: the studio's email and phone from the footer (ContactDirect), offered beside the form for those who would
 // rather write or call.
 interface Props { md: string[]; form: { fields: Field[]; groups: Group[]; submitLabel: string }; heading?: UiString; direct?: { label: UiString; email?: string; phone?: string; address?: string[]; find?: { label: UiString; places: { src: ImageMetadata; alt: string; caption: UiString }[] } } }
 const { md, form, heading, direct } = Astro.props;
@@ -34,35 +35,26 @@ const autocomplete = (f: Field) => ({ name: 'name', company: 'organization', ema
 const fieldName = (f: Field) => f.name || (f.type === 'textarea' ? 'message' : 'field');
 // Wix's second "Selection 2" group is the overflow of the services list: shown as one list.
 const groups = mergeContinuationGroups(form.groups);
+// Wix's message box has no label, only a placeholder (verbatim) that disappears while typing; it gets a
+// persistent visible label (new wording, Draft; review 23 Oct 2026).
+const messageLabel = (await loadExtras()).text('form-message');
+const hasDirect = !!direct && !!(direct.email || direct.phone);
+// Each control is named by its label text alone (aria-labelledby): the error line sits inside the <label>,
+// and would otherwise be read as part of the name as well as through aria-describedby (review, 24 Oct 2026).
 ---
 <section id="contact" class="contact">
   <LogoSketch id="contact-sketch" class="c-sketch" />
   <div class="inner">
     <div class="intro">
       {heading ? <h2><T s={heading} /></h2> : intro.map((m) => <div set:html={renderMd(m)} />)}
-      {direct && (direct.email || direct.phone) && (
-        <div class="direct">
-          <p class="direct-l"><T s={direct.label} /></p>
-          {direct.email && <p><a href={`mailto:${direct.email}`}>{direct.email}</a></p>}
-          {direct.phone && <p><a href={`tel:${direct.phone.replace(/\s+/g, '')}`}>{direct.phone}</a></p>}
-          {direct.address?.length && <p class="direct-addr">{direct.address.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
-          {direct.find && (
-            <div class="find">
-              <p class="direct-l"><T s={direct.find.label} /></p>
-              <div class="find-plates">
-                {direct.find.places.map((pl) => <figure class="find-plate"><Pic src={pl.src} alt={pl.alt} crop={4 / 3} widths={[320, 480, 640, 870]} sizes="(max-width: 1023px) 45vw, 180px" /><figcaption><T s={pl.caption} /></figcaption></figure>)}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {hasDirect && <ContactDirect direct={direct!} class="direct-wide" />}
     </div>
     <form class="enquiry" novalidate>
       <div class="lines">
         {lines.map((f) => (
           <label class:list={['field', { wide: f.type === 'email' }]}>
-            <span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
-            <input type={inputType(f)} name={fieldName(f)} required={f.required} autocomplete={autocomplete(f)} aria-describedby={f.required ? `err-${fieldName(f)}` : undefined} />
+            <span class="flabel" id={`lbl-${fieldName(f)}`}>{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span>
+            <input type={inputType(f)} name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} autocomplete={autocomplete(f)} aria-describedby={f.required ? `err-${fieldName(f)}` : undefined} />
             {f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}
           </label>
         ))}
@@ -81,9 +73,8 @@ const groups = mergeContinuationGroups(form.groups);
       ))}
       {boxes.map((f) => (
         f.label
-          ? <label class="field"><span class="flabel">{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
-          /* Wix's message box has no label: its placeholder (verbatim) shows in the box and names it for screen readers. */
-          : <div class="field"><textarea name={fieldName(f)} required={f.required} placeholder={f.placeholder} aria-label={f.placeholder || undefined} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</div>
+          ? <label class="field"><span class="flabel" id={`lbl-${fieldName(f)}`}>{f.label}{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
+          : <label class="field"><span class="flabel" id={`lbl-${fieldName(f)}`}><T s={messageLabel} />{f.required && <span class="req" aria-hidden="true"> *</span>}</span><textarea name={fieldName(f)} aria-labelledby={`lbl-${fieldName(f)}`} required={f.required} placeholder={f.placeholder} rows="6" aria-describedby={f.required ? `err-${fieldName(f)}` : undefined}></textarea>{f.required && <span class="field-error" id={`err-${fieldName(f)}`}></span>}</label>
       ))}
       <div class="send-row">
         <button type="submit" class="send">{form.submitLabel}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg></button>
@@ -91,6 +82,7 @@ const groups = mergeContinuationGroups(form.groups);
       </div>
       {success && <div class="success" hidden set:html={renderMd(success)} />}
     </form>
+    {hasDirect && <ContactDirect direct={direct!} class="direct-narrow" />}
   </div>
 </section>
 <script>
@@ -167,34 +159,22 @@ const groups = mergeContinuationGroups(form.groups);
   }
 </script>
 <style>
-  /* Tap area of 44px on the e-mail and phone (inline padding: the lines don't move). */
-  .direct p > a { padding-block: 11px; }
   /* Direction B (after Aesop): one centred column. Boxed fields with small labels above, the service
      choices as an even grid of square checkboxes, a proper message box and one solid button. */
   .contact { position: relative; isolation: isolate; overflow: clip; background: var(--blush); color: var(--ink); padding: var(--section-y) var(--gutter); }
   .contact > :global(.c-sketch) { position: absolute; z-index: -1; left: -6vw; bottom: -4vw; width: clamp(220px, 30vw, 460px); color: rgb(51 51 51 / .12); }
   .inner { max-width: 760px; margin-inline: auto; display: grid; gap: var(--s-7); }
   .intro { text-align: center; display: grid; gap: var(--s-5); align-content: start; }
-  .direct { display: grid; gap: 4px; justify-items: center; font-size: var(--fs-lead); }
-  .direct p { margin: 0; }
-  .direct .direct-l { margin-bottom: 4px; font-size: var(--fs-small); color: var(--text-2); }
-  .direct a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; }
-  .direct a:hover { color: var(--accent-text); }
-  .direct-addr { margin-top: var(--s-2) !important; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
-  /* Finding us: the building and the directory board, as two small plates (Achates360_Office.pdf). */
-  .find { display: grid; gap: var(--s-2); width: 100%; margin-top: var(--s-5); }
-  .find-plates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); max-width: 420px; margin-inline: auto; }
-  .find-plate { margin: 0; display: grid; gap: var(--s-1); text-align: left; }
-  .find-plate :global(img) { display: block; width: 100%; height: auto; }
-  .find-plate figcaption { font-size: .8125rem; color: var(--text-2); }
   .intro :global(h2) { margin: 0 auto; max-width: 22ch; font: 400 var(--fs-h2)/1.25 var(--font-display); text-wrap: balance; }
-  /* Wide screens: the invitation and the direct lines beside the form, staying in view while it is filled in. */
+  /* Narrower screens: the direct lines after the form. Wide screens: the invitation and the direct lines
+     beside the form, staying in view while it is filled in. */
+  .intro :global(.direct-wide) { display: none; }
   @media (min-width: 1024px) {
     .inner { max-width: 1180px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); column-gap: var(--s-9); align-items: start; }
     .intro { position: sticky; top: calc(var(--header-h) + var(--s-6)); text-align: left; }
     .intro :global(h2) { margin: 0; text-align: left; }
-    .direct { justify-items: start; padding-top: var(--s-5); border-top: 1px solid rgb(51 51 51 / .25); }
-    .find-plates { margin-inline: 0; }
+    .intro :global(.direct-wide) { display: grid; }
+    .inner > :global(.direct-narrow) { display: none; }
   }
   .enquiry { display: grid; gap: var(--s-6); }
   .lines { display: grid; gap: var(--s-5); }

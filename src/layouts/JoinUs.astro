@@ -1,4 +1,5 @@
 ---
+import { altOr } from '../lib/seo';
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from './Base.astro';
@@ -40,7 +41,7 @@ if (others.length) throw new Error(`/joinus: ${others.length} block(s) not place
           <h2 class="display h2">{r.title}</h2>
         </summary>
         <div class="role-body">
-          {r.image && <Image class="role-img" src={r.image.src} alt={r.image.alt} widths={[480, 960, 1440]} sizes="(max-width: 1023px) 100vw, 40vw" />}
+          {r.image && <Image class="role-img" src={r.image.src} alt={altOr(r.image.alt, '')} widths={[480, 960, 1440]} sizes="(max-width: 1023px) 100vw, 40vw" />}
           <div class="role-copy">
             <div class="prose" set:html={renderMd(r.md)} />
             {r.apply && <p class="apply"><Pill href={r.apply.href} variant="fill">{r.apply.label}</Pill></p>}

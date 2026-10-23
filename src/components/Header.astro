@@ -127,6 +127,8 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   .menu-open path { transition: d .35s var(--ease-out); }
   .menu-open:hover path { d: path('M3 9h18M3 15h18'); }
   .site-header[data-over-hero]:not(.is-solid) :focus-visible { outline-color: var(--white); }
+  /* The category panel is cream even over the hero: an ink ring there. */
+  .site-header[data-over-hero]:not(.is-solid) .sub :focus-visible { outline-color: var(--ink); }
 
   /* Wide screens: one masthead row, sections | logo | contact. Every page is already in the bar (the
      logo is Home, the footer has the social links), so the full menu is for narrower screens only.

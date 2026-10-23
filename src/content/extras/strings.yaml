@@ -14,6 +14,10 @@
 - { id: nav-categories, text: Categories, placeholder: true }
 - { id: selected-cta, text: View all projects, placeholder: true }
 - { id: work-eyebrow, text: Selected work, placeholder: true }
+- { id: form-message, text: Message, placeholder: true }
+- { id: hero-contact-cta, text: Discuss your project, placeholder: true }
+- { id: card-qr-alt, text: QR code, placeholder: true }
+- { id: award-seal-alt, text: Award winning, placeholder: true }
 # awards-line: the twelve awards on the March 2026 portfolio deck's "Awards" slide, as its badges read
 # (site builder approved using the deck's wording, 17 Oct 2026; CONTENT-QUERIES 20).
 - { id: awards-line, text: "GDUSA American Graphic Design Award 2016 Winner · 2016 GOV Design Awards Gold · 2016 Hong Kong Design Awards Gold · 2016 New York Design Awards Gold · 2016 London Design Awards Silver · A' Design Award Winner 2017 Bronze · Prime Design Mark · HOW International Design Awards Winner · Singapore Book Awards 2017 Book of the Year · Singapore Book Awards 2017 Finalist, Best Book Cover Design · Singapore Book Awards 2017 Winner, Best Illustrated Non-Fiction Title · The Paperweight Awards 2014", placeholder: false }

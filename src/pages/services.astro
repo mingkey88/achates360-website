@@ -1,4 +1,5 @@
 ---
+import { STILLS } from '../lib/stills';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ServicesContents from '../components/ServicesContents.astro';
@@ -24,10 +25,11 @@ const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.s
 const home = (await getEntry('home', 'home'))!.data;
 const catalogue = catalogueOf(home.allProjects.items, projects);
 const cats = new Map(projectCategories(sections).map((c) => [c.heading, c]));
+const seen = new Set<string>(x.services.map((s: any) => s.project));
 const services = x.services.map((s: any) => {
   const p = projects.get(s.project);
   if (!p?.hero) throw new Error(`services/${s.id}: project "${s.project}" has no hero to show`);
-  const image = p.hero.type === 'video' ? p.hero.poster : p.hero.src;
+  const image = p.hero.type === 'video' ? (STILLS[s.project] ?? p.hero.poster) : p.hero.src;
   const covers = s.tags.map((h: string) => {
     const c = cats.get(h);
     if (!c) throw new Error(`services/${s.id}: "${h}" is not a project category`);
@@ -35,9 +37,8 @@ const services = x.services.map((s: any) => {
   });
   // More in this service: three more of its projects as small plates on the words page, taken from its
   // categories in turn (each category's in catalogue order), so each kind of work it covers shows;
-  // never the plate's project, and no project twice.
+  // never a service's plate project, and no project twice on the page (one set shared by every service).
   const lists: IndexEntry[][] = s.tags.map((h: string) => cardsFor(sections.find((x) => x.heading === h)!.items, catalogue).sort((a, b) => a.no - b.no));
-  const seen = new Set<string>([s.project]);
   const more: IndexEntry[] = [];
   for (let round = 0; more.length < 3 && lists.some((l) => l.length > round); round++) {
     for (const l of lists) {

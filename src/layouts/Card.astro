@@ -1,10 +1,15 @@
 ---
+import { altOr } from '../lib/seo';
+import { loadExtras } from '../lib/extras';
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from './Base.astro';
 import { mediaUrl } from '../lib/paths';
 interface Props { entry: CollectionEntry<'cards'> }
 const d = Astro.props.entry.data;
+// The portrait is named by the h1 beside it, so it is decorative; the QR code says what it is for (the
+// exported descriptions were file names). "QR code" is new wording (Draft).
+const qrLabel = (await loadExtras()).text('card-qr-alt');
 // Icon links are the links whose label is not the visible display text (e.g. "Phone", "Mail").
 // Each link keeps its own verbatim target: on some cards the "Mail" icon and the visible address
 // open different mailboxes, exactly as on Wix (CONTENT-QUERIES.md #1).
@@ -15,7 +20,7 @@ const mailIcon = icon('mailto:');
 <Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} page="card">
   <section class="card-section">
     <div class="card">
-      <Image class="photo" src={d.photo.src} alt={d.photo.alt} widths={[180, 360, 540]} sizes="(max-width: 767px) 41vw, 179px" loading="eager" />
+      <Image class="photo" src={d.photo.src} alt="" widths={[180, 360, 540]} sizes="(max-width: 767px) 41vw, 179px" loading="eager" />
       <h1 class="name">{d.name}</h1>
       <p class="role">{d.role}</p>
       <p class="blurb">{d.blurb}</p>
@@ -42,7 +47,7 @@ const mailIcon = icon('mailto:');
         {/* Wix's "+" button icon (copied from the rendered page) */}
         <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M145 96h-41V55h-8v41H55v8h41v41h8v-41h41v-8z" /></svg>
       </a>
-      <Image class="qr" src={d.qr.src} alt={d.qr.alt} widths={[148, 296, 444]} sizes="(max-width: 767px) 56vw, 148px" />
+      <Image class="qr" src={d.qr.src} alt={altOr(d.qr.alt, `${qrLabel.text}: ${d.name}`)} widths={[148, 296, 444]} sizes="(max-width: 767px) 56vw, 148px" />
     </div>
   </section>
 </Base>

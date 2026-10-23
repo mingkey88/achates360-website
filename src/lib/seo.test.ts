@@ -71,6 +71,15 @@ describe('alt text', () => {
     expect(isFileNameAlt('SMRT_290926_ED-169.jpg')).toBe(true);
     expect(isFileNameAlt('Building Memories_cover.JPEG ')).toBe(true);
     expect(isFileNameAlt('A bespoke gift box')).toBe(false);
+    // Wix also exported names without the extension, and mock-up names with a size or date stamp.
+    expect(isFileNameAlt('Moving_Memories')).toBe(true);
+    expect(isFileNameAlt('Digital-Poster-in-Office-Lobby-01_edited')).toBe(true);
+    expect(isFileNameAlt('Achates360_Mock up for publication_NK_2000x2000px_06OCT22_V01-MOCKUPpg 10+11')).toBe(true);
+    expect(isFileNameAlt('ChuanQRcode')).toBe(true);
+    // Real words stay, including one-word names and titles with symbols.
+    expect(isFileNameAlt('Vimeo')).toBe(false);
+    expect(isFileNameAlt('St Regis - TeaRoom & Patisserie')).toBe(false);
+    expect(isFileNameAlt('Greeting Card & eDM')).toBe(false);
     expect(altOr('1.jpeg', 'R151 Movia')).toBe('R151 Movia');
     expect(altOr('', 'R151 Movia')).toBe('R151 Movia');
     expect(altOr('Ribbon-pull ceremony', 'R151 Movia')).toBe('Ribbon-pull ceremony');

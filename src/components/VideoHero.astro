@@ -9,19 +9,20 @@ import type { UiString } from '../lib/strings';
 // most of the first screen behind the transparent header, with nothing written over it (client: "the
 // words preferably don't overlap the video… keep it small at the bottom"). A slim band beneath, on the
 // paper, closes the first screen: the tagline (the page's h1, named with the studio), the studio's
-// description, the full film with sound and the way to all the work. A scrim darkens the film's top
-// for the header. The loop is the studio's 15 s hero cut (23 Oct 2026); phones load a smaller copy
+// description, the full film with sound and Discuss your project (to /contact; both outside reviews,
+// 23 Oct 2026, asked for an enquiry route on the first screen; View all projects follows the work
+// tiles below). A scrim darkens the film's top for the header. The loop is the studio's 15 s hero cut (23 Oct 2026); phones load a smaller copy
 // (phonePreview). Under reduced motion the loop holds on its poster with a Play button (BgVideo).
 interface Props {
   name: UiString; tagline: UiString; blurb: string; label: UiString; playLabel: UiString; closeLabel: string;
-  cta: UiString; count: number; src: string; preview: string; phonePreview: string; poster: ImageMetadata;
+  contact: UiString; src: string; preview: string; phonePreview: string; poster: ImageMetadata;
 }
-const { name, tagline, blurb, label, playLabel, closeLabel, cta, count, src, preview, phonePreview, poster } = Astro.props;
+const { name, tagline, blurb, label, playLabel, closeLabel, contact, src, preview, phonePreview, poster } = Astro.props;
 const { text: t } = await loadExtras();
 ---
 <section class="vh" aria-labelledby="vh-title">
   <div class="vh-stage">
-    <BgVideo src={preview} phoneSrc={phonePreview} desktopOnly poster={poster} class="vh-video" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
+    <BgVideo src={preview} phoneSrc={phonePreview} desktopOnly eager poster={poster} class="vh-video" pauseLabel={t('video-pause').text} playLabel={t('video-play').text} draft={t('video-pause').placeholder} />
   </div>
   <div class="vh-bar">
     <h1 id="vh-title" class="vh-tagline"><span class="sr-only">{name.text}: </span>{tagline.text.replace(/ •/g, ' •')}</h1>
@@ -31,7 +32,7 @@ const { text: t } = await loadExtras();
         <span class="vh-ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" /></svg></span>
         <T s={playLabel} />
       </button>
-      <Pill href="/projects"><T s={cta} /><span class="vh-count">({count})</span></Pill>
+      <Pill href="/contact"><T s={contact} /></Pill>
     </div>
   </div>
   <FilmDialog id="hero-film" label={label.text} closeLabel={closeLabel} src={src} poster={poster} />
@@ -42,9 +43,11 @@ const { text: t } = await loadExtras();
   .vh-stage { position: relative; min-height: 320px; background: var(--ink); overflow: clip; }
   .vh-stage :global(.vh-video) { position: absolute; inset: 0; }
   .vh-stage :global(.vh-video :is(video, .bv-noscript)) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* A flat .6 band as tall as the header keeps its white links at 4.5:1 over the film's lightest frames,
+     then fades out (review, 24 Oct 2026: .45 fading at once let them drop below on some frames). */
   .vh-stage::after {
-    content: ''; position: absolute; inset: 0 0 auto; height: 30%; z-index: 1; pointer-events: none;
-    background: linear-gradient(180deg, rgb(13 13 13 / .45), rgb(13 13 13 / 0));
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgb(13 13 13 / .6) 0, rgb(13 13 13 / .6) calc(var(--header-h) + env(safe-area-inset-top, 0px)), rgb(13 13 13 / 0) 30%);
   }
   .vh-stage :global(.bv-toggle) { z-index: 2; }
 
@@ -55,7 +58,6 @@ const { text: t } = await loadExtras();
   .vh-tagline { margin: 0; font: 400 clamp(1.25rem, 1rem + .8vw, 1.75rem)/1.15 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
   .vh-blurb { margin: 0; max-width: 62ch; min-width: 0; font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
   .vh-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
-  .vh-count { font-variant-numeric: tabular-nums; }
   .vh-play {
     display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0;
     background: none; color: inherit; cursor: pointer; font: 400 var(--fs-small)/1 var(--font-text);

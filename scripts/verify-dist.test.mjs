@@ -129,6 +129,10 @@ describe('pageChecks', () => {
   it('passes a well-formed page', () => {
     expect(pageChecks([{ file: 'a.html', html: page('<h1>A</h1>') }], opts)).toEqual([]);
   });
+  it('flags a file name used as an image description', () => {
+    const problems = pageChecks([{ file: 'a.html', html: page('<h1>A</h1><img alt="SMRT_290926_ED-169.jpg" src="x"><img alt="" src="y"><img alt="A gift box" src="z">') }], opts);
+    expect(problems.map((p) => p.problem)).toEqual(['file name as image description: SMRT_290926_ED-169.jpg']);
+  });
   it('requires exactly one h1', () => {
     expect(pageChecks([{ file: 'a.html', html: page('<h2>x</h2>') }], opts)[0].problem).toMatch(/h1/);
     expect(pageChecks([{ file: 'a.html', html: page('<h1>a</h1><h1>b</h1>') }], opts)[0].problem).toMatch(/2 h1/);

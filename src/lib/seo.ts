@@ -1,3 +1,4 @@
+import { isFileNameAlt } from './file-name-alt.js';
 export type SiteEnv = 'staging' | 'production';
 
 export function robotsMeta(env: SiteEnv): string | null {
@@ -69,10 +70,8 @@ export function sitemapXml(urls: string[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
 
-/** Wix exports often carry the upload's file name as the description ("SMRT_290926_ED-169.jpg"). */
-export function isFileNameAlt(alt: string | undefined): boolean {
-  return !!alt && /\.(jpe?g|png|gif|webp|avif|svg|tiff?|heic)\s*$/i.test(alt.trim());
-}
+/** Wix exports often carry the upload's file name as the description (lib/file-name-alt.js). */
+export { isFileNameAlt };
 
 /** The supplied description, or the fallback when the supplied one is empty or a file name. */
 export function altOr(alt: string | undefined, fallback: string): string {

@@ -14,7 +14,8 @@ async function load() {
     process: process.sort((a, b) => a.step - b.step),
     timeline: timeline.sort((a, b) => a.order - b.order),
     stats: stats.sort((a, b) => a.order - b.order),
-    clients, testimonials, strings,
+    clients: clients.sort((a, b) => a.order - b.order),
+    testimonials, strings,
   };
   assertPublishable(groups, SITE_ENV);
   return { ...groups, text: makeText(strings) };

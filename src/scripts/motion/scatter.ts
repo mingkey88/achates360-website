@@ -34,10 +34,26 @@ export function scatter(): void {
         rotation: (i % 2 ? 1 : -1) * (3 + (i % 4) * 2), scale: .62, duration: .5,
       }, i * .035);
     });
-    // autoAlpha: while hidden the message (and its button) is visibility:hidden, so not focusable.
+    // Opacity only (not autoAlpha): the message stays in the accessibility tree and the tab order while it
+    // waits, and shows at once when it takes focus (.scta-msg:focus-within, ScatterCTA.astro).
     // On phones the pictures pass close to the message, so it comes a little later there.
-    const at = ctx.conditions?.phone ? .35 : .2;
-    if (msg) tl.from(msg, { autoAlpha: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
+    // (Phones: .45, so the pictures have cleared the message box before it shows.)
+    const at = ctx.conditions?.phone ? .45 : .2;
+    if (msg) tl.from(msg, { opacity: 0, y: 30, duration: .2 }, at).to({}, { duration: .15 });
+    // Until the message has nearly risen in it takes no clicks (.is-pending, ScatterCTA.astro).
+    const shown = (at + .18) / tl.duration();
+    const pending = () => msg?.classList.toggle('is-pending', tl.progress() < shown);
+    tl.eventCallback('onUpdate', pending);
+    pending();
+    // Keyboard focus reaching the section before the pile has spread: scroll to the spread's end, so the
+    // words never sit over the pictures and a focused picture's caption is clear.
+    const onFocus = (e: Event) => {
+      const st = tl.scrollTrigger;
+      if (st && st.progress < 1 && (e.target as HTMLElement).matches(':focus-visible')) window.scrollTo({ top: st.end, behavior: 'instant' });
+    };
+    // On the whole section: keyboard focus on a pile picture spreads the pile too.
+    root.addEventListener('focusin', onFocus);
+    return () => { root.removeEventListener('focusin', onFocus); msg?.classList.remove('is-pending'); };
   });
 }
 
