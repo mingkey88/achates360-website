@@ -8,33 +8,26 @@ import gov from '../assets/wix/e9d9c2_92810ae250b04ec1a5ca44e641d2aecb.jpg';
 import hongKong from '../assets/wix/e9d9c2_779557ad8d434171a96ceced0dadc43c.jpg';
 import newYork from '../assets/wix/e9d9c2_82689079ca644ca3b0e7ac477c805391.jpg';
 import london from '../assets/wix/e9d9c2_28a6aa4434cc412187c1cadb7673fb0e.jpg';
-import buildingMemories from '../assets/wix/e9d9c2_0e6b90170b6241e990e431f71e61e3ef.png';
-import aviationJournal from '../assets/wix/e7c864_4e0d2686bf2942219ba5f25372fd72b3.jpg';
 
 /**
- * The awards on About, by the work that won them (client, 26 Oct 2026: "more pictures rather than just
- * texts"; then "the low-res logos are quite an eyesore"). Keyed by each award exactly as the awards line
- * names it. project: the work that won it, shown as a large photograph (PHOTOS) with its awards beside;
- * badge: the award's own seal from the case study, small enough to stay sharp (the files are about 200px
- * tall). An award with no project on the site (Prime Design Mark, CONTENT-QUERIES 67) is listed by name.
+ * The award seals on About (client, 26 Oct 2026: "more pictures rather than just texts", then "show the
+ * awards, but remove Paperweight awards and Prime design mark. Dont need to show the project"), keyed by
+ * each award exactly as the awards line names it. Only awards with a seal are shown; the two without one
+ * ({}) stay in the line, unshown. The seals come from the 'Building Memories' case study and are about
+ * 200px tall, so they are shown at half that or less, where they stay sharp.
  */
-export const AWARDS: Record<string, { badge?: ImageMetadata; project?: string }> = {
-  'GDUSA American Graphic Design Award 2016 Winner': { badge: gdusa, project: 'building-memories-artbook' },
-  '2016 GOV Design Awards Gold': { badge: gov, project: 'building-memories-artbook' },
-  '2016 Hong Kong Design Awards Gold': { badge: hongKong, project: 'building-memories-artbook' },
-  '2016 New York Design Awards Gold': { badge: newYork, project: 'building-memories-artbook' },
-  '2016 London Design Awards Silver': { badge: london, project: 'building-memories-artbook' },
-  "A' Design Award Winner 2017 Bronze": { badge: aDesign, project: 'building-memories-artbook' },
+export const AWARDS: Record<string, { badge?: ImageMetadata }> = {
+  'GDUSA American Graphic Design Award 2016 Winner': { badge: gdusa },
+  '2016 GOV Design Awards Gold': { badge: gov },
+  '2016 Hong Kong Design Awards Gold': { badge: hongKong },
+  '2016 New York Design Awards Gold': { badge: newYork },
+  '2016 London Design Awards Silver': { badge: london },
+  "A' Design Award Winner 2017 Bronze": { badge: aDesign },
   'Prime Design Mark': {},
-  'HOW International Design Awards Winner': { badge: how, project: 'building-memories-artbook' },
-  'Singapore Book Awards 2017 Book of the Year': { badge: sbaBookOfYear, project: 'building-memories-artbook' },
-  'Singapore Book Awards 2017 Finalist, Best Book Cover Design': { badge: sbaFinalist, project: 'building-memories-artbook' },
-  'Singapore Book Awards 2017 Winner, Best Illustrated Non-Fiction Title': { badge: sbaWinner, project: 'building-memories-artbook' },
-  'The Paperweight Awards 2014': { project: 'journal-of-aviation-management' },
+  'HOW International Design Awards Winner': { badge: how },
+  'Singapore Book Awards 2017 Book of the Year': { badge: sbaBookOfYear },
+  'Singapore Book Awards 2017 Finalist, Best Book Cover Design': { badge: sbaFinalist },
+  'Singapore Book Awards 2017 Winner, Best Illustrated Non-Fiction Title': { badge: sbaWinner },
+  'The Paperweight Awards 2014': {},
 };
 
-/** The photograph that stands for each winning work: the book's cover; the journal open at a spread. */
-export const PHOTOS: Record<string, ImageMetadata> = {
-  'building-memories-artbook': buildingMemories,
-  'journal-of-aviation-management': aviationJournal,
-};
