@@ -10,7 +10,7 @@ import heroPoster from '../assets/hero-loop-poster.jpg';
 import WorkStack from '../components/WorkStack.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
-import AgateBands from '../components/ui/AgateBands.astro';
+import ColourField from '../components/ui/ColourField.astro';
 import DraftTag from '../components/ui/DraftTag.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
@@ -49,7 +49,7 @@ const scatter = SCATTER.map((slug) => {
 });
 // The homepage, about five screens (Rebecca, 26 Oct 2026: "hard to get and capture the essence of the
 // company"): hero (the studio's showreel; after aesop.com, client 21 Oct 2026), who the studio is (its
-// sentence and its disciplines, on the agate ground), four works, one testimonial (only once the client
+// sentence and its disciplines, on the colour field), four works, one testimonial (only once the client
 // has supplied a real one), Write to us. The service index and the imprint (clients, awards, figures)
 // left the homepage: they repeated /services and /about, where they remain.
 // (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
@@ -81,7 +81,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} contact={text('hero-contact-cta')} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-hero-loop.mp4" phonePreview="media/video/achates360-hero-loop-phone.mp4" poster={heroPoster} />
 
   <section class="h-intro section" aria-labelledby="intro-title">
-    <AgateBands seed={7} />
+    <ColourField variant="statement" />
     <div class="h-intro-in wrap">
       <RunningHead as="p" s={text('intro-eyebrow')} />
       <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
@@ -99,7 +99,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   <ScatterCTA items={scatter} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  /* Who the studio is, straight after the hero: its sentence and its disciplines on the agate ground,
+  /* Who the studio is, straight after the hero: its sentence and its disciplines on the colour field,
      set left on the page's grid under its running head. */
   .h-intro { position: relative; isolation: isolate; background: var(--stone); padding-block: var(--s-9); overflow: hidden; }
   .h-intro-in { position: relative; z-index: 1; display: grid; justify-items: start; }

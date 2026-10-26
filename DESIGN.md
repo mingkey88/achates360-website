@@ -139,7 +139,7 @@ appears in one place only: a quotation set alone.
 | **Captions beneath** | picture whole, caption under it (title in ink, client in grey) | everywhere work is shown |
 | **Ruled lists** | rows on hairlines with a count at the right | Services list, categories |
 | **Showreel** | the studio's reel looping silently, Play with sound opens the full film | Home (full-width, with View all projects beneath), Services (within the margins) |
-| **Agate ground** | hairline agate bands (ink, an orange band every seventh ring) with a light grain, on stone; decorative, drawn at build time (`ui/AgateBands.astro`) | Home: the studio's sentence, Write to us |
+| **Colour field** | large soft washes of brand orange and turquoise on stone, under a fine grain; decorative, pure CSS (`ui/ColourField.astro`) | Home: the studio's sentence, Write to us |
 | **Leader line** | a line from the page's edge into "Write to us.", ending in an orange bar | the close of inner pages |
 | **Paper cut** | words cut through a sheet with a picture showing through: kept as a single small signature | the 404 page only |
 
