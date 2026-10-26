@@ -62,6 +62,7 @@
 # Homepage closing scatter (17 Oct 2026): the proof-mark hint on the first print, and the button that puts
 # the moved prints back (client: "just have a reset button"). New wording, for approval.
 - { id: drag-hint, text: Drag me, placeholder: true }
+- { id: cursor-view, text: View, placeholder: true }
 - { id: drag-reset, text: Reset, placeholder: true }
 # The office photographs (Achates360_Office.pdf, 17 Oct 2026): their captions are the PDF's own labels.
 - { id: office-building, text: Building, placeholder: false }

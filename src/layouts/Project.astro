@@ -20,6 +20,7 @@ import { creativeWorkLd, breadcrumbLd, canonicalUrl } from '../lib/seo';
 import { firstYear } from '../lib/meta';
 import { visibleBlocks } from '../lib/visibility';
 import { HELD_FROM_SEARCH } from '../lib/seo';
+import { morphName } from '../lib/morph';
 interface Props { entry: CollectionEntry<'projects'> }
 const { id, data: d } = Astro.props.entry;
 const { text } = await loadExtras();
@@ -58,7 +59,7 @@ const jsonLd = [
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" noindex={HELD_FROM_SEARCH.has(`/${id}`)}>
   <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
-    {hero && <HeroMedia media={hero} fallbackAlt={d.title} />}
+    {hero && <HeroMedia media={hero} fallbackAlt={d.title} style={`view-transition-name: ${morphName(id)}`} />}
     <div class="p-hero-text wrap">
       {d.categories[0] && <Sticker>{d.categories[0]}</Sticker>}
       <h1 class="display h1" data-split>{d.title}</h1>

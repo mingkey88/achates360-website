@@ -10,13 +10,13 @@ import { altOr } from '../../lib/seo';
 // Images load eagerly as the LCP candidate.
 type Media = { type: 'image'; src: ImageMetadata; alt: string } | { type: 'video'; src: string; poster: ImageMetadata };
 // fallbackAlt: used when the export's description is empty or just the upload's file name.
-interface Props { media: Media; class?: string; eager?: boolean; fallbackAlt?: string }
-const { media, class: cls, eager = true, fallbackAlt = '' } = Astro.props;
+interface Props { media: Media; class?: string; style?: string; eager?: boolean; fallbackAlt?: string }
+const { media, class: cls, style, eager = true, fallbackAlt = '' } = Astro.props;
 const { text } = await loadExtras();
 const stillUrl = media.type === 'video' ? (await getImage({ src: media.poster, width: 1440, format: 'webp' })).src : undefined;
 const load = eager ? 'eager' : 'lazy';
 ---
-<div class:list={['hero-media', cls]} data-bgvideo-viewport>
+<div class:list={['hero-media', cls]} style={style} data-bgvideo-viewport>
   {media.type === 'video' ? (
     <>
       <BgVideo src={media.src} poster={media.poster} desktopOnly class="hm-video" pauseLabel={text('video-pause').text} playLabel={text('video-play').text} draft={text('video-pause').placeholder || text('video-play').placeholder} />

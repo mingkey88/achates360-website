@@ -2,25 +2,31 @@
 import Pic from './Pic.astro';
 import { withBase, mediaUrl, linkAttrs } from '../../lib/paths';
 import Sticker from './Sticker.astro';
+import { morphName } from '../../lib/morph';
+import { loadExtras } from '../../lib/extras';
 // An image card. previewVideo: a muted preview that plays on hover, only on hover-capable pointers and
 // without reduced motion (Review Focus 5). wipe: the image is unveiled on scroll (motion/reveal.ts).
-// Linked cards get a soft follow-the-pointer arrow on fine pointers (direction B).
+// Linked cards get the View label that follows the pointer on fine pointers (scripts/cursor.ts).
 // reveal: false for cards on the first screen, which should paint at once (largest-paint candidates).
 // duplicateLink: the same page is linked by a named title next to the card, so the picture link stays
 // clickable but is left out of the tab order and the accessibility tree (no unnamed repeat stop).
+// morph: the picture carries its project's cross-page transition name (lib/morph), so it grows into the
+// case study's hero; only one card per project on a page may set it.
 interface Props {
   image: ImageMetadata; alt: string; href?: string; title?: string; subtitle?: string; sticker?: string; tag?: string; position?: string;
-  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean;
+  previewVideo?: string; ratio?: string; sizes: string; widths?: number[]; tilt?: boolean; eager?: boolean; wipe?: boolean; duplicateLink?: boolean; reveal?: boolean; morph?: boolean;
 }
-const { image, alt, href, title, subtitle, sticker, tag, position, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true } = Astro.props;
+const { image, alt, href, title, subtitle, sticker, tag, position, previewVideo, ratio = '4 / 3', sizes, widths = [480, 720, 960, 1280], tilt = false, eager = false, wipe = false, duplicateLink = false, reveal = true, morph = false } = Astro.props;
+const vt = morph ? morphName(href) : undefined;
+const { text } = await loadExtras();
 // A fixed frame ("5 / 4") is cropped at build time; "auto" keeps the picture's own shape.
 const m = /^\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/.exec(ratio);
 const crop = m ? Number(m[1]) / Number(m[2]) : undefined;
 const Wrap = href ? 'a' : 'div';
 const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplicateLink ? { tabindex: -1, 'aria-hidden': 'true' } : {}) } : {};
 ---
-<Wrap class="media-card" {...wrapAttrs} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal={reveal ? '' : undefined}>
-  <div class="mc-media" style={`aspect-ratio: ${ratio}`} data-wipe={wipe ? '' : undefined}>
+<Wrap class="media-card" {...wrapAttrs} data-cursor={href ? text('cursor-view').text : undefined} data-tilt={tilt ? '' : undefined} data-preview={previewVideo ? '' : undefined} data-reveal={reveal ? '' : undefined}>
+  <div class="mc-media" style={`aspect-ratio: ${ratio}${vt ? `; view-transition-name: ${vt}` : ''}`} data-wipe={wipe ? '' : undefined}>
     <Pic src={image} alt={alt} crop={crop} widths={widths} sizes={sizes} position={position} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
     {previewVideo && <video class="mc-preview" data-src={mediaUrl(previewVideo)} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {sticker && <Sticker class="mc-sticker" tilt={4}>{sticker}</Sticker>}
@@ -34,6 +40,7 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   )}
 </Wrap>
 <script>
+  import { viewCursor } from '../../scripts/cursor';
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const hover = window.matchMedia('(hover: hover)');
   for (const card of document.querySelectorAll<HTMLElement>('.media-card[data-preview]')) {
@@ -47,34 +54,8 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
     card.addEventListener('pointerleave', () => { card.classList.remove('is-playing'); v.pause(); });
   }
 
-  // A small circle with an arrow follows the pointer over linked cards, easing behind it.
-  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-  const links = document.querySelectorAll<HTMLElement>('a.media-card');
-  if (links.length && fine.matches && !reduce.matches) {
-    const dot = document.createElement('div');
-    dot.className = 'mc-cursor';
-    dot.setAttribute('aria-hidden', 'true');
-    dot.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8" /></svg>';
-    document.body.append(dot);
-    // The disc stands in for the pointer over linked cards (the browser's hand is hidden there).
-    document.documentElement.classList.add('has-mc-cursor');
-    let x = 0, y = 0, tx = 0, ty = 0, raf = 0, idle = 0;
-    const tick = () => {
-      x += (tx - x) * .55; y += (ty - y) * .55;
-      dot.style.translate = `${x}px ${y}px`;
-      raf = Math.abs(tx - x) + Math.abs(ty - y) > .3 ? requestAnimationFrame(tick) : 0;
-    };
-    const follow = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY; if (!raf) raf = requestAnimationFrame(tick); };
-    for (const a of links) {
-      a.addEventListener('pointerenter', (e) => {
-        clearTimeout(idle);
-        if (!dot.classList.contains('is-on')) { x = tx = e.clientX; y = ty = e.clientY; dot.style.translate = `${x}px ${y}px`; }
-        dot.classList.add('is-on');
-      });
-      a.addEventListener('pointermove', follow);
-      a.addEventListener('pointerleave', () => { idle = window.setTimeout(() => dot.classList.remove('is-on'), 40); });
-    }
-  }
+  // The View label follows the pointer over linked cards (scripts/cursor.ts).
+  viewCursor();
 </script>
 <style>
   .media-card { display: block; color: inherit; text-decoration: none; }
@@ -90,15 +71,5 @@ const wrapAttrs = href ? { href: withBase(href), ...linkAttrs(href), ...(duplica
   .mc-sub { margin: 4px 0 0; font-size: var(--fs-small); color: var(--text-2); }
   /* A small label under the caption (an award the gallery notes): ink in a hairline box, like a stamp. */
   .mc-tag { display: inline-block; justify-self: start; margin: var(--s-2) 0 0; padding: 2px 7px; border: 1px solid var(--accent); font: 500 .6875rem/1.4 var(--font-text); color: var(--ink); }
-  /* A small hairline circle with an arrow that replaces the pointer over linked cards: centred on the
-     pointer, following it closely; the browser's hand is hidden there so only one shows. */
-  :global(.mc-cursor) {
-    position: fixed; left: 0; top: 0; z-index: 60; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
-    display: grid; place-items: center; background: var(--paper); color: var(--ink); border: 1px solid rgb(51 51 51 / .35); pointer-events: none;
-    scale: 0; transition: scale .35s var(--ease-out);
-  }
-  :global(.mc-cursor.is-on) { scale: 1; }
-  :global(.has-mc-cursor) a.media-card, :global(.has-mc-cursor) a.media-card :global(*) { cursor: none; }
-  :global(.mc-cursor svg) { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
   @media (prefers-reduced-motion: reduce) { .mc-media :global(img) { transition: none; } }
 </style>
