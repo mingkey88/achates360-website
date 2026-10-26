@@ -76,7 +76,7 @@ const description = sentenceStarting(aboutMd, 'We are an integrated creative age
 const knowsAbout = [...new Set([...projects.values()].filter((p) => p.listed).flatMap((p) => p.categories))].sort();
 const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, description, knowsAbout }), websiteLd(homeUrl)];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home" overHero>
+<Base title={d.seo.title} description={d.seo.description} ogImage={d.seo.ogImage} jsonLd={jsonLd} page="home">
   <script is:inline define:vars={{ contactPage: withBase('/contact') }}>
     // Old links to the homepage form (/#contact) go to the contact page.
     if (location.hash === '#contact') location.replace(contactPage);
