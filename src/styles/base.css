@@ -58,3 +58,29 @@ html:not(.js) .bgvideo video[data-src] { display: none; }
 .hl { color: var(--accent-text); font-weight: 500; }
 :is(.on-dark, .site-footer) .hl { color: var(--accent); }
 .rh-name .hl { color: inherit; font-weight: inherit; }
+
+/* Page to page (client, 26 Oct 2026: "more interesting animation"): the browser's own cross-page
+   transition. A project's picture carries the same name on its tile (homepage work, /projects and the
+   category pages) and on its case study's hero, so the picture grows from the tile into the hero (and
+   back), and between category pages the tiles slide to their new places. The header holds still; the
+   rest cross-fades. Browsers without it simply change page. Off under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+.site-header { view-transition-name: site-header; }
+::view-transition-group(*) { animation-duration: .7s; animation-timing-function: cubic-bezier(.65, 0, .2, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
+/* A tile and a hero have different shapes: crop each snapshot to the moving frame instead of stretching it. */
+::view-transition-old(*), ::view-transition-new(*) { height: 100%; width: 100%; object-fit: cover; overflow: clip; }
+
+/* The View label that stands in for the pointer over linked work (scripts/cursor.ts): an ink disc with the
+   word and an arrow, centred on the pointer, growing in from nothing. */
+.view-cursor {
+  position: fixed; left: 0; top: 0; z-index: 60; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; gap: 4px; background: var(--ink); color: var(--paper);
+  font: 500 .8125rem/1 var(--font-text); letter-spacing: .02em; pointer-events: none;
+  scale: 0; transition: scale .4s cubic-bezier(.2, .9, .3, 1.25);
+}
+.view-cursor.is-on { scale: 1; }
+.view-cursor svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.has-view-cursor [data-cursor], .has-view-cursor [data-cursor] * { cursor: none; }

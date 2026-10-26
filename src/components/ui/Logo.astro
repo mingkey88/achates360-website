@@ -2,10 +2,26 @@
 // The Achates360 logo (figures + "achates 360"), outlined from brand/logo/Achates360_LogoRGB.pdf.
 // Fills with currentColor so it follows the surrounding text colour. With a label it is the
 // image's accessible name; without one it is decorative.
+// The outline is one path; it is split here into the five figures (each a head and a body, the shapes
+// left of the lettering) and the lettering, so the figures can move on their own (motion/logoin.ts: they
+// fly in and join hands, as on About). Drawn the same either way.
 import svg from '../../assets/logo-horizontal.svg?raw';
 interface Props { label?: string; class?: string }
 const { label, class: cls } = Astro.props;
-const a11y = label ? `role="img" aria-label="${label.replace(/"/g, '&quot;')}"` : 'aria-hidden="true" focusable="false"';
-const html = svg.replace('<svg ', `<svg class="logo${cls ? ` ${cls}` : ''}" ${a11y} `);
+const viewBox = svg.match(/viewBox="([^"]+)"/)![1];
+const parts = svg.match(/ d="([^"]+)"/)![1].match(/M[^M]+/g)!.map((d) => {
+  const n = d.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+  const xs = n.filter((_, i) => i % 2 === 0), ys = n.filter((_, i) => i % 2 === 1);
+  return { d, x0: Math.min(...xs), x1: Math.max(...xs), h: Math.max(...ys) - Math.min(...ys) };
+});
+// The lettering starts at its first letter; everything left of it is a figure.
+const LETTERS_FROM = 90;
+const figParts = parts.filter((p) => p.x1 < LETTERS_FROM);
+const bodies = figParts.filter((p) => p.h > 20).sort((a, b) => a.x0 - b.x0);
+const heads = figParts.filter((p) => p.h <= 20).sort((a, b) => a.x0 - b.x0);
+// Heads and bodies pair off in order, left to right (a head's centre can sit over two bodies' spans).
+if (bodies.length !== 5 || heads.length !== 5) throw new Error('Logo: could not split the five figures from the outline');
+const figs = bodies.map((b, i) => heads[i].d + b.d);
+const word = parts.filter((p) => p.x1 >= LETTERS_FROM).map((p) => p.d).join('');
 ---
-<Fragment set:html={html} />
+<svg class:list={['logo', cls]} xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} set:html={`${figs.map((d) => `<path class="logo-fig" fill="currentColor" d="${d}"/>`).join('')}<path class="logo-word" fill="currentColor" d="${word}"/>`} {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true', focusable: 'false' })} />

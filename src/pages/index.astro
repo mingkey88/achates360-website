@@ -84,7 +84,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
     <ColourField variant="statement" />
     <div class="h-intro-in wrap">
       <RunningHead as="p" s={text('intro-eyebrow')} />
-      <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
+      <h2 id="intro-title" class="display two-tone" data-ink>{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
       <ul class="h-disc" aria-label={text('services-eyebrow').text}>
         {services.map((s) => <li data-placeholder={s.placeholder ? '' : undefined}><a href={withBase(`/services#${s.id}`)}>{s.title}</a><DraftTag when={s.placeholder} /></li>)}
       </ul>
@@ -118,5 +118,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   import { reveal } from '../scripts/motion/reveal';
   import { counters } from '../scripts/motion/counters';
   import { scatter } from '../scripts/motion/scatter';
-  run(reveal, counters, scatter);
+  import { ink } from '../scripts/motion/ink';
+  import { logoIn } from '../scripts/motion/logoin';
+  run(reveal, counters, scatter, ink, logoIn);
 </script>

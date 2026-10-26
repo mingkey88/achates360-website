@@ -426,3 +426,5 @@ replaced. Existing copy from the Wix site is unchanged.
 
 
 67. **Awards as pictures; the homepage made shorter (26 Oct 2026).** About's Recognition now shows the ten award seals (all from 'Building Memories'). The Paperweight Awards 2014 and Prime Design Mark are not shown (they have no seal on the site); they are still in the awards wording. (a) The seals on the site are small (about 200px), so they are shown small; sharper copies or vector files would let them be larger. (b) Two Gold awards appear on case studies but not in the awards list: Hong Kong Design Awards 2018 (the National Theatre pop-up kit) and DrivenxDesign 2021 (Julius Baer). Should they join the list? (c) On the homepage, the service index, the client logos and the awards were removed (they remain on /services and /about), and the work was cut from seven tiles to four (DXV, Samsung, IDM, Alstom). Say if other projects should stand for the studio there.
+
+68. **New wording for the hover label (26 Oct 2026).** Over a project's picture, a round label now follows the mouse and reads "View". Please approve the word or suggest another (e.g. "View project", "See the work").
