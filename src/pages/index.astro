@@ -7,19 +7,17 @@ import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
 import heroPoster from '../assets/hero-loop-poster.jpg';
-import ServiceIndex from '../components/ServiceIndex.astro';
 import WorkStack from '../components/WorkStack.astro';
-import Credentials from '../components/Credentials.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
+import AgateBands from '../components/ui/AgateBands.astro';
+import DraftTag from '../components/ui/DraftTag.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
-import { withLinks } from '../lib/categories';
 import { withBase } from '../lib/paths';
 import { getImage } from 'astro:assets';
 import { organizationLd, websiteLd } from '../lib/seo';
 import ogDefault from '../assets/og-default.jpg';
-import { serviceCount } from '../lib/service-counts';
 import { ABOUT_ACCENTS } from '../lib/accents';
 
 const d = (await getEntry('home', 'home'))!.data;
@@ -37,10 +35,10 @@ const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.sl
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 const catalogue = catalogueOf(d.allProjects.items, projects);
-// The work after the hero (WorkStack, after wearecollins.com): seven projects across the disciplines,
-// films first: packaging, campaign content, branding, advertising, campaigns, brand and packaging, events.
-// DXV leads: the hero loop already shows the Star Wars plate, so that tile comes fourth (review, 24 Oct 2026).
-const WORK = ['dxv', 'samsung-connected-home', 'idm-venture-capital', 'starwars-luzerne', 'grohe-quarterly-campaigns', 'notter', 'alstom-r151-last-train-handover'];
+// The work after the studio's sentence (WorkStack, after wearecollins.com): four projects, one per
+// discipline: packaging, campaign content, branding, events (Rebecca, 26 Oct 2026: "too many selected
+// works, too much scrolling"; it was seven). The rest are on /projects.
+const WORK = ['dxv', 'samsung-connected-home', 'idm-venture-capital', 'alstom-r151-last-train-handover'];
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
 // end on. The first six are the ones phones show.
 const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
@@ -49,16 +47,15 @@ const scatter = SCATTER.map((slug) => {
   if (!it) throw new Error(`Homepage scatter: "${slug}" is not a listed project in the gallery`);
   return it;
 });
-// The homepage: hero (the studio's showreel full-screen, with the way to all the work and the film
-// with sound; after aesop.com, client 21 Oct 2026), the work (seven projects as large moving tiles), the
-// point of view, the service index, the imprint (clients, awards, figures), one testimonial
-// (only once the client has supplied a real one), contact. The full project list lives on /projects.
+// The homepage, about five screens (Rebecca, 26 Oct 2026: "hard to get and capture the essence of the
+// company"): hero (the studio's showreel; after aesop.com, client 21 Oct 2026), who the studio is (its
+// sentence and its disciplines, on the agate ground), four works, one testimonial (only once the client
+// has supplied a real one), Write to us. The service index and the imprint (clients, awards, figures)
+// left the homepage: they repeated /services and /about, where they remain.
 // (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
 // of project cards by the showreel as the hero: client, 21 Oct 2026. The lens is tag lens-hero-v1.)
-// The service contents: each service's number of listed projects, counted as on /services.
-const sections = withLinks((await getEntry('projectsIndex', 'projects'))!.data.sections);
-const listed = new Set([...projects].filter(([, p]) => p.listed).map(([id]) => id));
-const services = x.services.map((s: any) => ({ ...s, count: serviceCount(s.tags, sections, listed) }));
+// The disciplines under the studio's sentence: the service names, each to its spread on /services.
+const services = x.services as { id: string; title: string; placeholder: boolean }[];
 // The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
 // appears once the client supplies a real quotation (CONTENT-QUERIES 10).
 const quote = x.testimonials.find((t: any) => !t.placeholder);
@@ -83,28 +80,38 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   </script>
   <VideoHero name={text('wordmark')} tagline={text('hero-tagline')} blurb={d.seo.description} label={text('showreel-label')} playLabel={text('showreel-play')} closeLabel={text('showreel-close').text} contact={text('hero-contact-cta')} src="media/video/achates360-showreel.mp4" preview="media/video/achates360-hero-loop.mp4" phonePreview="media/video/achates360-hero-loop-phone.mp4" poster={heroPoster} />
 
-  <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
-
-  <section class="h-intro wrap section" aria-labelledby="intro-title">
-    <RunningHead as="p" s={text('intro-eyebrow')} />
-    <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
-    <Pill href="/about"><T s={text('intro-cta')} /></Pill>
+  <section class="h-intro section" aria-labelledby="intro-title">
+    <AgateBands seed={7} />
+    <div class="h-intro-in wrap">
+      <RunningHead as="p" s={text('intro-eyebrow')} />
+      <h2 id="intro-title" class="display two-tone">{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
+      <ul class="h-disc" aria-label={text('services-eyebrow').text}>
+        {services.map((s) => <li data-placeholder={s.placeholder ? '' : undefined}><a href={withBase(`/services#${s.id}`)}>{s.title}</a><DraftTag when={s.placeholder} /></li>)}
+      </ul>
+      <Pill href="/about"><T s={text('intro-cta')} /></Pill>
+    </div>
   </section>
 
-  <ServiceIndex services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} countLabel={text('contents-count')} />
-
-  <Credentials stats={x.stats} listedCount={listedCount} clients={x.clients} eyebrow={text('clients-eyebrow')} awards={text('awards-line')} awardsLabel={text('meta-recognition')} />
+  <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
   <ScatterCTA items={scatter} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  /* The studio's sentence as an opening statement, set left on the page's grid under its running head. */
-  .h-intro { padding-block: var(--s-9) var(--s-9); display: grid; justify-items: start; }
+  /* Who the studio is, straight after the hero: its sentence and its disciplines on the agate ground,
+     set left on the page's grid under its running head. */
+  .h-intro { position: relative; isolation: isolate; background: var(--stone); padding-block: var(--s-9); overflow: hidden; }
+  .h-intro-in { position: relative; z-index: 1; display: grid; justify-items: start; }
   .two-tone { max-width: 30ch; margin-block: var(--s-7) var(--s-6); font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.75rem); line-height: 1.25; text-wrap: pretty; }
-  @media (min-width: 1024px) { .two-tone { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } .h-intro :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
-  .h-intro > :global(.rh) { justify-self: stretch; }
+  .h-disc { list-style: none; margin: 0 0 var(--s-7); padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) 0; font-size: var(--fs-lead); }
+  .h-disc li { display: inline-flex; align-items: baseline; }
+  /* The slash trails its name, so a wrapped line never starts with one. */
+  .h-disc li:not(:last-child)::after { content: '/'; margin-inline: .6em; color: var(--muted); }
+  .h-disc a { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-decoration-thickness: 1px; text-underline-offset: 5px; transition: text-decoration-color .2s; }
+  .h-disc a:hover { text-decoration-color: var(--accent); }
+  @media (min-width: 1024px) { .two-tone, .h-disc, .h-intro-in > :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
+  .h-intro-in > :global(.rh) { justify-self: stretch; }
 </style>
 <script>
   import { run } from '../scripts/motion/index';

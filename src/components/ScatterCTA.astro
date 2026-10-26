@@ -1,5 +1,6 @@
 ---
 import Pic from './ui/Pic.astro';
+import AgateBands from './ui/AgateBands.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
 import type { UiString } from '../lib/strings';
@@ -13,7 +14,8 @@ import { FOOTER_ACCENT, splitAccent } from '../lib/accents';
 // the pictures simply sit in their spread-out places with the message visible.
 // Each picture links to its project; on desktop it can also be dragged around (scripts/pile.ts): a
 // pencilled "Drag me" proof mark points at the first print, picked-up prints lift and settle at a tilt,
-// and a Reset button returns them.
+// and a Reset button returns them. The ground is the agate texture (AgateBands), its rings centred on
+// the message (Rebecca, 26 Oct 2026).
 interface Item { thumb: ImageMetadata; title: string; href?: string }
 interface Props { items: Item[]; heading: UiString; blurb: string; cta: UiString; href: string }
 const { items, heading, blurb, cta, href } = Astro.props;
@@ -42,6 +44,7 @@ const reset = text('drag-reset');
 ---
 <section class="scta" aria-labelledby="scta-title" data-scatter>
   <div class="scta-stage">
+    <AgateBands seed={23} cx={720} cy={500} />
     <ul class="scta-pics">
       {pics.map(({ thumb, title, href: to, p }, i) => (
         <li class:list={['pic crop', { 'desk-only': p.mx === undefined, 'cap-end': p.x > 60 }]} style={`--x: ${p.x}; --y: ${p.y}; --w: ${p.w}; --mx: ${p.mx ?? p.x}; --my: ${p.my ?? p.y}; --mw: ${p.mw ?? p.w}; --z: ${i}`}>
@@ -76,8 +79,8 @@ const reset = text('drag-reset');
      3s fallback) there is nothing to scrub, so the section is one screen. */
   .scta { position: relative; }
   :global(html.motion-live) .scta { height: 130svh; }
-  .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; }
-  .scta-pics { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
+  .scta-stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; isolation: isolate; background: var(--stone); }
+  .scta-pics { position: absolute; inset: 0; z-index: 1; margin: 0; padding: 0; list-style: none; }
   .pic {
     position: absolute; left: calc(var(--x) * 1% + var(--dx, 0px)); top: calc(var(--y) * 1% + var(--dy, 0px)); width: calc(var(--w) * 1vw);
     translate: -50% -50%; z-index: var(--z); background: var(--stone);
