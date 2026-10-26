@@ -1,19 +1,19 @@
 ---
 import { withBase } from '../lib/paths';
 // The projects' categories as a row of tabs (direction B, after nationalgallery.sg's exhibition tabs), on
-// /projects and every category page: "All projects" then each category (its name verbatim) with the number
-// of projects on its page. The page you are on is marked as a selected tab: a thick bar of the brand
+// /projects and every category page: "All projects" then each category (its name verbatim), without
+// counts (client, 26 Oct 2026). The page you are on is marked as a selected tab: a thick bar of the brand
 // orange on its top edge, over the row's hairline, and its name set heavier (in ink, for legibility). Tabs are divided by hairlines.
 // Wide screens set them as two rows of five; narrower screens as one row that scrolls sideways, opened
 // with the current tab in view.
-interface Tab { label: string; href: string; count: number }
+interface Tab { label: string; href: string }
 interface Props { tabs: Tab[]; path: string; label: string }
 const { tabs, path, label } = Astro.props;
 ---
 <nav class="ctabs wrap" aria-label={label} data-ctabs>
   <ul>
     {tabs.map((t) => (
-      <li><a href={withBase(t.href)} aria-current={t.href === path ? 'page' : undefined}><span class="ct-name">{t.label}</span><span class="ct-n">{t.count}</span></a></li>
+      <li><a href={withBase(t.href)} aria-current={t.href === path ? 'page' : undefined}><span class="ct-name">{t.label}</span></a></li>
     ))}
   </ul>
 </nav>
@@ -55,13 +55,11 @@ const { tabs, path, label } = Astro.props;
     transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease-out);
   }
   .ctabs li:first-child a::before { left: 0; }
-  .ct-n { font-size: .75rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
   .ctabs a:hover .ct-name { text-decoration: underline; text-underline-offset: .25em; text-decoration-thickness: 1px; }
   .ctabs a:hover::before { transform: scaleX(1); background: var(--line); }
   .ctabs a[aria-current] { color: var(--ink); font-weight: 500; }
   .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
   .ctabs a[aria-current] .ct-name { text-decoration: none; }
-  .ctabs a[aria-current] .ct-n { color: var(--ink); }
   /* Wide screens: every tab in view, two rows of five, each row on its own hairline, the rows set apart
      so a second-row tab's bar can't read as the underline of the tab above it (audit, 20 Oct 2026). */
   @media (min-width: 1024px) {

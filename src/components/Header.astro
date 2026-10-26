@@ -3,8 +3,8 @@ import { withBase, menuCurrent } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import Logo from './ui/Logo.astro';
 interface Link { label: string; href: string }
-interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString; subLabel: UiString }
-const { menu, path, overHero, wordmark, menuLabel, navLabel, subLabel } = Astro.props;
+interface Props { menu: (Link & { items?: Link[] })[]; path: string; overHero: boolean; wordmark: UiString; menuLabel: UiString; navLabel: UiString }
+const { menu, path, overHero, wordmark, menuLabel, navLabel } = Astro.props;
 // Wide screens: one masthead row. The logo (which links home) is centred; the site's sections sit to
 // its left in their menu order; Contact stands alone at the right as the one action. Home is left out
 // of the bar (the logo is the way home) but stays in the full menu (Menu.astro).
@@ -16,25 +16,11 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     <a class="wordmark" href={withBase('/')}><Logo label={wordmark.text} /></a>
     <nav class="primary" aria-label={navLabel.text}>
       <ul>
-        {sections.map((it, i) => {
+        {/* No dropdowns: the category pages are the tabs on /projects (client, 26 Oct 2026). Projects still
+            shows as current on a category page ('parent'). */}
+        {sections.map((it) => {
           const current = menuCurrent(it, path);
-          const sub = it.items && it.items.length > 0;
-          return (
-            <li class:list={{ 'has-sub': sub }}>
-              <a href={withBase(it.href)} aria-current={current === 'page' ? 'page' : undefined} data-current={current ?? undefined}>{it.label}</a>
-              {sub && (
-                <>
-                  {/* A disclosure, not an ARIA menu: the button opens a plain list of links. Hover opens it too. */}
-                  <button class="sub-toggle" type="button" aria-expanded="false" aria-controls={`nav-sub-${i}`} aria-label={`${subLabel.text}: ${it.label}`} data-placeholder={subLabel.placeholder ? '' : undefined}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-                  </button>
-                  <ul class="sub" id={`nav-sub-${i}`}>
-                    {it.items!.map((s) => <li><a href={withBase(s.href)} aria-current={s.href === path ? 'page' : undefined}>{s.label}</a></li>)}
-                  </ul>
-                </>
-              )}
-            </li>
-          );
+          return <li><a href={withBase(it.href)} aria-current={current === 'page' ? 'page' : undefined} data-current={current ?? undefined}>{it.label}</a></li>;
         })}
       </ul>
     </nav>
@@ -70,19 +56,6 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     window.addEventListener('scroll', update, { passive: true });
     header.addEventListener('focusin', () => header.classList.remove('is-hidden'));
     update();
-  }
-
-  // Category dropdowns: the toggle opens/closes; Escape or a click elsewhere closes.
-  for (const btn of document.querySelectorAll<HTMLButtonElement>('.sub-toggle')) {
-    const li = btn.closest('li')!;
-    const set = (open: boolean) => { btn.setAttribute('aria-expanded', String(open)); li.classList.toggle('is-open', open); };
-    btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
-    li.addEventListener('keydown', (e) => { if (e.key === 'Escape' && li.classList.contains('is-open')) { set(false); btn.focus(); } });
-    // A menu opened by hovering closes on Escape too, and stays shut until the pointer leaves.
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && li.matches(':hover')) li.classList.add('is-dismissed'); });
-    li.addEventListener('mouseleave', () => li.classList.remove('is-dismissed'));
-    document.addEventListener('click', (e) => { if (!li.contains(e.target as Node)) set(false); });
-    li.addEventListener('focusout', (e) => { if (!li.contains(e.relatedTarget as Node)) set(false); });
   }
 </script>
 <style>
@@ -127,8 +100,6 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   .menu-open path { transition: d .35s var(--ease-out); }
   .menu-open:hover path { d: path('M3 9h18M3 15h18'); }
   .site-header[data-over-hero]:not(.is-solid) :focus-visible { outline-color: var(--white); }
-  /* The category panel is cream even over the hero: an ink ring there. */
-  .site-header[data-over-hero]:not(.is-solid) .sub :focus-visible { outline-color: var(--ink); }
 
   /* Wide screens: one masthead row, sections | logo | contact. Every page is already in the bar (the
      logo is Home, the footer has the social links), so the full menu is for narrower screens only.
@@ -139,7 +110,6 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     .wordmark :global(.logo) { height: 56px; }
     .primary { grid-column: 1; grid-row: 1; justify-self: start; }
     .primary > ul { display: flex; align-items: center; gap: var(--s-6); }
-    .primary .sub { display: block; }
     .actions { grid-column: 3; grid-row: 1; justify-self: end; gap: var(--s-4); }
     .contact { display: inline-block; }
     .menu-open { display: none; }
@@ -147,23 +117,5 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
     .is-condensed .wordmark :global(.logo) { height: 48px; } /* not smaller: the wordmark softens below ~46px */
   }
 
-  .has-sub { position: relative; display: flex; align-items: center; gap: 0; }
-  .sub-toggle { display: grid; place-items: center; width: 24px; height: 32px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
-  .sub-toggle svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.4; transition: rotate .3s var(--ease-out); }
-  .is-open .sub-toggle svg, .has-sub:hover .sub-toggle svg { rotate: 180deg; }
-  /* The dropdown: a sheet of the same paper, framed by a hairline (no soft shadow), set left under its label. */
-  .sub {
-    position: absolute; left: 0; top: calc(100% + 10px); z-index: 2; min-width: 280px; max-height: min(70vh, 560px); overflow-y: auto;
-    margin: 0; padding: var(--s-3) 0; list-style: none;
-    background: var(--paper); border: 1px solid var(--line); color: var(--ink);
-    opacity: 0; visibility: hidden; translate: 0 -4px; transition: opacity .25s, translate .35s var(--ease-out), visibility 0s .25s;
-  }
-  /* Bridges the gap between the label and the sheet so hovering across it keeps the menu open. */
-  .sub::before { content: ''; position: absolute; inset: -11px 0 auto; height: 11px; }
-  .has-sub:hover .sub, .has-sub.is-open .sub { opacity: 1; visibility: visible; translate: none; transition-delay: 0s; }
-  .has-sub.is-dismissed:hover:not(.is-open) .sub { opacity: 0; visibility: hidden; }
-  .sub a { display: block; padding: 9px var(--s-5); font-size: var(--fs-small); letter-spacing: 0; text-decoration: none; text-transform: none; white-space: nowrap; transition: padding-left .3s var(--ease-out), color .2s; color: var(--text-2); }
-  .sub a::first-letter { text-transform: none; }
-  .sub a:is(:hover, :focus-visible, [aria-current]) { padding-left: calc(var(--s-5) + 6px); color: var(--ink); }
-  @media (prefers-reduced-motion: reduce) { .site-header, .bar, .sub, .sub a, .sub-toggle svg, .wordmark :global(.logo), .primary a::after, .menu-open path { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .site-header, .bar, .wordmark :global(.logo), .primary a::after, .menu-open path { transition: none; } }
 </style>

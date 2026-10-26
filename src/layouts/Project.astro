@@ -56,7 +56,7 @@ const jsonLd = [
   breadcrumbLd([['Projects', abs('/projects')], ...(cat ? [[cat, abs(`/projects/${categorySlug(cat)}`)] as [string, string]] : []), [d.title, abs(`/${id}`)]]),
 ];
 ---
-<Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" noindex={HELD_FROM_SEARCH.has(`/${id}`)} overHero={!!d.hero}>
+<Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" noindex={HELD_FROM_SEARCH.has(`/${id}`)}>
   <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
     {hero && <HeroMedia media={hero} fallbackAlt={d.title} />}
     <div class="p-hero-text wrap">
@@ -76,8 +76,8 @@ const jsonLd = [
 </Base>
 <style>
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
-  /* A darker shade at the top keeps the white header legible over light photographs. */
-  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / .55), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6) 65%, rgb(0 0 0 / .85)); pointer-events: none; } /* the foot holds the small white category label at 4.5:1 on every hero (all 53 checked, 24 Oct 2026) */
+  /* A shade at the foot keeps the white words legible (the header above is solid since 26 Oct 2026). */
+  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6) 65%, rgb(0 0 0 / .85)); pointer-events: none; } /* the foot holds the small white category label at 4.5:1 on every hero (all 53 checked, 24 Oct 2026) */
   .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
   /* A soft shade behind the words themselves, wherever they fall in the hero (on short screens a long
      title lifts the small category label into the photo's clear middle): white text at 4.5:1 or more on

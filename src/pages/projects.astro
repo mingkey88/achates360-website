@@ -38,7 +38,6 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   <div class="pi">
     <header class="wrap pi-head">
       <h1 class="display h1 sc" data-split>{heading}</h1>
-      <span class="pi-total" aria-hidden="true">{entries.length}</span>
     </header>
     <CategoryTabs tabs={tabs} path="/projects" label={text('nav-categories').text} />
     <section class="wrap pi-body" aria-labelledby="pi-title">
@@ -51,8 +50,6 @@ const redirects = Object.fromEntries([['top', cats[0].href], ...cats.map((c) => 
   .pi { position: relative; z-index: 1; }
   .pi-head { display: flex; align-items: flex-start; gap: var(--s-3); padding-block: var(--s-8) var(--s-6); }
   .pi-head h1 { margin: 0; }
-  /* The count sits up by the heading like a folio. */
-  .pi-total { padding-top: .4em; font-size: var(--fs-small); font-variant-numeric: tabular-nums; color: var(--text-2); }
   .pi-body { padding-block: var(--s-7) var(--section-y); }
 </style>
 <script>

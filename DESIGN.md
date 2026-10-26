@@ -137,8 +137,9 @@ appears in one place only: a quotation set alone.
 |---|---|---|
 | **Section heads** (`RunningHead`) | the section's name on an ink hairline with a 4px orange bar under it; an optional fact at the right (the studio's address, the years a story spans) | Home sections, About chapters, Credentials, case notes |
 | **Captions beneath** | picture whole, caption under it (title in ink, client in grey) | everywhere work is shown |
-| **Ruled lists** | rows on hairlines with a count at the right | Services list, homepage services, categories |
+| **Ruled lists** | rows on hairlines with a count at the right | Services list, categories |
 | **Showreel** | the studio's reel looping silently, Play with sound opens the full film | Home (full-width, with View all projects beneath), Services (within the margins) |
+| **Colour field** | large soft washes of brand orange and turquoise on stone, under a fine grain; decorative, pure CSS (`ui/ColourField.astro`) | Home: the studio's sentence, Write to us |
 | **Leader line** | a line from the page's edge into "Write to us.", ending in an orange bar | the close of inner pages |
 | **Paper cut** | words cut through a sheet with a picture showing through: kept as a single small signature | the 404 page only |
 
@@ -205,7 +206,7 @@ Motion is scrubbed by scrolling, eased (`--ease-out`), and never required to rea
 
 | Moment | What moves |
 |---|---|
-| Home hero | the showreel loops silently behind the header, filling the first screen above a slim band with the tagline and buttons (pause control; holds on its poster under reduced motion); Play with sound opens the full film |
+| Home hero | the showreel loops silently under the solid header, filling the first screen above a slim band with the tagline and Discuss your project; Play with sound sits on the film (pause control; holds on its poster under reduced motion); Play with sound opens the full film |
 | Home close | printed pieces spread from a pile; they can be picked up, dragged and reset |
 | Services, How we work | one artboard goes through the four steps: brief, concept, the logo's layers sliding into place, the finished lockup |
 | About | the chronology held as one stage while milestones turn; the logo's figures join hands; a sentence inks in |
