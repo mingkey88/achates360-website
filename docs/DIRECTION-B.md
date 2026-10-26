@@ -170,6 +170,6 @@ Closing section (after kitpro-croma): the contact form moves to its own page, /c
   1. Page to page: the browser's cross-document view transition (base.css). A project's picture has the same name on its tile (homepage work, /projects and category cards) and its case-study hero (lib/morph.ts), so the picture grows into the hero and back. The header holds; the rest cross-fades.
   2. Category switching: the same transition, so the cards slide to their new places between category pages (they are separate pages, so there is no in-page filter to animate).
   3. The studio's sentence inks in word by word with the scroll, the orange phrase last (motion/ink.ts, homepage).
-  4. About's client wall is two long rows that drift in opposite directions with the scroll (motion/drift.ts). Tied to the scroll, not looping, so no pause control is needed (WCAG 2.2.2). Without motion it is the one wall as before.
+  4. (Removed the same day, client: "seems a bit distracting": About's client wall drifting in two rows with the scroll. The wall is static again.)
   5. The award seals stamp in one after another (motion/stamp.ts).
   6. Over linked work, a round ink "View" label replaces the pointer (scripts/cursor.ts; it replaces the small arrow disc), on the homepage tiles and the project cards. With a mouse, a homepage tile's film plays only while hovered, fading in over the still; touch screens keep the films looping on screen.
