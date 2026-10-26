@@ -18,12 +18,10 @@ const parts = svg.match(/ d="([^"]+)"/)![1].match(/M[^M]+/g)!.map((d) => {
 const LETTERS_FROM = 90;
 const figParts = parts.filter((p) => p.x1 < LETTERS_FROM);
 const bodies = figParts.filter((p) => p.h > 20).sort((a, b) => a.x0 - b.x0);
-const heads = figParts.filter((p) => p.h <= 20);
-const figs = bodies.map((b) => {
-  const head = heads.find((h) => (h.x0 + h.x1) / 2 >= b.x0 && (h.x0 + h.x1) / 2 <= b.x1);
-  return (head ? head.d : '') + b.d;
-});
-if (figs.length !== 5 || figs.some((f, i) => !f.startsWith('M') || f === bodies[i].d)) throw new Error('Logo: could not split the five figures from the outline');
+const heads = figParts.filter((p) => p.h <= 20).sort((a, b) => a.x0 - b.x0);
+// Heads and bodies pair off in order, left to right (a head's centre can sit over two bodies' spans).
+if (bodies.length !== 5 || heads.length !== 5) throw new Error('Logo: could not split the five figures from the outline');
+const figs = bodies.map((b, i) => heads[i].d + b.d);
 const word = parts.filter((p) => p.x1 >= LETTERS_FROM).map((p) => p.d).join('');
 ---
 <svg class:list={['logo', cls]} xmlns="http://www.w3.org/2000/svg" viewBox={viewBox} set:html={`${figs.map((d) => `<path class="logo-fig" fill="currentColor" d="${d}"/>`).join('')}<path class="logo-word" fill="currentColor" d="${word}"/>`} {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true', focusable: 'false' })} />
