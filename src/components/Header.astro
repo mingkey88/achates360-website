@@ -70,7 +70,7 @@ const sections = menu.filter((it) => it.href !== '/' && it !== contact);
   .wordmark { flex: none; margin-right: auto; display: flex; padding-block: 4px; }
   /* The wordmark's letters are fine strokes: at 46px they were ~9px tall and anti-aliased soft on
      standard screens. Larger, in the deeper ink, they stay crisp. */
-  .wordmark :global(.logo) { display: block; height: 44px; width: auto; shape-rendering: geometricPrecision; transition: height .4s var(--ease-out); }
+  .wordmark :global(.logo) { display: block; overflow: visible; height: 44px; width: auto; shape-rendering: geometricPrecision; transition: height .4s var(--ease-out); }
   .site-header:is(:not([data-over-hero]), .is-solid) .wordmark { color: var(--teal-ink); }
   @media (min-width: 768px) { .wordmark :global(.logo) { height: 48px; } }
 
