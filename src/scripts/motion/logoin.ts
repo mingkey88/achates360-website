@@ -1,4 +1,4 @@
-import { gsap } from './index';
+import { gsap, ScrollTrigger } from './index';
 
 /**
  * The masthead logo assembles as the homepage opens (client, 26 Oct 2026: "i actually like how the
@@ -25,16 +25,19 @@ export function logoIn(): void {
 }
 
 /**
- * The bookend: as the footer comes up, its large logo's five figures drift in from apart and join hands,
- * scrubbed with the scroll, so the homepage ends where it began. They start visible (positions only).
+ * The bookend: as the footer's large logo comes on screen, its five figures drift in from apart and join
+ * hands, so the homepage ends where it began. Played once, not scrubbed: the logo sits at the very foot of
+ * the page, where the scroll runs out before a scrubbed gather could finish (it stopped mid-flight).
  */
 export function footerGather(): void {
   const logo = document.querySelector<SVGSVGElement>('.mega-mark .logo');
   const figs = logo ? gsap.utils.toArray<SVGPathElement>(logo.querySelectorAll('.logo-fig')) : [];
   if (!logo || figs.length !== 5) return;
-  const tl = gsap.timeline({ scrollTrigger: { trigger: logo, start: 'top bottom', end: 'center 65%', scrub: .6 } });
+  const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.set(figs, { clearProps: 'all' }); } });
   figs.forEach((f, i) => {
     const a = (i / figs.length) * Math.PI * 2 + .6;
-    tl.from(f, { x: Math.cos(a) * 40, y: Math.sin(a) * 28, rotation: (i % 2 ? 1 : -1) * (40 + i * 12), transformOrigin: '50% 50%', ease: 'power2.out' }, i * .05);
+    tl.from(f, { x: Math.cos(a) * 40, y: Math.sin(a) * 28, rotation: (i % 2 ? 1 : -1) * (40 + i * 12), opacity: .2, transformOrigin: '50% 50%', duration: 1.1, ease: 'power3.out' }, i * .08);
   });
+  tl.progress(1).progress(0); // start state applied only when the logo nears, so it is never seen scattered at rest
+  ScrollTrigger.create({ trigger: logo, start: 'top 95%', once: true, onEnter: () => tl.play(0) });
 }
