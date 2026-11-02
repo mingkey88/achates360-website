@@ -16,9 +16,12 @@ import type { UiString } from '../lib/strings';
 // disciplines beneath. The order mixes the studio's disciplines (packaging, campaigns, branding,
 // content, events) so no one medium leads. A tile's film is, in order: the homepage slide's film for
 // that project, the project's hero film, its first film in the story; films load on wide screens only,
-// near the viewport (phones show the still). The whole tile opens the case study. With a mouse, a tile's
-// film plays only while the pointer is over it (client, 26 Oct 2026), fading in over the still, and the
-// View label follows the pointer (scripts/cursor.ts); touch screens keep the films looping on screen.
+// near the viewport (phones show the still). The whole card opens the case study; the View label follows
+// the pointer (scripts/cursor.ts).
+// Scrollytelling homepage (client, 2 Nov 2026, after yaas-energy.com): the projects are full-screen cards
+// that stack as you scroll, each sliding up over the last while the last recedes (motion/cards.ts), and
+// only the card in front plays its film. At rest (no motion) they are simply full-screen cards one after
+// another.
 interface Props { slugs: string[]; eyebrow: UiString; cta: UiString; count: number }
 const { slugs, eyebrow, cta, count } = Astro.props;
 const { text } = await loadExtras();
@@ -38,81 +41,64 @@ const tiles = await Promise.all(slugs.map(async (slug) => {
     video: film?.src,
   };
 }));
-// 1, 2, 1, 2, 1: a full-width tile, then a pair, alternating.
-const wide = (i: number) => i % 3 === 0;
 const videoDraft = text('video-pause').placeholder || text('video-play').placeholder;
 ---
-<section class="ws section" aria-labelledby="ws-title">
-  <div class="wrap"><RunningHead s={eyebrow} id="ws-title" /></div>
-  <ul class="ws-grid wrap">
-    {tiles.map((t, i) => (
-      <li class:list={['ws-item', wide(i) ? 'is-wide' : 'is-pair']} data-cursor={text('cursor-view').text}>
-        <div class="ws-media" data-bgvideo-viewport style={`view-transition-name: ${morphName(t.slug)}`}>
-          <Image class="ws-still" src={t.still} alt="" widths={[480, 960, 1440, 1920]} sizes={wide(i) ? '(max-width: 1440px) 92vw, 1320px' : '(max-width: 767px) 92vw, 46vw'} />
-          {t.video && <BgVideo src={t.video} poster={t.still} desktopOnly posterless class="ws-video" pauseLabel={`${text('video-pause').text}: ${t.title}`} playLabel={`${text('video-play').text}: ${t.title}`} draft={videoDraft} />}
-        </div>
-        <div class="ws-cap">
-          <h3 class="ws-title"><a class="ws-link" href={withBase(`/${t.slug}`)}>{t.title}</a></h3>
-          <p class="ws-meta">{t.client && <span>{t.client}</span>}<span>{t.categories.join(', ')}</span></p>
-        </div>
-      </li>
-    ))}
-  </ul>
+<section class="ws" aria-labelledby="ws-title" data-workstack>
+  <div class="wrap ws-head"><RunningHead s={eyebrow} id="ws-title" /></div>
+  <div class="ws-stage" data-workstack-stage>
+    <ul class="ws-cards">
+      {tiles.map((t, i) => (
+        <li class="ws-card" style={`--i: ${i}`} data-cursor={text('cursor-view').text}>
+          <div class="ws-media" data-bgvideo-viewport style={`view-transition-name: ${morphName(t.slug)}`}>
+            <Image class="ws-still" src={t.still} alt="" widths={[640, 960, 1440, 1920, 2560]} sizes="100vw" />
+            {t.video && <BgVideo src={t.video} poster={t.still} desktopOnly posterless class="ws-video" pauseLabel={`${text('video-pause').text}: ${t.title}`} playLabel={`${text('video-play').text}: ${t.title}`} draft={videoDraft} />}
+          </div>
+          <div class="ws-band">
+            <p class="ws-num" aria-hidden="true">{String(i + 1).padStart(2, '0')} <span>/ {String(tiles.length).padStart(2, '0')}</span></p>
+            <h3 class="ws-title"><a class="ws-link" href={withBase(`/${t.slug}`)}>{t.title}</a></h3>
+            <p class="ws-meta">{t.client && <span>{t.client}</span>}<span>{t.categories.join(', ')}</span></p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
   <div class="ws-cta wrap"><Pill href="/projects" variant="fill"><T s={cta} /><span class="ws-count">({count})</span></Pill></div>
 </section>
 <script>
   import { viewCursor } from '../scripts/cursor';
-  // Mouse pointers: hold every tile's film (BgVideo's data-bgvideo-hold) until the pointer is over its tile.
-  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const stack = document.querySelector<HTMLElement>('.ws');
-  if (stack && fine && !reduce) {
-    stack.classList.add('ws-hover');
-    const refresh = () => document.dispatchEvent(new Event('bgvideo:refresh'));
-    for (const item of stack.querySelectorAll<HTMLElement>('.ws-item')) {
-      const media = item.querySelector<HTMLElement>('.ws-media');
-      if (!media?.querySelector('video')) continue;
-      media.setAttribute('data-bgvideo-hold', '');
-      item.addEventListener('pointerenter', () => { media.removeAttribute('data-bgvideo-hold'); refresh(); });
-      item.addEventListener('pointerleave', () => { media.setAttribute('data-bgvideo-hold', ''); refresh(); });
-    }
-    refresh();
-  }
   viewCursor();
 </script>
 <style>
-  .ws { display: grid; gap: var(--s-7); }
-  .ws-grid { list-style: none; margin-block: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: var(--s-8) var(--s-5); }
-  .ws-item { position: relative; display: grid; gap: var(--s-4); align-content: start; }
-  .ws-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--stone); }
+  .ws { padding-block: var(--section-y); }
+  .ws-head { margin-bottom: var(--s-6); }
+  /* At rest: full-screen cards one after another. */
+  .ws-cards { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .ws-card { position: relative; height: calc(100svh - var(--header-h)); min-height: 420px; overflow: hidden; background: var(--black); color: var(--white); }
+  .ws-media { position: absolute; inset: 0; }
   .ws-media > :global(*) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .ws-media :global(.ws-video video) { width: 100%; height: 100%; object-fit: cover; }
-  .ws-still, .ws-media :global(.ws-video) { transition: transform 1.2s var(--ease-out); }
-  .ws-item:hover :is(.ws-still, :global(.ws-video)) { transform: scale(1.025); }
-  .ws-media :global(.bv-toggle) { z-index: 3; right: var(--s-3); bottom: var(--s-3); }
-  .ws-cap { display: grid; gap: 4px; }
-  .ws-title { margin: 0; font: 400 clamp(1.125rem, 1rem + .5vw, 1.5rem)/1.2 var(--font-display); letter-spacing: -.01em; }
+  .ws-media :global(.bv-toggle) { z-index: 3; top: var(--s-4); bottom: auto; right: var(--gutter); }
+  /* The name in a band at the card's foot, on a shade that keeps it legible over any frame. */
+  .ws-band {
+    position: absolute; inset: auto 0 0; z-index: 2; display: grid; gap: var(--s-2); justify-items: start;
+    padding: var(--s-9) var(--gutter) var(--s-6); background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .65));
+  }
+  .ws-num { margin: 0; font: 500 var(--fs-small)/1 var(--font-text); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+  .ws-num span { opacity: .6; }
+  .ws-title { margin: 0; max-width: 24ch; font: 400 clamp(1.75rem, 1.2rem + 2.4vw, 3.5rem)/1.05 var(--font-display); letter-spacing: -.02em; text-wrap: balance; }
   .ws-link { color: inherit; text-decoration: none; }
-  /* The whole tile is the link; the pause key sits above it. */
+  /* The whole card is the link; the pause key sits above it. */
   .ws-link::after { content: ''; position: absolute; inset: 0; z-index: 2; }
   .ws-link:focus-visible { outline: none; }
-  .ws-item:has(.ws-link:focus-visible) { outline: 2px solid var(--ink); outline-offset: 6px; }
-  .ws-item:hover .ws-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
-  .ws-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-4); font-size: var(--fs-small); color: var(--text-2); }
-  .ws-cta { display: flex; justify-content: center; }
+  .ws-card:has(.ws-link:focus-visible) { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .ws-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-4); font-size: var(--fs-small); color: rgb(255 255 255 / .85); }
+  .ws-cta { display: flex; justify-content: center; margin-top: var(--s-7); }
   .ws-count { font-variant-numeric: tabular-nums; }
   /* Phones show only the still (the films load on wide screens), so no pause key there. */
   @media (max-width: 767px) { .ws-media :global(.bv-toggle) { display: none; } }
-  @media (min-width: 768px) {
-    .ws-grid { grid-template-columns: 1fr 1fr; }
-    .is-wide { grid-column: 1 / -1; }
-    .is-wide .ws-media { aspect-ratio: 16 / 9; max-height: 86svh; width: 100%; }
-    /* The pair's second tile sits lower, so the two don't read as a table row. */
-    .is-pair + .is-pair { margin-top: var(--s-9); }
-  }
-  /* Hover-to-play (mouse): a held film fades out to the still beneath; no pause key, as nothing plays by itself. */
-  .ws-hover .ws-media :global(.ws-video) { transition: transform 1.2s var(--ease-out), opacity .4s; }
-  .ws-hover .ws-media[data-bgvideo-hold] :global(.ws-video) { opacity: 0; }
-  .ws-hover .ws-media :global(.bv-toggle) { display: none; }
-  @media (prefers-reduced-motion: reduce) { .ws-still, .ws-media :global(.ws-video) { transition: none; } }
+  /* Stacking (motion running): one screen-high stage the page holds while the cards slide up over each
+     other (motion/cards.ts). */
+  :global(html.motion-live) .ws-stage { position: relative; height: calc(100svh - var(--header-h)); min-height: 420px; overflow: hidden; }
+  :global(html.motion-live) .ws-cards { display: block; height: 100%; }
+  :global(html.motion-live) .ws-card { position: absolute; inset: 0; height: auto; min-height: 0; z-index: var(--i); will-change: transform; }
 </style>

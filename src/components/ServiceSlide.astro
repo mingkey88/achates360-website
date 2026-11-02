@@ -1,0 +1,70 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import RunningHead from './ui/RunningHead.astro';
+import Pill from './ui/Pill.astro';
+import T from './ui/T.astro';
+import Amp from './ui/Amp.astro';
+import DraftTag from './ui/DraftTag.astro';
+import ColourField from './ui/ColourField.astro';
+import { withBase } from '../lib/paths';
+import { STILLS } from '../lib/stills';
+import type { UiString } from '../lib/strings';
+// What the studio does, on the homepage (client, 2 Nov 2026, after yaas-energy.com): the four services as
+// numbered cards, each with its service's project picture (services.yaml "project"), linking to its
+// spread on /services. In motion on wide screens the page holds while the cards slide sideways across
+// the colour field (motion/slide.ts); at rest, and on phones, they are a plain grid.
+interface Service { id: string; title: string; placeholder: boolean; project: string }
+interface Props { services: Service[]; eyebrow: UiString; cta: UiString }
+const { services, eyebrow, cta } = Astro.props;
+const cards = await Promise.all(services.map(async (s) => {
+  const p = (await getEntry('projects', s.project))?.data;
+  if (!p) throw new Error(`Service slide: "${s.id}" names project "${s.project}", which does not exist`);
+  const pic = STILLS[s.project] ?? (p.hero?.type === 'image' ? p.hero.src : p.hero?.type === 'video' ? p.hero.poster : undefined);
+  if (!pic) throw new Error(`Service slide: project "${s.project}" has no hero picture`);
+  return { ...s, pic };
+}));
+---
+<section class="sv" aria-labelledby="sv-title" data-slide>
+  <ColourField variant="close" />
+  <div class="sv-in">
+    <div class="wrap"><RunningHead id="sv-title" s={eyebrow} /></div>
+    <div class="sv-window">
+      <ol class="sv-track" data-slide-track>
+        {cards.map((s, i) => (
+          <li class="sv-card" data-placeholder={s.placeholder ? '' : undefined}>
+            <a class="sv-link" href={withBase(`/services#${s.id}`)}>
+              <span class="sv-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="sv-title"><Amp text={s.title} /><DraftTag when={s.placeholder} /></span>
+              <span class="sv-pic"><Image src={s.pic} alt="" widths={[480, 720, 960, 1280]} sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 38vw" /></span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <div class="wrap sv-cta"><Pill href="/services"><T s={cta} /></Pill></div>
+  </div>
+</section>
+<style>
+  .sv { position: relative; isolation: isolate; overflow: hidden; padding-block: var(--section-y); }
+  .sv-in { position: relative; z-index: 1; display: grid; gap: var(--s-7); }
+  /* At rest (and on phones): a grid, one to four across. */
+  .sv-track { list-style: none; margin: 0 auto; padding: 0; width: min(100% - 2 * var(--gutter), var(--max)); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--s-5); }
+  .sv-card { min-width: 0; }
+  .sv-link { display: grid; grid-template-rows: auto 1fr auto; gap: var(--s-4); height: 100%; padding: var(--s-5); background: var(--paper); color: inherit; text-decoration: none; box-shadow: 0 1px 0 var(--line); transition: translate .5s var(--ease-out), box-shadow .5s; }
+  .sv-link:hover { translate: 0 -6px; box-shadow: 0 18px 40px rgb(0 0 0 / .1); }
+  .sv-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .sv-num { font: 400 clamp(2.5rem, 2rem + 2vw, 4rem)/1 var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .sv-title { font: 400 clamp(1.375rem, 1.1rem + 1vw, 2rem)/1.15 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  .sv-pic { display: block; overflow: hidden; aspect-ratio: 4 / 3; background: var(--stone); }
+  .sv-pic :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; transition: scale 1.2s var(--ease-out); }
+  .sv-link:hover .sv-pic :global(img) { scale: 1.04; }
+  .sv-cta { display: flex; justify-content: center; }
+  /* Sliding (motion running, wide screens): one long row the page holds and slides sideways. */
+  @media (min-width: 768px) {
+    :global(html.motion-live) .sv-window { overflow: hidden; }
+    :global(html.motion-live) .sv-track { display: flex; width: max-content; margin: 0; padding-inline: var(--gutter); gap: var(--s-6); }
+    :global(html.motion-live) .sv-card { flex: 0 0 min(40vw, 520px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .sv-link, .sv-pic :global(img) { transition: none; } }
+</style>

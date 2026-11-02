@@ -23,3 +23,18 @@ export function logoIn(): void {
   });
   tl.from(word, { x: -14, opacity: 0, duration: .8, ease: 'power3.out' }, .75);
 }
+
+/**
+ * The bookend: as the footer comes up, its large logo's five figures drift in from apart and join hands,
+ * scrubbed with the scroll, so the homepage ends where it began. They start visible (positions only).
+ */
+export function footerGather(): void {
+  const logo = document.querySelector<SVGSVGElement>('.mega-mark .logo');
+  const figs = logo ? gsap.utils.toArray<SVGPathElement>(logo.querySelectorAll('.logo-fig')) : [];
+  if (!logo || figs.length !== 5) return;
+  const tl = gsap.timeline({ scrollTrigger: { trigger: logo, start: 'top bottom', end: 'center 65%', scrub: .6 } });
+  figs.forEach((f, i) => {
+    const a = (i / figs.length) * Math.PI * 2 + .6;
+    tl.from(f, { x: Math.cos(a) * 40, y: Math.sin(a) * 28, rotation: (i % 2 ? 1 : -1) * (40 + i * 12), transformOrigin: '50% 50%', ease: 'power2.out' }, i * .05);
+  });
+}

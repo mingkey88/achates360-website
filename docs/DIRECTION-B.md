@@ -174,3 +174,12 @@ Closing section (after kitpro-croma): the contact form moves to its own page, /c
   5. The award seals stamp in one after another (motion/stamp.ts).
   6. Over linked work, a round ink "View" label replaces the pointer (scripts/cursor.ts; it replaces the small arrow disc), on the homepage tiles and the project cards. With a mouse, a homepage tile's film plays only while hovered, fading in over the still; touch screens keep the films looping on screen.
   7. The masthead logo assembles as the homepage opens (client: "i actually like how the achates logo fly in … could you do that for the navbar or at least the hero?"): its five figures fly in from apart, turning, in orange, turquoise and lime, settle to ink as they join hands (the About chapter's movement), then the lettering slides in (motion/logoin.ts). Homepage only, once per load. The logo's one outline is split at build time into the five figures and the lettering (ui/Logo.astro); it draws the same.
+
+- **Scrollytelling homepage (2 Nov 2026, client: "revamp the homepage to something like [yaas-energy.com] … more movement but not too much such that it erodes the branding"; storyboard agreed the same day).** yaas's mechanics in the Achates look (cream, ink, one orange accent, slow easing, no bounce). Story: a faithful companion since 2001, whose work you can watch, hold and come back to.
+  1. Opening: the page holds the hero while the studio's sentence rises over it like a curtain (its panel rounded at the top), the film drawing in from full bleed to a rounded frame (motion/curtain.ts).
+  2. Who we are: as before (the sentence inks in).
+  3. The work: four full-screen cards that stack as you scroll, each sliding over the last, which recedes; only the front card plays its film (WorkStack, motion/cards.ts). Replaces the 1-2-1 tile grid.
+  4. What we do: the four services as numbered cards with their projects' pictures, sliding sideways on wide screens while the page holds (ServiceSlide, motion/slide.ts); a grid on phones and at rest.
+  5. Write to us: the print pile, as before.
+  6. Bookend: the footer logo's figures join hands as it comes up (motion/logoin.ts footerGather).
+  Three holds (hero, work, services), none elsewhere. No new wording. Reduced motion: every section complete and still. Lenis smooth scroll deliberately left out.
