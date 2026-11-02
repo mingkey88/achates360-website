@@ -3,7 +3,7 @@ import { gsap } from './index';
 /**
  * The work as a stack of full-screen cards (client, 2 Nov 2026, after yaas-energy.com): the page holds
  * the [data-workstack-stage] while each card slides up over the one before, which recedes (shrinks, rounds
- * its corners, darkens); the incoming picture settles from a slight push-in. Only the card in front plays
+ * its corners, dims under a veil); the incoming picture settles from a slight push-in. Only the card in front plays
  * its film (the others are held, BgVideo's data-bgvideo-hold).
  */
 export function cards(): void {
@@ -34,6 +34,8 @@ export function cards(): void {
     const at = i - 1;
     tl.to(card, { yPercent: 0, duration: 1 }, at)
       .fromTo(media[i], { scale: 1.14 }, { scale: 1, duration: 1 }, at)
-      .to(items[i - 1], { scale: .9, borderRadius: 28, filter: 'brightness(.45)', duration: 1 }, at);
+      .to(items[i - 1], { scale: .9, borderRadius: 28, duration: 1 }, at)
+      // A veil, not a CSS filter: a filter cannot be eased from none, so the card went black at once.
+      .fromTo(items[i - 1].querySelector('.ws-dim'), { opacity: 0 }, { opacity: .5, duration: 1 }, at);
   });
 }
