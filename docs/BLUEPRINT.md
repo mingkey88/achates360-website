@@ -62,13 +62,13 @@ achates360-website/
 
 | URL | Page file | Template | Main sections | Words and pictures from |
 |---|---|---|---|---|
-| `/` | `src/pages/index.astro` | Base | VideoHero (the showreel, full-screen) → WorkStack → studio sentence → ServiceIndex → Credentials → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence) |
+| `/` | `src/pages/index.astro` | Base | VideoHero (the hero loop, full-screen) → studio sentence (rises over the hero) → WorkStack (four stacking cards) → ServiceSlide (four cards, three projects each) → QuoteBand (once a real testimonial exists) → ScatterCTA | `content/home/home.md`, `content/extras/*`, About text (studio sentence) |
 | `/projects` | `src/pages/projects.astro` | Base | heading, CategoryTabs, ProjectCards | homepage gallery list in `home.md` (`allProjects`), `content/projects/*` |
 | `/projects/<category>` | `src/pages/projects/[category].astro` | Base | heading, CategoryTabs, ProjectCards | `content/projectsIndex/projects.md` (categories) |
-| `/<project>` (61 case studies) | `src/pages/[slug].astro` | Project | hero, MetaStrip, ArtRows, CaseNotes, NextProject | `content/projects/<slug>.md`, layout in `content/art/<slug>.yaml`, notes in `content/notes/<slug>.yaml` |
+| `/<project>` (61 case studies) | `src/pages/[slug].astro` | Project | hero, MetaStrip, ArtRows, CaseNotes, NextProject (uncovered as the page lifts) | `content/projects/<slug>.md`, layout in `content/art/<slug>.yaml`, notes in `content/notes/<slug>.yaml` |
 | `/about` | `[slug].astro` | About | statement, since, Chronology, companion, visual, office, awards chapter, Credentials, colophon, CloseCTA | `content/basic/about.md`, `extras/timeline.yaml`, `extras/stats.yaml`, `extras/clients.yaml` |
 | `/services` | `src/pages/services.astro` | Base | ServicesContents, Showreel, ServiceSpread ×4, ProcessSteps, CloseCTA | `extras/services.yaml`, `extras/process.yaml` |
-| `/contact` | `src/pages/contact.astro` | Base | ContactForm | `home.md` (`contact` block: intro, form fields), footer address in `site.md` |
+| `/contact` | `src/pages/contact.astro` | Base | ContactForm (with JoinHands, the logo's figures joining as it fills in) | `home.md` (`contact` block: intro, form fields), footer address in `site.md` |
 | `/joinus` | `[slug].astro` | JoinUs | job listings | `content/basic/joinus.md` |
 | `/<name>` (team cards) | `[slug].astro` | Card | business card | `content/cards/<name>.md` |
 | `/404` | `src/pages/404.astro` | Base | paper-cut "404", links | strings, also redirects old Wix addresses |

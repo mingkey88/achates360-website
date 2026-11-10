@@ -1,6 +1,8 @@
 ---
-import { Image } from 'astro:assets';
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+import Pic from './ui/Pic.astro';
+import { catalogueOf } from '../lib/catalogue';
+import { cardsFor } from '../lib/project-index';
 import RunningHead from './ui/RunningHead.astro';
 import Pill from './ui/Pill.astro';
 import T from './ui/T.astro';
@@ -11,19 +13,45 @@ import { withBase } from '../lib/paths';
 import { STILLS } from '../lib/stills';
 import type { UiString } from '../lib/strings';
 // What the studio does, on the homepage (client, 2 Nov 2026, after yaas-energy.com): the four services as
-// numbered cards, each with its service's project picture (services.yaml "project"), linking to its
-// spread on /services. In motion on wide screens the page holds while the cards slide sideways across
-// the colour field (motion/slide.ts); at rest, and on phones, they are a plain grid.
-interface Service { id: string; title: string; placeholder: boolean; project: string }
-interface Props { services: Service[]; eyebrow: UiString; cta: UiString }
-const { services, eyebrow, cta } = Astro.props;
-const cards = await Promise.all(services.map(async (s) => {
-  const p = (await getEntry('projects', s.project))?.data;
+// numbered cards, each with pictures of its own projects, linking to its spread on /services. In motion
+// on wide screens the page holds while the cards slide sideways across the colour field
+// (motion/slide.ts); at rest, and on phones, they are a plain grid.
+// Each card shows up to three of its service's projects, one at a time, captioned with the project's
+// name (10 Nov 2026): the picture steps on as the visitor scrolls (motion/slide.ts), never on a timer,
+// so nothing moves that the visitor did not move. First the service's own project (services.yaml
+// "project"), then others from its categories in turn, in the /projects order. A project the page
+// already shows elsewhere (exclude: the work stack) is passed over, and none appears on two cards, so
+// the homepage shows more of the range instead of one picture twice. At rest only the first shows.
+interface Service { id: string; title: string; placeholder: boolean; project: string; tags: string[] }
+interface Props { services: Service[]; eyebrow: UiString; cta: UiString; exclude?: string[] }
+const { services, eyebrow, cta, exclude = [] } = Astro.props;
+const SHOTS = 3;
+const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
+const sections = (await getEntry('projectsIndex', 'projects'))!.data.sections;
+const catalogue = catalogueOf((await getEntry('home', 'home'))!.data.allProjects.items, projects);
+const bySlug = new Map(catalogue.map((e) => [e.slug, e]));
+// Taken: shown elsewhere on the page, or kept for another card as its own project.
+const taken = new Set<string>([...exclude, ...services.map((s) => s.project)]);
+const cards = services.map((s) => {
+  const p = projects.get(s.project);
   if (!p) throw new Error(`Service slide: "${s.id}" names project "${s.project}", which does not exist`);
-  const pic = STILLS[s.project] ?? (p.hero?.type === 'image' ? p.hero.src : p.hero?.type === 'video' ? p.hero.poster : undefined);
-  if (!pic) throw new Error(`Service slide: project "${s.project}" has no hero picture`);
-  return { ...s, pic };
-}));
+  const own = STILLS[s.project] ?? (p.hero?.type === 'image' ? p.hero.src : p.hero?.type === 'video' ? p.hero.poster : undefined);
+  if (!own) throw new Error(`Service slide: project "${s.project}" has no hero picture`);
+  const shots: { title: string; pic: ImageMetadata; position?: string }[] = exclude.includes(s.project) ? [] : [{ title: p.title, pic: own }];
+  const lists = s.tags.map((h) => {
+    const sec = sections.find((x) => x.heading === h);
+    if (!sec) throw new Error(`Service slide: "${s.id}" names "${h}", which is not a project category`);
+    return cardsFor(sec.items, catalogue).sort((a, b) => a.no - b.no);
+  });
+  for (let round = 0; shots.length < SHOTS && lists.some((l) => l.length > round); round++) {
+    for (const l of lists) {
+      const e = l[round];
+      if (e && !taken.has(e.slug) && shots.length < SHOTS) { taken.add(e.slug); shots.push({ title: bySlug.get(e.slug)!.title, pic: e.thumb, position: e.position }); }
+    }
+  }
+  if (!shots.length) throw new Error(`Service slide: "${s.id}" has no project picture to show`);
+  return { ...s, shots };
+});
 ---
 <section class="sv" aria-labelledby="sv-title" data-slide>
   <ColourField variant="close" />
@@ -36,7 +64,15 @@ const cards = await Promise.all(services.map(async (s) => {
             <a class="sv-link" href={withBase(`/services#${s.id}`)}>
               <span class="sv-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <span class="sv-title"><Amp text={s.title} /><DraftTag when={s.placeholder} /></span>
-              <span class="sv-pic"><Image src={s.pic} alt="" widths={[480, 720, 960, 1280]} sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 38vw" /></span>
+              {/* Decorative: the link is named by its service; the pictures and their captions change. */}
+              <span class="sv-shots" aria-hidden="true" data-slide-shots>
+                {s.shots.map((shot, n) => (
+                  <span class:list={['sv-shot', { on: n === 0 }]}>
+                    <span class="sv-pic"><Pic src={shot.pic} alt="" crop={4 / 3} position={shot.position} widths={[480, 720, 960, 1280]} sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 38vw" /></span>
+                    <span class="sv-cap">{shot.title.trim()}</span>
+                  </span>
+                ))}
+              </span>
             </a>
           </li>
         ))}
@@ -56,6 +92,11 @@ const cards = await Promise.all(services.map(async (s) => {
   .sv-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
   .sv-num { font: 400 clamp(2.5rem, 2rem + 2vw, 4rem)/1 var(--font-display); color: var(--accent-text); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
   .sv-title { font: 400 clamp(1.375rem, 1.1rem + 1vw, 2rem)/1.15 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+  /* The shots share one place; only the one that is "on" shows (the first, at rest). */
+  .sv-shots { display: grid; }
+  .sv-shot { grid-area: 1 / 1; display: grid; gap: var(--s-3); min-width: 0; opacity: 0; transition: opacity .7s var(--ease-out); }
+  .sv-shot.on { opacity: 1; }
+  .sv-cap { font-size: var(--fs-small); line-height: 1.3; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sv-pic { display: block; overflow: hidden; aspect-ratio: 4 / 3; background: var(--stone); }
   .sv-pic :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; transition: scale 1.2s var(--ease-out); }
   .sv-link:hover .sv-pic :global(img) { scale: 1.04; }
@@ -66,5 +107,5 @@ const cards = await Promise.all(services.map(async (s) => {
     :global(html.motion-live) .sv-track { display: flex; width: max-content; margin: 0; padding-inline: var(--gutter); gap: var(--s-6); }
     :global(html.motion-live) .sv-card { flex: 0 0 min(40vw, 520px); }
   }
-  @media (prefers-reduced-motion: reduce) { .sv-link, .sv-pic :global(img) { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .sv-link, .sv-shot, .sv-pic :global(img) { transition: none; } }
 </style>

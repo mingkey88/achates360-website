@@ -3,20 +3,29 @@ import { withBase } from '../lib/paths';
 import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
 import Pic from './ui/Pic.astro';
+import { morphName } from '../lib/morph';
 // The end of a case study: the next project's picture, wide, with "Next project" and its name beneath,
 // and beside them the way to start one like this. The picture and name are one link; the picture drifts
 // larger on hover. (The paper-cut lettering over the picture was removed with the print devices,
 // 21 Oct 2026; the paper cut stays only on the 404 page.)
+// The curtain (10 Nov 2026, the homepage's opening run the other way): the block is one screen high and
+// waits at the foot of the window behind the case study, which lifts away at its end like a sheet
+// (Project.astro .p-sheet) to uncover it; its picture then grows into the next case study's hero as that
+// page opens (lib/morph). The picture is cut 16:9 (4:5 on phones) so it fills that screen-high frame
+// without being enlarged; it was 21:9 and 4:3. The curtain itself is CSS (position: sticky); under reduced
+// motion, and on very short windows, it is the plain band it was. One small script: the block's links can
+// take the keyboard's focus while the page still covers them, so it is then brought fully into view.
 interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; discuss?: { label: UiString; href: string } }
 const { href, title, label, image, position, discuss } = Astro.props;
+const morph = morphName(href);
 ---
 <section class="next-project">
   <div class="np-band wrap">
     <a class="np" href={withBase(href)}>
-      <span class="np-pic"><Pic src={image} alt="" crop={21 / 9} mobileCrop={4 / 3} widths={[640, 960, 1280, 1920]} mobileWidths={[400, 600, 800]} sizes="(max-width: 767px) calc(100vw - 32px), min(1320px, 100vw - 120px)" mobileSizes="calc(100vw - 32px)" position={position} loading="lazy" /></span>
+      <span class="np-pic" style={morph ? `view-transition-name: ${morph}` : undefined}><Pic src={image} alt="" crop={16 / 9} mobileCrop={4 / 5} widths={[640, 960, 1280, 1920]} mobileWidths={[400, 600, 800, 1080]} sizes="(max-width: 767px) calc(100vw - 32px), min(1320px, 100vw - 120px)" mobileSizes="calc(100vw - 32px)" position={position} loading="lazy" /></span>
       <span class="np-meta">
         <span class="label"><T s={label} /></span>
-        <span class="np-title" data-reveal>{typeof title === 'string' ? title : <T s={title} />} <span class="np-arrow" aria-hidden="true">→</span></span>
+        <span class="np-title">{typeof title === 'string' ? title : <T s={title} />} <span class="np-arrow" aria-hidden="true">→</span></span>
       </span>
     </a>
     {discuss && (
@@ -24,6 +33,17 @@ const { href, title, label, image, position, discuss } = Astro.props;
     )}
   </div>
 </section>
+<script>
+  // Keyboard focus landing on a link the case study still covers: scroll the page clear of the block
+  // (to its own place in the page, where it fills the window). Pointer presses are left alone.
+  for (const np of document.querySelectorAll<HTMLElement>('.next-project')) {
+    np.addEventListener('focusin', (e) => {
+      if (getComputedStyle(np).position !== 'sticky' || !(e.target as Element).matches(':focus-visible')) return;
+      const cover = np.previousElementSibling?.getBoundingClientRect().bottom ?? 0;
+      if (cover > 0) window.scrollBy({ top: cover, behavior: 'instant' });
+    });
+  }
+</script>
 <style>
   /* A stone band ending on a hairline, so it no longer runs into the charcoal footer. */
   .next-project { background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
@@ -49,5 +69,16 @@ const { href, title, label, image, position, discuss } = Astro.props;
     .np-meta { padding-right: 320px; }
     .np-discuss { position: absolute; right: 0; bottom: var(--section-y); }
   }
+  /* The curtain: one screen high, held at the window's foot while the case study above lifts off it.
+     It must fit the window to work (a taller block would hide its own top), so the picture takes whatever
+     height the words leave, and short windows keep the plain band. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
+    .next-project { position: sticky; bottom: 0; z-index: 0; height: 100svh; padding-top: var(--header-h); border-bottom: 0; }
+    .np-band { --np-pad: clamp(var(--s-5), 5svh, var(--s-8)); height: 100%; padding-block: var(--np-pad); grid-template-rows: minmax(0, 1fr); grid-auto-rows: auto; }
+    .np { grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
+    .np-pic { min-height: 0; }
+    .np-pic :global(img) { height: 100%; object-fit: cover; }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-height: 600px) and (min-width: 900px) { .np-discuss { bottom: var(--np-pad); } }
   @media (prefers-reduced-motion: reduce) { .np-arrow, .np-discuss, .np-pic :global(img) { transition: none; } }
 </style>

@@ -58,6 +58,8 @@ const jsonLd = [
 ];
 ---
 <Base title={d.seo.title} description={d.seo.description} ogImage={shareImage ?? d.seo.ogImage} ogAlt={d.title} ogType="article" jsonLd={jsonLd} page="project" noindex={HELD_FROM_SEARCH.has(`/${id}`)}>
+  {/* The case study is one sheet that lifts away at its end to uncover the next project (NextProject). */}
+  <div class="p-sheet">
   <section class:list={['p-hero', { 'p-hero-plain': !d.hero }]}>
     {hero && <HeroMedia media={hero} fallbackAlt={d.title} style={`view-transition-name: ${morphName(id)}`} />}
     <div class="p-hero-text wrap">
@@ -73,9 +75,18 @@ const jsonLd = [
     <article class="p-body"><ArtRows blocks={body} art={art} pageTitle={d.title} slug={id} />{notes && <CaseNotes notes={notes} heading={text('case-notes')} title={d.title} />}</article>
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
+  </div>
   <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} image={nextCard.thumb} position={nextCard.position} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
 </Base>
 <style>
+  /* Above the next project, which waits behind it at the foot of the window; where that curtain runs
+     (NextProject's own conditions) the sheet's foot is rounded and casts a soft shadow, as the homepage's
+     curtain does. */
+  .p-sheet { position: relative; z-index: 1; background: var(--paper); }
+  @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
+    .p-sheet { border-radius: 0 0 32px 32px; box-shadow: 0 18px 40px rgb(0 0 0 / .12); }
+    .p-sheet:not(:has(.p-back)) { padding-bottom: var(--s-6); }
+  }
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
   /* A shade at the foot keeps the white words legible (the header above is solid since 26 Oct 2026). */
   .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6) 65%, rgb(0 0 0 / .85)); pointer-events: none; } /* the foot holds the small white category label at 4.5:1 on every hero (all 53 checked, 24 Oct 2026) */

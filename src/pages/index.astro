@@ -56,7 +56,7 @@ const scatter = SCATTER.map((slug) => {
 // (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
 // of project cards by the showreel as the hero: client, 21 Oct 2026. The lens is tag lens-hero-v1.)
 // The disciplines under the studio's sentence: the service names, each to its spread on /services.
-const services = x.services as { id: string; title: string; placeholder: boolean; project: string }[];
+const services = x.services as { id: string; title: string; placeholder: boolean; project: string; tags: string[] }[];
 // The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
 // appears once the client supplies a real quotation (CONTENT-QUERIES 10).
 const quote = x.testimonials.find((t: any) => !t.placeholder);
@@ -95,7 +95,7 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
 
   <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 
-  <ServiceSlide services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} />
+  <ServiceSlide services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} exclude={WORK} />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 

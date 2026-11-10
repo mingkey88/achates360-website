@@ -4,7 +4,9 @@ import { gsap } from './index';
  * The work as a stack of full-screen cards (client, 2 Nov 2026, after yaas-energy.com): the page holds
  * the [data-workstack-stage] while each card slides up over the one before, which recedes (shrinks, rounds
  * its corners, dims under a veil); the incoming picture settles from a slight push-in. Only the card in front plays
- * its film (the others are held, BgVideo's data-bgvideo-hold).
+ * its film (the others are held, BgVideo's data-bgvideo-hold). What is held is the stage's
+ * [data-workstack-pin] wrapper where there is one: the stage with the button beneath it, which on phones
+ * (cards shorter than the screen) stays in view under the cards.
  */
 export function cards(): void {
   const stage = document.querySelector<HTMLElement>('[data-workstack-stage]');
@@ -25,7 +27,7 @@ export function cards(): void {
     defaults: { ease: 'none' },
     scrollTrigger: {
       trigger: stage, start: () => `top top+=${headerH()}`, end: () => `+=${(items.length - 1) * window.innerHeight * .9}`,
-      pin: true, scrub: .6, invalidateOnRefresh: true,
+      pin: stage.closest<HTMLElement>('[data-workstack-pin]') ?? true, scrub: .6, invalidateOnRefresh: true,
       onUpdate: (st) => setFront(Math.min(items.length - 1, Math.floor(st.progress * (items.length - 1) + .5))),
     },
   });

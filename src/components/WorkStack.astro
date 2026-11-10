@@ -22,6 +22,11 @@ import type { UiString } from '../lib/strings';
 // that stack as you scroll, each sliding up over the last while the last recedes (motion/cards.ts), and
 // only the card in front plays its film. At rest (no motion) they are simply full-screen cards one after
 // another.
+// Phones held upright (10 Nov 2026): a landscape picture stretched over a tall screen showed only its
+// middle third (DXV's title read "RY OF TIME"; IDM's website was an unreadable slice). There each card is
+// the picture cut 4:3, the site's card shape, with its name beneath on the card's dark ground: the work
+// shown whole and captioned, as everywhere else. The cards are then shorter than the screen; the
+// button to all projects is held with them ([data-workstack-pin]), in view beneath while they stack.
 interface Props { slugs: string[]; eyebrow: UiString; cta: UiString; count: number }
 const { slugs, eyebrow, cta, count } = Astro.props;
 const { text } = await loadExtras();
@@ -45,6 +50,8 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
 ---
 <section class="ws" aria-labelledby="ws-title" data-workstack>
   <div class="wrap ws-head"><RunningHead s={eyebrow} id="ws-title" /></div>
+  {/* Held together while the cards stack (motion/cards.ts), so the button stays under the cards. */}
+  <div data-workstack-pin>
   <div class="ws-stage" data-workstack-stage>
     <ul class="ws-cards">
       {tiles.map((t, i) => (
@@ -64,6 +71,7 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
     </ul>
   </div>
   <div class="ws-cta wrap"><Pill href="/projects" variant="fill"><T s={cta} /><span class="ws-count">({count})</span></Pill></div>
+  </div>
 </section>
 <script>
   import { viewCursor } from '../scripts/cursor';
@@ -104,4 +112,13 @@ const videoDraft = text('video-pause').placeholder || text('video-play').placeho
   :global(html.motion-live) .ws-stage { position: relative; height: calc(100svh - var(--header-h)); min-height: 420px; overflow: hidden; }
   :global(html.motion-live) .ws-cards { display: block; height: 100%; }
   :global(html.motion-live) .ws-card { position: absolute; inset: 0; height: auto; min-height: 0; z-index: var(--i); will-change: transform; }
+  /* Phones held upright: the picture whole at 4:3 with its name beneath, not stretched over the screen.
+     --ws-h is the card's height: the picture, then room for a three-line name and its details. */
+  @media (max-width: 767px) and (orientation: portrait) {
+    .ws { --ws-h: min(calc(100svh - var(--header-h)), calc(75vw + 15.5rem)); }
+    .ws-card { display: grid; grid-template-rows: auto 1fr; height: var(--ws-h); min-height: 0; }
+    .ws-media { position: relative; inset: auto; aspect-ratio: 4 / 3; overflow: hidden; }
+    .ws-band { position: relative; inset: auto; align-content: start; padding: var(--s-5) var(--gutter) var(--s-6); background: var(--black); }
+    :global(html.motion-live) .ws-stage { height: var(--ws-h); min-height: 0; }
+  }
 </style>

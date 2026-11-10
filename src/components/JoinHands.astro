@@ -1,0 +1,49 @@
+---
+import logo from '../assets/logo-stacked-parts.svg?raw';
+// The logo's five figures, joining hands as the enquiry form fills in (10 Nov 2026): the studio's own
+// line, "hand in hand", made literal on the page where a visitor decides to write. Each figure belongs
+// to one required part of the form (name, company, email, services, message); it waits a little apart,
+// drawn as a thin ink outline, and steps into the circle in a brand colour once its part is filled in
+// (ContactForm's script sets .in on each figure and data-done on the mark). Without JavaScript, and until
+// the script starts it (data-live), the figures simply stand joined in outline. Always decorative: the
+// form's own labels and error lines say what is missing.
+// It replaces LogoSketch, the faint outline of the same figures behind the form.
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+const mark = logo.match(/<g class="lg-mark">(.*?)<\/g><g class="lg-word">/)?.[1] ?? '';
+// The arrival colours of the logo wherever it gathers (motion/logoin.ts).
+const COLOURS = ['var(--accent)', 'var(--turquoise)', 'var(--lime)', 'var(--turquoise)', 'var(--accent)'];
+const CENTRE = { x: 96.6, y: 46 }; // the middle of the five figures, in the artwork's own units
+const APART = 15; // how far a waiting figure stands from its place, in the same units
+let n = 0;
+const figures = mark.replace(/<g class="lg-fig" data-cx="([\d.]+)" data-cy="([\d.]+)">/g, (_m: string, cx: string, cy: string) => {
+  const dx = Number(cx) - CENTRE.x, dy = Number(cy) - CENTRE.y, d = Math.hypot(dx, dy) || 1, i = n++;
+  const turn = (i % 2 ? 1 : -1) * (16 + i * 4);
+  return `<g class="lg-fig" style="--dx:${((dx / d) * APART).toFixed(1)}px;--dy:${((dy / d) * APART).toFixed(1)}px;--turn:${turn}deg;--c:${COLOURS[i % COLOURS.length]}">`;
+});
+if (n !== 5) throw new Error(`JoinHands: expected the logo's five figures, found ${n}`);
+---
+<svg class:list={['jh', cls]} viewBox="50 -3 94 103" aria-hidden="true" focusable="false" data-joinhands>
+  <g set:html={figures} />
+</svg>
+<style>
+  .jh { display: block; overflow: visible; pointer-events: none; color: var(--ink); }
+  .jh :global(.lg-fig) {
+    transform-box: fill-box; transform-origin: center;
+    transition: transform .9s var(--ease-out), opacity .5s, fill .5s;
+    fill: transparent;
+  }
+  .jh :global(path) { stroke: currentColor; vector-effect: non-scaling-stroke; stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; shape-rendering: geometricPrecision; }
+  /* Waiting: apart from the circle, turned a little, fainter. */
+  .jh[data-live] :global(.lg-fig:not(.in)) { transform: translate(var(--dx), var(--dy)) rotate(var(--turn)); opacity: .45; }
+  /* Joined: in its place, in its colour. */
+  .jh :global(.lg-fig.in) { fill: var(--c); }
+  /* All five: one small breath as the circle closes. */
+  .jh[data-done] { animation: jh-done .7s var(--ease-out); }
+  @keyframes jh-done { 40% { scale: 1.06; } }
+  @media (prefers-reduced-motion: reduce) {
+    .jh :global(.lg-fig) { transition: none; }
+    .jh[data-live] :global(.lg-fig:not(.in)) { transform: none; }
+    .jh[data-done] { animation: none; }
+  }
+</style>
