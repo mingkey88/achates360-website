@@ -7,12 +7,10 @@ import RunningHead from '../components/ui/RunningHead.astro';
 import Pill from '../components/ui/Pill.astro';
 import T from '../components/ui/T.astro';
 import heroPoster from '../assets/hero-loop-poster.jpg';
-import WorkStack from '../components/WorkStack.astro';
-import ServiceSlide from '../components/ServiceSlide.astro';
+import ClientWork from '../components/ClientWork.astro';
 import ScatterCTA from '../components/ScatterCTA.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import ColourField from '../components/ui/ColourField.astro';
-import DraftTag from '../components/ui/DraftTag.astro';
 import { loadExtras } from '../lib/extras';
 import { sentenceStarting } from '../lib/copy';
 import { withBase } from '../lib/paths';
@@ -36,10 +34,32 @@ const [introBefore, introKey, introAfter] = at < 0 ? [intro, '', ''] : [intro.sl
 const projects = new Map((await getCollection('projects')).map((e) => [e.id, e.data]));
 const listedCount = [...projects.values()].filter((p) => p.listed).length;
 const catalogue = catalogueOf(d.allProjects.items, projects);
-// The work after the studio's sentence (WorkStack, after wearecollins.com): four projects, one per
-// discipline: packaging, campaign content, branding, events (Rebecca, 26 Oct 2026: "too many selected
-// works, too much scrolling"; it was seven). The rest are on /projects.
-const WORK = ['dxv', 'samsung-connected-home', 'idm-venture-capital', 'alstom-r151-last-train-handover'];
+// Selected work, by client (ClientWork; client, 11 Nov 2026: "the site should be quieter in a way where
+// every element has to mean something"): three clients the studio has made several things for, each a
+// picture (the lead project's) and the list of those projects, oldest first. client: its id on the
+// roster (clients.yaml), whose name heads the group. The rest are on /projects.
+const CLIENT_WORK = [
+  { client: 'samsung', lead: 'samsung-connected-home', slugs: ['samsung-tablets-tactical-campaigns', 'samsung-connected-home', 'samsung-micro-led', 'samsung-the-freestyle'] },
+  { client: 'ritz-carlton', lead: 'ritz-carlton-festive-greetings', slugs: ['the-ritz-kids-programme-guide', 'the-ritz-carlton-superbrunch', 'ritz-carlton-festive-greetings'] },
+  { client: 'dbs', lead: 'dbs-sustainable-investing-video', slugs: ['dbs-sustainable-investing-video', 'dbs-cio-animated-videos', 'dbs-cio-podcasts', 'dbs-wealth-feed'] },
+];
+// A card's year is one year or a range ("2013–2016"): its first and last year.
+const startYear = (y: string) => Number(y.match(/\d{4}/)?.[0] ?? 0);
+const endYear = (y: string) => Number(y.match(/\d{4}/g)?.pop() ?? 0);
+const clientWork = CLIENT_WORK.map((g) => {
+  const client = x.clients.find((c: any) => c.id === g.client);
+  if (!client) throw new Error(`Homepage work: no client "${g.client}" on the roster (clients.yaml)`);
+  const rows = g.slugs.map((slug) => {
+    const card = catalogue.find((e) => e.slug === slug);
+    if (!card) throw new Error(`Homepage work: "${slug}" is not a listed project in the gallery`);
+    return { slug, href: card.href, title: projects.get(slug)!.title, year: card.year, categories: projects.get(slug)!.categories, thumb: card.thumb, position: card.position };
+  }).sort((a, b) => startYear(a.year) - startYear(b.year));
+  const lead = rows.find((r) => r.slug === g.lead);
+  if (!lead) throw new Error(`Homepage work: the lead "${g.lead}" is not among ${g.client}'s projects`);
+  // The span of the work, written as the cards write a range ("2013–2016", an en dash).
+  const [first, last] = [Math.min(...rows.map((r) => startYear(r.year))), Math.max(...rows.map((r) => endYear(r.year)))];
+  return { name: client.name as string, draft: !!client.placeholder, years: first === last ? `${first}` : `${first}–${last}`, lead, rows };
+});
 // The closing scatter: nine pieces of printed work (books, magazines, guides, kits), calm paper and ink to
 // end on. The first six are the ones phones show.
 const SCATTER = ['the-art-of-tan-ping-chiang', 'socialspace', 'mosaic-magazine', 'the-ritz-kids-programme-guide', 'little-thoughts-thinking-out-loud', 'journal-of-aviation-management', 'singapore-conference-hall-sg5050', 'national-theatre-pop-up-kit', 'changi-airport-group'];
@@ -50,13 +70,13 @@ const scatter = SCATTER.map((slug) => {
 });
 // The homepage, about five screens (Rebecca, 26 Oct 2026: "hard to get and capture the essence of the
 // company"): hero (the studio's showreel; after aesop.com, client 21 Oct 2026), who the studio is (its
-// sentence and its disciplines, on the colour field), four works, one testimonial (only once the client
-// has supplied a real one), Write to us. The service index and the imprint (clients, awards, figures)
-// left the homepage: they repeated /services and /about, where they remain.
+// sentence, on the colour field), the work by client, one testimonial (only once the client has supplied
+// a real one), Write to us. The service index and the imprint (clients, awards, figures) left the
+// homepage: they repeated /services and /about, where they remain. The quieter homepage (client, 11 Nov
+// 2026): the stacked work cards and the sliding service cards went, and so did the line of disciplines
+// under the sentence (the disciplines now read on the work itself); the hero is unchanged.
 // (Selected work, five featured projects with a film cover, was replaced by the showreel, and the lens
 // of project cards by the showreel as the hero: client, 21 Oct 2026. The lens is tag lens-hero-v1.)
-// The disciplines under the studio's sentence: the service names, each to its spread on /services.
-const services = x.services as { id: string; title: string; placeholder: boolean; project: string; tags: string[] }[];
 // The draft testimonial ("[Draft] A short client testimonial goes here…") is not shown: the band
 // appears once the client supplies a real quotation (CONTENT-QUERIES 10).
 const quote = x.testimonials.find((t: any) => !t.placeholder);
@@ -86,35 +106,24 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
     <div class="h-intro-in wrap">
       <RunningHead as="p" s={text('intro-eyebrow')} />
       <h2 id="intro-title" class="display two-tone" data-ink>{introBefore}{introKey && <span class="hl">{introKey}</span>}{introAfter}</h2>
-      <ul class="h-disc" aria-label={text('services-eyebrow').text}>
-        {services.map((s) => <li data-placeholder={s.placeholder ? '' : undefined}><a href={withBase(`/services#${s.id}`)}>{s.title}</a><DraftTag when={s.placeholder} /></li>)}
-      </ul>
       <Pill href="/about"><T s={text('intro-cta')} /></Pill>
     </div>
   </section>
 
-  <WorkStack slugs={WORK} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
-
-  <ServiceSlide services={services} eyebrow={text('services-eyebrow')} cta={text('services-cta')} exclude={WORK} />
+  <ClientWork groups={clientWork} eyebrow={text('work-eyebrow')} cta={text('selected-cta')} count={listedCount} />
 
   {quote && <QuoteBand id="quote-title" eyebrow={text('testimonials-eyebrow')} quote={quote} />}
 
   <ScatterCTA items={scatter} heading={text('contact-heading')} blurb={footerIntro} cta={text('connect-cta')} href="/contact" />
 </Base>
 <style>
-  /* Who the studio is, straight after the hero: its sentence and its disciplines on the colour field,
-     set left on the page's grid under its running head. */
+  /* Who the studio is, straight after the hero: its sentence on the colour field, set left on the page's
+     grid under its running head. */
   /* Rounded at its top: in motion it rises over the held hero like a curtain (motion/curtain.ts). */
   .h-intro { position: relative; z-index: 2; isolation: isolate; background: var(--stone); padding-block: var(--s-9); overflow: hidden; border-radius: 32px 32px 0 0; box-shadow: 0 -18px 40px rgb(0 0 0 / .12); }
   .h-intro-in { position: relative; z-index: 1; display: grid; justify-items: start; }
   .two-tone { max-width: 30ch; margin-block: var(--s-7) var(--s-6); font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.75rem); line-height: 1.25; text-wrap: pretty; }
-  .h-disc { list-style: none; margin: 0 0 var(--s-7); padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) 0; font-size: var(--fs-lead); }
-  .h-disc li { display: inline-flex; align-items: baseline; }
-  /* The slash trails its name, so a wrapped line never starts with one. */
-  .h-disc li:not(:last-child)::after { content: '/'; margin-inline: .6em; color: var(--muted); }
-  .h-disc a { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-decoration-thickness: 1px; text-underline-offset: 5px; transition: text-decoration-color .2s; }
-  .h-disc a:hover { text-decoration-color: var(--accent); }
-  @media (min-width: 1024px) { .two-tone, .h-disc, .h-intro-in > :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
+  @media (min-width: 1024px) { .two-tone, .h-intro-in > :global(.pill) { margin-left: calc((100% - 11 * var(--s-5)) / 12 * 2 + 2 * var(--s-5)); } }
   .h-intro-in > :global(.rh) { justify-self: stretch; }
 </style>
 <script>
@@ -125,7 +134,5 @@ const jsonLd = [organizationLd({ url: homeUrl, logo: logoUrl, email, sameAs, des
   import { ink } from '../scripts/motion/ink';
   import { logoIn, footerGather } from '../scripts/motion/logoin';
   import { curtain } from '../scripts/motion/curtain';
-  import { cards } from '../scripts/motion/cards';
-  import { slide } from '../scripts/motion/slide';
-  run(curtain, reveal, counters, ink, logoIn, cards, slide, scatter, footerGather);
+  run(curtain, reveal, counters, ink, logoIn, scatter, footerGather);
 </script>

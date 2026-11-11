@@ -3,7 +3,7 @@ export type MotionModule = 'reveal' | 'stack' | 'counters' | 'tilt' | 'scatter' 
 
 /** Which motion modules each page kind loads (spec §5: case studies only get the light reveals). */
 export const MOTION: Record<PageKind, MotionModule[]> = {
-  home: ['reveal', 'counters', 'scatter', 'ink', 'logoin', 'curtain', 'cards', 'slide'],
+  home: ['reveal', 'counters', 'scatter', 'ink', 'logoin', 'curtain'],
   project: ['reveal'],
   projects: ['reveal', 'tilt'],
   categories: ['reveal', 'tilt'],
