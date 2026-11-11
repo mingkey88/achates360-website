@@ -7,6 +7,8 @@ import { gsap } from './index';
  * its film (the others are held, BgVideo's data-bgvideo-hold). What is held is the stage's
  * [data-workstack-pin] wrapper where there is one: the stage with the button beneath it, which on phones
  * (cards shorter than the screen) stays in view under the cards.
+ * Only the card in front keeps its picture's cross-page name (lib/morph): the browser lifts every named
+ * element above the page during a page transition, so a card hidden behind the front one would show.
  */
 export function cards(): void {
   const stage = document.querySelector<HTMLElement>('[data-workstack-stage]');
@@ -14,11 +16,15 @@ export function cards(): void {
   if (!stage || items.length < 2) return;
   const headerH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
   const media = items.map((c) => c.querySelector<HTMLElement>('.ws-media')!);
+  const names = media.map((m) => m.style.viewTransitionName);
   let front = -1;
   const setFront = (n: number) => {
     if (n === front) return;
     front = n;
-    media.forEach((m, i) => (i === n ? m.removeAttribute('data-bgvideo-hold') : m.setAttribute('data-bgvideo-hold', '')));
+    media.forEach((m, i) => {
+      if (i === n) m.removeAttribute('data-bgvideo-hold'); else m.setAttribute('data-bgvideo-hold', '');
+      m.style.viewTransitionName = i === n ? names[i] : 'none';
+    });
     document.dispatchEvent(new Event('bgvideo:refresh'));
   };
   setFront(0);
