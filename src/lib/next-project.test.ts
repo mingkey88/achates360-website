@@ -25,6 +25,14 @@ describe('nextProject', () => {
   it('is null for a project missing from the homepage order (band links to /projects)', () => {
     expect(nextProject('infographics', order, exists)).toBeNull();
   });
+  it('skips an unlisted neighbour, so a listed page never leads to a hidden one', () => {
+    const shown = (s: string) => s !== 'mannhummel';
+    expect(nextProject('dbs-affluent-segment-ai-assets', order, shown)).toBe('copy-of-international-green-building');
+  });
+  it('leads on from an unlisted page to the next listed one after it', () => {
+    const shown = (s: string) => s !== 'mannhummel';
+    expect(nextProject('mannhummel', order, shown)).toBe('copy-of-international-green-building');
+  });
   it('is null when there is nothing else to go to', () => {
     expect(nextProject('notter', ['notter', 'notter'], exists)).toBeNull();
   });
