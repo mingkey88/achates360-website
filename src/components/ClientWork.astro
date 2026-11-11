@@ -12,7 +12,8 @@ import type { UiString } from '../lib/strings';
 // and the sliding service cards). Each client is one picture and a ruled list of what the studio made
 // for them: the project's name, its year and its disciplines, each row to its case study. The years show
 // the "faithful friend"; the rows show the range of work, so there is no separate "what we do" section.
-// Nothing moves: no pin, no stack, no slide. The picture is the lead project's card picture and grows into
+// The picture alternates sides down the page, left then right (client, 11 Nov 2026: "stagger the
+// arrangement abit. left and right"). Nothing moves: no pin, no stack, no slide. The picture is the lead project's card picture and grows into
 // that case study's hero as it opens (lib/morph).
 interface Row { href: string; title: string; year: string; categories: string[] }
 interface Group { name: string; draft: boolean; years: string; lead: { href: string; thumb: ImageMetadata; position?: string }; rows: Row[] }
@@ -50,6 +51,9 @@ const { groups, eyebrow, cta, count } = Astro.props;
   </div>
 </section>
 <style>
+  /* Above the hero the page holds beneath the studio's sentence (motion/curtain.ts), and on the paper,
+     so the fading hero never shows through or over the work. */
+  .cw { position: relative; z-index: 1; background: var(--paper); }
   .cw-in { display: grid; gap: var(--s-8); }
   .cw-group { display: grid; gap: var(--s-5); align-items: start; }
   .cw-pic { display: block; overflow: hidden; background: var(--stone); }
@@ -73,6 +77,9 @@ const { groups, eyebrow, cta, count } = Astro.props;
     .cw-in { gap: var(--s-9); }
     .cw-in > :global(.rh) { margin-bottom: calc(var(--s-7) - var(--s-9)); }
     .cw-group { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--s-7); }
+    /* Every second client mirrored: the list at the left, the picture at the right. */
+    .cw-group:nth-of-type(even) { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    .cw-group:nth-of-type(even) .cw-pic { order: 2; }
     .cw-cta { margin-top: calc(var(--s-7) - var(--s-9)); }
   }
   @media (prefers-reduced-motion: reduce) { .cw-pic :global(img) { transition: none; } }
