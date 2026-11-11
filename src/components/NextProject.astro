@@ -15,6 +15,10 @@ import { morphName } from '../lib/morph';
 // without being enlarged; it was 21:9 and 4:3. The curtain itself is CSS (position: sticky); under reduced
 // motion, and on very short windows, it is the plain band it was. One small script: the block's links can
 // take the keyboard's focus while the page still covers them, so it is then brought fully into view.
+// The picture's cross-page name is not in the markup: under the curtain the block sits inside the window
+// from the start, hidden behind the case study, and the browser lifts every named element above the page
+// during a page transition, so the next project's picture flashed over a case study as it opened
+// (client, 11 Nov 2026). The script names the picture only while at least half of it is uncovered.
 interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; discuss?: { label: UiString; href: string } }
 const { href, title, label, image, position, discuss } = Astro.props;
 const morph = morphName(href);
@@ -22,7 +26,7 @@ const morph = morphName(href);
 <section class="next-project">
   <div class="np-band wrap">
     <a class="np" href={withBase(href)}>
-      <span class="np-pic" style={morph ? `view-transition-name: ${morph}` : undefined}><Pic src={image} alt="" crop={16 / 9} mobileCrop={4 / 5} widths={[640, 960, 1280, 1920]} mobileWidths={[400, 600, 800, 1080]} sizes="(max-width: 767px) calc(100vw - 32px), min(1320px, 100vw - 120px)" mobileSizes="calc(100vw - 32px)" position={position} loading="lazy" /></span>
+      <span class="np-pic" data-morph={morph}><Pic src={image} alt="" crop={16 / 9} mobileCrop={4 / 5} widths={[640, 960, 1280, 1920]} mobileWidths={[400, 600, 800, 1080]} sizes="(max-width: 767px) calc(100vw - 32px), min(1320px, 100vw - 120px)" mobileSizes="calc(100vw - 32px)" position={position} loading="lazy" /></span>
       <span class="np-meta">
         <span class="label"><T s={label} /></span>
         <span class="np-title">{typeof title === 'string' ? title : <T s={title} />} <span class="np-arrow" aria-hidden="true">→</span></span>
@@ -37,6 +41,20 @@ const morph = morphName(href);
   // Keyboard focus landing on a link the case study still covers: scroll the page clear of the block
   // (to its own place in the page, where it fills the window). Pointer presses are left alone.
   for (const np of document.querySelectorAll<HTMLElement>('.next-project')) {
+    // The picture carries its cross-page name (data-morph, lib/morph) only while it can be seen: with no
+    // curtain (the plain band) always; under the curtain once the case study has lifted off half of it.
+    const pic = np.querySelector<HTMLElement>('.np-pic[data-morph]');
+    const sheet = np.previousElementSibling;
+    if (pic) {
+      const sync = () => {
+        const r = pic.getBoundingClientRect();
+        const covered = getComputedStyle(np).position === 'sticky' && !!sheet && sheet.getBoundingClientRect().bottom > r.top + r.height / 2;
+        pic.style.viewTransitionName = covered ? '' : pic.dataset.morph!;
+      };
+      sync();
+      window.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync);
+    }
     np.addEventListener('focusin', (e) => {
       if (getComputedStyle(np).position !== 'sticky' || !(e.target as Element).matches(':focus-visible')) return;
       const cover = np.previousElementSibling?.getBoundingClientRect().bottom ?? 0;

@@ -25,14 +25,19 @@ interface Props { entry: CollectionEntry<'projects'> }
 const { id, data: d } = Astro.props.entry;
 const { text } = await loadExtras();
 const home = (await getEntry('home', 'home'))!.data;
-const built = new Set((await getCollection('projects')).map((e) => e.id));
+// Only listed case studies are offered as the next project: an unlisted page (three sit in the order) has
+// no card on /projects, so it showed under the first card's picture (Little Thoughts led to an unlisted
+// brochure under the Alstom picture; client, 11 Nov 2026).
+const listed = new Set((await getCollection('projects')).filter((e) => e.data.listed).map((e) => e.id));
 const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null);
-const next = nextProject(id, order, (s) => built.has(s));
+const next = nextProject(id, order, (s) => listed.has(s));
 const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback');
 // The picture under the Next project's paper cut: the next project's card picture (its /projects card),
 // or, at the end of the list, the first card's.
 const catalogue = catalogueOf(home.allProjects.items, new Map((await getCollection('projects')).map((e) => [e.id, e.data])));
-const nextCard = catalogue.find((e) => e.slug === next) ?? catalogue[0];
+const nextCard = next ? catalogue.find((e) => e.slug === next) : catalogue[0];
+// No silent stand-in: a next project without a card would show another project's picture.
+if (!nextCard) throw new Error(`Next project: "${next}" (after "${id}") has no card on /projects`);
 // The case study in the standard template (lib/art.ts autoArt), or a hand-made layout for this project
 // if one has been made (src/content/art/<slug>.yaml). Pictures are arranged by their shape (mediaRatio:
 // films by their poster, embedded players 16:9).
