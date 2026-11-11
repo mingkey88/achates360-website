@@ -31,7 +31,11 @@ const home = (await getEntry('home', 'home'))!.data;
 const listed = new Set((await getCollection('projects')).filter((e) => e.data.listed).map((e) => e.id));
 const order = home.allProjects.items.map((i) => slugOf(i.href)).filter((s): s is string => s !== null);
 const next = nextProject(id, order, (s) => listed.has(s));
-const nextTitle = next ? (await getEntry('projects', next))!.data.title : text('next-fallback');
+const nextData = next ? (await getEntry('projects', next))!.data : undefined;
+const nextTitle = nextData ? nextData.title : text('next-fallback');
+// The next case study's own hero (with its hand-picked still, as on its page): NextProject fetches it
+// ahead, so it is already there when that page opens.
+const nextHero = nextData?.hero?.type === 'video' && STILLS[next!] ? { ...nextData.hero, poster: STILLS[next!] } : nextData?.hero;
 // The picture under the Next project's paper cut: the next project's card picture (its /projects card),
 // or, at the end of the list, the first card's.
 const catalogue = catalogueOf(home.allProjects.items, new Map((await getCollection('projects')).map((e) => [e.id, e.data])));
@@ -81,7 +85,7 @@ const jsonLd = [
   </div>
   {d.backLink && (() => { const m = d.backLink.label.match(/^(←\s*)?(.*)$/)!; return <p class="wrap p-back"><a class="p-back-link" href={withBase(backLinkHref(d.backLink.href))}>{m[1] && <span aria-hidden="true">← </span>}<span class="sc">{m[2]}</span></a></p>; })()}
   </div>
-  <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} image={nextCard.thumb} position={nextCard.position} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
+  <NextProject href={next ? `/${next}` : '/projects'} title={nextTitle} label={text('next-project')} image={nextCard.thumb} position={nextCard.position} preload={nextHero} discuss={{ label: text('discuss-cta'), href: '/contact' }} />
 </Base>
 <style>
   /* Above the next project, which waits behind it at the foot of the window; where that curtain runs

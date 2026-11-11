@@ -4,6 +4,8 @@ import type { UiString } from '../lib/strings';
 import T from './ui/T.astro';
 import Pic from './ui/Pic.astro';
 import { morphName } from '../lib/morph';
+import { getImage } from 'astro:assets';
+import HeroMedia from './ui/HeroMedia.astro';
 // The end of a case study: the next project's picture, wide, with "Next project" and its name beneath,
 // and beside them the way to start one like this. The picture and name are one link; the picture drifts
 // larger on hover. (The paper-cut lettering over the picture was removed with the print devices,
@@ -19,8 +21,16 @@ import { morphName } from '../lib/morph';
 // from the start, hidden behind the case study, and the browser lifts every named element above the page
 // during a page transition, so the next project's picture flashed over a case study as it opened
 // (client, 11 Nov 2026). The script names the picture only while at least half of it is uncovered.
-interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; discuss?: { label: UiString; href: string } }
-const { href, title, label, image, position, discuss } = Astro.props;
+// Fetching ahead (client, 11 Nov 2026: "a slight pause (black screen) before going into the entire
+// image"): the next case study's hero sits on a dark ground until its picture arrives. Its hero is kept
+// here in a <template> (the same HeroMedia its page renders, so the browser picks the very same file), and
+// the script puts it in a hidden, inert box once the reader is within a screen of this block, so the file
+// is already in the cache when the next page opens. Not under Save-Data.
+type Media = { type: 'image'; src: ImageMetadata; alt: string } | { type: 'video'; src: string; poster: ImageMetadata };
+interface Props { href: string; title: string | UiString; label: UiString; image: ImageMetadata; position?: string; preload?: Media; discuss?: { label: UiString; href: string } }
+const { href, title, label, image, position, preload, discuss } = Astro.props;
+// A film hero shows its poster on wide screens (BgVideo sets it by script, from this same file).
+const posterUrl = preload?.type === 'video' ? (await getImage({ src: preload.poster, width: 1920, format: 'webp' })).src : undefined;
 const morph = morphName(href);
 ---
 <section class="next-project">
@@ -36,6 +46,12 @@ const morph = morphName(href);
       <a class="np-discuss" href={withBase(discuss.href)}><T s={discuss.label} /> <span aria-hidden="true">→</span></a>
     )}
   </div>
+  {preload && (
+    <template data-np-preload>
+      <HeroMedia media={preload} />
+      {posterUrl && <img src={posterUrl} alt="" data-wide />}
+    </template>
+  )}
 </section>
 <script>
   // Keyboard focus landing on a link the case study still covers: scroll the page clear of the block
@@ -45,6 +61,24 @@ const morph = morphName(href);
     // curtain (the plain band) always; under the curtain once the case study has lifted off half of it.
     const pic = np.querySelector<HTMLElement>('.np-pic[data-morph]');
     const sheet = np.previousElementSibling;
+    // Fetch the next case study's hero ahead, once, when the reader is within a screen of this block.
+    const tpl = np.querySelector<HTMLTemplateElement>('template[data-np-preload]');
+    let warmed = !tpl || !sheet;
+    const warm = () => {
+      if (warmed || sheet!.getBoundingClientRect().bottom > window.innerHeight * 2) return;
+      warmed = true;
+      if ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return;
+      const frag = tpl!.content.cloneNode(true) as DocumentFragment;
+      if (!window.matchMedia('(min-width: 768px)').matches) frag.querySelectorAll('[data-wide]').forEach((el) => el.remove());
+      const box = document.createElement('div');
+      box.className = 'np-warm';
+      box.inert = true;
+      box.setAttribute('aria-hidden', 'true');
+      box.append(frag);
+      np.append(box);
+    };
+    warm();
+    window.addEventListener('scroll', warm, { passive: true });
     if (pic) {
       const sync = () => {
         const r = pic.getBoundingClientRect();
@@ -64,7 +98,9 @@ const morph = morphName(href);
 </script>
 <style>
   /* A stone band ending on a hairline, so it no longer runs into the charcoal footer. */
-  .next-project { background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
+  .next-project { position: relative; background: var(--stone); color: var(--ink); border-bottom: 1px solid var(--line); }
+  /* The next hero fetched ahead (the script's box): present so its picture loads, never seen or reached. */
+  .next-project :global(.np-warm) { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
   .np-band { display: grid; gap: var(--s-6); padding-block: var(--section-y); }
   .np { display: grid; gap: var(--s-5); text-decoration: none; color: inherit; }
   .np-meta { display: grid; gap: var(--s-2); }
