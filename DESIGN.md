@@ -5,9 +5,9 @@ site keeps it one coherent thing. Present tense: this is how the site **is** des
 The dated record of every decision and why it was made is [docs/DIRECTION-B.md](docs/DIRECTION-B.md).
 How the site is organised: [docs/INFORMATION-ARCHITECTURE.md](docs/INFORMATION-ARCHITECTURE.md).
 How it is built: [docs/BLUEPRINT.md](docs/BLUEPRINT.md).
-Last updated 10 Nov 2026 (brought in line with the scrollytelling homepage of 2 Nov 2026: the curtain,
-the stacked work cards, the sliding services; and with the joining figures and the Next project curtain
-of 10 Nov 2026). Print devices were removed on 21 Oct 2026; the version before is git tag `print-v1`.
+Last updated 11 Nov 2026 (the quieter homepage: the stacked work cards and the sliding services went, the
+work is set by client; the hero and its curtain, the joining figures and the Next project curtain of
+10 Nov 2026 stay). Print devices were removed on 21 Oct 2026; the version before is git tag `print-v1`.
 
 ---
 
@@ -26,8 +26,9 @@ print-led image, so those devices were removed and the elegance kept.)
 - **Accents with intent.** Orange marker bars, one orange phrase in a heading, selected tabs, a leader
   line into the close (after National Gallery Singapore).
 - **Movement that serves the story.** Scrubbed by scrolling, eased, never decoration for its own sake.
-- **One story on the homepage.** The homepage is told by scrolling: the film, the studio's sentence rising
-  over it, the work as cards that stack, the services sliding past, the invitation to write.
+- **One story on the homepage, quietly told.** The film, the studio's sentence rising over it, the work
+  set by client (one picture, a ruled list), the invitation to write. Every element has to mean something
+  (client, 11 Nov 2026): only the hero's curtain holds the page.
 
 **Personality:** quiet, assured, crafted, warm. A faithful friend and a thoughtful designer
 (the studio's own line: *faithful friend • thoughtful design*).
@@ -35,8 +36,8 @@ print-led image, so those devices were removed and the elegance kept.)
 **References** (their feel, not their code or images): Aesop (one quiet grotesk, cream and earthy
 tints, sentence case, calm) · National Gallery Singapore (orange marker bars, two-tone headings, selected
 tabs, leader lines) · Kitpro "Croma" (the closing scatter) · Aesop (the homepage hero: a film full-screen,
-the words in a slim band at its foot) · yaas-energy.com (the homepage's scrolling story: the curtain, the
-stacking cards, the sideways slide; its mechanics only, in this site's colours and pace).
+the words in a slim band at its foot) · yaas-energy.com (the homepage hero's curtain; its stacking cards and
+sideways slide were tried and removed on 11 Nov 2026).
 
 ---
 
@@ -150,7 +151,7 @@ appears in one place only: a quotation set alone.
 | **Showreel** | the studio's reel looping silently, Play with sound opens the full film | Home (full-width, with View all projects beneath), Services (within the margins) |
 | **Colour field** | large soft washes of brand orange and turquoise on stone, under a fine grain; decorative, pure CSS (`ui/ColourField.astro`) | Home: the studio's sentence, Write to us |
 | **Curtain** | one sheet sliding over another, its leading edge rounded (32px) with one soft shadow under it: the only rounded edge and the only shadow at rest on the site | Home (the studio's sentence rises over the hero); case studies (the page lifts at its end to uncover the next project, which waits one screen high behind it) |
-| **Stacked work cards** | four projects as full-screen cards that stack as you scroll; the card behind recedes (smaller, rounded, dimmed), only the front card plays its film | Home |
+| **Work by client** | one picture and a ruled list per client: each project's name, year and disciplines, a row to its case study; the client's name and the span of years above. Nothing moves | Home |
 | **Joining figures** | the logo's five figures, in outline and apart, each stepping into the circle in a brand colour (orange, turquoise, lime) as one required part of the enquiry is filled in; all five joined when it is ready to send | Contact (above the invitation; beside the submit button on narrower screens) |
 | **Leader line** | a line from the page's edge into "Write to us.", ending in an orange bar | the close of inner pages |
 | **Paper cut** | words cut through a sheet with a picture showing through: kept as a single small signature | the 404 page only |
@@ -210,8 +211,7 @@ and the "NEXT PROJECT" paper cut. The site's code still orders projects by the h
 | **Footer** | charcoal; intro line (orange phrase), page links, contact, social marks (square, outlined), closing line with the legal lines and Back to top |
 | **Buttons** | rectangular with square corners, hairline-framed or filled ink, with an arrow |
 | **Cards** | 4:3 picture, title, client; award tag as ink text in an orange frame; a round ink "View" label follows the pointer over linked work |
-| **Work cards (home)** | four full-screen cards, one per discipline, stacking; the name at the foot on a shade (wide screens) or beneath a 4:3 picture (upright phones), with the button to all projects held under them |
-| **Service cards (home)** | number, name (orange ampersand), one 4:3 picture with its project's name beneath; up to three of the service's projects, shown one at a time as the visitor scrolls, none that the work cards already show |
+| **Client work (home)** | picture (3:2, the lead project's card picture) beside the list on wide screens, above it on phones; rows on hairlines, year at the right, disciplines in grey beneath the name |
 | **Category tabs** | All + 9 categories with counts; selected tab: orange bar on top, name heavier in ink; two rows of five on wide screens, one scrolling row on phones |
 | **Case study** | hero, details (client · year · categories), the story arranged by picture shape (or a hand layout), case notes, then the page lifts like a sheet to uncover Next project (one screen high: its picture, the name beneath, Discuss a similar project); the picture grows into the next case study's hero |
 | **Contact** | the invitation and the direct lines beside the form on wide screens; boxed fields, square checkboxes, one solid button; the joining figures (§6) answer each part as it is filled in |
@@ -227,8 +227,7 @@ Motion is scrubbed by scrolling, eased (`--ease-out`), and never required to rea
 | Moment | What moves |
 |---|---|
 | Home hero | the studio's hero loop plays silently under the solid header, filling the first screen above a slim band with the tagline and Discuss your project; Play with sound sits on the film and opens the full reel (pause control; holds on its poster under reduced motion). The page holds it while the studio's sentence rises over it like a curtain, the film drawing in to a rounded frame; the masthead logo's figures fly in and join as the page opens |
-| Home work | the page holds while four full-screen cards stack, each sliding up over the last, which recedes |
-| Home services | the page holds while the service cards slide sideways (wide screens); each card's picture steps on to the next of its projects with the scroll, never on a timer |
+| Home work | none: the client lists stand still (the lead picture grows into its case study as that page opens) |
 | Home close | printed pieces spread from a pile; they can be picked up, dragged and reset; the footer logo's figures join hands as it comes up |
 | Case study end | the page lifts away to uncover the next project, held at the foot of the window |
 | Contact | the logo's figures join hands, one for each part of the form filled in |
