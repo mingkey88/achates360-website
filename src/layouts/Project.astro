@@ -97,15 +97,15 @@ const jsonLd = [
     .p-sheet:not(:has(.p-back)) { padding-bottom: var(--s-6); }
   }
   .p-hero { position: relative; display: flex; align-items: flex-end; min-height: 60svh; color: var(--white); isolation: isolate; }
-  /* A shade at the foot keeps the white words legible (the header above is solid since 26 Oct 2026). */
-  .p-hero::after { content: ''; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / .6) 65%, rgb(0 0 0 / .85)); pointer-events: none; } /* the foot holds the small white category label at 4.5:1 on every hero (all 53 checked, 24 Oct 2026) */
   .p-hero-text { position: relative; z-index: 1; display: grid; justify-items: start; gap: var(--s-4); padding-block: var(--s-9) var(--s-7); }
-  /* A soft shade behind the words themselves, wherever they fall in the hero (on short screens a long
-     title lifts the small category label into the photo's clear middle): white text at 4.5:1 or more on
-     any picture (review, 24 Oct 2026). */
-  .p-hero:not(.p-hero-plain) .p-hero-text::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(50% - 50vw); background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .55) var(--s-9)); pointer-events: none; }
+  /* The picture is left clear: the only shade is a band behind the words themselves, wherever they fall in
+     the hero (on short screens a long title lifts the small category label into the photo's middle). It
+     fades in over the space above the label and holds 60% black from the label down, which keeps white
+     text at 5.7:1 or more on any picture, a pure white one included (review, 24 Oct 2026, asked 4.5:1).
+     Until 16 Nov 2026 a second shade also darkened the hero from 35% of its height down, to 85% black at
+     the foot (client: "the lower half is too dark"). */
+  .p-hero:not(.p-hero-plain) .p-hero-text::before { content: ''; position: absolute; z-index: -1; inset: 0 calc(50% - 50vw); background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .2) calc(var(--s-9) * .45), rgb(0 0 0 / .6) var(--s-9)); pointer-events: none; }
   .p-hero-plain { min-height: 0; background: var(--teal-ink); color: var(--on-dark); }
-  .p-hero-plain::after { display: none; }
   .p-layout { display: grid; gap: 0; }
   /* The strip is its own .wrap elsewhere; inside the layout's wrap it must not add the margins again. */
   .p-meta :global(.meta.wrap) { width: 100%; }
