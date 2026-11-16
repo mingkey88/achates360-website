@@ -20,7 +20,7 @@ blocks:
       h: 37
   - type: image
     src: ../../assets/wix/dd7c1d_2f5f7a3f60ec41d285ff1dcec447c951.png
-    alt: Account Servicing.png
+    alt: Account Servicing
     box:
       x: 183
       y: 211

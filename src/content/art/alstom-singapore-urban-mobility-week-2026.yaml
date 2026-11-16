@@ -1,18 +1,33 @@
 # Art direction for /alstom-singapore-urban-mobility-week-2026 (src/lib/art.ts). Layout only: the page's
-# own words and pictures, each used once. Paragraphs: 0 placeholder write-up. Pictures (all 16:9 stand
-# renders): 0 services kiosk, 1 stand from above, 2 stand front under the "Realise the power of rail"
-# header, 3 stand side, 4 meeting nook, 5 Rail Stage, 6 rear corner.
-# Seven full-width renders in a row become full / pair / full / pair / full.
+# own words and pictures, each used once (the write-up and event photographs arrived with the Wix update
+# of 16 Nov 2026; until then the page had a placeholder line and the seven renders).
+# Paragraphs: 0 the project, 1 "Design & Execution Rationale", 2 its opening, 3-7 the five zones,
+# 8 the visitor count, 9 "3D Design Blueprint".
+# Pictures: photographs of the stand (4:3): 0 the booth wide, 1-2 interactive zones, 3-4 the Rail Stage,
+# 5 reception, 6 private meeting room; then the renders (16:9): 7 overview, 8 reception, 9 front,
+# 10 interactive zones, 11 side, 12 Rail Stage, 13 interactive kiosk, 14 meeting area.
+# The story first with the photographs zone by zone as the text names them, then the renders under their
+# own heading: full / pair / full / pair / pair.
 sections:
   - text: [0]
-    layout: lead
-  - media: [2]
+  - media: [0]
     layout: full
-  - media: [1, 3]
+  - text: [1, 2, 3, 4, 5, 6, 7]
+  - media: [1, 2]
     layout: pair
-  - media: [5]
-    layout: full
-  - media: [0, 4]
+  - media: [3, 4]
     layout: pair
-  - media: [6]
+  - media: [5, 6]
+    layout: pair
+  - text: [8]
+  - text: [9]
+    media: [7]
     layout: full
+  - media: [9, 11]
+    layout: pair
+  - media: [12]
+    layout: full
+  - media: [8, 14]
+    layout: pair
+  - media: [10, 13]
+    layout: pair

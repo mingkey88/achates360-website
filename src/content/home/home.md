@@ -81,6 +81,16 @@ slides:
 allProjects:
   md: "## [All Projects](/projects)"
   items:
+    - title: Singapore Urban Mobility Week 2026
+      description: Alstom Asia Pacific
+      href: /alstom-singapore-urban-mobility-week-2026
+      thumb: ../../assets/wix/1aae46_2869536a6692494fbc01a2f03e73754c.jpg
+      alt: Alstom booth by Achates 360 at Singapore Urban Mobility Week 2026
+    - title: Customised Corporate Gifts
+      description: Red Packets, Corporate Gifts & Packaging
+      href: /customised-corporate-gifts
+      thumb: ../../assets/wix/1aae46_3750e6300ce74d61a0114d9999d43903.jpg
+      alt: Custom-designed corporate red packets by Achates 360
     - title: R151 Movia™ Last Train Handover
       description: Alstom Asia Pacific
       href: /alstom-r151-last-train-handover
