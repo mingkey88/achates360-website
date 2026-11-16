@@ -159,6 +159,8 @@ menu:
         href: /sgh-patient-safety-appreciation-night
       - label: Singapore Urban Mobility Week 2026
         href: /alstom-singapore-urban-mobility-week-2026
+      - label: Customised Corporate Gifts
+        href: /customised-corporate-gifts
   - label: CONTACT
     href: /#contact
   - label: ABOUT
@@ -283,6 +285,8 @@ mobileMenu:
         href: /sgh-patient-safety-appreciation-night
       - label: Singapore Urban Mobility Week 2026
         href: /alstom-singapore-urban-mobility-week-2026
+      - label: Customised Corporate Gifts
+        href: /customised-corporate-gifts
   - label: ABOUT
     href: /about
   - label: JOIN US

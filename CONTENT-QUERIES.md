@@ -197,6 +197,32 @@ up once reviewed.
     snapshot, so the clone's menus leave these three entries out (logged in
     `docs/export-log.md`).
 
+### Live update of 16 Nov 2026 (taken into the clone the same day)
+
+The client published an update to www.achates360.com on 16 Nov 2026 and asked for staging to follow.
+Every public page was rendered again and compared with the clone. **Taken:**
+
+- **New case study `/customised-corporate-gifts`** ("Customised Corporate Gifts", Packaging &
+  Merchandise, © 2026), with its eight pictures, its gallery and menu entries.
+- **`/alstom-singapore-urban-mobility-week-2026` is now public** (no page password) with its write-up,
+  a new hero, seven photographs of the stand and the eight renders under "3D Design Blueprint", each
+  with a description. It is first in the homepage gallery and in Events, with a new card picture. Its
+  hand layout (`src/content/art/`) was rewritten for the new content.
+- **Join us:** the first picture's description, "Account Servicing" (was "Account Servicing.png").
+
+**Not taken (decide, or correct on Wix):**
+
+- **`/customised-corporate-gifts` shows "Red Packets, Corporate Gifts & Packaging" as its client** (the
+  homepage gallery's second line; /projects gives "Appian"). Shown as Wix has it.
+- **`/ritz-carlton-mid-autumn` now has the heading "Christmas Festival 2022"** on Wix (the page title is
+  still Mid Autumn Festival). The clone keeps "Mid-Autumn Festival 2022".
+- **The Award Winning badge on Notter and Bank Julius Baer** is a different file on Wix; the clone keeps
+  the darker badge chosen on 24 Oct 2026 so it shows on the light page.
+- **The homepage gallery lists Singapore Urban Mobility Week twice** on Wix (first, and at its old
+  place). The clone shows each project once.
+- **Password-protected pages** (R151 Last Train Handover, SGH Patient Safety Appreciation Night and four
+  not cloned) could not be read without the page password, so any changes to them are not included.
+
 ## Known differences from the Wix site
 
 These are differences in how the clone renders the site. None of them changes any text. They are
