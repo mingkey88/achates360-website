@@ -223,6 +223,15 @@ Every public page was rendered again and compared with the clone. **Taken:**
 - **Password-protected pages** (R151 Last Train Handover, SGH Patient Safety Appreciation Night and four
   not cloned) could not be read without the page password, so any changes to them are not included.
 
+### Live update of 17 Nov 2026 (taken the same day)
+
+The client republished with a new picture for Customised Corporate Gifts. Taken: the page's new hero (the
+gifts together), the red-packet close-up moved into the page, a new notebook picture, the second wine
+label removed; in the homepage gallery its card picture and description, and its second line, now
+"Achates 360". The gallery no longer lists Singapore Urban Mobility Week twice. Still open from 16 Nov:
+the case study's own client line ("Red Packets, Corporate Gifts & Packaging"), the Ritz-Carlton
+Mid-Autumn heading and the badge file.
+
 ## Known differences from the Wix site
 
 These are differences in how the clone renders the site. None of them changes any text. They are
