@@ -55,11 +55,11 @@ const { tabs, path, label } = Astro.props;
     transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease-out);
   }
   .ctabs li:first-child a::before { left: 0; }
-  .ctabs a:hover .ct-name { text-decoration: underline; text-underline-offset: .25em; text-decoration-thickness: 1px; }
+  /* Hover: the bar alone, in grey. The name was underlined as well until 17 Nov 2026 (client: "seems like
+     a double indication"). */
   .ctabs a:hover::before { transform: scaleX(1); background: var(--line); }
   .ctabs a[aria-current] { color: var(--ink); font-weight: 500; }
   .ctabs a[aria-current]::before { transform: scaleX(1); background: var(--accent); }
-  .ctabs a[aria-current] .ct-name { text-decoration: none; }
   /* Wide screens: every tab in view, two rows of five, each row on its own hairline, the rows set apart
      so a second-row tab's bar can't read as the underline of the tab above it (audit, 20 Oct 2026). */
   @media (min-width: 1024px) {

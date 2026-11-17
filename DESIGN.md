@@ -212,7 +212,7 @@ and the "NEXT PROJECT" paper cut. The site's code still orders projects by the h
 | **Buttons** | rectangular with square corners, hairline-framed or filled ink, with an arrow |
 | **Cards** | 4:3 picture, title, client; award tag as ink text in an orange frame; a round ink "View" label follows the pointer over linked work |
 | **Client work (home)** | picture (3:2, the lead project's card picture) beside the list on wide screens, above it on phones; rows on hairlines, year at the right, disciplines in grey beneath the name |
-| **Category tabs** | All + 9 categories with counts; selected tab: orange bar on top, name heavier in ink; two rows of five on wide screens, one scrolling row on phones |
+| **Category tabs** | All + 9 categories with counts; selected tab: orange bar on top, name heavier in ink; on hover the bar alone, in grey (no underline); two rows of five on wide screens, one scrolling row on phones |
 | **Case study** | hero, details (client · year · categories), the story arranged by picture shape (or a hand layout), case notes, then the page lifts like a sheet to uncover Next project (one screen high: its picture, the name beneath, Discuss a similar project); the picture grows into the next case study's hero |
 | **Contact** | the invitation and the direct lines beside the form on wide screens; boxed fields, square checkboxes, one solid button; the joining figures (§6) answer each part as it is filled in |
 | **Close** | "Write to us." with its orange leader line and one button, at the end of inner pages |
